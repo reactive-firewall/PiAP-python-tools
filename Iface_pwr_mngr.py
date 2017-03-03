@@ -17,15 +17,17 @@ def parseargs():
 
 def taint_name(rawtxt):
     """check the interface arguments"""
-    if rawtxt.lower() in "wlan1":
+    temptxt = str(ast.literal_eval(rawtxt))
+    theinput = temptxt.lower()
+    if theinput in "wlan1":
         return u'wlan1'
-    elif rawtxt.lower() in "wlan0":
+    elif theinput in "wlan0":
         return u'wlan0'
-    elif rawtxt.lower() in "eth0":
+    elif theinput in "eth0":
         return u'eth0'
-    elif rawtxt.lower() in "eth1":
+    elif theinput in "eth1":
         return u'eth1'
-    elif rawtxt.lower() in "lo":
+    elif theinput in "lo":
         return u'lo'
     else:
         return None
