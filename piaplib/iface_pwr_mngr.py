@@ -1,6 +1,7 @@
 #! /usr/bin/python
 
-INTERFACE_CHOICES=[u'wlan0', u'wlan1', u'eth0', u'eth1', u'lo']
+INTERFACE_CHOICES=[u'wlan0', u'wlan1', u'wlan2', u'wlan3', u'eth0', u'eth1', u'eth2', u'eth3', u'lo', u'mon0', u'mon1']
+""" whitelist of valid iface names """
 
 def parseargs():
     """Parse the arguments"""
@@ -8,29 +9,20 @@ def parseargs():
     parser = argparse.ArgumentParser(description='Alter the state of a given interface.', epilog='Basicly a python wrapper for iface.')
     parser.add_argument('-i', '--interface', default=INTERFACE_CHOICES[1], choices=INTERFACE_CHOICES, help='The interface to use.')
 	the_action = parser.add_mutually_exclusive_group(required=True)
-    the_action.add_argument('-u', '--up', '--enable', dest='enable_action', default=False, help='Enable the given interface.')
-    the_action.add_argument('-d', '--down', '--disable', dest='disable_action', default=False, help='Disable the given interface.')
-    the_action.add_argument('-r', '--down-up', '--restart', dest='restart_action', default=True, help='Disable and then re-enable the given interface. (default)')
+    the_action.add_argument('-u', '--up', '--enable', dest='enable_action', default=False, action='store_true', help='Enable the given interface.')
+    the_action.add_argument('-d', '--down', '--disable', dest='disable_action', default=False, action='store_true', help='Disable the given interface.')
+    the_action.add_argument('-r', '--down-up', '--restart', dest='restart_action', default=True, action='store_true', help='Disable and then re-enable the given interface. (default)')
     theResult = parser.parse_args()
     return theResult
 
 
 def taint_name(rawtxt):
-    """check the interface arguments"""
-    temptxt = str(ast.literal_eval(rawtxt))
-    theinput = temptxt.lower()
-    if theinput in "wlan1":
-        return u'wlan1'
-    elif theinput in "wlan0":
-        return u'wlan0'
-    elif theinput in "eth0":
-        return u'eth0'
-    elif theinput in "eth1":
-        return u'eth1'
-    elif theinput in "lo":
-        return u'lo'
-    else:
-        return None
+	"""check the interface arguments"""
+	tainted_input = str(rawtxt).lower()
+	for test_iface in INTERFACE_CHOICES:
+		if tainted_input in test_iface:
+			return test_iface
+	return None
 
 def enable_iface(iface_name="lo"):
     """enable the given interface by calling ifup."""
