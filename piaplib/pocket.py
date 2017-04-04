@@ -1,4 +1,5 @@
 #! /usr/bin/env python
+# -*- coding: utf-8 -*-
 
 #
 # Pocket PiAP
@@ -20,11 +21,26 @@
 
 import os
 import sys
+import argparse
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-import argparse
+try:
+	from . import pku as pku
+except Exception:
+	import pku as pku
 
-POCKET_UNITS_OPTIONS=[u'pku', u'protector', u'blade', u'keyring', u'lint', u'fruitsnack']
+
+try:
+	from . import keyring as keyring
+except Exception:
+	import keyring as keyring
+
+
+__prog__="PiAP-util.py"
+"""The name of this program is PiAP-util.py"""
+
+
+POCKET_UNITS={u'pku':pku.pku, u'protector':None, u'blade':None, u'keyring':keyring.keyring, u'lint':None, u'fruitsnack':None}
 """ The Pocket Knife Units available.
 	pku - the pocket knife unit. The everything pocket tool.
 	protector - the pocket protector. The defensive security tool.
@@ -32,7 +48,7 @@ POCKET_UNITS_OPTIONS=[u'pku', u'protector', u'blade', u'keyring', u'lint', u'fru
 	keyring - the pocket keyring. The crypto tool. (FUTURE/RESERVED)
 	lint - the extra pocket stuff tool. Small things always in the pocket.
 	fruitsnack - the little Pi in the pocket. Wrapper for all things RaspberryPi.
-	cargo - for storage and the like. (FUTURE/RESERVED)
+	book - the little pocket-book for storage and the like. (FUTURE/RESERVED)
 	"""
 
 PKU_OPTIONS=[u'config', u'backup', u'upgrade']
@@ -50,20 +66,26 @@ PROTECTOR_OPTIONS=[u'fw', u'ids', u'acl']
 	acl -  (FUTURE/RESERVED)
 	"""
 
-LINT_OPTIONS=[u'check', u'ids', u'acl']
+LINT_OPTIONS=[u'check', u'nrpe', u'help']
 """ The Pocket Lint Unit actions.
 	check - pocket checks.
 	nrpe - nagios/sensu/etc. compatible checks (FUTURE/RESERVED)
 	help -  (FUTURE/RESERVED)
 	"""
 
-def parseArgs():
+# etc... (FUTURE/RESERVED)
+
+
+def parseArgs(arguments=None):
 	"""Parses the CLI arguments."""
-	parser = argparse.ArgumentParser(prog="PiAP-util.py",
-		description='Handles PiAP python tools', epilog="PiAP Controller for PiAP tools.")
-	parser.add_argument('pocket_unit', choices=POCKET_UNITS_OPTIONS, help='the pocket service option.')
+	parser = argparse.ArgumentParser(
+		prog=__prog__,
+		description='Handles PiAP python tools',
+		epilog="PiAP Controller for PiAP tools."
+		)
+	parser.add_argument('pocket_unit', choices=POCKET_UNITS.keys(), help='the pocket service option.')
 	parser.add_argument('-V', '--version', action='version', version='%(prog)s 0.2.3')
-	return parser.parse_args()
+	return parser.parse_known_args(arguments)
 
 
 # define the function blocks
@@ -84,13 +106,31 @@ def doRunHandle(theInputStr):
 		import os
 		import subprocess
 		try:
-			theResult=subprocess.check_output(str(theInputStr).split(' '))
+			theResult=subprocess.check_output(str(theInputStr).split(u' '))
 		except Exception:
 			timestamp = getTimeStamp()
-			theResult = str(timestamp+" - WARNING - An error occured while handling the shell. Cascading failure.")
+			theResult = str(timestamp+" - WARNING - An error occured while handling the pocket tool. Cascading failure.")
 	except Exception:
 		theResult = str("CRITICAL - An error occured while handling the cascading failure.")
 		return theResult
+
+def useTool(tool, arguments=[None]):
+	"""Handler for launching pocket-tools."""
+	if tool is None:
+		return None
+	if tool in POCKET_UNITS.keys():
+		try:
+			try:
+				#print(str("PiAP launching: "+tool))
+				POCKET_UNITS[tool].main(arguments)
+			except Exception:
+				timestamp = getTimeStamp()
+				theResult = str(timestamp+" - WARNING - An error occured while handling the shell. Cascading failure.")
+		except Exception:
+			theResult = str("CRITICAL - An error occured while handling the cascading failure.")
+			return theResult
+	else:
+		return None
 
 # could do something per count too
 #count_options = {1 : first_handler,
@@ -99,17 +139,17 @@ def doRunHandle(theInputStr):
 #	4 : error_handler
 #}
 
-def main():
-	args = parseArgs()
+def main(argv=None):
 	try:
-		service_cmd = str(args.pocket_unit)
-	except Exception as cerr:
-		print(str(cerr))
-		print(str(cerr.args))
-		print(str(" UNKNOWN - An error occured while handling the arguments. Command failure."))
-		exit(3)
-	try:
-		doRunHandle(POCKET_UNITS[service_cmd]);
+		try:
+			args, extra = parseArgs(argv)
+			service_cmd = args.pocket_unit
+			useTool(service_cmd, extra)
+		except Exception as cerr:
+			print(str(cerr))
+			print(str(cerr.args))
+			theResult = str(timestamp+" - UNKNOWN - An error occured while handling the arguments. Cascading failure.")
+			exit(3)
 	except Exception:
 		print(str(" UNKNOWN - An error occured while handling the failure. Cascading failure."))
 		exit(3)
@@ -117,4 +157,7 @@ def main():
 
 
 if __name__ == '__main__':
-	main()
+	import sys
+	main(sys.argv[1:])
+	
+	

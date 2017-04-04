@@ -1,1 +1,8 @@
 sphinx
+argparse
+subprocess
+time
+re
+hashlib
+hmac
+

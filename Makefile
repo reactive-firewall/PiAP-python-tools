@@ -1,5 +1,29 @@
 #!/usr/bin/env make -f
 
+# License
+#
+# Copyright (c) 2017 Mr. Walls
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+
+
 ifeq "$(ECHO)" ""
 	ECHO=echo
 endif
@@ -8,9 +32,12 @@ ifeq "$(LINK)" ""
 	LINK=ln -sf
 endif
 
-
 ifeq "$(MAKE)" ""
 	MAKE=make
+endif
+
+ifeq "$(WAIT)" ""
+	WAIT=wait
 endif
 
 ifeq "$(INSTALL)" ""
@@ -31,7 +58,7 @@ ifeq "$(LOG)" "no"
 	QUIET=@
 endif
 
-PHONY: must_be_root
+PHONY: must_be_root cleanup
 
 build:
 	$(QUIET)$(ECHO) "No need to build. Try make -f Makefile install"
@@ -39,47 +66,44 @@ build:
 init:
 	$(QUIET)$(ECHO) "$@: Done."
 
-install: /usr/local/bin/ /var/lib/restart_service_handler/ must_be_root
-	$(QUITE)$(INSTALL) $(INST_OWN) $(INST_OPTS) ./code/pocket.py /var/opt/piaplib/pocket.py
-	$(QUITE)$(LINK) /var/opt/piaplib/pocket.py /usr/local/bin/pocket.py
-	$(QUITE) $(WAIT)
-	$(QUITE)$(INSTALL) $(INST_OWN) $(INST_OPTS) ./piaplib/__init__.py /var/opt/piaplib/__init__.py
+install: /opt/PiAP/bin/ /lib/opt/piaplib/ must_be_root
+	$(QUIET)python -m pip install "git+https://github.com/reactive-firewall/PiAP-python-tools.git"
 	$(QUITE) $(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
 
 uninstall:
-	$(QUITE)unlink /usr/local/bin/pocket.py 2>/dev/null || true
-	$(QUITE)rm -vfR /var/opt/piaplib/ 2>/dev/null || true
+	$(QUITE)$(QUIET)python -m pip uninstall piaplib
 	$(QUITE) $(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
 
 purge: clean uninstall
+	$(QUIET)python -m pip uninstall piaplib
 	$(QUIET)$(ECHO) "$@: Done."
 
-test:
+test: cleanup
 	$(QUIET)python -m unittest tests.test_basic
 	$(QUIET)$(ECHO) "$@: Done."
 
-clean:
-	$(QUIET)$(MAKE) -C ./docs/ -f Makefile clean 2>/dev/null
+cleanup:
 	$(QUIET)rm -f tests/*.pyc 2>/dev/null
 	$(QUIET)rm -f piaplib/*.pyc 2>/dev/null
+	$(QUIET)rm -f piaplib/*~ 2>/dev/null
 	$(QUIET)rm -f *.pyc 2>/dev/null
+	$(QUIET)rm -f piaplib/*/*.pyc 2>/dev/null
+	$(QUIET)rm -f piaplib/*/*~ 2>/dev/null
 	$(QUIET)rm -f *.DS_Store 2>/dev/null
+	$(QUIET)rm -f piaplib/*.DS_Store 2>/dev/null
+	$(QUIET)rm -f piaplib/*/*.DS_Store 2>/dev/null
 	$(QUIET)rm -f ./*/*~ 2>/dev/null
+	$(QUIET)rm -f ./*~ 2>/dev/null
+
+clean: cleanup
+	$(QUIET)$(MAKE) -s -C ./docs/ -f Makefile clean 2>/dev/null
 	$(QUIET)$(ECHO) "$@: Done."
 
 must_be_root:
 	runner=`whoami` ; \
 	if test $$runner != "root" ; then echo "You are not root." ; exit 1 ; fi
-
-/var/lib/piaplib/: /var/lib/ must_be_root
-	$(QUITE)$(INSTALL) -d $(INST_OWN) $(INST_OPTS) "$@" 2>/dev/null
-	$(QUITE)$(WAIT)
-
-/usr/local/bin/: /usr/local/ must_be_root
-	$(QUITE)$(INSTALL) -d $(INST_OWN) $(INST_OPTS) "$@" 2>/dev/null || true
-	$(QUITE)$(WAIT)
 
 %:
 	$(QUIET)$(ECHO) "No Rule Found For $@" ; $(WAIT) ;

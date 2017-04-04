@@ -19,24 +19,18 @@
 #   limitations under the License.
 #
 
-from setuptools import setup, find_packages
+try:
+	from . import config as config
+except Exception:
+	import config as config
 
 
-with open('README.rst') as f:
-    readme = f.read()
+def main():
+	print("PKU not implemented yet")
+	exit(0)
 
-with open('LICENSE') as f:
-    license = f.read()
 
-setup(
-    name='restart_service_handler',
-    version='0.2',
-    description='Beta for PiAP python tools',
-    long_description=readme,
-    author='reactive-firewall',
-    author_email='reactive-firewall@users.noreply.github.com',
-    url='https://github.com/reactive-firewall/PiAP-python-tools.git',
-    license=license,
-    packages=find_packages(exclude=('tests', 'docs'))
-)
+if __name__ in u'__main__':
+	main()
+
 

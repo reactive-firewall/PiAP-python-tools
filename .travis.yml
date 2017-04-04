@@ -1,16 +1,36 @@
 language: python
 sudo: false
-python:
-  - "2.6"
-  - "2.7"
-  - "3.2"
-  - "3.3"
-  - "3.4"
-  - "3.5"
-  - "3.5-dev" # 3.5 development branch
-  - "nightly" # currently points to 3.6-dev
-# command to install dependencies: none
+
+branches:
+  only:
+    - master
+
+matrix:
+  include:
+  - os: linux
+    python: "2.6"
+  - os: linux
+    python:  "2.7"
+  - os: linux
+    python:  "3.2"
+  - os: linux
+    python:  "3.3"
+  - os: linux
+    python:  "3.4"
+  - os: linux
+    python:  "3.5"
+  - os: linux
+    python:  "3.5-dev" # 3.5 development branch
+  - os: linux
+    python:  "nightly" # currently points to 3.6-dev
+  - os: osx
+    osx_image: xcode7.2
+    language: generic
+
+before_install:
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew search python || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python2.6 python2.7 $INSTALL || true ; fi
+
 install: "make init"
 # command to run tests
 script: make test
-
