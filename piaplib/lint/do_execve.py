@@ -9,9 +9,9 @@
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-#
+# 
 # http://www.apache.org/licenses/LICENSE-2.0
-#   
+# 
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -39,21 +39,14 @@ except Exception as importErr:
 	exit(255)
 
 
+try:
+	from .. import pku.utils as utils
+except Exception:
+	import pku.utils as utils
+
+
 __prog__ = str("""do_execve.py""")
 """This tool is called do_execve.py."""
-
-
-def literal_str(raw_input=None):
-	try:
-		if isinstance(unicode(raw_input).encode("utf-8"), basestring):
-			return str(unicode(raw_input).encode("utf-8"))
-		elif isinstance(raw_input, str):
-			return str(unicode(raw_input.decode("utf-8")).encode("utf-8"))
-	except Exception as malformErr:
-		malformErr = None
-		del malformErr
-		return None
-	return None
 
 
 def taint_int(raw_input):
@@ -61,25 +54,7 @@ def taint_int(raw_input):
 	try:
 		if raw_input is None:
 			return False
-		elif isinstance(raw_input, str) and int(raw_input, 10) > 2:
-			return True
-		elif isinstance(raw_input, int) and int(raw_input) > 2:
-			return True
-		else:
-			return False
-	except ValueError as junk:
-		junk = None
-		del junk
-		return False
-	return False
-
-
-def taint_str(raw_input):
-	"""Ensure the input makes some sense. Always expect CWE-20."""
-	try:
-		if raw_input is None:
-			return False
-		elif isinstance(raw_input, basicstr) and int(raw_input, 10) > 2:
+		elif isinstance(utils.literal_str(raw_input), str) and int(raw_input, 10) > 2:
 			return True
 		elif isinstance(raw_input, int) and int(raw_input) > 2:
 			return True
@@ -179,8 +154,10 @@ def unsafe_main(unsafe_input=None, chrootpath=None, uid=None, gid=None):
 			print(str(u'OK - PiAP Launched pid {} as SANDBOXED COMMAND.').format(pid))
 		else:
 			# we are the child process... lets do that plugin thing!
-			os.setuid(uid)
-			os.setgid(gid)
+			if taint_int(uid):
+				os.setuid(uid)
+			if taint_int(gid):
+				os.setuid(gid)
 			try:
 				os.chroot(chrootpath)
 			except OSError as badChrootErr:
@@ -208,14 +185,14 @@ def main(argv = None):
 		tainted_uid = os.geteuid()
 		tainted_gid = os.getegid()
 		os.umask(137)
-		if args.uid is not None:
+		if args.uid is not None and taint_int(args.uid):
 			tainted_uid = args.uid
 		if args.gid is not None:
 			tainted_gid = args.gid
 		if args.chroot_path is not None:
 			chroot_path = args.chroot_path
 		if args.unsafe_input is not None:
-			tainted_input = [literal_str(x) for x in args.unsafe_input]
+			tainted_input = [utils.literal_str(x) for x in args.unsafe_input]
 		unsafe_main(tainted_input, chroot_path, tainted_uid, tainted_gid) 
 	except Exception as mainErr:
 		print(str(u'MAIN FAILED DURRING UNSAFE COMMAND. ABORT.'))

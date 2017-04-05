@@ -83,6 +83,10 @@ purge: clean uninstall
 test: cleanup
 	$(QUIET)python -m unittest tests.test_basic
 	$(QUIET)$(ECHO) "$@: Done."
+	
+test-tox: cleanup
+	$(QUIET)tox --
+	$(QUIET)$(ECHO) "$@: Done."
 
 cleanup:
 	$(QUIET)rm -f tests/*.pyc 2>/dev/null || true

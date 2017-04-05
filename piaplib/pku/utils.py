@@ -25,16 +25,30 @@ except Exception:
 	import config as config
 
 
-try:
-	from . import utils as utils
-except Exception:
-	import utils as utils
+def literal_str(raw_input=None):
+	"""A simple attempt at validating utf-8 encoding. Always expect CWE-20."""
+	try:
+		if isinstance(raw_input, bytes):
+			return str(raw_input.decode("utf-8"))
+		elif isinstance(raw_input, str):
+			return str(raw_input.encode("utf-8").decode("utf-8"))
+	except Exception as malformErr:
+		malformErr = None
+		del malformErr
+		return None
+	return None
+
+
+def test_literal_str():
+	"""Tests the literal string functions"""
+	theResult = literal_str(b'test') in literal_str(str(u'test')) and literal_str(str(u'test')) in literal_str(b'test')
+	return theResult
 
 
 def main(argv=None):
-	"""The Main Event."""
-	print("PKU not implemented yet")
-	exit(0)
+	"""The Main Event makes no sense to utils."""
+	raise NotImplementedError("CRITICAL - PKU Uitls main() not implemented. yet?")
+	exit(3)
 
 
 if __name__ in u'__main__':
