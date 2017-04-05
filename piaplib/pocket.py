@@ -1,9 +1,9 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
-#
+
 # Pocket PiAP
-#
+# 
 # Copyright (c) 2017, Kendrick Walls
 #	
 #	Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,7 +17,7 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-#
+
 
 import os
 import sys
@@ -132,14 +132,17 @@ def useTool(tool, arguments=[None]):
 	else:
 		return None
 
+
 # could do something per count too
-#count_options = {1 : first_handler,
+# count_options = {1 : first_handler,
 #	2 : second_handler,
 #	3 : last_handler,
-#	4 : error_handler
-#}
+#   4 : error_handler
+# }
+
 
 def main(argv=None):
+	"""The Main Event."""
 	try:
 		try:
 			args, extra = parseArgs(argv)

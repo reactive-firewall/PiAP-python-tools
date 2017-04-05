@@ -1,23 +1,23 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
-#
+
 # Pocket PiAP
-#
+# 
 # Copyright (c) 2017, Kendrick Walls
-#	
-#	Licensed under the Apache License, Version 2.0 (the "License");
-#		you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-#	   
-#	   http://www.apache.org/licenses/LICENSE-2.0
-#   
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
+# http://www.apache.org/licenses/LICENSE-2.0
+#   
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 
 """
 	The PiAP equivilant of the execve call.
@@ -39,8 +39,21 @@ except Exception as importErr:
 	exit(255)
 
 
-__prog__ = u'do_execve.py'
+__prog__ = str("""do_execve.py""")
 """This tool is called do_execve.py."""
+
+
+def literal_str(raw_input=None):
+	try:
+		if isinstance(unicode(raw_input).encode("utf-8"), basestring):
+			return str(unicode(raw_input).encode("utf-8"))
+		elif isinstance(raw_input, str):
+			return str(unicode(raw_input.decode("utf-8")).encode("utf-8"))
+	except Exception as malformErr:
+		malformErr = None
+		del malformErr
+		return None
+	return None
 
 
 def taint_int(raw_input):
@@ -61,7 +74,25 @@ def taint_int(raw_input):
 	return False
 
 
-def parseargs():
+def taint_str(raw_input):
+	"""Ensure the input makes some sense. Always expect CWE-20."""
+	try:
+		if raw_input is None:
+			return False
+		elif isinstance(raw_input, basicstr) and int(raw_input, 10) > 2:
+			return True
+		elif isinstance(raw_input, int) and int(raw_input) > 2:
+			return True
+		else:
+			return False
+	except ValueError as junk:
+		junk = None
+		del junk
+		return False
+	return False
+
+
+def parseargs(tainted_arguments=None):
 	"""Parse the given arguments."""
 	try:
 		parser = argparse.ArgumentParser(
@@ -72,19 +103,20 @@ def parseargs():
 		parser.add_argument('-u', '--uid', default=os.geteuid(), type=int, required=False, help='the uid to use.')
 		parser.add_argument('-g', '--gid', default=os.getegid(), type=int, required=False, help='the gid to use.')
 		parser.add_argument('--chroot', dest='chroot_path', default=None, required=False, help='the sandbox to play in.')
-		parser.add_argument('-c', '--cmd', dest='unsafe_input', action='append', help='The command.')
 		the_action = parser.add_mutually_exclusive_group(required=False)
 		the_action.add_argument('-v', '--verbose', dest='verbose_mode', default=False, action='store_true', help='Enable verbose mode.')
 		the_action.add_argument('-q', '--quiet', dest='verbose_mode', default=False, action='store_false', help='Disable the given interface.')
 		parser.add_argument('-V', '--version', action='version', version='%(prog)s 0.2.3')
-		theResult = parser.parse_args()
+		parser.add_argument('-c', '--cmd', dest='unsafe_input', action='append', help='The command.')
+		parser.add_argument('-a', '--args', dest='unsafe_input', action='append', help='The command.')
+		theResult = parser.parse_args(tainted_arguments)
 	except Exception as parseErr:
 		try:
 			parser.error(str(parseErr))
 		except Exception as junk:
 			junk = None
 			del junk
-			print(u'CWE-20. Mighty creator help us.')
+			print(str(u'CWE-20. Mighty creator help us.'))
 		finally:
 			parseErr = None
 			del parseErr
@@ -95,6 +127,9 @@ def parseargs():
 def runUnsafeCommand(arguments, error_fd=None):
 	"""Run the actual Unsafe command. Mighty creator help us."""
 	theRawOutput = None
+	err_fd = None
+	if os.fork():
+		exit(0)
 	try:
 		if arguments is None or isinstance(arguments, list) is not True:
 			arguments = [u'exit', u'0']
@@ -109,6 +144,7 @@ def runUnsafeCommand(arguments, error_fd=None):
 			del fdErr
 			theRawOutput = None
 		try:
+			#print(literal_str(arguments))
 			theRawOutput = subprocess.check_output(arguments, stderr=err_fd)
 		except subprocess.CalledProcessError as subErr:
 			print(str(subErr))
@@ -130,6 +166,7 @@ def runUnsafeCommand(arguments, error_fd=None):
 		theRawOutput = None
 	return theRawOutput
 
+
 def unsafe_main(unsafe_input=None, chrootpath=None, uid=None, gid=None):
 	"""
 	The main unsafe work.
@@ -139,7 +176,7 @@ def unsafe_main(unsafe_input=None, chrootpath=None, uid=None, gid=None):
 		pid = os.fork()
 		if pid is not None and pid > 0:
 			# this is the parent process... do whatever needs to be done as the parent
-			print(str(u'{} PiAP Launched SANDBOXED COMMAND.').format(pid))
+			print(str(u'OK - PiAP Launched pid {} as SANDBOXED COMMAND.').format(pid))
 		else:
 			# we are the child process... lets do that plugin thing!
 			os.setuid(uid)
@@ -160,11 +197,12 @@ def unsafe_main(unsafe_input=None, chrootpath=None, uid=None, gid=None):
 		del unsafeErr
 		os.abort()
 	return False
-	
-def main():
+
+
+def main(argv = None):
 	"""The main event."""
 	try:
-		args = parseargs()
+		args = parseargs(argv)
 		tainted_input = None
 		chroot_path = str(u'/tmp')
 		tainted_uid = os.geteuid()
@@ -177,7 +215,7 @@ def main():
 		if args.chroot_path is not None:
 			chroot_path = args.chroot_path
 		if args.unsafe_input is not None:
-			tainted_input = args.unsafe_input
+			tainted_input = [literal_str(x) for x in args.unsafe_input]
 		unsafe_main(tainted_input, chroot_path, tainted_uid, tainted_gid) 
 	except Exception as mainErr:
 		print(str(u'MAIN FAILED DURRING UNSAFE COMMAND. ABORT.'))
@@ -189,7 +227,10 @@ def main():
 
 if __name__ in u'__main__':
 	try:
-		unsafe_pid = main()
+		if (sys.argv is not None and len(sys.argv) > 1):
+			unsafe_pid = main(sys.argv[1:])
+		else:
+			raise Exception("MAIN FAILED WHEN FOUND TO BE CWE-20 UNSAFE. ABORT.")
 	except Exception as err:
 		print(str(u'MAIN FAILED DURRING UNSAFE COMMAND. ABORT.'))
 		print(str(type(err)))
@@ -200,4 +241,5 @@ if __name__ in u'__main__':
 		exit(255)
 	finally:
 		exit(0)
+
 

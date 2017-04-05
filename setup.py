@@ -22,17 +22,34 @@
 from setuptools import setup, find_packages
 
 
-with open('README.rst') as f:
-    readme = f.read()
+try:
+	with open('./requirements.txt') as f:
+		requirements = f.read().splitlines()
+except Exception:
+	print(str(__file__))
+	requirements = None
 
-with open('LICENSE') as f:
-    license = f.read()
+
+try:
+	with open('./README.rst') as f:
+		readme = f.read()
+except Exception:
+	readme = str("""See https://github.com/reactive-firewall/PiAP-python-tools/README.rst""")
+
+
+try:
+	with open('./LICENSE.rst') as f:
+		license = f.read()
+except Exception:
+	readme = str("""See https://github.com/reactive-firewall/PiAP-python-tools/LICENSE.rst""")
+
 
 setup(
-    name='restart_service_handler',
-    version='0.2',
+    name='piaplib',
+    version='0.2.3',
     description='Beta for PiAP python tools',
     long_description=readme,
+    install_requires=requirements,
     author='reactive-firewall',
     author_email='reactive-firewall@users.noreply.github.com',
     url='https://github.com/reactive-firewall/PiAP-python-tools.git',

@@ -1,8 +1,9 @@
+#! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
-#
+
 # Pocket PiAP
-#
+# 
 # Copyright (c) 2017, Kendrick Walls
 #	
 #	Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,7 +17,7 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-#
+
 
 try:
 	import sys

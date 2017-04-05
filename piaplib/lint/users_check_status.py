@@ -68,13 +68,15 @@ def parseargs(arguments=None):
 		parser.error(str(parseErr))
 	return theResult
 
+
 def taint_name(rawtxt):
 	"""check the interface arguments"""
 	tainted_input = str(rawtxt).lower()
-	for test_iface in INTERFACE_CHOICES:
-		if tainted_input in test_iface:
-			return test_iface
+	for test_username in get_user_list():
+		if tainted_input in test_username:
+			return test_username
 	return None
+
 
 def show_user(user_name=None, is_verbose=False, use_html=False):
 	"""show the given user."""
@@ -96,6 +98,7 @@ def show_user(user_name=None, is_verbose=False, use_html=False):
 		print(str(cmdErr.args))
 		theResult = "UNKNOWN"
 	return theResult
+
 
 def get_user_name(user_name=None, use_html=False):
 	if user_name is None:
@@ -165,7 +168,8 @@ def get_system_work_status_raw(user_name=None):
 	try:
 		import subprocess
 		try:
-			theRawuserState = subprocess.check_output([str(get_test_path()+"/psutil.bash")], stderr=subprocess.STDOUT)
+			#hard-coded white list
+			theRawuserState = subprocess.check_output([str("""ulimit -t 2 ; ps -elf 2>/dev/null | tr -s ' ' ' ' | cut -d\  -f 3,15 | sed -E -e 's/[\[\(]{1}[^]]+[]\)]{1}/SYSTEM/g' | sort | uniq ;""")], shell=True, stderr=subprocess.STDOUT)
 			if (theRawuserState is not None) and (len(theRawuserState) > 0):
 				lines = [str(x) for x in theRawuserState.split(u'\n') if ((user_name is None) or (x.startswith(user_name) is True))]
 				theuserState = str('')
@@ -176,6 +180,8 @@ def get_system_work_status_raw(user_name=None):
 			else:
 				theuserState = None
 		except subprocess.CalledProcessError as subErr:
+			subErr = None
+			del subErr
 			theuserState = None
 		except Exception as cmdErr:
 			print(str(type(cmdErr)))
@@ -187,6 +193,7 @@ def get_system_work_status_raw(user_name=None):
 		print(str(importErr.args))
 		theuserState = None
 	return theuserState
+
 
 # TODO: memoize this function
 def get_user_work_status_raw(user_name=None):
@@ -218,6 +225,7 @@ def get_user_work_status_raw(user_name=None):
 		theRawuserState = None
 	return theRawuserState
 
+
 def compactList(list, intern_func=None):
    if intern_func is None:
        def intern_func(x): return x
@@ -229,6 +237,7 @@ def compactList(list, intern_func=None):
        seen[marker] = 1
        result.append(item)
    return result
+
 
 # TODO: memoize this function
 def get_user_list():
@@ -252,6 +261,7 @@ def get_user_list():
 		print(str(parseErr.args))
 		theResult = None
 	return theResult
+
 
 def get_user_status(user_name=None, use_html=False):
 	"""Generate the status"""
@@ -335,7 +345,8 @@ def get_user_status(user_name=None, use_html=False):
 		print(str(errcrit.args))
 		theResult = None
 	return theResult
-	
+
+
 def get_user_ttys(user=None, use_html=False):
 	"""Generate output of the user mac."""
 	if (user is None) and (use_html is not True):
@@ -386,33 +397,6 @@ def get_user_ip(user=None, use_html=False):
 		print(str(errcrit))
 		print(str(errcrit.args))
 		theResult = "UNKNOWN"
-	return theResult
-
-
-def get_test_path():
-	"""list the raw status of user work."""
-	theResult = u'./piaplib/lint/'
-	try:
-		import os
-		try:
-			theResult = str(os.path.abspath(os.path.join(os.path.dirname(__file__), '.')))
-			if 'lint' not in theResult:
-				if 'piaplib' not in theResult:
-					theResult = str(os.path.abspath(os.path.join(os.path.dirname(__file__), './piaplib/lint/.')))
-				else:	
-					raise NotImplementedError("ERROR: Oh NO, not sure what to do.")
-				theResult = str(os.path.abspath(os.path.join(os.path.dirname(__file__), './lint/')))
-		except subprocess.CalledProcessError as subErr:
-			theResult = u'./piaplib/lint/'
-		except Exception as cmdErr:
-			print(str("user_check_status.get_user_work_status_raw: ERROR: ACTION will not be compleated! ABORT!"))
-			print(str(cmdErr))
-			print(str(cmdErr.args))
-			theResult = u'./piaplib/lint/'
-	except Exception as importErr:
-		print(str(importErr))
-		print(str(importErr.args))
-		theResult = u'./piaplib/lint/'
 	return theResult
 
 

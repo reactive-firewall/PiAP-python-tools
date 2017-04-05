@@ -85,20 +85,23 @@ test: cleanup
 	$(QUIET)$(ECHO) "$@: Done."
 
 cleanup:
-	$(QUIET)rm -f tests/*.pyc 2>/dev/null
-	$(QUIET)rm -f piaplib/*.pyc 2>/dev/null
-	$(QUIET)rm -f piaplib/*~ 2>/dev/null
-	$(QUIET)rm -f *.pyc 2>/dev/null
-	$(QUIET)rm -f piaplib/*/*.pyc 2>/dev/null
-	$(QUIET)rm -f piaplib/*/*~ 2>/dev/null
-	$(QUIET)rm -f *.DS_Store 2>/dev/null
-	$(QUIET)rm -f piaplib/*.DS_Store 2>/dev/null
-	$(QUIET)rm -f piaplib/*/*.DS_Store 2>/dev/null
-	$(QUIET)rm -f ./*/*~ 2>/dev/null
-	$(QUIET)rm -f ./*~ 2>/dev/null
+	$(QUIET)rm -f tests/*.pyc 2>/dev/null || true
+	$(QUIET)rm -f piaplib/*.pyc 2>/dev/null || true
+	$(QUIET)rm -f piaplib/*~ 2>/dev/null || true
+	$(QUIET)rm -f *.pyc 2>/dev/null || true
+	$(QUIET)rm -f piaplib/*/*.pyc 2>/dev/null || true
+	$(QUIET)rm -f piaplib/*/*~ 2>/dev/null || true
+	$(QUIET)rm -f *.DS_Store 2>/dev/null || true
+	$(QUIET)rm -f piaplib/*.DS_Store 2>/dev/null || true
+	$(QUIET)rm -f piaplib/*/*.DS_Store 2>/dev/null || true
+	$(QUIET)rm -f piaplib.egg-info/* 2>/dev/null || true
+	$(QUIET)rmdir piaplib.egg-info 2>/dev/null || true
+	$(QUIET)rm -f ./*/*~ 2>/dev/null || true
+	$(QUIET)rm -f ./*~ 2>/dev/null || true
+	$(QUIET)rm -Rf ./.tox/ 2>/dev/null || true
 
 clean: cleanup
-	$(QUIET)$(MAKE) -s -C ./docs/ -f Makefile clean 2>/dev/null
+	$(QUIET)$(MAKE) -s -C ./docs/ -f Makefile clean 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
 
 must_be_root:
