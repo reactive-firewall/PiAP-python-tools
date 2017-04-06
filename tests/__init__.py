@@ -17,31 +17,39 @@
 # limitations under the License.
 
 try:
-	import sys
-	import os
-	sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), str('..'))))
-except Exception as ImportErr:
+	try:
+		import sys
+		import os
+		sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), str('..'))))
+	except Exception as ImportErr:
+		print(str(''))
+		print(str(type(ImportErr)))
+		print(str(ImportErr))
+		print(str((ImportErr.args)))
+		print(str(''))
+		ImportErr = None
+		del ImportErr
+		raise ImportError(str("Test module failed completely."))
+	try:
+		from tests import test_basic
+		if test_basic.__name__ is None:
+			raise ImportError(str("Test module failed to import even the basic tests."))
+	except Exception as impErr:
+		print(str(''))
+		print(str(type(impErr)))
+		print(str(impErr))
+		print(str((impErr.args)))
+		print(str(''))
+		impErr = None
+		del impErr
+		raise ImportError(str("Test module failed completely."))
+		exit(0)
+except Exception as badErr:
 	print(str(''))
-	print(str(type(ImportErr)))
-	print(str(ImportErr))
-	print(str((ImportErr.args)))
+	print(str(type(badErr)))
+	print(str(badErr))
+	print(str((badErr.args)))
 	print(str(''))
-	ImportErr = None
-	del ImportErr
-	raise ImportError(str(u'Test module failed completely.'))
-
-try:
-	from tests import test_basic
-	if test_basic.__name__ is None:
-		raise ImportError(str(u'Test module failed to import even the basic tests.'))
-except Exception as importErr:
-	print(str(''))
-	print(str(type(importErr)))
-	print(str(importErr))
-	print(str((importErr.args)))
-	print(str(''))
-	importErr = None
-	del importErr
-	raise ImportError(str(u'Test module failed completely.'))
+	badErr = None
+	del badErr
 	exit(0)
-
