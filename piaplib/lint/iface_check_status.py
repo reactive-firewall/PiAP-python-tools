@@ -199,6 +199,8 @@ def get_iface_status_raw(interface=None):
 		try:
 			theRawIfaceState = subprocess.check_output(arguments, stderr=subprocess.STDOUT)
 		except subprocess.CalledProcessError as subErr:
+			subErr = None
+			del subErr
 			theRawIfaceState = None
 		except Exception as cmdErr:
 			print(str(cmdErr))

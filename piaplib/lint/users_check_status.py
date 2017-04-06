@@ -274,6 +274,8 @@ def get_user_work_status_raw(user_name=None):
 			else:
 				theRawOutput = None
 		except subprocess.CalledProcessError as subErr:
+			subErr = None
+			del subErr
 			theRawOutput = None
 		except Exception as cmdErr:
 			print(str(cmdErr))

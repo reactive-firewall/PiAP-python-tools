@@ -184,10 +184,14 @@ def get_client_sta_status_raw():
 		try:
 			theRawClientState = subprocess.check_output(arguments, stderr=subprocess.STDOUT)
 		except subprocess.CalledProcessError as subErr:
+			subErr = None
+			del subErr
 			theRawClientState = None
 		except Exception as cmdErr:
 			# print(str(cmdErr))
 			# print(str(cmdErr.args))
+			cmdErr = None
+			del cmdErr
 			theRawClientState = None
 	except Exception as importErr:
 		print(str(importErr))
@@ -217,6 +221,8 @@ def get_client_arp_status_raw(client_ip=None):
 			else:
 				theRawClientState = theRawClientState.split(u'\n')
 		except subprocess.CalledProcessError as subErr:
+			subErr = None
+			del subErr
 			theRawClientState = None
 		except Exception as cmdErr:
 			print(str(cmdErr))
