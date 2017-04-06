@@ -1,29 +1,26 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
-
 # Pocket PiAP
-# 
+# ..................................
 # Copyright (c) 2017, Kendrick Walls
-#	
-#	Licensed under the Apache License, Version 2.0 (the "License");
-#		you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-#	   
-#	   http://www.apache.org/licenses/LICENSE-2.0
-#   
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
-
+# ..................................
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# ..........................................
+# http://www.apache.org/licenses/LICENSE-2.0
+# ..........................................
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 import os
 import sys
 import argparse
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
 
 try:
 	from . import saltify as saltify
@@ -35,24 +32,37 @@ __prog__ = """piaplib.keyring"""
 """The name of this PiAPLib tool is keyring"""
 
 
-KEYRING_UNITS={u'saltify':saltify, u'keys':None}
+KEYRING_UNITS = {u'saltify': saltify, u'keys': None}
 """ The Pocket Knife Unit actions.
 	saltify - HMAC salt functions.
 	keys -  (FUTURE/RESERVED)
 	"""
 
+
 def parseArgs(arguments=None):
 	"""Parses the CLI arguments."""
 	parser = argparse.ArgumentParser(
-		prog = __prog__,
-		description = 'Handles PiAP keyring tools',
-		epilog = "PiAP Controller for cryptographic tools."
-		)
+		prog=__prog__,
+		description='Handles PiAP keyring tools',
+		epilog="PiAP Controller for cryptographic tools."
+	)
 	parser.add_argument(
 		'keyring_unit',
-		choices = KEYRING_UNITS.keys(),
-		help = 'the pocket keyring service option.')
+		choices=KEYRING_UNITS.keys(),
+		help='the pocket keyring service option.'
+	)
 	return parser.parse_known_args(arguments)
+
+
+def getTimeStamp():
+	"""Returns the time stamp."""
+	theDate = None
+	try:
+		import time
+		theDate = time.strftime("%a %b %d %H:%M:%S %Z %Y", time.localtime())
+	except Exception:
+		theDate = str("")
+	return str(theDate)
 
 
 def useKeyTool(tool, arguments=[None]):
@@ -62,21 +72,25 @@ def useKeyTool(tool, arguments=[None]):
 	if tool in KEYRING_UNITS.keys():
 		try:
 			try:
-				#print(str("keyring launching: "+tool))
+				# print(str("keyring launching: "+tool))
 				KEYRING_UNITS[tool].main(arguments)
 			except Exception:
 				timestamp = getTimeStamp()
-				theResult = str(timestamp+" - WARNING - An error occured while handling the keyring tool. Cascading failure.")
+				theResult = str(
+					timestamp +
+					" - WARNING - An error occured while handling the keyring tool." +
+					"Cascading failure."
+				)
 		except Exception:
 			theResult = str("CRITICAL - An error occured while handling the cascading failure.")
-			return theResult
+		return theResult
 	else:
 		return None
 
 
 def main(argv=None):
 	"""The main event"""
-	#print("PiAP Keyring")
+	# print("PiAP Keyring")
 	try:
 		try:
 			args, extra = parseArgs(argv)

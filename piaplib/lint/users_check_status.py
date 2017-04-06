@@ -1,34 +1,53 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
-#
 # Pocket PiAP
-#
+# ..................................
 # Copyright (c) 2017, Kendrick Walls
-#	
-#	Licensed under the Apache License, Version 2.0 (the "License");
-#		you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-#	   
-#	   http://www.apache.org/licenses/LICENSE-2.0
-#   
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
-#
+# ..................................
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# ..........................................
+# http://www.apache.org/licenses/LICENSE-2.0
+# ..........................................
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
+# Imports
 try:
-	from . import html_generator as html_generator
-except Exception as ImpErr:
-	ImpErr = None
-	del ImpErr
-	import html_generator as html_generator
+	import os
+	import sys
+	sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+	try:
+		from .. import utils as utils
+	except Exception:
+		import pku.utils as utils
+	try:
+		from . import html_generator as html_generator
+	except Exception as ImpErr:
+		ImpErr = None
+		del ImpErr
+		import html_generator as html_generator
+	if utils.__name__ is None:
+		raise ImportError("Failed to open PKU Utils")
+	if html_generator.__name__ is None:
+		raise ImportError("Failed to open HTML5 Pocket Lint")
+except Exception as importErr:
+	print(str(importErr))
+	print(str(importErr.args))
+	importErr = None
+	del importErr
+	raise ImportError("Failed to import " + str(__file__))
+	exit(255)
 
 
 __prog__ = u'users_check_status'
 """The Program's name"""
+
 
 def error_handling(func):
 	"""Runs a function in try-except"""
@@ -40,7 +59,9 @@ def error_handling(func):
 		except Exception as err:
 			print(str(err))
 			print(str((err.args)))
-			print(str("{}: REALLY BAD ERROR: ACTION will not be completed! ABORT!").format(__prog__))
+			print(str(
+				"{}: REALLY BAD ERROR: ACTION will not be completed! ABORT!"
+			).format(__prog__))
 			theOutput = None
 		return theOutput
 	return helper
@@ -54,14 +75,37 @@ def parseargs(arguments=None):
 			prog=__prog__,
 			description='Report the state of a given user.',
 			epilog='Basically ps wrapper.'
-			)
-		parser.add_argument('-u', '--user', default=None, help='The user to show.')
-		parser.add_argument('-l', '--list', default=False, action='store_true', help='List current users.')
-		parser.add_argument('--html', dest='output_html', default=False, action='store_true', help='output HTML.')
-		parser.add_argument('-a', '--all', dest='show_all', default=False, action='store_true', help='show all users.')
+		)
+		parser.add_argument(
+			'-u', '--user',
+			default=None, help='The user to show.'
+		)
+		parser.add_argument(
+			'-l', '--list',
+			default=False, action='store_true',
+			help='List current users.'
+		)
+		parser.add_argument(
+			'--html', dest='output_html',
+			default=False, action='store_true',
+			help='output HTML.'
+		)
+		parser.add_argument(
+			'-a', '--all',
+			dest='show_all', default=False,
+			action='store_true', help='show all users.'
+		)
 		the_action = parser.add_mutually_exclusive_group(required=False)
-		the_action.add_argument('-v', '--verbose', dest='verbose_mode', default=False, action='store_true', help='Enable verbose mode.')
-		the_action.add_argument('-q', '--quiet', dest='verbose_mode', default=False, action='store_false', help='Disable the given interface.')
+		the_action.add_argument(
+			'-v', '--verbose',
+			dest='verbose_mode', default=False,
+			action='store_true', help='Enable verbose mode.'
+		)
+		the_action.add_argument(
+			'-q', '--quiet',
+			dest='verbose_mode', default=False,
+			action='store_false', help='Disable the given interface.'
+		)
 		parser.add_argument('-V', '--version', action='version', version='%(prog)s 0.2.3')
 		theResult = parser.parse_args(arguments)
 	except Exception as parseErr:
@@ -86,13 +130,16 @@ def show_user(user_name=None, is_verbose=False, use_html=False):
 		else:
 			format_pattern = u'{} {} {} {}'
 		theResult = format_pattern.format(
-				get_user_name(user_name, use_html),
-				get_user_ttys(user_name, use_html),
-				get_user_ip(user_name, use_html),
-				get_user_status(get_user_name(user_name, False), use_html)
-				)
+			get_user_name(user_name, use_html),
+			get_user_ttys(user_name, use_html),
+			get_user_ip(user_name, use_html),
+			get_user_status(get_user_name(user_name, False), use_html)
+		)
 		if use_html:
-			theResult = html_generator.gen_html_tr(theResult, str(u'user_status_row_{}').format(get_user_name(user_name, False)))
+			theResult = html_generator.gen_html_tr(
+				theResult,
+				str(u'user_status_row_{}').format(get_user_name(user_name, False))
+			)
 	except Exception as cmdErr:
 		print(str(cmdErr))
 		print(str(cmdErr.args))
@@ -105,61 +152,68 @@ def get_user_name(user_name=None, use_html=False):
 		return None
 	if use_html is not True:
 		temp = get_user_list()
-		if literal_str(user_name) in temp:
+		if utils.literal_str(user_name) in temp:
 			temp = None
 			del temp
-			return literal_str(user_name)
+			return utils.literal_str(user_name)
 		else:
 			temp = None
 			del temp
 			return None
 	else:
-		user = literal_str(get_user_name(user_name, False))
+		user = utils.literal_str(get_user_name(user_name, False))
 		return html_generator.gen_html_td(user, str(u'user_name_{}').format(user))
+
 
 # TODO: move this function to utils
 def extractRegexPattern(theInput_Str, theInputPattern):
 	import re
-	sourceStr = literal_str(theInput_Str)
+	sourceStr = utils.literal_str(theInput_Str)
 	prog = re.compile(theInputPattern)
 	theList = prog.findall(sourceStr)
 	return theList
 
 
-def literal_str(raw_input=None):
-	try:
-		if isinstance(unicode(raw_input).encode("utf-8"), basestring):
-			return str(unicode(raw_input).encode("utf-8"))
-		elif isinstance(raw_input, str):
-			return str(unicode(raw_input.decode("utf-8")).encode("utf-8"))
-	except Exception as malformErr:
-		malformErr = None
-		del malformErr
-		return None
-	return None
-
-
 def compactSpace(theInput_Str):
 	"""Try to remove the spaces from the input string."""
 	import re
-	sourceStr = str(theInput_Str)
+	sourceStr = utils.literal_str(theInput_Str)
 	theList = re.sub(r' +', u' ', sourceStr)
 	return theList
 
 
 def extractTTYs(theInputStr):
 	"""Extract the TTYs from a string."""
-	return extractRegexPattern(theInputStr, """(?:(?:[[:print:]]*){0,1}(?P<TTYs>(?:(?:pts|tty|console|ptty){1}[\/]?[0-9]+){1})+(?:[[:print:]]*){0,1})+""")
+	return extractRegexPattern(
+		theInputStr,
+		"""(?:(?:[[:print:]]*){0,1}(?P<TTYs>(?:(?:pts|tty|console|ptty)""" +
+		"""{1}[\/]?[0-9]+){1})+(?:[[:print:]]*){0,1})+"""
+	)
 
 
 def extractIPv4(theInputStr):
 	"""Extract the Ipv4 addresses from a string. Simple x.x.x.x matching, no checks."""
-	return extractRegexPattern(theInputStr, """(?:(?:[[:print:]]*){0,1}(?P<IP>(?:[12]?[0-9]?[0-9]{1}[\.]{1}){3}(?:[12]?[0-9]?[0-9]{1}){1}){1}(?:[[:print:]]*){0,1})+""")
+	return extractRegexPattern(
+		theInputStr,
+		"""(?:(?:[[:print:]]*){0,1}(?P<IP>(?:[12]?[0-9]?[0-9]{1}[\.]{1})""" +
+		"""{3}(?:[12]?[0-9]?[0-9]{1}){1}){1}(?:[[:print:]]*){0,1})+"""
+	)
 
 
 def extractIPAddr(theInputStr):
 	"""Extract the Ipv4 addresses from a string. Simple x.x.x.x matching, no checks."""
-	return extractRegexPattern(theInputStr, """(?:(?:[[:print:]]*){0,1}(?P<IP>(?:[12]?[0-9]?[0-9]{1}[\.]{1}){3}(?:[12]?[0-9]?[0-9]{1}){1}){1}(?:[/]{1}){1}(?:[[:print:]]*){0,1})+""")
+	return extractRegexPattern(
+		theInputStr,
+		"""(?:(?:[[:print:]]*){0,1}(?P<IP>(?:[12]?[0-9]?[0-9]{1}[\.]{1}){3}"""
+		"""(?:[12]?[0-9]?[0-9]{1}){1}){1}(?:[/]{1}){1}(?:[[:print:]]*){0,1})+"""
+	)
+
+
+def isLineForUser(someLine=None, username=None):
+	"""determins if a raw output line is for a user"""
+	if ((username is None) or (someLine.startswith(username) is True)):
+		return True
+	return False
 
 
 def get_system_work_status_raw(user_name=None):
@@ -168,10 +222,17 @@ def get_system_work_status_raw(user_name=None):
 	try:
 		import subprocess
 		try:
-			#hard-coded white list
-			theRawuserState = subprocess.check_output([str("""ulimit -t 2 ; ps -elf 2>/dev/null | tr -s ' ' ' ' | cut -d\  -f 3,15 | sed -E -e 's/[\[\(]{1}[^]]+[]\)]{1}/SYSTEM/g' | sort | uniq ;""")], shell=True, stderr=subprocess.STDOUT)
-			if (theRawuserState is not None) and (len(theRawuserState) > 0):
-				lines = [str(x) for x in theRawuserState.split(u'\n') if ((user_name is None) or (x.startswith(user_name) is True))]
+			# hard-coded white list cmd
+			theRawOutput = subprocess.check_output(
+				[str(
+					"""ulimit -t 2 ; ps -elf 2>/dev/null | tr -s ' ' ' ' | cut -d\  -f 3,15 """ +
+					"""| sed -E -e 's/[\[\(]{1}[^]]+[]\)]{1}/SYSTEM/g' | sort | uniq ;"""
+				)],
+				shell=True,
+				stderr=subprocess.STDOUT
+			)
+			if (theRawOutput is not None) and (len(theRawOutput) > 0):
+				lines = [str(x) for x in theRawOutput.splitlines() if isLineForUser(x, user_name)]
 				theuserState = str('')
 				for line in lines:
 					if (line is not None) and (len(line) > 0):
@@ -198,45 +259,53 @@ def get_system_work_status_raw(user_name=None):
 # TODO: memoize this function
 def get_user_work_status_raw(user_name=None):
 	"""list the raw status of user work."""
-	theRawuserState = None
+	theRawOutput = None
 	try:
 		import subprocess
 		try:
-			theRawuserState = subprocess.check_output(["w", "-his"], stderr=subprocess.STDOUT)
-			if theRawuserState is not None and len(theRawuserState) > 0:
-				lines = [str(x) for x in theRawuserState.split(u'\n') if ((user_name is None) or (x.startswith(user_name) is True))]
-				theRawuserState = str('')
+			theRawOutput = subprocess.check_output(["w", "-his"], stderr=subprocess.STDOUT)
+			if theRawOutput is not None and len(theRawOutput) > 0:
+				lines = [str(x) for x in theRawOutput.splitlines() if isLineForUser(x, user_name)]
+				theRawOutput = str('')
 				for line in lines:
 					if (line is not None) and (len(line) > 0):
-						theRawuserState = str(u'{}{}\n').format(theRawuserState, compactSpace(line))
+						theRawOutput = str(u'{}{}\n').format(theRawOutput, compactSpace(line))
 				del lines
 			else:
-				theRawuserState = None
+				theRawOutput = None
 		except subprocess.CalledProcessError as subErr:
-			theRawuserState = None
+			theRawOutput = None
 		except Exception as cmdErr:
-			print(str("user_check_status.get_user_work_status_raw: ERROR: ACTION will not be compleated! ABORT!"))
 			print(str(cmdErr))
 			print(str(cmdErr.args))
-			theRawuserState = None
+			theRawOutput = None
 	except Exception as importErr:
 		print(str(importErr))
 		print(str(importErr.args))
-		theRawuserState = None
-	return theRawuserState
+		theRawOutput = None
+	return theRawOutput
 
 
 def compactList(list, intern_func=None):
-   if intern_func is None:
-       def intern_func(x): return x
-   seen = {}
-   result = []
-   for item in list:
-       marker = intern_func(item)
-       if marker in seen: continue
-       seen[marker] = 1
-       result.append(item)
-   return result
+	if intern_func is None:
+		def intern_func(x):
+			return x
+	seen = {}
+	result = []
+	for item in list:
+		marker = intern_func(item)
+		if marker in seen:
+			continue
+		seen[marker] = 1
+		result.append(item)
+	return result
+
+
+def xstr(some_str=None):
+	try:
+		return utils.literal_str(u'x' + utils.literal_str(some_str) + u'x')
+	except Exception:
+		return None
 
 
 # TODO: memoize this function
@@ -246,20 +315,24 @@ def get_user_list():
 	try:
 		theRawuserState = get_system_work_status_raw(None)
 		if theRawuserState is None:
-			return None
+			theResult = []
+			return theResult
 		try:
-			theResult = compactList([x.split(u' ', 1)[0] for x in theRawuserState.split(u'\n') if u' ' in x])
+			theResult = compactList(
+				[x.split(u' ', 1)[0] for x in theRawuserState.split(u'\n') if u' ' in x]
+			)
 		except Exception as cmdErr:
-			print(str("user_check_status.get_user_list: ERROR: ACTION will not be compleated! DEBUG!"))
 			print(str(cmdErr))
 			print(str(cmdErr.args))
-			theRawuserState = "FAILED"
-		theResult = [x for x in theResult if u'xUIDx' not in str(u'x'+str(x)+u'x') and u'xmessage+x' not in str(u'x'+str(x)+u'x')]
+			theResult = []
+		theResult = [
+			x for x in theResult if xstr("UID") not in xstr(x) and xstr("message+") not in xstr(x)
+		]
 	except Exception as parseErr:
 		print(str("user_check_status.get_user_list: ERROR: ACTION will not be compleated! ABORT!"))
 		print(str(parseErr))
 		print(str(parseErr.args))
-		theResult = None
+		theResult = []
 	return theResult
 
 
@@ -272,29 +345,39 @@ def get_user_status(user_name=None, use_html=False):
 		if user_name is not None:
 			user_tty = get_user_ttys(user_name, False)
 		status_txt = get_system_work_status_raw(user_name)
-		if (user_tty is not None) and (user_tty not in "console"):
+		if (user_tty is not None) and (xstr(user_tty) not in xstr("console")):
 			status_txt = get_user_work_status_raw(user_name)
-			status_list = compactList([str(str(x).split(u' ', 4)[-1]) for x in status_txt.split(u'\n') if (x is not None) and (len(x) > 0)])
+			status_list = compactList(
+				[str(
+					str(x).split(u' ', 4)[-1]
+				) for x in status_txt.split(u'\n') if (x is not None) and (len(x) > 0)]
+			)
 		elif status_txt is not None:
 			if (str(u'root SYSTEM\n') not in status_txt):
-				theWorks = compactList([str(str(x).split(u' ', 2)[-1]) for x in status_txt.split(u'\n') if (x is not None) and (len(x) > 0)])
-				known_work_cases = dict({u'/usr/sbin/cron':u'SYSTEM AUTOMATION',
-					u'/usr/sbin/ntpd':u'TIMEKEEPING SERVICES',
-					u'/usr/sbin/rsyslogd':u'LOGGING SERVICES',
-					u'wlan1':u'NETWORK SERVICES',
-					u'usb0':u'NETWORK SERVICES',
-					u'eth0':u'NETWORK SERVICES',
-					u'wlan0':u'NETWORK SERVICES',
-					u'wpa_supplicant':u'WPA SERVICES',
-					u'/usr/sbin/hostapd':u'AP SERVICES',
-					u'/sbin/dhcpcd':u'DHCP-CLIENT SERVICES',
-					u'/usr/sbin/dnsmasq':u'DNS-DHCP-SERVER SERVICES',
-					u'/usr/bin/freshclam':u'SYSTEM DEFENSE',
-					u'/usr/bin/denyhosts.py':u'SYSTEM DEFENSE',
-					u'/usr/bin/rkhunter':u'SYSTEM DEFENSE',
-					u'/usr/bin/nmap':u'COUNTER OFFENSE',
-					u'nginx: ':u'WEB SERVICES',
-					u'php-fpm':u'WEB SERVICES'})
+				theWorks = compactList(
+					[str(
+						str(x).split(u' ', 2)[-1]
+					) for x in status_txt.split(u'\n') if (x is not None) and (len(x) > 0)]
+				)
+				known_work_cases = dict({
+					u'/usr/sbin/cron': u'SYSTEM AUTOMATION',
+					u'/usr/sbin/ntpd': u'TIMEKEEPING SERVICES',
+					u'/usr/sbin/rsyslogd': u'LOGGING SERVICES',
+					u'wlan1': u'NETWORK SERVICES',
+					u'usb0': u'NETWORK SERVICES',
+					u'eth0': u'NETWORK SERVICES',
+					u'wlan0': u'NETWORK SERVICES',
+					u'wpa_supplicant': u'WPA SERVICES',
+					u'/usr/sbin/hostapd': u'AP SERVICES',
+					u'/sbin/dhcpcd': u'DHCP-CLIENT SERVICES',
+					u'/usr/sbin/dnsmasq': u'DNS-DHCP-SERVER SERVICES',
+					u'/usr/bin/freshclam': u'SYSTEM DEFENSE',
+					u'/usr/bin/denyhosts.py': u'SYSTEM DEFENSE',
+					u'/usr/bin/rkhunter': u'SYSTEM DEFENSE',
+					u'/usr/bin/nmap': u'COUNTER OFFENSE',
+					u'nginx: ': u'WEB SERVICES',
+					u'php-fpm': u'WEB SERVICES'
+				})
 				for theWork in theWorks:
 					temp_txt = u'UNKNOWN'
 					if (theWork.startswith(u'SYSTEM')):
@@ -331,7 +414,10 @@ def get_user_status(user_name=None, use_html=False):
 		if use_html is not True:
 			theResult = status_list
 		else:
-			theResult = html_generator.gen_html_td(html_generator.gen_html_ul(status_list), str(u'user_status_what_{}').format(user_name))
+			theResult = html_generator.gen_html_td(
+				html_generator.gen_html_ul(status_list),
+				str(u'user_status_what_{}').format(user_name)
+			)
 		status_list = None
 		del status_list
 		status_txt = None
@@ -364,7 +450,10 @@ def get_user_ttys(user=None, use_html=False):
 			else:
 				theResult = u'console'
 		else:
-			theResult = html_generator.gen_html_td(html_generator.gen_html_ul(tty_list_txt), str(u'user_status_tty_{}').format(user))
+			theResult = html_generator.gen_html_td(
+				html_generator.gen_html_ul(tty_list_txt),
+				str(u'user_status_tty_{}').format(user)
+			)
 	except Exception as errcrit:
 		print(str("user_check_status.get_user_ttys: ERROR: ACTION will not be compleated! ABORT!"))
 		print(str(errcrit))
@@ -374,6 +463,7 @@ def get_user_ttys(user=None, use_html=False):
 
 
 def getLocalhostName():
+	"""What is my name?"""
 	return str(u'Pocket')
 
 
@@ -389,9 +479,15 @@ def get_user_ip(user=None, use_html=False):
 				theResult = getLocalhostName()
 		else:
 			if ip_list_txt is not None and len(ip_list_txt) > 0:
-				theResult = html_generator.gen_html_td(html_generator.gen_html_ul(ip_list_txt), str(u'user_status_ips_{}').format(user))
+				theResult = html_generator.gen_html_td(
+					html_generator.gen_html_ul(ip_list_txt),
+					str(u'user_status_ips_{}').format(user)
+				)
 			else:
-				theResult = html_generator.gen_html_td(html_generator.gen_html_label(getLocalhostName(), u'disabled'), str(u'user_status_ips_{}').format(user))
+				theResult = html_generator.gen_html_td(
+					html_generator.gen_html_label(getLocalhostName(), u'disabled'),
+					str(u'user_status_ips_{}').format(user)
+				)
 	except Exception as errcrit:
 		print(str("user_check_status.get_user_ip: ERROR: ACTION will not be compleated! ABORT!"))
 		print(str(errcrit))
@@ -411,7 +507,10 @@ def main(argv=None):
 				output_html = args.output_html
 		if args.show_all is True:
 			if output_html:
-				print("<table class=\"table table-striped\"><thead><th>User</th><th>TTYs</th><th>Host</th><th>Status</th></thead><tbody>")
+				print(
+					"<table class=\"table table-striped\">" +
+					"<thead><th>User</th><th>TTYs</th><th>Host</th><th>Status</th></thead><tbody>"
+				)
 			for user_name in get_user_list():
 				print(show_user(user_name, verbose, output_html))
 			if output_html:
@@ -431,6 +530,7 @@ def main(argv=None):
 		print(str(main_err.args))
 	return 1
 
+
 if __name__ == '__main__':
 	try:
 		import sys
@@ -441,3 +541,4 @@ if __name__ == '__main__':
 		print(str(main_err))
 		print(str(main_err.args))
 	exit(1)
+

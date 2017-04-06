@@ -1,23 +1,21 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
-
 # Pocket PiAP
-# 
+# ..................................
 # Copyright (c) 2017, Kendrick Walls
-#	
-#	Licensed under the Apache License, Version 2.0 (the "License");
-#		you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-#	   
-#	   http://www.apache.org/licenses/LICENSE-2.0
-#   
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
-
+# ..................................
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# ..........................................
+# http://www.apache.org/licenses/LICENSE-2.0
+# ..........................................
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 try:
 	import argparse
@@ -27,12 +25,25 @@ except Exception:
 	raise ImportError()
 	exit(255)
 
+
 def parseArgs(arguments=None):
 	theArgs = None
 	try:
 		parser = argparse.ArgumentParser(description='check for an arp entry')
-		parser.add_argument('-m', '--msg', dest='msg', required=True, help='The Message. An unsalted message.')
-		parser.add_argument('-S', '--salt', dest='salt', required=True, help='The Salt. A unique secret.')
+		parser.add_argument(
+			'-m',
+			'--msg',
+			dest='msg',
+			required=True,
+			help='The Message. An unsalted message.'
+		)
+		parser.add_argument(
+			'-S',
+			'--salt',
+			dest='salt',
+			required=True,
+			help='The Salt. A unique secret.'
+		)
 		theArgs = parser.parse_args(arguments)
 	except Exception as err:
 		print(str(u'FAILED DURRING SALTIFY. ABORT.'))
@@ -59,6 +70,7 @@ def main(argv=None):
 
 """ Test cases """
 
+
 def _test_try_or_fail(f):
 	""" decorator for try-except wrapping tests """
 	def helper():
@@ -75,7 +87,10 @@ def _test_try_or_fail(f):
 
 @_test_try_or_fail
 def _test_keyring_salt_test_salt():
-	test_salt_one = u'7a9356011e7f6bc42105deee6d49983e0cfa7650c7fce5d5d3b19aacca91605199ee017707f627087f8376143f368b17ed927d918eecfe100a7b1b6e39dd3c8a'
+	test_salt_one = str(
+		u'7a9356011e7f6bc42105deee6d49983e0cfa7650c7fce5d' +
+		u'5d3b19aacca91605199ee017707f627087f8376143f368b17ed927d918eecfe100a7b1b6e39dd3c8a'
+	)
 	theTest = (str(saltify("Test Message", "testSalt")) is str(test_salt_one))
 	del test_salt_one
 	if theTest:
