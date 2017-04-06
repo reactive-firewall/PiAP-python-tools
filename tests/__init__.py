@@ -28,12 +28,12 @@ except Exception as ImportErr:
 	print('')
 	ImportErr = None
 	del ImportErr
-	raise ImportError(u'Test module failed completely.')
+	raise ImportError(str(u'Test module failed completely.'))
 
 try:
 	from tests import test_basic
 	if test_basic.__name__ is None:
-		raise ImportError(u'Test module failed to import even the basic tests.')
+		raise ImportError(str(u'Test module failed to import even the basic tests.'))
 except Exception as importErr:
 	print('')
 	print(str(type(importErr)))
@@ -42,6 +42,6 @@ except Exception as importErr:
 	print('')
 	importErr = None
 	del importErr
-	raise ImportError(u'Test module failed completely.')
+	raise ImportError(str(u'Test module failed completely.'))
 	exit(0)
 

@@ -27,7 +27,7 @@ except Exception as ImportErr:
 	print(str((ImportErr.args)))
 	ImportErr = None
 	del ImportErr
-	raise ImportError(u'PiAPlib Failed to Import')
+	raise ImportError(str(u'PiAPlib Failed to Import'))
 
 try:
 	from . import pocket as pocket
@@ -55,11 +55,11 @@ except Exception as importErr:
 
 if __name__ in u'__main__':
 	if pku.__name__ is None:
-		raise ImportError("Failed to open Pocket Knife Unit")
+		raise ImportError(str(u'Failed to open Pocket Knife Unit'))
 	if keyring.__name__ is None:
-		raise ImportError("Failed to find Pocket Keyring")
+		raise ImportError(str(u'Failed to find Pocket Keyring'))
 	if lint.__name__ is None:
-		raise ImportError("Failed to gather Pocket Lint")
+		raise ImportError(str(u'Failed to gather Pocket Lint'))
 	pocket.main()
 	exit(0)
 
