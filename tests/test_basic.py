@@ -125,6 +125,28 @@ class BasicTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
+	def test_case_utils_literal_str(self):
+		"""Test case for saltify."""
+		theResult = True
+		try:
+			from piaplib import pku as pku
+			if pku.__name__ is None:
+				raise ImportError("Failed to import pku")
+			from pku import utils as utils
+			if utils.__name__ is None:
+				raise ImportError("Failed to import utils")
+			theResult = utils.test_literal_str()
+		except Exception as err:
+			print(u'')
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(u'')
+			err = None
+			del err
+			theResult = False
+		assert theResult
+
 	def test_a_which_command(self):
 		"""Test case for backend which."""
 		theResult = False
