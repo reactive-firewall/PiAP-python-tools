@@ -37,13 +37,6 @@ def literal_str(raw_input=None):
 	return None
 
 
-def test_literal_str():
-	"""Tests the literal string functions"""
-	theResult = literal_str(b'test') in literal_str(str(u'test'))
-	theResult = (theResult is True) and (literal_str(str(u'test')) in literal_str(b'test'))
-	return theResult
-
-
 def main(argv=None):
 	"""The Main Event makes no sense to utils."""
 	raise NotImplementedError("CRITICAL - PKU Uitls main() not implemented. yet?")
