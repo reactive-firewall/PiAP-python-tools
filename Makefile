@@ -81,7 +81,7 @@ purge: clean uninstall
 	$(QUIET)$(ECHO) "$@: Done."
 
 test: cleanup
-	$(QUIET)python -m unittest tests.test_basic tests.test_strings
+	$(QUIET)python -m unittest tests.test_basic tests.test_strings tests.test_salt
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-tox: cleanup
