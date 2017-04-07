@@ -37,6 +37,7 @@ try:
 except Exception:
 	raise ImportError("Failed to import test context")
 
+
 class StringsTestSuite(unittest.TestCase):
 	"""Basic test cases."""
 
@@ -133,8 +134,8 @@ class StringsTestSuite(unittest.TestCase):
 				utils.literal_str(str(u'u\'butter\'')) in utils.literal_str(b'u\'butter\'')
 			)
 			theResult = (theResult is True) and (theResult_temp is True)
-			theResults_temp = None
-			del theResults_temp
+			theResult_temp = None
+			del theResult_temp
 		except Exception as err:
 			print(u'')
 			print(str(type(err)))
@@ -145,7 +146,7 @@ class StringsTestSuite(unittest.TestCase):
 			del err
 			theResult = False
 		assert theResult
-		
+
 	def test_case_utils_Pangram_literal_str(self):
 		"""Tests the literal string functions with a Pangram"""
 		theResult = True
@@ -168,7 +169,7 @@ class StringsTestSuite(unittest.TestCase):
 			del err
 			theResult = False
 		assert theResult
-		
+
 	def test_case_utils_test_not_literal_str(self):
 		"""Tests the literal string functions with u\'butter\'"""
 		theResult = True
@@ -186,8 +187,8 @@ class StringsTestSuite(unittest.TestCase):
 				utils.literal_str(u'') is not utils.literal_str(b'')
 			)
 			theResult = (theResult is True) and (theResult_temp is True)
-			theResults_temp = None
-			del theResults_temp
+			theResult_temp = None
+			del theResult_temp
 		except Exception as err:
 			print(u'')
 			print(str(type(err)))
@@ -198,9 +199,7 @@ class StringsTestSuite(unittest.TestCase):
 			del err
 			theResult = False
 		assert theResult
-		
-		(b'', u'')
-		
+
 	def test_case_utils_fuzz_literal_str(self):
 		"""Tests the literal string functions with a Pangram"""
 		theResult = True
@@ -236,8 +235,8 @@ class StringsTestSuite(unittest.TestCase):
 							testcase[0] in testcase[1]
 						)
 						theResult = (theResult is True) and (theResult_temp is True)
-						theResults_temp = None
-						del theResults_temp
+						theResult_temp = None
+						del theResult_temp
 		except Exception as err:
 			print(u'')
 			print(str(type(err)))
@@ -248,6 +247,7 @@ class StringsTestSuite(unittest.TestCase):
 			del err
 			theResult = False
 		assert theResult
+
 
 if __name__ == '__main__':
 	unittest.main()

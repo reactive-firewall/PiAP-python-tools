@@ -37,6 +37,7 @@ try:
 except Exception:
 	raise ImportError("Failed to import test context")
 
+
 class StringsTestSuite(unittest.TestCase):
 	"""Basic test cases."""
 
