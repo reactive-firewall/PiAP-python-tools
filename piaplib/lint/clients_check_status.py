@@ -155,8 +155,8 @@ def extractMACAddr(theInputStr):
 	"""Extract the MAC addresses from a string."""
 	return extractRegexPattern(
 		theInputStr,
-		"(?:(?:[[:print:]]*){0,1}(?P<Mac>(?:(?:[0-9a-fA-F]{1,2}[\:]{1}){5}" +
-		"(?:[0-9a-fA-F]{1,2}){1}){1})+(?:[[:print:]]*){0,1})+"
+		"""(?:(?:[[:print:]]*){0,1}(?P<Mac>(?:(?:[0-9a-fA-F]{1,2}[\:]{1}){5}""" +
+		"""(?:[0-9a-fA-F]{1,2}){1}){1})+(?:[[:print:]]*){0,1})+"""
 	)
 
 
@@ -164,8 +164,8 @@ def extractIPv4(theInputStr):
 	"""Extract the Ipv4 addresses from a string. Simple x.x.x.x matching, no checks."""
 	return extractRegexPattern(
 		theInputStr,
-		"(?:(?:[[:print:]]*){0,1}(?P<IP>(?:[12]?[0-9]?[0-9]{1}[\.]{1}){3}" +
-		"(?:[12]?[0-9]?[0-9]{1}){1}){1}(?:[[:print:]]*){0,1})+"
+		"""(?:(?:[[:print:]]*){0,1}(?P<IP>(?:[12]?[0-9]?[0-9]{1}[\.]{1}){3}""" +
+		"""(?:[12]?[0-9]?[0-9]{1}){1}){1}(?:[[:print:]]*){0,1})+"""
 	)
 
 
@@ -173,8 +173,8 @@ def extractIPAddr(theInputStr):
 	"""Extract the Ipv4 addresses from a string. Simple x.x.x.x matching, no checks."""
 	return extractRegexPattern(
 		theInputStr,
-		"(?:(?:[[:print:]]*){0,1}(?P<IP>(?:[12]?[0-9]?[0-9]{1}[\.]{1}){3}" +
-		"(?:[12]?[0-9]?[0-9]{1}){1}){1}(?:[/]{1}){1}(?:[[:print:]]*){0,1})+"
+		"""(?:(?:[[:print:]]*){0,1}(?P<IP>(?:[12]?[0-9]?[0-9]{1}[\.]{1}){3}""" +
+		"""(?:[12]?[0-9]?[0-9]{1}){1}){1}(?:[/]{1}){1}(?:[[:print:]]*){0,1})+"""
 	)
 
 
@@ -217,15 +217,15 @@ def get_client_arp_status_raw(client_ip=None):
 			theRawClientState = subprocess.check_output(arguments, stderr=subprocess.STDOUT)
 			if (client_ip is not None):
 				if (theRawClientState is not None) and (len(theRawClientState) > 0):
-					lines = [x for x in theRawClientState.splitlines() if client_ip in x]
+					lines = [str(x) for x in theRawClientState.splitlines() if client_ip in x]
 					theRawClientState = str("")
 					for line in lines:
-						theRawClientState = str(u'{}{}\n').format(theRawClientState, line)
+						theRawClientState = str(u'{}{}\n').format(str(theRawClientState), str(line))
 					del lines
 				else:
-					theRawClientState = theRawClientState.split(u'\n')
+					theRawClientState = str(theRawClientState).splitlines()
 			else:
-				theRawClientState = theRawClientState.split(u'\n')
+				theRawClientState = str(theRawClientState).splitlines()
 		except subprocess.CalledProcessError as subErr:
 			subErr = None
 			del subErr
