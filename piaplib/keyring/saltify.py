@@ -68,43 +68,10 @@ def main(argv=None):
 		print(saltify(str(args.msg), str(args.salt)))
 
 
-""" Test cases """
-
-
-def _test_try_or_fail(f):
-	""" decorator for try-except wrapping tests """
-	def helper():
-		theResult = False
-		try:
-			theResult = f()
-		except Exception as failErr:
-			failErr = None
-			del failErr
-			theResult = False
-		return theResult
-	return helper
-
-
-@_test_try_or_fail
-def _test_keyring_salt_test_salt():
-	test_salt_one = str(
-		u'7a9356011e7f6bc42105deee6d49983e0cfa7650c7fce5d' +
-		u'5d3b19aacca91605199ee017707f627087f8376143f368b17ed927d918eecfe100a7b1b6e39dd3c8a'
-	)
-	theTest = (str(saltify("Test Message", "testSalt")) is str(test_salt_one))
-	del test_salt_one
-	if theTest:
-		del theTest
-		return True
-	else:
-		del theTest
-		return False
-
-
 if __name__ in u'__main__':
 	try:
 		import sys
-		main(sys.argv)
+		main(sys.argv[1:])
 	except Exception as err:
 		print(str(u'MAIN FAILED DURRING SALTIFY. ABORT.'))
 		print(str(type(err)))

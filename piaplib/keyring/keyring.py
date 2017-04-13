@@ -70,10 +70,11 @@ def useKeyTool(tool, arguments=[None]):
 	if tool is None:
 		return None
 	if tool in KEYRING_UNITS.keys():
+		theResult = None
 		try:
 			try:
 				# print(str("keyring launching: "+tool))
-				KEYRING_UNITS[tool].main(arguments)
+				theResult = KEYRING_UNITS[tool].main(arguments)
 			except Exception:
 				timestamp = getTimeStamp()
 				theResult = str(

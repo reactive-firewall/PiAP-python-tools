@@ -19,8 +19,26 @@
 
 import unittest
 
+try:
+	try:
+		import sys
+		import os
+		sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), str('..'))))
+		sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), str('.'))))
+	except Exception as ImportErr:
+		print(str(''))
+		print(str(type(ImportErr)))
+		print(str(ImportErr))
+		print(str((ImportErr.args)))
+		print(str(''))
+		ImportErr = None
+		del ImportErr
+		raise ImportError(str("Test module failed completely."))
+except Exception:
+	raise ImportError("Failed to import test context")
 
-class BasicTestSuite(unittest.TestCase):
+
+class StringsTestSuite(unittest.TestCase):
 	"""Basic test cases."""
 
 	def test_absolute_truth_and_meaning(self):
@@ -54,15 +72,6 @@ class BasicTestSuite(unittest.TestCase):
 			import os
 			if os.__name__ is None:
 				theResult = False
-			import argparse
-			if argparse.__name__ is None:
-				theResult = False
-			import subprocess
-			if subprocess.__name__ is None:
-				theResult = False
-			import time
-			if time.__name__ is None:
-				theResult = False
 			import re
 			if re.__name__ is None:
 				theResult = False
@@ -81,51 +90,67 @@ class BasicTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
-	def test_a_which_command(self):
-		"""Test case for backend which."""
-		theResult = False
+	def test_before_case_saltify(self):
+		"""Test before test-case saltify."""
+		theResult = True
 		try:
-			import subprocess
-			theOutputtext = subprocess.check_output(["which", "which"])
-			try:
-				if (str("/which") in str(theOutputtext)):
-					theResult = True
-			except Exception as err:
-				print(u'')
-				print(str(type(err)))
-				print(str(err))
-				print(str((err.args)))
-				print(u'')
-				err = None
-				del err
+			from piaplib import keyring as keyring
+			if keyring.__name__ is None:
 				theResult = False
-		except Exception as othererr:
+			from keyring import saltify as saltify
+			if saltify.__name__ is None:
+				theResult = False
+		except Exception as err:
 			print(u'')
-			print(str(type(othererr)))
-			print(str(othererr))
-			print(str((othererr.args)))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
 			print(u'')
-			othererr = None
-			del othererr
+			err = None
+			del err
 			theResult = False
 		assert theResult
 
-	def test_z_remote_command(self):
-		"""Test case for backend library."""
-		theResult = False
-		try:
-			import subprocess
-			theOutputtext = subprocess.check_output(["which", "python"])
-			if (str("/python") in str(theOutputtext)):
-				theResult = True
-		except Exception:
+	def _test_try_or_fail(f):
+		""" decorator for try-except wrapping tests """
+		def helper(self):
 			theResult = False
 			try:
-				theOutputtext = subprocess.check_output(["which", "which"])
-				if (str("/which") in str(theOutputtext)):
-					theResult = True
-			except Exception:
+				f(self)
+				theResult = True
+			except Exception as failErr:
+				failErr = None
+				del failErr
 				theResult = False
+			assert theResult
+		return helper
+
+	@_test_try_or_fail
+	def _test_keyring_salt_test_salt(self):
+		theResult = True
+		try:
+			from .context import piaplib
+			if piaplib.__name__ is None:
+				theResult = False
+			from piaplib import keyring as keyring
+			if keyring.__name__ is None:
+				theResult = False
+			from keyring import saltify as saltify
+			if saltify.__name__ is None:
+				theResult = False
+			test_salt_one = str(
+				u'7a9356011e7f6bc42105deee6d49983e0cfa7650c7fce5d' +
+				u'5d3b19aacca91605199ee017707f627087f8376143f368b17ed927d918eecfe100a7b1b6e39dd3c8a'
+			)
+			theResult = (str(saltify.saltify("Test Message", "testSalt")) is str(test_salt_one))
+			del test_salt_one
+		except Exception as impErr:
+			print(u'')
+			print(str(type(impErr)))
+			print(str(impErr))
+			print(str((impErr.args)))
+			print(u'')
+			theResult = False
 		assert theResult
 
 
