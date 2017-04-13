@@ -90,7 +90,10 @@ test-tox: cleanup
 
 cleanup:
 	$(QUIET)rm -f tests/*.pyc 2>/dev/null || true
+	$(QUIET)rm -Rf tests/__pycache__ 2>/dev/null || true
 	$(QUIET)rm -f piaplib/*.pyc 2>/dev/null || true
+	$(QUIET)rm -Rf piaplib/__pycache__ 2>/dev/null || true
+	$(QUIET)rm -Rf piaplib/*/__pycache__ 2>/dev/null || true
 	$(QUIET)rm -f piaplib/*~ 2>/dev/null || true
 	$(QUIET)rm -f *.pyc 2>/dev/null || true
 	$(QUIET)rm -f piaplib/*/*.pyc 2>/dev/null || true

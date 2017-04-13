@@ -32,6 +32,11 @@ try:
 except Exception:
 	import keyring as keyring
 
+try:
+	from . import lint as lint
+except Exception:
+	import lint as lint
+
 __prog__ = "PiAP-util.py"
 """The name of this program is PiAP-util.py"""
 
@@ -40,7 +45,7 @@ POCKET_UNITS = {
 	u'protector': None,
 	u'blade': None,
 	u'keyring': keyring.keyring,
-	u'lint': None,
+	u'lint': lint.lint,
 	u'fruitsnack': None
 }
 """ The Pocket Knife Units available.

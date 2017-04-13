@@ -24,30 +24,35 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 
 
 try:
-	from . import html_generator as html_generator
+	from . import clients_check_status as clients_check_status
 except Exception:
-	import html_generator as html_generator
+	import clients_check_status as clients_check_status
 
 try:
-	from . import check as check
+	from . import iface_check_status as iface_check_status
 except Exception:
-	import check as check
+	import iface_check_status as iface_check_status
 
 try:
-	from . import do_execve as do_execve
+	from . import users_check_status as users_check_status
 except Exception:
-	import do_execve as do_execve
+	import users_check_status as users_check_status
 
 
-__prog__ = """piaplib.keyring"""
-"""The name of this PiAPLib tool is keyring"""
+__prog__ = """piaplib.lint.check"""
+"""The name of this PiAPLib tool is check"""
 
 
-LINT_UNITS = {u'html': html_generator, u'check': check, u'execve': do_execve}
-"""	The Pocket Knife Unit actions.
-	check - monitoring checks
-	execve - sandbox functions.
-	html -  (FUTURE/RESERVED)
+CHECK_UNITS = {
+	u'clients': clients_check_status,
+	u'iface': iface_check_status,
+	u'users': users_check_status
+}
+"""	The Pocket Lint Check actions.
+	clients - client monitoring checks
+	iface - interface health checks.
+	user - users health checks.
+	fw -  (FUTURE/RESERVED)
 	"""
 
 
@@ -59,9 +64,9 @@ def parseArgs(arguments=None):
 		epilog="PiAP Lint Controller for extra tools."
 	)
 	parser.add_argument(
-		'lint_unit',
-		choices=LINT_UNITS.keys(),
-		help='the pocket lint service option.'
+		'check_unit',
+		choices=CHECK_UNITS.keys(),
+		help='the pocket service check option.'
 	)
 	return parser.parse_known_args(arguments)
 
@@ -77,15 +82,15 @@ def getTimeStamp():
 	return str(theDate)
 
 
-def useLintTool(tool, arguments=[None]):
+def useCheckTool(tool, arguments=[None]):
 	"""Handler for launching pocket-tools."""
 	if tool is None:
 		return None
-	if tool in LINT_UNITS.keys():
+	if tool in CHECK_UNITS.keys():
 		try:
 			try:
-				# print(str("keyring launching: "+tool))
-				LINT_UNITS[tool].main(arguments)
+				# print(str("check launching: "+tool))
+				theResult = CHECK_UNITS[tool].main(arguments)
 			except Exception:
 				timestamp = getTimeStamp()
 				theResult = str(
@@ -102,12 +107,11 @@ def useLintTool(tool, arguments=[None]):
 
 def main(argv=None):
 	"""The main event"""
-	# print("PiAP Keyring")
 	try:
 		try:
 			args, extra = parseArgs(argv)
-			lint_cmd = args.lint_unit
-			useLintTool(lint_cmd, extra)
+			lint_cmd = args.check_unit
+			useCheckTool(lint_cmd, extra)
 		except Exception as cerr:
 			print(str(cerr))
 			print(str(cerr.args))

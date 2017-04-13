@@ -211,9 +211,14 @@ def extractIPAddr(theInputStr):
 
 def isLineForUser(someLine=None, username=None):
 	"""determins if a raw output line is for a user"""
-	if ((username is None) or (someLine.startswith(username) is True)):
+	if ((username is None) or (utils.literal_str(
+		someLine
+	).startswith(utils.literal_str(
+		username
+	)) is True)):
 		return True
-	return False
+	else:
+		return False
 
 
 def get_system_work_status_raw(user_name=None):
@@ -223,20 +228,22 @@ def get_system_work_status_raw(user_name=None):
 		import subprocess
 		try:
 			# hard-coded white list cmd
-			theRawOutput = subprocess.check_output(
-				[str(
+			output = subprocess.check_output(
+				[utils.literal_str(
 					"""ulimit -t 2 ; ps -elf 2>/dev/null | tr -s ' ' ' ' | cut -d\  -f 3,15 """ +
 					"""| sed -E -e 's/[\[\(]{1}[^]]+[]\)]{1}/SYSTEM/g' | sort | uniq ;"""
 				)],
 				shell=True,
 				stderr=subprocess.STDOUT
 			)
-			if (theRawOutput is not None) and (len(theRawOutput) > 0):
-				lines = [str(x) for x in theRawOutput.splitlines() if isLineForUser(x, user_name)]
-				theuserState = str('')
+			if (output is not None) and (len(output) > 0):
+				lines = [
+					utils.literal_str(x) for x in output.splitlines() if isLineForUser(x, user_name)
+				]
+				theuserState = str("")
 				for line in lines:
 					if (line is not None) and (len(line) > 0):
-						theuserState = str(u'{}{}\n').format(theuserState, line)
+						theuserState = str("{}{}\n").format(str(theuserState), str(line))
 				del lines
 			else:
 				theuserState = None
@@ -263,13 +270,19 @@ def get_user_work_status_raw(user_name=None):
 	try:
 		import subprocess
 		try:
-			theRawOutput = subprocess.check_output(["w", "-his"], stderr=subprocess.STDOUT)
-			if theRawOutput is not None and len(theRawOutput) > 0:
-				lines = [str(x) for x in theRawOutput.splitlines() if isLineForUser(x, user_name)]
-				theRawOutput = str('')
+			output = subprocess.check_output(
+				[str("""ulimit -t 2 ; w -his 2>/dev/null | tr -s ' ' ' '""")],
+				shell=True,
+				stderr=subprocess.STDOUT
+			)
+			if output is not None and len(output) > 0:
+				lines = [
+					utils.literal_str(x) for x in output.splitlines() if isLineForUser(x, user_name)
+				]
+				theRawOutput = str("")
 				for line in lines:
 					if (line is not None) and (len(line) > 0):
-						theRawOutput = str(u'{}{}\n').format(theRawOutput, compactSpace(line))
+						theRawOutput = str("{}{}\n").format(str(theRawOutput), str(line))
 				del lines
 			else:
 				theRawOutput = None
@@ -305,7 +318,7 @@ def compactList(list, intern_func=None):
 
 def xstr(some_str=None):
 	try:
-		return utils.literal_str(u'x' + utils.literal_str(some_str) + u'x')
+		return str("_x_" + utils.literal_str(some_str) + "_x_")
 	except Exception:
 		return None
 
@@ -321,7 +334,7 @@ def get_user_list():
 			return theResult
 		try:
 			theResult = compactList(
-				[x.split(u' ', 1)[0] for x in theRawuserState.split(u'\n') if u' ' in x]
+				[str(str(x).split(u' ', 1)[0]) for x in theRawuserState.split(u'\n') if (u' ' in x)]
 			)
 		except Exception as cmdErr:
 			print(str(cmdErr))
@@ -347,7 +360,7 @@ def get_user_status(user_name=None, use_html=False):
 		if user_name is not None:
 			user_tty = get_user_ttys(user_name, False)
 		status_txt = get_system_work_status_raw(user_name)
-		if (user_tty is not None) and (xstr(user_tty) not in xstr("console")):
+		if (user_tty is not None) and (str(user_tty) not in str("console")):
 			status_txt = get_user_work_status_raw(user_name)
 			status_list = compactList(
 				[str(
@@ -355,7 +368,7 @@ def get_user_status(user_name=None, use_html=False):
 				) for x in status_txt.split(u'\n') if (x is not None) and (len(x) > 0)]
 			)
 		elif status_txt is not None:
-			if (str(u'root SYSTEM\n') not in status_txt):
+			if (str("root SYSTEM\n") not in status_txt):
 				theWorks = compactList(
 					[str(
 						str(x).split(u' ', 2)[-1]
@@ -381,8 +394,8 @@ def get_user_status(user_name=None, use_html=False):
 					u'php-fpm': u'WEB SERVICES'
 				})
 				for theWork in theWorks:
-					temp_txt = u'UNKNOWN'
-					if (theWork.startswith(u'SYSTEM')):
+					temp_txt = "UNKNOWN"
+					if (u'SYSTEM' in theWork):
 						temp_txt = "SYSTEM"
 					else:
 						for known_case in known_work_cases.keys():
@@ -520,7 +533,7 @@ def main(argv=None):
 		else:
 			if args.list is True:
 				for user_name in get_user_list():
-					print(str(user_name))
+					print(user_name)
 			else:
 				user = args.user
 				print(show_user(user, verbose, output_html))
