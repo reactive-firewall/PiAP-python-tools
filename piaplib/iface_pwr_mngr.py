@@ -20,6 +20,7 @@
 IFACE_PREFIXES = ['wlan', 'eth', 'usb', 'br' 'mon']
 """whitelist of valid iface prefixes"""
 
+
 INTERFACE_CHOICES = [str('{}{}').format(x, str(y)) for x in IFACE_PREFIXES for y in range(5)]
 """whitelist of valid iface names"""
 

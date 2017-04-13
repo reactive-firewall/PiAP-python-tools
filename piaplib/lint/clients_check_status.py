@@ -41,6 +41,12 @@ __prog__ = str("""clients_check_status.py""")
 """The Program's name"""
 
 
+INTERFACE_CHOICES = [
+	str('{}{}').format(x, str(y)) for x in ['wlan', 'eth', 'mon'] for y in range(5)
+]
+"""whitelist of valid iface names"""
+
+
 HTML_LABEL_ROLES = [u'default', u'success', u'info', u'warning', u'danger']
 """the types of labels that can be used in html output"""
 
@@ -82,6 +88,11 @@ def parseargs(arguments=None):
 			'--html', dest='output_html',
 			default=False, action='store_true',
 			help='output html.'
+		)
+		parser.add_argument(
+			'--interface', dest='interface',
+			default=INTERFACE_CHOICES[1], choices=INTERFACE_CHOICES,
+			help='The LAN interface.'
 		)
 		parser.add_argument(
 			'-a', '--all',
@@ -164,7 +175,7 @@ def extractIPv4(theInputStr):
 	"""Extract the Ipv4 addresses from a string. Simple x.x.x.x matching, no checks."""
 	return extractRegexPattern(
 		theInputStr,
-		"""(?:(?:[[:print:]]*){0,1}(?P<IP>(?:[12]?[0-9]?[0-9]{1}[\.]{1}){3}""" +
+		"""(?:(?:[[:print:]]*){0,1}(?P<IP>(?:[12]?[0-9]?[0-9]{1}[\.]{1}){3}"""
 		"""(?:[12]?[0-9]?[0-9]{1}){1}){1}(?:[[:print:]]*){0,1})+"""
 	)
 
@@ -207,17 +218,17 @@ def get_client_sta_status_raw():
 
 
 # TODO: memoize this function
-def get_client_arp_status_raw(client_ip=None):
+def get_client_arp_status_raw(client_ip=None, lan_interface=INTERFACE_CHOICES[1]):
 	"""list the raw status of client sta."""
-	arguments = [u'arp', u'-i', u'wlan0', u'-a']
+	arguments = [u'arp', u'-i', str(lan_interface), u'-a']
 	theRawClientState = None
 	try:
 		import subprocess
 		try:
-			theRawClientState = subprocess.check_output(arguments, stderr=subprocess.STDOUT)
+			output = subprocess.check_output(arguments, stderr=subprocess.STDOUT)
 			if (client_ip is not None):
-				if (theRawClientState is not None) and (len(theRawClientState) > 0):
-					lines = [str(x) for x in theRawClientState.splitlines() if client_ip in x]
+				if (output is not None) and (len(output) > 0):
+					lines = [str(x) for x in output.splitlines() if client_ip in x]
 					theRawClientState = str("")
 					for line in lines:
 						theRawClientState = str(u'{}{}\n').format(str(theRawClientState), str(line))
@@ -276,11 +287,11 @@ def compactList(list, intern_func=None):
 
 
 # TODO: memoize this function
-def get_client_list():
+def get_client_list(lan_interface=None):
 	"""list the available clients."""
 	theResult = None
 	try:
-		theRawClientState = get_client_arp_status_raw(None)
+		theRawClientState = get_client_arp_status_raw(None, lan_interface)
 		theResult = compactList([x for x in extractIPv4(theRawClientState) if u'10.0.40.' in x])
 	except Exception as parseErr:
 		print(str("ERROR: get_client_list"))
@@ -547,27 +558,30 @@ def main(argv=None):
 	args = parseargs(argv)
 	try:
 		verbose = False
+		client_interface = INTERFACE_CHOICES[1]
 		if args.verbose_mode is not None:
 			verbose = args.verbose_mode
 		if args.output_html is not None:
 			output_html = args.output_html
+		if args.interface is not None:
+			client_interface = args.interface
 		if args.show_all is True:
 			if output_html:
 				print(str(
 					u'<table class=\"table table-striped\">' +
 					u'<thead><th>Client</th><th>MAC</th><th>IP</th><th>Status</th></thead><tbody>'
 				))
-			for client_name in get_client_list():
+			for client_name in get_client_list(client_interface):
 				print(show_client(client_name, verbose, output_html))
 			if output_html:
 				print("</tbody></table>")
 		else:
 			if args.list is True:
-				for client_name in get_client_list():
+				for client_name in get_client_list(client_interface):
 					print(str(client_name))
 			else:
-				interface = args.interface
-				print(show_client(interface, verbose, output_html))
+				ip = args.ip
+				print(show_client(ip, verbose, output_html))
 				return 0
 			return 0
 	except Exception as main_err:
