@@ -175,8 +175,8 @@ class StringsTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
-	def test_case_utils_test_not_literal_str(self):
-		"""Tests the literal string functions with blank not equal to blank"""
+	def test_case_utils_test_empty_literal_str(self):
+		"""Tests the literal string functions with blank equal to blank"""
 		theResult = True
 		try:
 			from piaplib import pku as pku
@@ -191,10 +191,10 @@ class StringsTestSuite(unittest.TestCase):
 			except Exception:
 				b_test = str(b'')
 			theResult = (
-				utils.literal_str(b_test) is not utils.literal_str(u_test)
+				utils.literal_str(b_test) in utils.literal_str(u_test)
 			)
 			theResult_temp = (
-				utils.literal_str(u_test) is not utils.literal_str(b_test)
+				utils.literal_str(u_test) in utils.literal_str(b_test)
 			)
 			theResult = (theResult is True) and (theResult_temp is True)
 			theResult_temp = None
