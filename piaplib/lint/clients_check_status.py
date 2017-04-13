@@ -102,6 +102,8 @@ def parseargs(arguments=None):
 		parser.add_argument('-V', '--version', action='version', version='%(prog)s 0.2.3')
 		theResult = parser.parse_args(arguments)
 	except Exception as parseErr:
+		parser.error(str("ERROR: parseargs"))
+		parser.error(str(type(parseErr)))
 		parser.error(str(parseErr))
 	return theResult
 
@@ -122,6 +124,8 @@ def show_client(client_ip=None, is_verbose=False, use_html=False):
 		if use_html:
 			theResult = gen_html_tr(theResult, str(u'client_status_row_{}').format(client_ip))
 	except Exception as cmdErr:
+		print(str("ERROR: show_client"))
+		print(str(type(cmdErr)))
 		print(str(cmdErr))
 		print(str(cmdErr.args))
 		theResult = "UNKNOWN"
@@ -177,7 +181,7 @@ def extractIPAddr(theInputStr):
 # TODO: memoize this function
 def get_client_sta_status_raw():
 	"""list the raw status of client sta."""
-	arguments = [u'/opt/PiAP/hostapd_actions/clients']
+	arguments = [str("""/opt/PiAP/hostapd_actions/clients 2>/dev/null ;""")]
 	theRawClientState = None
 	try:
 		import subprocess
@@ -188,8 +192,10 @@ def get_client_sta_status_raw():
 			del subErr
 			theRawClientState = None
 		except Exception as cmdErr:
-			# print(str(cmdErr))
-			# print(str(cmdErr.args))
+			print(str("ERROR: get_client_sta_status_raw"))
+			print(str(type(cmdErr)))
+			print(str(cmdErr))
+			print(str(cmdErr.args))
 			cmdErr = None
 			del cmdErr
 			theRawClientState = None
@@ -212,7 +218,7 @@ def get_client_arp_status_raw(client_ip=None):
 			if (client_ip is not None):
 				if (theRawClientState is not None) and (len(theRawClientState) > 0):
 					lines = [x for x in theRawClientState.splitlines() if client_ip in x]
-					theRawClientState = u''
+					theRawClientState = str("")
 					for line in lines:
 						theRawClientState = str(u'{}{}\n').format(theRawClientState, line)
 					del lines
@@ -225,6 +231,8 @@ def get_client_arp_status_raw(client_ip=None):
 			del subErr
 			theRawClientState = None
 		except Exception as cmdErr:
+			print(str("ERROR: get_client_arp_status_raw"))
+			print(str(type(cmdErr)))
 			print(str(cmdErr))
 			print(str(cmdErr.args))
 			theRawClientState = None
@@ -244,6 +252,8 @@ def get_client_sta_status(client=None):
 			if client in extractMACAddr(get_client_sta_status_raw()):
 				theClientState = u'associated'
 		except Exception as cmdErr:
+			print(str("ERROR: get_client_sta_status"))
+			print(str(type(cmdErr)))
 			print(str(cmdErr))
 			print(str(cmdErr.args))
 			theClientState = u'Unknown'
@@ -273,6 +283,8 @@ def get_client_list():
 		theRawClientState = get_client_arp_status_raw(None)
 		theResult = compactList([x for x in extractIPv4(theRawClientState) if u'10.0.40.' in x])
 	except Exception as parseErr:
+		print(str("ERROR: get_client_list"))
+		print(str(type(parseErr)))
 		print(str(parseErr))
 		print(str(parseErr.args))
 		theResult = None
