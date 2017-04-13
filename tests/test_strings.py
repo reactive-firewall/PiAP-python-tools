@@ -82,11 +82,11 @@ class StringsTestSuite(unittest.TestCase):
 			if hmac.__name__ is None:
 				theResult = False
 		except Exception as impErr:
-			print(u'')
+			print(str(""))
 			print(str(type(impErr)))
 			print(str(impErr))
 			print(str((impErr.args)))
-			print(u'')
+			print(str(""))
 			theResult = False
 		assert theResult
 
@@ -107,11 +107,11 @@ class StringsTestSuite(unittest.TestCase):
 				)
 			)
 		except Exception as err:
-			print(u'')
+			print(str(""))
 			print(str(type(err)))
 			print(str(err))
 			print(str((err.args)))
-			print(u'')
+			print(str(""))
 			err = None
 			del err
 			theResult = False
@@ -137,11 +137,11 @@ class StringsTestSuite(unittest.TestCase):
 			theResult_temp = None
 			del theResult_temp
 		except Exception as err:
-			print(u'')
+			print(str(""))
 			print(str(type(err)))
 			print(str(err))
 			print(str((err.args)))
-			print(u'')
+			print(str(""))
 			err = None
 			del err
 			theResult = False
@@ -160,18 +160,18 @@ class StringsTestSuite(unittest.TestCase):
 			theResult = utils.literal_str(b'The quick brown fox jumps over the lazy dog') in utils.literal_str(str(u'The quick brown fox jumps over the lazy dog')) # noqa
 			theResult = (theResult is True) and (utils.literal_str(str(u'The quick brown fox jumps over the lazy dog')) in utils.literal_str(b'The quick brown fox jumps over the lazy dog')) # noqa
 		except Exception as err:
-			print(u'')
+			print(str(""))
 			print(str(type(err)))
 			print(str(err))
 			print(str((err.args)))
-			print(u'')
+			print(str(""))
 			err = None
 			del err
 			theResult = False
 		assert theResult
 
 	def test_case_utils_test_not_literal_str(self):
-		"""Tests the literal string functions with u\'butter\'"""
+		"""Tests the literal string functions with blank not equal to blank"""
 		theResult = True
 		try:
 			from piaplib import pku as pku
@@ -190,11 +190,11 @@ class StringsTestSuite(unittest.TestCase):
 			theResult_temp = None
 			del theResult_temp
 		except Exception as err:
-			print(u'')
+			print(str(""))
 			print(str(type(err)))
 			print(str(err))
 			print(str((err.args)))
-			print(u'')
+			print(str(""))
 			err = None
 			del err
 			theResult = False
@@ -238,11 +238,11 @@ class StringsTestSuite(unittest.TestCase):
 						theResult_temp = None
 						del theResult_temp
 		except Exception as err:
-			print(u'')
+			print(str(""))
 			print(str(type(err)))
 			print(str(err))
 			print(str((err.args)))
-			print(u'')
+			print(str(""))
 			err = None
 			del err
 			theResult = False

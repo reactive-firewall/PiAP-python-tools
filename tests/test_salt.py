@@ -82,11 +82,11 @@ class StringsTestSuite(unittest.TestCase):
 			if hmac.__name__ is None:
 				theResult = False
 		except Exception as impErr:
-			print(u'')
+			print(str(""))
 			print(str(type(impErr)))
 			print(str(impErr))
 			print(str((impErr.args)))
-			print(u'')
+			print(str(""))
 			theResult = False
 		assert theResult
 
@@ -101,11 +101,11 @@ class StringsTestSuite(unittest.TestCase):
 			if saltify.__name__ is None:
 				theResult = False
 		except Exception as err:
-			print(u'')
+			print(str(""))
 			print(str(type(err)))
 			print(str(err))
 			print(str((err.args)))
-			print(u'')
+			print(str(""))
 			err = None
 			del err
 			theResult = False
@@ -145,11 +145,11 @@ class StringsTestSuite(unittest.TestCase):
 			theResult = (str(saltify.saltify("Test Message", "testSalt")) is str(test_salt_one))
 			del test_salt_one
 		except Exception as impErr:
-			print(u'')
+			print(str(""))
 			print(str(type(impErr)))
 			print(str(impErr))
 			print(str((impErr.args)))
-			print(u'')
+			print(str(""))
 			theResult = False
 		assert theResult
 

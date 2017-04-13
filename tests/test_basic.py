@@ -73,11 +73,11 @@ class BasicTestSuite(unittest.TestCase):
 			if hmac.__name__ is None:
 				theResult = False
 		except Exception as impErr:
-			print(u'')
+			print(str(""))
 			print(str(type(impErr)))
 			print(str(impErr))
 			print(str((impErr.args)))
-			print(u'')
+			print(str(""))
 			theResult = False
 		assert theResult
 
@@ -91,20 +91,20 @@ class BasicTestSuite(unittest.TestCase):
 				if (str("/which") in str(theOutputtext)):
 					theResult = True
 			except Exception as err:
-				print(u'')
+				print(str(""))
 				print(str(type(err)))
 				print(str(err))
 				print(str((err.args)))
-				print(u'')
+				print(str(""))
 				err = None
 				del err
 				theResult = False
 		except Exception as othererr:
-			print(u'')
+			print(str(""))
 			print(str(type(othererr)))
 			print(str(othererr))
 			print(str((othererr.args)))
-			print(u'')
+			print(str(""))
 			othererr = None
 			del othererr
 			theResult = False
