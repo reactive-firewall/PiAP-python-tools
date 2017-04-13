@@ -188,6 +188,11 @@ def unsafe_main(unsafe_input=None, chrootpath=None, uid=None, gid=None):
 			try:
 				os.chroot(chrootpath)
 			except OSError as badChrootErr:
+				print(str(""))
+				print(str("ERROR: ") + str(type(badChrootErr)))
+				print(str("ERROR: ") + str(badChrootErr))
+				print(str("ERROR: ") + str((badChrootErr.args)))
+				print(str(""))
 				badChrootErr = None
 				del badChrootErr
 				os.chdir(chrootpath)
