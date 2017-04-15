@@ -595,7 +595,7 @@ def main(argv=None):
 					u'<thead><th>Client</th><th>MAC</th><th>IP</th><th>Status</th></thead><tbody>'
 				))
 			for client_name in get_client_list(client_interface):
-				print(show_client(client_name, verbose, output_html))
+				print(show_client(str(client_name), verbose, output_html))
 			if output_html:
 				print("</tbody></table>")
 		else:
