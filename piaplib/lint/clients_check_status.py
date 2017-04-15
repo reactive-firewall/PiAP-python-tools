@@ -197,7 +197,16 @@ def get_client_sta_status_raw():
 	try:
 		import subprocess
 		try:
-			theRawClientState = subprocess.check_output(arguments, stderr=subprocess.STDOUT)
+			output = subprocess.check_output(arguments, stderr=subprocess.STDOUT)
+			if (output is not None) and (len(output) > 0):
+				lines = [utils.literal_str(x) for x in output.splitlines() if x is not None]
+				theRawClientState = str("")
+				for line in lines:
+					if (line is not None) and (len(line) > 0):
+						theRawClientState = str("{}{}\n").format(str(theRawClientState), str(line))
+				del lines
+			else:
+				theRawClientState = None
 		except subprocess.CalledProcessError as subErr:
 			subErr = None
 			del subErr
