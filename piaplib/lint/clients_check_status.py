@@ -192,7 +192,7 @@ def extractIPAddr(theInputStr):
 # TODO: memoize this function
 def get_client_sta_status_raw():
 	"""list the raw status of client sta."""
-	arguments = [str("""/opt/PiAP/hostapd_actions/clients 2>/dev/null ;""")]
+	arguments = [str("""/opt/PiAP/hostapd_actions/clients""")]
 	theRawClientState = None
 	try:
 		import subprocess
@@ -217,26 +217,40 @@ def get_client_sta_status_raw():
 	return theRawClientState
 
 
+def isLineForSTA(someLine=None, staname=None):
+	"""determins if a raw output line is for a user"""
+	if ((staname is None) or (utils.literal_str(
+		someLine
+	).startswith(utils.literal_str(
+		staname
+	)) is True)):
+		return True
+	else:
+		return False
+
+
 # TODO: memoize this function
 def get_client_arp_status_raw(client_ip=None, lan_interface=INTERFACE_CHOICES[1]):
 	"""list the raw status of client sta."""
+	if lan_interface not in INTERFACE_CHOICES:
+		lan_interface = INTERFACE_CHOICES[1]
 	arguments = [u'arp', u'-i', str(lan_interface), u'-a']
 	theRawClientState = None
 	try:
 		import subprocess
 		try:
 			output = subprocess.check_output(arguments, stderr=subprocess.STDOUT)
-			if (client_ip is not None):
-				if (output is not None) and (len(output) > 0):
-					lines = [str(x) for x in output.splitlines() if client_ip in x]
-					theRawClientState = str("")
-					for line in lines:
-						theRawClientState = str(u'{}{}\n').format(str(theRawClientState), str(line))
-					del lines
-				else:
-					theRawClientState = str(theRawClientState).splitlines()
+			if (output is not None) and (len(output) > 0):
+				lines = [
+					utils.literal_str(x) for x in output.splitlines() if isLineForSTA(x, client_ip)
+				]
+				theRawClientState = str("")
+				for line in lines:
+					if (line is not None) and (len(line) > 0):
+						theRawClientState = str("{}{}\n").format(str(theRawClientState), str(line))
+				del lines
 			else:
-				theRawClientState = str(theRawClientState).splitlines()
+				theRawClientState = None
 		except subprocess.CalledProcessError as subErr:
 			subErr = None
 			del subErr
