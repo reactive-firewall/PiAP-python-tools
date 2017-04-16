@@ -332,7 +332,7 @@ def get_user_status(user_name=None, use_html=False):
 				})
 				for theWork in theWorks:
 					temp_txt = "UNKNOWN"
-					if (u'SYSTEM' in theWork):
+					if ("SYSTEM" in theWork):
 						temp_txt = "SYSTEM"
 					else:
 						for known_case in known_work_cases.keys():
@@ -346,11 +346,13 @@ def get_user_status(user_name=None, use_html=False):
 						elif (u'DEFENSE' in temp_txt):
 							temp_txt = html_generator.gen_html_label(u'Defense', u'success')
 						elif (u'OFFENSE' in temp_txt):
-							temp_txt = html_generator.gen_html_label(u'Offense', u'default')
+							temp_txt = html_generator.gen_html_label(u'Offense', u'primary')
 						elif (u'NETWORK SERVICES' in temp_txt):
 							temp_txt = html_generator.gen_html_label(u'Network', u'info')
 						elif (u'LOGGING SERVICES' in temp_txt):
 							temp_txt = html_generator.gen_html_label(u'Logging', u'info')
+						elif (u'TIMEKEEPING SERVICES' in temp_txt):
+							temp_txt = html_generator.gen_html_label(u'Clock', u'info')
 						elif (u'DNS-DHCP-SERVER' in temp_txt):
 							temp_txt = html_generator.gen_html_label(u'Local Domain', u'info')
 						elif (u'SYSTEM' in temp_txt):
@@ -362,7 +364,10 @@ def get_user_status(user_name=None, use_html=False):
 					status_list.append(str(temp_txt))
 				status_list = utils.compactList(status_list)
 			else:
-				status_list = ["SYSTEM"]
+				if use_html is True:
+					status_list = [html_generator.gen_html_label(u'System', u'info')]
+				else:
+					status_list = ["SYSTEM"]
 		if use_html is not True:
 			theResult = status_list
 		else:
@@ -461,7 +466,7 @@ def main(argv=None):
 			if output_html:
 				print(
 					"<table class=\"table table-striped\">" +
-					"<thead><th>User</th><th>TTYs</th><th>Host</th><th>Status</th></thead><tbody>"
+					"<thead><th>User</th><th>TTYs</th><th>Host</th><th>Activity</th></thead><tbody>"
 				)
 			for user_name in get_user_list():
 				print(show_user(user_name, verbose, output_html))

@@ -235,8 +235,19 @@ def get_iface_status(iface=u'lo', use_html=False):
 				theResult = str("UNKNOWN")
 		else:
 			if status_txt is not None:
+				if (str(" DOWN") in str(status_txt)):
 					theResult = html_generator.gen_html_td(
-						html_generator.gen_html_label(get_iface_status(iface, False), u'default'),
+						html_generator.gen_html_label(str("DOWN"), u'danger'),
+						str(u'iface_status_value_{}').format(iface)
+					)
+				elif (str(" UP") in str(status_txt)):
+					theResult = html_generator.gen_html_td(
+						html_generator.gen_html_label(str("UP"), u'success'),
+						str(u'iface_status_value_{}').format(iface)
+					)
+				else:
+					theResult = html_generator.gen_html_td(
+						html_generator.gen_html_label(str("UNKNOWN"), u'default'),
 						str(u'iface_status_value_{}').format(iface)
 					)
 			else:
@@ -322,7 +333,7 @@ def main(argv=None):
 			if output_html:
 				print(
 					"<table class=\"table table-striped\">" +
-					"<thead><th>Interface</th><th>MAC</th><th>IP</th><th>Status</th></thead><tbody>"
+					"<thead><th>Interface</th><th>MAC</th><th>IP</th><th>State</th></thead><tbody>"
 				)
 			for iface_name in get_iface_list():
 				print(show_iface(iface_name, verbose, output_html))
