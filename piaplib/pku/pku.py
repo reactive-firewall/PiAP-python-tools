@@ -27,6 +27,11 @@ try:
 except Exception:
 	import utils as utils
 
+try:
+	from . import interfaces as interfaces
+except Exception:
+	import interfaces as interfaces
+
 
 def main(argv=None):
 	"""The Main Event."""

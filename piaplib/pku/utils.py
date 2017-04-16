@@ -72,6 +72,14 @@ def extractMACAddr(theInputStr):
 	)
 
 
+def extractIfaceNames(theInputStr):
+	"""Extracts the expected iface names."""
+	return extractRegexPattern(
+		theInputStr,
+		"(?:(?:[[:print:]]*){0,1}(?P<iface_name>[abehlstuw]{3}[n]?[0-9]+){1}(?:[[:print:]]*){0,1})+"
+	)
+
+
 def extractTTYs(theInputStr):
 	"""Extract the TTYs from a string."""
 	return extractRegexPattern(
@@ -152,7 +160,10 @@ def main(argv=None):
 
 
 if __name__ in u'__main__':
-	import sys
-	main(sys.argv[1:])
+	try:
+		import sys
+		main(sys.argv[1:])
+	except Exception:
+		exit(3)
 
 
