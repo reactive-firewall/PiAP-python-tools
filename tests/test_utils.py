@@ -200,7 +200,7 @@ class UtilsTestSuite(unittest.TestCase):
 			from pku import utils as utils
 			if utils.__name__ is None:
 				raise ImportError("Failed to import utils")
-			validIPv4 = ["10.0.40.1"]
+			validIPv4 = ["10.20.30.40"]
 			temp = utils.extractIPv4(
 				"""test.PiAP.local (10.20.30.40) at 00:FF:00:FF:00:FF [ether] on wlan5"""
 			)
