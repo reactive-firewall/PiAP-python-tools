@@ -180,7 +180,7 @@ def extractIfaceNames(theInputStr):
 	"""Extracts the expected iface names."""
 	return extractRegexPattern(
 		theInputStr,
-		"(?:(?:[[:print:]]*){0,1}(?P<iface_name>[aehltw]{3}[n]?[0-9]+){1}(?:[[:print:]]*){0,1})+"
+		"(?:(?:[[:print:]]*){0,1}(?P<iface_name>[abehlstuw]{3}[n]?[0-9]+){1}(?:[[:print:]]*){0,1})+"
 	)
 
 
