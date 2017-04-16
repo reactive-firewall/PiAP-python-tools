@@ -26,8 +26,22 @@ try:
 		from .. import utils as utils
 	except Exception:
 		import pku.utils as utils
+	try:
+		from . import html_generator as html_generator
+	except Exception as ImpErr:
+		ImpErr = None
+		del ImpErr
+		import html_generator as html_generator
+	try:
+		from .. import interfaces as interfaces
+	except Exception:
+		import pku.interfaces as interfaces
 	if utils.__name__ is None:
 		raise ImportError("Failed to open PKU Utils")
+	if interfaces.__name__ is None:
+		raise ImportError("Failed to open PKU Interfaces")
+	if html_generator.__name__ is None:
+		raise ImportError("Failed to open HTML5 Pocket Lint")
 except Exception as importErr:
 	print(str(importErr))
 	print(str(importErr.args))
@@ -39,16 +53,6 @@ except Exception as importErr:
 
 __prog__ = str("""clients_check_status.py""")
 """The Program's name"""
-
-
-INTERFACE_CHOICES = [
-	str('{}{}').format(x, str(y)) for x in ['wlan', 'eth', 'mon'] for y in range(5)
-]
-"""whitelist of valid iface names"""
-
-
-HTML_LABEL_ROLES = [u'default', u'success', u'info', u'warning', u'danger']
-"""the types of labels that can be used in html output"""
 
 
 def error_handling(func):
@@ -91,7 +95,7 @@ def parseargs(arguments=None):
 		)
 		parser.add_argument(
 			'--interface', dest='interface',
-			default=INTERFACE_CHOICES[1], choices=INTERFACE_CHOICES,
+			default=interfaces.INTERFACE_CHOICES[1], choices=interfaces.INTERFACE_CHOICES,
 			help='The LAN interface.'
 		)
 		parser.add_argument(
@@ -119,18 +123,24 @@ def parseargs(arguments=None):
 	return theResult
 
 
-def show_client(client_ip=None, is_verbose=False, use_html=False):
+def show_client(client_ip=None, is_verbose=False, use_html=False, lan_interface=None):
 	"""show the given client."""
 	try:
+		if lan_interface not in interfaces.INTERFACE_CHOICES:
+			lan_interface = interfaces.INTERFACE_CHOICES[1]
 		if use_html:
 			format_pattern = u'{}{}{}{}'
 		else:
 			format_pattern = u'{} {} {} {}'
 		theResult = format_pattern.format(
-			get_client_name(client_ip, use_html),
-			get_client_mac(client_ip, use_html),
-			get_client_ip(client_ip, use_html),
-			get_client_status(get_client_ip(client_ip, False), use_html)
+			get_client_name(client_ip, use_html, lan_interface),
+			get_client_mac(client_ip, use_html, lan_interface),
+			get_client_ip(client_ip, use_html, lan_interface),
+			get_client_status(
+				get_client_ip(client_ip, False, lan_interface),
+				use_html,
+				lan_interface
+			)
 		)
 		if use_html:
 			theResult = gen_html_tr(theResult, str(u'client_status_row_{}').format(client_ip))
@@ -143,61 +153,30 @@ def show_client(client_ip=None, is_verbose=False, use_html=False):
 	return theResult
 
 
-def get_client_name(client_ip=None, use_html=False):
+def get_client_name(client_ip=None, use_html=False, lan_interface=None):
+	if lan_interface not in interfaces.INTERFACE_CHOICES:
+		lan_interface = interfaces.INTERFACE_CHOICES[1]
 	if client_ip is None:
 		return None
 	if use_html is not True:
-		return get_client_arp_status_raw(client_ip).split(u' ', 1)[0]
+		return get_client_arp_status_raw(client_ip, lan_interface).split(u' ', 1)[0]
 	else:
 		client = str(get_client_name(client_ip, False))
 		return gen_html_td(client, str(u'client_status_{}').format(client))
 
 
-# TODO: move this function to utils
-def extractRegexPattern(theInput_Str, theInputPattern):
-	import re
-	sourceStr = str(theInput_Str)
-	prog = re.compile(theInputPattern)
-	theList = prog.findall(sourceStr)
-	return theList
-
-
-def extractMACAddr(theInputStr):
-	"""Extract the MAC addresses from a string."""
-	return extractRegexPattern(
-		theInputStr,
-		"""(?:(?:[[:print:]]*){0,1}(?P<Mac>(?:(?:[0-9a-fA-F]{1,2}[\:]{1}){5}""" +
-		"""(?:[0-9a-fA-F]{1,2}){1}){1})+(?:[[:print:]]*){0,1})+"""
-	)
-
-
-def extractIPv4(theInputStr):
-	"""Extract the Ipv4 addresses from a string. Simple x.x.x.x matching, no checks."""
-	return extractRegexPattern(
-		theInputStr,
-		"""(?:(?:[[:print:]]*){0,1}(?P<IP>(?:[12]?[0-9]?[0-9]{1}[\.]{1}){3}"""
-		"""(?:[12]?[0-9]?[0-9]{1}){1}){1}(?:[[:print:]]*){0,1})+"""
-	)
-
-
-def extractIPAddr(theInputStr):
-	"""Extract the Ipv4 addresses from a string. Simple x.x.x.x matching, no checks."""
-	return extractRegexPattern(
-		theInputStr,
-		"""(?:(?:[[:print:]]*){0,1}(?P<IP>(?:[12]?[0-9]?[0-9]{1}[\.]{1}){3}""" +
-		"""(?:[12]?[0-9]?[0-9]{1}){1}){1}(?:[/]{1}){1}(?:[[:print:]]*){0,1})+"""
-	)
-
-
 # TODO: memoize this function
 def get_client_sta_status_raw():
 	"""list the raw status of client sta."""
-	arguments = [str("""/opt/PiAP/hostapd_actions/clients""")]
 	theRawClientState = None
 	try:
 		import subprocess
 		try:
-			output = subprocess.check_output(arguments, stderr=subprocess.STDOUT)
+			# hard-coded white-list cmd
+			output = subprocess.check_output(
+				[str("""/opt/PiAP/hostapd_actions/clients""")],
+				stderr=subprocess.STDOUT
+			)
 			if (output is not None) and (len(output) > 0):
 				lines = [utils.literal_str(x) for x in output.splitlines() if x is not None]
 				theRawClientState = str("")
@@ -207,10 +186,14 @@ def get_client_sta_status_raw():
 				del lines
 			else:
 				theRawClientState = None
+		except FileNotFoundError as depErr:
+			depErr = None
+			del depErr
+			theRawClientState = u'UNKNOWN'
 		except subprocess.CalledProcessError as subErr:
 			subErr = None
 			del subErr
-			theRawClientState = None
+			theRawClientState = u'UNKNOWN'
 		except Exception as cmdErr:
 			print(str("ERROR: get_client_sta_status_raw"))
 			print(str(type(cmdErr)))
@@ -227,23 +210,30 @@ def get_client_sta_status_raw():
 
 
 def isLineForSTA(someLine=None, staname=None):
-	"""determins if a raw output line is for a user"""
-	if ((staname is None) or (utils.literal_str(
-		someLine
-	).startswith(utils.literal_str(
-		staname
-	)) is True)):
-		return True
-	else:
-		return False
+	"""determins if a raw output line is for a STA"""
+	doesMatch = False
+	try:
+		doesMatch = utils.isLineForMatch(someLine, staname)
+		if (doesMatch is False):
+			if str(staname) in utils.extractIPv4(utils.literal_str(someLine)):
+				doesMatch = True
+			else:
+				doesMatch = False
+	except Exception as matchErr:
+		print(str(type(matchErr)))
+		print(str(matchErr))
+		print(str(matchErr.args))
+		matchErr = None
+		del matchErr
+		doesMatch = False
+	return doesMatch
 
 
-# TODO: memoize this function
-def get_client_arp_status_raw(client_ip=None, lan_interface=INTERFACE_CHOICES[1]):
+def get_client_arp_status_raw(client_ip=None, lan_interface=interfaces.INTERFACE_CHOICES[1]):
 	"""list the raw status of client sta."""
-	if lan_interface not in INTERFACE_CHOICES:
-		lan_interface = INTERFACE_CHOICES[1]
-	arguments = [u'arp', u'-i', str(lan_interface), u'-a']
+	if lan_interface not in interfaces.INTERFACE_CHOICES:
+		lan_interface = interfaces.INTERFACE_CHOICES[1]
+	arguments = [str("arp"), str("-i"), str(lan_interface), str("-a")]
 	theRawClientState = None
 	try:
 		import subprocess
@@ -265,7 +255,7 @@ def get_client_arp_status_raw(client_ip=None, lan_interface=INTERFACE_CHOICES[1]
 			del subErr
 			theRawClientState = None
 		except Exception as cmdErr:
-			print(str("ERROR: get_client_arp_status_raw"))
+			print(str("ERROR: get_client_arp_status_raw - 403"))
 			print(str(type(cmdErr)))
 			print(str(cmdErr))
 			print(str(cmdErr.args))
@@ -278,35 +268,20 @@ def get_client_arp_status_raw(client_ip=None, lan_interface=INTERFACE_CHOICES[1]
 
 
 # TODO: memoize this function
-def get_client_sta_status(client=None):
+def get_client_sta_status(client_mac=None):
 	"""list the raw status of client sta."""
 	theClientState = u'disassociated'
-	if client is not None:
+	if client_mac is not None:
 		try:
-			if client in extractMACAddr(get_client_sta_status_raw()):
+			if str(client_mac).upper() in utils.extractMACAddr(get_client_sta_status_raw()):
 				theClientState = u'associated'
 		except Exception as cmdErr:
 			print(str("ERROR: get_client_sta_status"))
 			print(str(type(cmdErr)))
 			print(str(cmdErr))
 			print(str(cmdErr.args))
-			theClientState = u'Unknown'
+			theClientState = u'UNKNOWN'
 	return theClientState
-
-
-def compactList(list, intern_func=None):
-	if intern_func is None:
-		def intern_func(x):
-			return x
-	seen = {}
-	result = []
-	for item in list:
-		marker = intern_func(item)
-		if marker in seen:
-			continue
-		seen[marker] = 1
-		result.append(item)
-	return result
 
 
 # TODO: memoize this function
@@ -315,7 +290,9 @@ def get_client_list(lan_interface=None):
 	theResult = None
 	try:
 		theRawClientState = get_client_arp_status_raw(None, lan_interface)
-		theResult = compactList([x for x in extractIPv4(theRawClientState) if u'10.0.40.' in x])
+		theResult = utils.compactList(
+			[x for x in utils.extractIPv4(theRawClientState) if u'10.0.40.' in x]
+		)
 	except Exception as parseErr:
 		print(str("ERROR: get_client_list"))
 		print(str(type(parseErr)))
@@ -325,14 +302,16 @@ def get_client_list(lan_interface=None):
 	return theResult
 
 
-def get_client_status(client=None, use_html=False):
+def get_client_status(client=None, use_html=False, lan_interface=None):
 	"""Generate the status"""
 	theResult = None
 	try:
-		client_mac = get_client_mac(client, False)
+		if lan_interface not in interfaces.INTERFACE_CHOICES:
+			lan_interface = interfaces.INTERFACE_CHOICES[1]
+		client_mac = get_client_mac(client, False, lan_interface)
 		status_txt = get_client_sta_status(client_mac)
-		status_txt = None
 		if client_mac is not None:
+			status_txt = None
 			status_txt = get_client_sta_status(client_mac)
 		if use_html is not True:
 			if status_txt is not None:
@@ -366,23 +345,31 @@ def get_client_status(client=None, use_html=False):
 	return theResult
 
 
-def get_client_mac(client=None, use_html=False):
+def get_client_mac(client=None, use_html=False, lan_interface=None):
 	"""Generate output of the client mac."""
 	if client is None and use_html is not True:
 		return None
+	if lan_interface not in interfaces.INTERFACE_CHOICES:
+		lan_interface = interfaces.INTERFACE_CHOICES[1]
 	theResult = None
 	try:
-		mac_list_txt = extractMACAddr(get_client_arp_status_raw(client))
+		mac_list_txt = utils.extractMACAddr(get_client_arp_status_raw(client, lan_interface))
 		if use_html is not True:
 			if (mac_list_txt is not None) and (len(mac_list_txt) > 0):
 				theResult = str(mac_list_txt[0])
 			else:
 				theResult = None
 		else:
-			theResult = gen_html_td(
-				get_client_mac(client, False),
-				str(u'client_status_mac_{}').format(client)
-			)
+			if mac_list_txt is not None and len(mac_list_txt) > 0:
+				theResult = gen_html_td(
+					str(mac_list_txt[0]),
+					str(u'client_status_macs_{}')
+				).format(client)
+			else:
+				theResult = gen_html_td(
+					gen_html_label(u'No IP', html_generator.HTML_LABEL_ROLES[3]),
+					str(u'client_status_macs_{}').format(client)
+				)
 	except Exception as errcrit:
 		print(str(errcrit))
 		print(str(errcrit.args))
@@ -390,11 +377,13 @@ def get_client_mac(client=None, use_html=False):
 	return theResult
 
 
-def get_client_ip(client=None, use_html=False):
+def get_client_ip(client=None, use_html=False, lan_interface=None):
 	"""Generate output of the client IP."""
 	theResult = None
 	try:
-		ip_list_txt = extractIPv4(get_client_arp_status_raw(client))
+		if lan_interface not in interfaces.INTERFACE_CHOICES:
+			lan_interface = interfaces.INTERFACE_CHOICES[1]
+		ip_list_txt = utils.extractIPv4(get_client_arp_status_raw(client, lan_interface))
 		if use_html is not True:
 			if ip_list_txt is not None and len(ip_list_txt) > 0:
 				theResult = str(ip_list_txt[0])
@@ -408,7 +397,7 @@ def get_client_ip(client=None, use_html=False):
 				).format(client)
 			else:
 				theResult = gen_html_td(
-					gen_html_label(u'No IP', HTML_LABEL_ROLES[3]),
+					gen_html_label(u'No IP', html_generator.HTML_LABEL_ROLES[3]),
 					str(u'client_status_ips_{}').format(client)
 				)
 	except Exception as errcrit:
@@ -544,7 +533,7 @@ def gen_html_li(item=None, id=None, name=None):
 
 
 # duplicate
-def gen_html_label(content=None, role=HTML_LABEL_ROLES[0], id=None, name=None):
+def gen_html_label(content=None, role=html_generator.HTML_LABEL_ROLES[0], id=None, name=None):
 	"""
 	Generates a table data html lable taglet.
 	param content -- The content of the td taglet.
@@ -581,7 +570,7 @@ def main(argv=None):
 	args = parseargs(argv)
 	try:
 		verbose = False
-		client_interface = INTERFACE_CHOICES[1]
+		client_interface = interfaces.INTERFACE_CHOICES[1]
 		if args.verbose_mode is not None:
 			verbose = args.verbose_mode
 		if args.output_html is not None:
@@ -595,7 +584,7 @@ def main(argv=None):
 					u'<thead><th>Client</th><th>MAC</th><th>IP</th><th>Status</th></thead><tbody>'
 				))
 			for client_name in get_client_list(client_interface):
-				print(show_client(str(client_name), verbose, output_html))
+				print(show_client(str(client_name), verbose, output_html, client_interface))
 			if output_html:
 				print("</tbody></table>")
 		else:
@@ -604,7 +593,7 @@ def main(argv=None):
 					print(str(client_name))
 			else:
 				ip = args.ip
-				print(show_client(ip, verbose, output_html))
+				print(show_client(ip, verbose, output_html, client_interface))
 				return 0
 			return 0
 	except Exception as main_err:

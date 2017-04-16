@@ -49,6 +49,7 @@ HTML_LABEL_STATUS = {
 }
 """The basic status mappings to lables"""
 
+
 HTML_LABEL_ROLES = [
 	u'default', HTML_LABEL_STATUS[u'DEBUG'],
 	HTML_LABEL_STATUS[u'OK'], HTML_LABEL_STATUS[u'WARNING'],
@@ -69,12 +70,18 @@ def has_special_html_chars(raw_str=None):
 		somestr = utils.literal_str(raw_str)
 		if somestr is None:
 			return True
-		badchars = [u'\"', u'\'', u'\\', u'%', u'>', u'<', u'=']
+		badchars = [
+			u'\"', u'\'', u'\\', u'%', u'>',
+			u'<', u'=', str("""\""""), str("""\'"""), str("""\\"""),
+			str("""%"""), str(""">"""), str("""<"""), str("""='""")
+		]
 		for badchar in badchars:
 			if badchar in somestr:
 				return True
 	except Exception as badinput:
 		print(str("Bad html render string input."))
+		print(str(type(badinput)))
+		badinput = None
 		del badinput
 		return True
 	return False

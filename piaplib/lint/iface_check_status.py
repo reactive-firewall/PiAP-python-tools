@@ -17,13 +17,39 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-INTERFACE_CHOICES = [
-	str('{}{}').format(x, str(y)) for x in ['wlan', 'eth', 'mon'] for y in range(5)
-]
-"""whitelist of valid iface names"""
 
-HTML_LABEL_ROLES = [u'default', u'success', u'info', u'warning', u'danger']
-"""the types of labels that can be used in html output"""
+try:
+	import os
+	import sys
+	sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+	try:
+		from .. import utils as utils
+	except Exception:
+		import pku.utils as utils
+	try:
+		from . import html_generator as html_generator
+	except Exception as ImpErr:
+		ImpErr = None
+		del ImpErr
+		import html_generator as html_generator
+	try:
+		from .. import interfaces as interfaces
+	except Exception:
+		import pku.interfaces as interfaces
+	if utils.__name__ is None:
+		raise ImportError("Failed to open PKU Utils")
+	if interfaces.__name__ is None:
+		raise ImportError("Failed to open PKU Interfaces")
+	if html_generator.__name__ is None:
+		raise ImportError("Failed to open HTML5 Pocket Lint")
+except Exception as importErr:
+	print(str(importErr))
+	print(str(importErr.args))
+	importErr = None
+	del importErr
+	raise ImportError("Failed to import " + str(__file__))
+	exit(255)
+
 
 __prog__ = u'iface_check_status'
 """The Program's name"""
@@ -47,7 +73,7 @@ def error_handling(func):
 	return helper
 
 
-def parseargs():
+def parseargs(arguments=None):
 	"""Parse the arguments"""
 	import argparse
 	try:
@@ -58,7 +84,7 @@ def parseargs():
 		)
 		parser.add_argument(
 			'-i', '--interface',
-			default=INTERFACE_CHOICES[1], choices=INTERFACE_CHOICES,
+			default=interfaces.INTERFACE_CHOICES[1], choices=interfaces.INTERFACE_CHOICES,
 			help='The interface to show.'
 		)
 		parser.add_argument(
@@ -91,7 +117,7 @@ def parseargs():
 			'-V', '--version',
 			action='version', version='%(prog)s 0.2.3'
 		)
-		theResult = parser.parse_args()
+		theResult = parser.parse_args(arguments)
 	except Exception as parseErr:
 		parser.error(str(parseErr))
 	return theResult
@@ -100,9 +126,9 @@ def parseargs():
 def taint_name(rawtxt):
 	"""check the interface arguments"""
 	tainted_input = str(rawtxt).lower()
-	for test_iface in INTERFACE_CHOICES:
-		if tainted_input in test_iface:
-			return test_iface
+	for test_iface in interfaces.INTERFACE_CHOICES:
+		if str(tainted_input) in str(test_iface):
+			return str(test_iface)
 	return None
 
 
@@ -116,15 +142,14 @@ def show_iface(iface_name=None, is_verbose=False, use_html=False):
 				format_pattern = u'{}{}{}{}'
 			else:
 				format_pattern = u'{} {} {} {}'
-			theResult = gen_html_tr(
-				format_pattern.format(
-					get_iface_name(iface_name, use_html),
-					get_iface_mac(iface_name, use_html),
-					get_iface_ip_list(iface_name, use_html),
-					get_iface_status(iface_name, use_html)
-				),
-				str(u'iface_status_row_{}').format(iface_name)
+			theResult = format_pattern.format(
+				get_iface_name(iface_name, use_html),
+				get_iface_mac(iface_name, use_html),
+				get_iface_ip_list(iface_name, use_html),
+				get_iface_status(iface_name, use_html)
 			)
+			if use_html:
+				theResult = gen_html_tr(theResult, str(u'iface_status_row_{}').format(iface_name))
 		except Exception as cmdErr:
 			print(str(cmdErr))
 			print(str(cmdErr.args))
@@ -168,15 +193,6 @@ def extractMACAddr(theInputStr):
 	)
 
 
-def extractIPv4(theInputStr):
-	"""Extract the Ipv4 addresses from a string. Simple x.x.x.x matching, no checks."""
-	return extractRegexPattern(
-		theInputStr,
-		"(?:(?:[[:print:]]*){0,1}(?P<IP>(?:[12]?[0-9]?[0-9]{1}[\.]{1}){3}" +
-		"(?:[12]?[0-9]?[0-9]{1}){1}){1}(?:[[:print:]]*){0,1})+"
-	)
-
-
 def extractIPAddr(theInputStr):
 	"""Extract the Ipv4 addresses from a string. Simple x.x.x.x matching, no checks."""
 	return extractRegexPattern(
@@ -189,16 +205,21 @@ def extractIPAddr(theInputStr):
 # TODO: memoize this function
 def get_iface_status_raw(interface=None):
 	"""list the raw status of interfaces."""
-	arguments = [u'ip', u'addr']
+	arguments = [str("ip"), str("addr")]
 	if interface is not None:
 		tainted_name = taint_name(interface)
-		arguments = [u'ip', u'addr', u'show', tainted_name]
+		arguments = [str("ip"), str("addr"), str("show"), str(tainted_name)]
 	theRawIfaceState = None
 	try:
 		import subprocess
 		try:
 			theRawIfaceState = subprocess.check_output(arguments, stderr=subprocess.STDOUT)
 		except subprocess.CalledProcessError as subErr:
+			print(str("ERROR"))
+			print(str(type(subErr)))
+			print(str(subErr))
+			print(str(subErr.args))
+			print(str(""))
 			subErr = None
 			del subErr
 			theRawIfaceState = None
@@ -213,30 +234,16 @@ def get_iface_status_raw(interface=None):
 	return theRawIfaceState
 
 
-def compactList(list, intern_func=None):
-	if intern_func is None:
-		def intern_func(x):
-			return x
-	seen = {}
-	result = []
-	for item in list:
-		marker = intern_func(item)
-		if marker in seen:
-			continue
-		seen[marker] = 1
-		result.append(item)
-	return result
-
-
 # TODO: memoize this function
 def get_iface_list():
 	"""list the available interfaces."""
-	theResult = None
+	theResult = []
 	try:
 		theRawIfaceState = get_iface_status_raw(None)
-		theResult = compactList(
-			[x for x in extractIfaceNames(theRawIfaceState) if x in INTERFACE_CHOICES]
-		)
+		for x in extractIfaceNames(theRawIfaceState):
+			if x in interfaces.INTERFACE_CHOICES:
+				theResult.append(x)
+		theResult = utils.compactList([x for x in theResult])
 		"""while '[aehltw]{3}[n]?[0-9]+' would probably work well here, best to whitelist. """
 	except Exception as parseErr:
 		print(str(parseErr))
@@ -253,30 +260,28 @@ def get_iface_status(iface=u'lo', use_html=False):
 		status_txt = get_iface_status_raw(iface)
 		if use_html is False:
 			if status_txt is not None:
-				if (" DOWN" in status_txt):
-					theResult = u'DOWN'
-				elif (" UP" in status_txt):
-					theResult = u'UP'
+				if (str(" DOWN") in str(status_txt)):
+					theResult = str("DOWN")
+				elif (str(" UP") in str(status_txt)):
+					theResult = str("UP")
 				else:
-					theResult = u'UNKNOWN'
+					theResult = str("UNKNOWN")
+			else:
+				theResult = str("UNKNOWN")
 		else:
 			if status_txt is not None:
-				if (u' DOWN' in status_txt):
 					theResult = gen_html_td(
-						gen_html_label(u'DOWN', u'danger'),
+						gen_html_label(get_iface_status(iface, False), u'default'),
 						str(u'iface_status_value_{}').format(iface)
 					)
-				elif (u' UP' in status_txt):
-					theResult = gen_html_td(
-						gen_html_label(u'UP', u'success'),
-						str(u'iface_status_value_{}').format(iface)
-					)
-				else:
-					theResult = gen_html_td(
-						gen_html_label(u'UNKNOWN', u'default'),
-						str(u'iface_status_value_{}').format(iface)
-					)
+			else:
+				theResult = gen_html_td(
+					gen_html_label(str("UNKNOWN"), u'default'),
+					str(u'iface_status_value_{}').format(iface)
+				)
 	except Exception as errcrit:
+		print(str("Status ERROR"))
+		print(str(type(errcrit)))
 		print(str(errcrit))
 		print(str(errcrit.args))
 		theResult = None
@@ -289,15 +294,21 @@ def get_iface_mac(iface=u'lo', use_html=False):
 	try:
 		mac_list_txt = extractMACAddr(get_iface_status_raw(iface))
 		if use_html is False:
-			if mac_list_txt is not None:
+			if mac_list_txt is not None and len(mac_list_txt) > 0:
 				theResult = str(mac_list_txt[0])
 			else:
 				theResult = None
 		else:
-			theResult = gen_html_td(
-				get_iface_mac(iface, False),
-				str(u'iface_status_mac_{}').format(iface)
-			)
+			if mac_list_txt is not None and len(mac_list_txt) > 0:
+				theResult = gen_html_td(
+					str(mac_list_txt[0]),
+					str(u'iface_status_mac_{}').format(iface)
+				)
+			else:
+				theResult = gen_html_td(
+					"",
+					str(u'iface_status_mac_{}').format(iface)
+				)
 	except Exception as errcrit:
 		print(str(errcrit))
 		print(str(errcrit.args))
@@ -323,7 +334,7 @@ def get_iface_ip_list(iface=u'lo', use_html=False):
 				)
 			else:
 				theResult = gen_html_td(
-					gen_html_label(u'No IP', HTML_LABEL_ROLES[3]),
+					gen_html_label(u'No IP', html_generator.HTML_LABEL_ROLES[3]),
 					str(u'iface_status_ips_{}').format(iface)
 				)
 	except Exception as errcrit:
@@ -459,7 +470,7 @@ def gen_html_li(item=None, id=None, name=None):
 
 
 # duplicate
-def gen_html_label(content=None, role=HTML_LABEL_ROLES[0], id=None, name=None):
+def gen_html_label(content=None, role=html_generator.HTML_LABEL_ROLES[0], id=None, name=None):
 	"""
 	Generates a table data html lable taglet.
 	param content -- The content of the td taglet.
@@ -489,9 +500,9 @@ def gen_html_label(content=None, role=HTML_LABEL_ROLES[0], id=None, name=None):
 		return str(u'<span class=\"lable lable-{}\">{}</span>').format(role, str(content))
 
 
-def main():
+def main(argv=None):
 	"""The main function."""
-	args = parseargs()
+	args = parseargs(argv)
 	try:
 		verbose = False
 		if args.verbose_mode is not None:

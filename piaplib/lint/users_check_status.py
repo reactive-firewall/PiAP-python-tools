@@ -165,60 +165,19 @@ def get_user_name(user_name=None, use_html=False):
 		return html_generator.gen_html_td(user, str(u'user_name_{}').format(user))
 
 
-# TODO: move this function to utils
-def extractRegexPattern(theInput_Str, theInputPattern):
-	import re
-	sourceStr = utils.literal_str(theInput_Str)
-	prog = re.compile(theInputPattern)
-	theList = prog.findall(sourceStr)
-	return theList
-
-
-def compactSpace(theInput_Str):
-	"""Try to remove the spaces from the input string."""
-	import re
-	sourceStr = utils.literal_str(theInput_Str)
-	theList = re.sub(r' +', u' ', sourceStr)
-	return theList
-
-
-def extractTTYs(theInputStr):
-	"""Extract the TTYs from a string."""
-	return extractRegexPattern(
-		theInputStr,
-		"""(?:(?:[[:print:]]*){0,1}(?P<TTYs>(?:(?:pts|tty|console|ptty)""" +
-		"""{1}[\/]?[0-9]+){1})+(?:[[:print:]]*){0,1})+"""
-	)
-
-
-def extractIPv4(theInputStr):
-	"""Extract the Ipv4 addresses from a string. Simple x.x.x.x matching, no checks."""
-	return extractRegexPattern(
-		theInputStr,
-		"""(?:(?:[[:print:]]*){0,1}(?P<IP>(?:[12]?[0-9]?[0-9]{1}[\.]{1})""" +
-		"""{3}(?:[12]?[0-9]?[0-9]{1}){1}){1}(?:[[:print:]]*){0,1})+"""
-	)
-
-
-def extractIPAddr(theInputStr):
-	"""Extract the Ipv4 addresses from a string. Simple x.x.x.x matching, no checks."""
-	return extractRegexPattern(
-		theInputStr,
-		"""(?:(?:[[:print:]]*){0,1}(?P<IP>(?:[12]?[0-9]?[0-9]{1}[\.]{1}){3}"""
-		"""(?:[12]?[0-9]?[0-9]{1}){1}){1}(?:[/]{1}){1}(?:[[:print:]]*){0,1})+"""
-	)
-
-
 def isLineForUser(someLine=None, username=None):
 	"""determins if a raw output line is for a user"""
-	if ((username is None) or (utils.literal_str(
-		someLine
-	).startswith(utils.literal_str(
-		username
-	)) is True)):
-		return True
-	else:
-		return False
+	doesMatch = False
+	try:
+		doesMatch = utils.isLineForMatch(someLine, username)
+	except Exception as matchErr:
+		print(str(type(matchErr)))
+		print(str(matchErr))
+		print(str(matchErr.args))
+		matchErr = None
+		del matchErr
+		doesMatch = False
+	return doesMatch
 
 
 def get_system_work_status_raw(user_name=None):
@@ -227,7 +186,7 @@ def get_system_work_status_raw(user_name=None):
 	try:
 		import subprocess
 		try:
-			# hard-coded white list cmd
+			# hard-coded white-list cmd
 			output = subprocess.check_output(
 				[utils.literal_str(
 					"""ulimit -t 2 ; ps -elf 2>/dev/null | tr -s ' ' ' ' | cut -d\  -f 3,15 """ +
@@ -301,28 +260,6 @@ def get_user_work_status_raw(user_name=None):
 	return theRawOutput
 
 
-def compactList(list, intern_func=None):
-	if intern_func is None:
-		def intern_func(x):
-			return x
-	seen = {}
-	result = []
-	for item in list:
-		marker = intern_func(item)
-		if marker in seen:
-			continue
-		seen[marker] = 1
-		result.append(item)
-	return result
-
-
-def xstr(some_str=None):
-	try:
-		return str("_x_" + utils.literal_str(some_str) + "_x_")
-	except Exception:
-		return None
-
-
 # TODO: memoize this function
 def get_user_list():
 	"""list the available users."""
@@ -333,16 +270,16 @@ def get_user_list():
 			theResult = []
 			return theResult
 		try:
-			theResult = compactList(
+			theResult = utils.compactList(
 				[str(str(x).split(u' ', 1)[0]) for x in theRawuserState.split(u'\n') if (u' ' in x)]
 			)
 		except Exception as cmdErr:
 			print(str(cmdErr))
 			print(str(cmdErr.args))
 			theResult = []
-		theResult = [
-			x for x in theResult if xstr("UID") not in xstr(x) and xstr("message+") not in xstr(x)
-		]
+		# while one line is probably faster here, two is more readable
+		for reserved_lines in ["UID", "message+"]:
+			theResult = [x for x in theResult if utils.xstr(reserved_lines) not in utils.xstr(x)]
 	except Exception as parseErr:
 		print(str("user_check_status.get_user_list: ERROR: ACTION will not be compleated! ABORT!"))
 		print(str(parseErr))
@@ -362,14 +299,14 @@ def get_user_status(user_name=None, use_html=False):
 		status_txt = get_system_work_status_raw(user_name)
 		if (user_tty is not None) and (str(user_tty) not in str("console")):
 			status_txt = get_user_work_status_raw(user_name)
-			status_list = compactList(
+			status_list = utils.compactList(
 				[str(
 					str(x).split(u' ', 4)[-1]
 				) for x in status_txt.split(u'\n') if (x is not None) and (len(x) > 0)]
 			)
 		elif status_txt is not None:
 			if (str("root SYSTEM\n") not in status_txt):
-				theWorks = compactList(
+				theWorks = utils.compactList(
 					[str(
 						str(x).split(u' ', 2)[-1]
 					) for x in status_txt.split(u'\n') if (x is not None) and (len(x) > 0)]
@@ -423,7 +360,7 @@ def get_user_status(user_name=None, use_html=False):
 						else:
 							temp_txt = html_generator.gen_html_label(temp_txt, u'disabled')
 					status_list.append(str(temp_txt))
-				status_list = compactList(status_list)
+				status_list = utils.compactList(status_list)
 			else:
 				status_list = ["SYSTEM"]
 		if use_html is not True:
@@ -440,7 +377,7 @@ def get_user_status(user_name=None, use_html=False):
 		user_tty = None
 		del user_tty
 	except Exception as errcrit:
-		print(str("user_check_status.get_user_status: ERROR: ACTION will not be compleated! ABORT!"))
+		print(str("get_user_status: ERROR: ACTION will not be compleated! ABORT!"))
 		print(str(type(errcrit)))
 		print(str(errcrit))
 		print(str(errcrit.args))
@@ -458,7 +395,7 @@ def get_user_ttys(user=None, use_html=False):
 		raw_data = get_user_work_status_raw(user)
 		if raw_data is None:
 			return u'UNKNOWN'
-		tty_list_txt = extractTTYs(raw_data)
+		tty_list_txt = utils.extractTTYs(raw_data)
 		if use_html is not True:
 			if tty_list_txt is not None and len(tty_list_txt) > 0:
 				theResult = str(tty_list_txt)
@@ -486,7 +423,7 @@ def get_user_ip(user=None, use_html=False):
 	"""Generate output of the user IP."""
 	theResult = None
 	try:
-		ip_list_txt = extractIPv4(get_user_work_status_raw(user))
+		ip_list_txt = utils.extractIPv4(get_user_work_status_raw(user))
 		if use_html is not True:
 			if ip_list_txt is not None and len(ip_list_txt) > 0:
 				theResult = str(ip_list_txt[0])

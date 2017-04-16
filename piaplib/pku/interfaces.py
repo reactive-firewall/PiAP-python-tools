@@ -17,15 +17,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-IFACE_PREFIXES = ['wlan', 'eth', 'usb', 'br' 'mon']
+
+IFACE_PREFIXES = [str("wlan"), str("eth"), str("usb"), str("br"), str("mon")]
 """whitelist of valid iface prefixes"""
 
 
-INTERFACE_CHOICES = [str('{}{}').format(x, str(y)) for x in IFACE_PREFIXES for y in range(5)]
+INTERFACE_CHOICES = [str('{}{}').format(str(x), str(y)) for x in IFACE_PREFIXES for y in range(5)]
 """whitelist of valid iface names"""
 
 
-def parseargs():
+def parseargs(arguments=None):
 	"""Parse the arguments"""
 	import argparse
 	parser = argparse.ArgumentParser(
@@ -67,7 +68,7 @@ def parseargs():
 		action='store_true',
 		help='Disable and then re-enable the given interface. (default)'
 	)
-	theResult = parser.parse_args()
+	theResult = parser.parse_args(arguments)
 	return theResult
 
 
@@ -111,7 +112,8 @@ def restart_iface(iface_name="lo"):
 
 
 if __name__ == '__main__':
-	args = parseargs()
+	import sys
+	args = parseargs(sys.argv[:1])
 	try:
 		interface = args.interface
 		if args.enable_action is True:
@@ -126,5 +128,5 @@ if __name__ == '__main__':
 	except Exception as main_err:
 		print(str("iface_pwr_mgr: REALLY BAD ERROR: ACTION will not be compleated! ABORT!"))
 		print(str(main_err.args[0]))
-exit(1)
+	exit(1)
 

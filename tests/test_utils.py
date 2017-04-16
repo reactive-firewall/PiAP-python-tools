@@ -38,7 +38,7 @@ except Exception:
 	raise ImportError("Failed to import test context")
 
 
-class StringsTestSuite(unittest.TestCase):
+class UtilsTestSuite(unittest.TestCase):
 	"""Basic test cases."""
 
 	def test_absolute_truth_and_meaning(self):
@@ -93,8 +93,8 @@ class StringsTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
-	def test_case_utils_interfaces(self):
-		"""Tests the interface enumeration logic"""
+	def test_case_utils_compact_list_safe(self):
+		"""Tests the compact list logic"""
 		theResult = True
 		try:
 			from piaplib import pku as pku
@@ -103,10 +103,120 @@ class StringsTestSuite(unittest.TestCase):
 			from pku import utils as utils
 			if utils.__name__ is None:
 				raise ImportError("Failed to import utils")
-			INTERFACE_CHOICES = [
-				str('{}{}').format(x, str(y)) for x in ['wlan', 'eth', 'mon'] for y in range(5)
+			TEST_LIST = [
+				[x for x in range(5)],
+				[x for x in range(50)],
 			]
-			theResult = utils.literal_str("wlan1") in INTERFACE_CHOICES
+			theResult = utils.compactList(TEST_LIST[0] + TEST_LIST[1]) in TEST_LIST
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			err = None
+			del err
+			theResult = False
+		assert theResult
+
+	def test_case_utils_regex_ipv4_quick(self):
+		"""Tests the ipv4 regex logic quickly"""
+		theResult = True
+		try:
+			from piaplib import pku as pku
+			if pku.__name__ is None:
+				raise ImportError("Failed to import pku")
+			from pku import utils as utils
+			if utils.__name__ is None:
+				raise ImportError("Failed to import utils")
+			validIPv4 = ["0.0.0.0", "255.255.255.255", "10.0.40.1"]
+			temp = utils.extractIPv4("""0.0.0.0, 255.255.255.255, 10.0.40.1, 300.1.2.3""")
+			for x in temp:
+				if x in validIPv4:
+					theResult = (theResult is True)
+				else:
+					theResult = False
+					print(str(""))
+					print(str(x))
+					print(str(""))
+			if (theResult is False):
+				print(str(""))
+				print(str(temp))
+				print(str(""))
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			err = None
+			del err
+			theResult = False
+		assert theResult
+
+	def test_case_utils_regex_ipv4_full(self):
+		"""Tests the ipv4 regex logic fully"""
+		theResult = True
+		try:
+			from piaplib import pku as pku
+			if pku.__name__ is None:
+				raise ImportError("Failed to import pku")
+			from pku import utils as utils
+			if utils.__name__ is None:
+				raise ImportError("Failed to import utils")
+			validIPv4 = ["0.0.0.0", "255.255.255.255", "10.0.40.1"]
+			temp = utils.extractIPv4("""0.0.0.0, 255.255.255.255, 10.0.40.1, 300.1.2.3""")
+			theResult = (len(validIPv4) is len(temp))
+			for x in temp:
+				if x in validIPv4:
+					theResult = (theResult is True)
+				else:
+					theResult = False
+					print(str(""))
+					print(str(x))
+					print(str(""))
+			if (theResult is False):
+				print(str(""))
+				print(str(temp))
+				print(str(""))
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			err = None
+			del err
+			theResult = False
+		assert theResult
+
+	def test_case_utils_regex_ipv4_arp_output(self):
+		"""Tests the ipv4 regex logic on arp output"""
+		theResult = True
+		try:
+			from piaplib import pku as pku
+			if pku.__name__ is None:
+				raise ImportError("Failed to import pku")
+			from pku import utils as utils
+			if utils.__name__ is None:
+				raise ImportError("Failed to import utils")
+			validIPv4 = ["10.0.40.1"]
+			temp = utils.extractIPv4(
+				"""test.PiAP.local (10.20.30.40) at 00:FF:00:FF:00:FF [ether] on wlan5"""
+			)
+			theResult = (len(validIPv4) is len(temp))
+			for x in temp:
+				if x in validIPv4:
+					theResult = (theResult is True)
+				else:
+					theResult = False
+					print(str(""))
+					print(str(x))
+					print(str(""))
+			if (theResult is False):
+				print(str(""))
+				print(str(temp))
+				print(str(""))
 		except Exception as err:
 			print(str(""))
 			print(str(type(err)))
