@@ -365,7 +365,7 @@ def get_user_status(user_name=None, use_html=False):
 				status_list = utils.compactList(status_list)
 			else:
 				if use_html is True:
-					status_list = [html_generator.gen_html_label(u'System', u'info')]
+					status_list = [str(html_generator.gen_html_label(u'System', u'info'))]
 				else:
 					status_list = ["SYSTEM"]
 		if use_html is not True:
