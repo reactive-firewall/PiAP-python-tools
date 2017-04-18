@@ -279,11 +279,13 @@ def get_client_arp_status_raw(client_ip=None, lan_interface=interfaces.INTERFACE
 # TODO: memoize this function
 def get_client_sta_status(client_mac=None):
 	"""list the raw status of client sta."""
-	theClientState = u'disassociated'
+	theClientState = str("disassociated")
 	if client_mac is not None:
+		matches = []
 		try:
+			matches = utils.extractMACAddr(get_client_sta_status_raw())
 			if str(client_mac) in utils.extractMACAddr(get_client_sta_status_raw()):
-				theClientState = u'associated'
+				theClientState = str("associated")
 		except Exception as cmdErr:
 			print(str("ERROR: get_client_sta_status"))
 			print(str(type(cmdErr)))
@@ -324,20 +326,20 @@ def get_client_status(client=None, use_html=False, lan_interface=None):
 			status_txt = get_client_sta_status(client_mac)
 		if use_html is not True:
 			if status_txt is not None:
-				if (" DOWN" in status_txt):
+				if (str("disassociated") in status_txt):
 					theResult = u'disassociated'
-				elif (" UP" in status_txt):
+				elif (str("associated") in status_txt):
 					theResult = u'associated'
 				else:
 					theResult = u'UNKNOWN'
 		else:
 			if status_txt is not None:
-				if (u' DOWN' in status_txt):
+				if (str("disassociated") in status_txt):
 					theResult = html_generator.gen_html_td(
 						html_generator.gen_html_label(u'disassociated', u'danger'),
 						str(u'client_status_value_{}').format(client)
 					)
-				elif (u' UP' in status_txt):
+				elif (str("associated") in status_txt):
 					theResult = html_generator.gen_html_td(
 						html_generator.gen_html_label(u'associated', u'success'),
 						str(u'client_status_value_{}').format(client)
