@@ -149,7 +149,10 @@ def show_iface(iface_name=None, is_verbose=False, use_html=False):
 				get_iface_status(iface_name, use_html)
 			)
 			if use_html:
-				theResult = html_generator.gen_html_tr(theResult, str(u'iface_status_row_{}').format(iface_name))
+				theResult = html_generator.gen_html_tr(
+					theResult,
+					str(u'iface_status_row_{}').format(iface_name)
+				)
 		except Exception as cmdErr:
 			print(str(cmdErr))
 			print(str(cmdErr.args))

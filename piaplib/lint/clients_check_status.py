@@ -137,13 +137,16 @@ def show_client(client_ip=None, is_verbose=False, use_html=False, lan_interface=
 			get_client_mac(client_ip, use_html, lan_interface),
 			get_client_ip(client_ip, use_html, lan_interface),
 			get_client_status(
-				get_client_ip(client_ip, False, lan_interface),
+				get_client_mac(client_ip, False, lan_interface),
 				use_html,
 				lan_interface
 			)
 		)
 		if use_html:
-			theResult = html_generator.gen_html_tr(theResult, str(u'client_status_row_{}').format(client_ip))
+			theResult = html_generator.gen_html_tr(
+				theResult,
+				str(u'client_status_row_{}').format(client_ip)
+			)
 	except Exception as cmdErr:
 		print(str("ERROR: show_client"))
 		print(str(type(cmdErr)))
@@ -159,7 +162,7 @@ def get_client_name(client_ip=None, use_html=False, lan_interface=None):
 	if client_ip is None:
 		return None
 	if use_html is not True:
-		return get_client_arp_status_raw(client_ip, lan_interface).split(u' ', 1)[0]
+		return get_client_arp_status_raw(client_ip, lan_interface).split(r' +', 1)[0]
 	else:
 		client = str(get_client_name(client_ip, False))
 		return html_generator.gen_html_td(client, str(u'client_status_{}').format(client))
@@ -279,7 +282,7 @@ def get_client_sta_status(client_mac=None):
 	theClientState = u'disassociated'
 	if client_mac is not None:
 		try:
-			if str(client_mac).upper() in utils.extractMACAddr(get_client_sta_status_raw()):
+			if str(client_mac) in utils.extractMACAddr(get_client_sta_status_raw()):
 				theClientState = u'associated'
 		except Exception as cmdErr:
 			print(str("ERROR: get_client_sta_status"))

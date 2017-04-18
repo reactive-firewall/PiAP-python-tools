@@ -44,6 +44,8 @@ if __name__ in u'__main__':
 		raise ImportError("Error Importing utils")
 	if config.__name__ is None:
 		raise ImportError("Error Importing config")
+	if interfaces.__name__ is None:
+		raise ImportError("Error Importing interfaces")
 	import sys
 	main(sys.argv[1:])
 

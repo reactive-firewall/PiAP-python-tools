@@ -228,6 +228,44 @@ class UtilsTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
+	def test_case_utils_regex_mac_clients_output(self):
+		"""Tests the mac addr regex logic on clients output"""
+		theResult = True
+		try:
+			from piaplib import pku as pku
+			if pku.__name__ is None:
+				raise ImportError("Failed to import pku")
+			from pku import utils as utils
+			if utils.__name__ is None:
+				raise ImportError("Failed to import utils")
+			validMAC = ["00:FF:00:FF:00:FF"]
+			temp = utils.extractMACAddr(
+				"""00:FF:00:FF:00:FF"""
+			)
+			theResult = (len(validMAC) is len(temp))
+			for x in temp:
+				if x in validMAC:
+					theResult = (theResult is True)
+				else:
+					theResult = False
+					print(str(""))
+					print(str(x))
+					print(str(""))
+			if (theResult is False):
+				print(str(""))
+				print(str(temp))
+				print(str(""))
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			err = None
+			del err
+			theResult = False
+		assert theResult
+
 
 if __name__ == '__main__':
 	unittest.main()
