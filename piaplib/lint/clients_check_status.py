@@ -137,7 +137,7 @@ def show_client(client_ip=None, is_verbose=False, use_html=False, lan_interface=
 			get_client_mac(client_ip, use_html, lan_interface),
 			get_client_ip(client_ip, use_html, lan_interface),
 			get_client_status(
-				get_client_mac(client_ip, False, lan_interface),
+				get_client_ip(client_ip, False, lan_interface),
 				use_html,
 				lan_interface
 			)
@@ -284,7 +284,7 @@ def get_client_sta_status(client_mac=None):
 		matches = []
 		try:
 			matches = utils.extractMACAddr(get_client_sta_status_raw())
-			if str(client_mac) in utils.extractMACAddr(get_client_sta_status_raw()):
+			if str(client_mac) in matches:
 				theClientState = str("associated")
 		except Exception as cmdErr:
 			print(str("ERROR: get_client_sta_status"))
