@@ -170,11 +170,23 @@ def open_func(file, mode='r', buffering=-1, encoding=None):
 		return io.open(file, mode, buffering, encoding)
 
 
+def write_func(someFile, the_data=None):
+	""" cross-python open function """
+	try:
+		import six
+		if six.PY2:
+			return someFile.write(unicode(the_data))
+		else:
+			return someFile.write(the_data)
+	except Exception:
+		return someFile.write(unicode(the_data))
+
+
 def readFile(somefile):
 	"""Reads the raw contents of a file."""
 	read_data = None
 	theReadPath = str(somefile)
-	with open_func(theReadPath, 'r', encoding='utf-8') as f:
+	with open_func(theReadPath, u'r', encoding='utf-8') as f:
 		read_data = f.read()
 	f.close()
 	return read_data
@@ -186,8 +198,8 @@ def writeFile(somefile, somedata):
 	f = None
 	theResult = False
 	try:
-		with open_func(theWritePath, 'w+', encoding='utf-8') as f:
-			f.write(somedata)
+		with open_func(theWritePath, u'w+', encoding='utf-8') as f:
+			write_func(f, somedata)
 		theResult = True
 	except IOError:
 		theResult = False
@@ -203,9 +215,9 @@ def appendFile(somefile, somedata):
 	f = None
 	theResult = False
 	try:
-		with open_func(theWritePath, 'a', encoding='utf-8') as f:
-			f.write(somedata)
-			f.write(str("\n"))
+		with open_func(theWritePath, u'a', encoding='utf-8') as f:
+			write_func(f, somedata)
+		write_func(f, str("\n"))
 		theResult = True
 	except IOError:
 		theResult = False
