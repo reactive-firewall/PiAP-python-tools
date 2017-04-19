@@ -22,6 +22,7 @@
 # except Exception:
 # 	import config as config
 
+
 def literal_code(raw_input=None):
 	"""A simple attempt at validating raw python unicode. Always expect CWE-20.
 		param raw_input - the tainted given input.
