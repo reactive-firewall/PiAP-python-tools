@@ -22,6 +22,24 @@
 # except Exception:
 # 	import config as config
 
+def literal_code(raw_input=None):
+	"""A simple attempt at validating raw python unicode. Always expect CWE-20.
+		param raw_input - the tainted given input.
+		Returns:
+			byte string / unicode - the literal code if posible to represent,
+			None - otherwise
+	"""
+	try:
+		if isinstance(raw_input, bytes):
+			return raw_input.decode("utf-8")
+		elif isinstance(raw_input, str):
+			return raw_input.encode("utf-8").decode("utf-8")
+	except Exception as malformErr:
+		malformErr = None
+		del malformErr
+		return None
+	return None
+
 
 def literal_str(raw_input=None):
 	"""A simple attempt at validating utf-8 encoding. Always expect CWE-20.
@@ -175,11 +193,11 @@ def write_func(someFile, the_data=None):
 	try:
 		import six
 		if six.PY2:
-			return someFile.write(unicode(the_data))
+			return someFile.write(literal_code(the_data))
 		else:
 			return someFile.write(the_data)
 	except Exception:
-		return someFile.write(unicode(the_data))
+		return someFile.write(literal_code(the_data))
 
 
 def readFile(somefile):
@@ -217,7 +235,7 @@ def appendFile(somefile, somedata):
 	try:
 		with open_func(theWritePath, u'a', encoding='utf-8') as f:
 			write_func(f, somedata)
-		write_func(f, str("\n"))
+		write_func(f, '\n')
 		theResult = True
 	except IOError:
 		theResult = False
