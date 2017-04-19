@@ -186,7 +186,7 @@ def writeFile(somefile, somedata):
 	f = None
 	theResult = False
 	try:
-		with open_func(theWritePath, 'w+') as f:
+		with open_func(theWritePath, 'w+', encoding='utf-8') as f:
 			f.write(somedata)
 		theResult = True
 	except IOError:
@@ -203,7 +203,7 @@ def appendFile(somefile, somedata):
 	f = None
 	theResult = False
 	try:
-		with open_func(theWritePath, 'a') as f:
+		with open_func(theWritePath, 'a', encoding='utf-8') as f:
 			f.write(somedata)
 			f.write(str("\n"))
 		theResult = True
