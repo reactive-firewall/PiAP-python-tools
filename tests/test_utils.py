@@ -266,6 +266,49 @@ class UtilsTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
+	def test_case_utils_read_write_file(self):
+		"""Tests the read and write functions"""
+		theResult = False
+		try:
+			from piaplib import pku as pku
+			if pku.__name__ is None:
+				raise ImportError("Failed to import pku")
+			from pku import utils as utils
+			if utils.__name__ is None:
+				raise ImportError("Failed to import utils")
+			theBlob = str("""This will test writes,
+and this will test reads.""")
+			somefile = str("the_test_file.txt")
+			if (utils.writeFile(somefile, theBlob) is True):
+				readback = utils.readFile(somefile)
+				if (theBlob in readback) and (readback in theBlob):
+					theResult = (len(readback) is len(theBlob))
+				else:
+					theResult = False
+				if (theResult is False):
+					print(str("wrote"))
+					print(str(theBlob))
+					print(str(""))
+					print(str("read"))
+					print(str(readback))
+					print(str(""))
+			else:
+				theResult = False
+			if (theResult is False):
+				print(str("write failed"))
+				print(str(theBlob))
+				print(str(""))
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			err = None
+			del err
+			theResult = False
+		assert theResult
+
 
 if __name__ == '__main__':
 	unittest.main()

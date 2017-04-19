@@ -153,6 +153,68 @@ def xstr(some_str=None):
 		return None
 
 
+""" I/O and Files """
+
+
+def open_func(file, mode='r', buffering=-1, encoding=None):
+	""" cross-python open function """
+	try:
+		import six
+		if six.PY2:
+			import io
+			return io.open(file, mode, buffering, encoding)
+		else:
+			return open(file, mode, buffering, encoding)
+	except Exception:
+		import io
+		return io.open(file, mode, buffering, encoding)
+
+
+def readFile(somefile):
+	"""Reads the raw contents of a file."""
+	read_data = None
+	theReadPath = str(somefile)
+	with open_func(theReadPath, 'r', encoding='utf-8') as f:
+		read_data = f.read()
+	f.close()
+	return read_data
+
+
+def writeFile(somefile, somedata):
+	"""Writes the raw contents of a file."""
+	theWritePath = str(somefile)
+	f = None
+	theResult = False
+	try:
+		with open_func(theWritePath, 'w+') as f:
+			f.write(somedata)
+		theResult = True
+	except IOError:
+		theResult = False
+	finally:
+		if f:
+			f.close()
+	return theResult
+
+
+def appendFile(somefile, somedata):
+	"""Apends to the raw contents of a file."""
+	theWritePath = str(somefile)
+	f = None
+	theResult = False
+	try:
+		with open_func(theWritePath, 'a') as f:
+			f.write(somedata)
+			f.write(str("\n"))
+		theResult = True
+	except IOError:
+		theResult = False
+	finally:
+		if f:
+			f.close()
+	return theResult
+
+
 def main(argv=None):
 	"""The Main Event makes no sense to utils."""
 	raise NotImplementedError("CRITICAL - PKU Uitls main() not implemented. yet?")

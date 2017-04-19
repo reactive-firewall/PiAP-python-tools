@@ -20,17 +20,26 @@
 try:
 	from . import config as config
 except Exception:
-	import config as config
+	try:
+		import config as config
+	except Exception:
+		raise ImportError("Error Importing config")
 
 try:
 	from . import utils as utils
 except Exception:
-	import utils as utils
+	try:
+		import utils as utils
+	except Exception:
+		raise ImportError("Error Importing utils")
 
 try:
 	from . import interfaces as interfaces
 except Exception:
-	import interfaces as interfaces
+	try:
+		import interfaces as interfaces
+	except Exception:
+		raise ImportError("Error Importing interfaces")
 
 
 def main(argv=None):
@@ -46,6 +55,9 @@ if __name__ in u'__main__':
 		raise ImportError("Error Importing config")
 	if interfaces.__name__ is None:
 		raise ImportError("Error Importing interfaces")
-	import sys
+	try:
+		import sys
+	except Exception:
+		raise ImportError("Error Importing builtin sys")
 	main(sys.argv[1:])
 
