@@ -84,11 +84,20 @@ def compactSpace(theInput_Str):
 
 def extractMACAddr(theInputStr):
 	"""Extract the MAC addresses from a string."""
-	return extractRegexPattern(
-		theInputStr,
-		"""(?:(?:[[:print:]]*){0,1}(?P<Mac>(?:(?:[0-9a-fA-F]{1,2}[\:]{1}){5}""" +
-		"""(?:[0-9a-fA-F]{1,2}){1}){1})+(?:[[:print:]]*){0,1})+"""
-	)
+	theResult = []
+	try:
+		theResult = extractRegexPattern(
+			theInputStr,
+			"""(?:(?:[[:print:]]*){0,1}(?P<Mac>(?:(?:[0-9a-fA-F]{1,2}[\:]{1}){5}""" +
+			"""(?:[0-9a-fA-F]{1,2}){1}){1})+(?:[[:print:]]*){0,1})+"""
+		)
+	except DeprecationWarning:
+		theResult = extractRegexPattern(
+			theInputStr,
+			"""(?:(?:[[:print:]]*){0,1}(?P<Mac>(?:(?:[0-9a-fA-F]{1,2}[\\:]{1}){5}""" +
+			"""(?:[0-9a-fA-F]{1,2}){1}){1})+(?:[[:print:]]*){0,1})+"""
+		)
+	return theResult
 
 
 def extractIfaceNames(theInputStr):
@@ -101,31 +110,60 @@ def extractIfaceNames(theInputStr):
 
 def extractTTYs(theInputStr):
 	"""Extract the TTYs from a string."""
-	return extractRegexPattern(
-		theInputStr,
-		"""(?:(?:[[:print:]]*){0,1}(?P<TTYs>(?:(?:pts|tty|console|ptty)""" +
-		"""{1}[\/]?[0-9]+){1})+(?:[[:print:]]*){0,1})+"""
-	)
+	theResult = []
+	try:
+		theResult = extractRegexPattern(
+			theInputStr,
+			"""(?:(?:[[:print:]]*){0,1}(?P<TTYs>(?:(?:pts|tty|console|ptty)""" +
+			"""{1}[\/]?[0-9]+){1})+(?:[[:print:]]*){0,1})+"""
+		)
+	except DeprecationWarning:
+		theResult = extractRegexPattern(
+			theInputStr,
+			"""(?:(?:[[:print:]]*){0,1}(?P<TTYs>(?:(?:pts|tty|console|ptty)""" +
+			"""{1}[\\/]?[0-9]+){1})+(?:[[:print:]]*){0,1})+"""
+		)
+	return theResult
 
 
 def extractIPv4(theInputStr):
 	"""Extract the Ipv4 addresses from a string. Simple x.x.x.x matching, no checks."""
-	return extractRegexPattern(
-		theInputStr,
-		"""(?:(?:(?:^|[^0-9]{1}){1}(?P<IP>(?:(?:[12]{1}[0-9]{1}[0-9]{1}|[1-9]{1}[0-9]{1}|""" +
-		"""[0-9]{1}){1}[\.]{1}){3}(?:[12]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[0-9]{1}){1}){1}""" +
-		"""(?:[^0-9\.]?|$){1}){1})"""
-	)
+	theResult = []
+	try:
+		theResult = extractRegexPattern(
+			theInputStr,
+			"""(?:(?:(?:^|[^0-9]{1}){1}(?P<IP>(?:(?:[12]{1}[0-9]{1}[0-9]{1}|[1-9]{1}[0-9]{1}|""" +
+			"""[0-9]{1}){1}[\.]{1}){3}(?:[12]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[0-9]{1}){1}){1}""" +
+			"""(?:[^0-9\.]?|$){1}){1})"""
+		)
+	except DeprecationWarning:
+		theResult = extractRegexPattern(
+			theInputStr,
+			"""(?:(?:(?:^|[^0-9]{1}){1}(?P<IP>(?:(?:[12]{1}[0-9]{1}[0-9]{1}|[1-9]{1}[0-9]{1}|""" +
+			"""[0-9]{1}){1}[\\.]{1}){3}(?:[12]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[0-9]{1}){1}){1}""" +
+			"""(?:[^0-9\\.]?|$){1}){1})"""
+		)
+	return theResult
 
 
 def extractIPAddr(theInputStr):
 	"""Extract the Ipv4 addresses from a string. Simple x.x.x.x matching, no checks."""
-	return extractRegexPattern(
-		theInputStr,
-		"""(?:(?:(?:^|[^0-9]{1}){1}(?P<IP>(?:(?:[12]{1}[0-9]{1}[0-9]{1}|[1-9]{1}[0-9]{1}|""" +
-		"""[0-9]{1}){1}[\.]{1}){3}(?:[12]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[0-9]{1}){1}){1}""" +
-		"""(?:[/]{1}){1}(?:[^0-9\.]?|$){1}){1})"""
-	)
+	theResult = []
+	try:
+		theResult = extractRegexPattern(
+			theInputStr,
+			"""(?:(?:(?:^|[^0-9]{1}){1}(?P<IP>(?:(?:[12]{1}[0-9]{1}[0-9]{1}|[1-9]{1}[0-9]{1}|""" +
+			"""[0-9]{1}){1}[\.]{1}){3}(?:[12]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[0-9]{1}){1}){1}""" +
+			"""(?:[/]{1}){1}(?:[^0-9\.]?|$){1}){1})"""
+		)
+	except DeprecationWarning:
+		theResult = extractRegexPattern(
+			theInputStr,
+			"""(?:(?:(?:^|[^0-9]{1}){1}(?P<IP>(?:(?:[12]{1}[0-9]{1}[0-9]{1}|[1-9]{1}[0-9]{1}|""" +
+			"""[0-9]{1}){1}[\\.]{1}){3}(?:[12]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[0-9]{1}){1}){1}""" +
+			"""(?:[\\/]{1}){1}(?:[^0-9\\.]?|$){1}){1})"""
+		)
+	return theResult
 
 
 def isLineForMatch(someLine=None, toMatch=None):
