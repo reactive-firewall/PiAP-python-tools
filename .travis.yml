@@ -47,7 +47,8 @@ matrix:
 
 before_install:
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew upgrade || true ; fi
-  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python2.7 python3.5 python3.4 $INSTALL || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python2.6 python3.5 python3.4 $INSTALL || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install tox $INSTALL || true ; fi
 
 install: "make init"
 # command to run tests
