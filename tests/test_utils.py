@@ -323,20 +323,22 @@ and this will test reads.""")
 and this will test reads.""")
 			theBlobtail = str("""This will test ammends.""")
 			somefile = str("the_test_file.txt")
-			if (utils.writeFile(somefile, theBlob) is True and (utils.appendFile(somefile, theBlobtail) is True)):
-				readback = utils.readFile(somefile)
-				if (theBlobtail in readback) and (readback not in theBlob):
-					theResult = (len(readback) is not len(theBlob))
-					
+			if (utils.writeFile(somefile, theBlob) is True):
+				if (utils.appendFile(somefile, theBlobtail) is True):
+					readback = utils.readFile(somefile)
+					if (theBlobtail in readback) and (readback not in theBlob):
+						theResult = (len(readback) is not len(theBlob))
+					else:
+						theResult = False
+					if (theResult is False):
+						print(str("wrote"))
+						print(str(theBlob))
+						print(str(""))
+						print(str("read"))
+						print(str(readback))
+						print(str(""))
 				else:
 					theResult = False
-				if (theResult is False):
-					print(str("wrote"))
-					print(str(theBlob))
-					print(str(""))
-					print(str("read"))
-					print(str(readback))
-					print(str(""))
 			else:
 				theResult = False
 			if (theResult is False):
@@ -353,6 +355,7 @@ and this will test reads.""")
 			del err
 			theResult = False
 		assert theResult
+
 
 if __name__ == '__main__':
 	unittest.main()
