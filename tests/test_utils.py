@@ -309,6 +309,50 @@ and this will test reads.""")
 			theResult = False
 		assert theResult
 
+	def test_case_utils_read_ammend_file(self):
+		"""Tests the read and write functions"""
+		theResult = False
+		try:
+			from piaplib import pku as pku
+			if pku.__name__ is None:
+				raise ImportError("Failed to import pku")
+			from pku import utils as utils
+			if utils.__name__ is None:
+				raise ImportError("Failed to import utils")
+			theBlob = str("""This will test writes,
+and this will test reads.""")
+			theBlobtail = str("""This will test ammends.""")
+			somefile = str("the_test_file.txt")
+			if (utils.writeFile(somefile, theBlob) is True and (utils.ammendFile(somefile, theBlobtail) is True)):
+				readback = utils.readFile(somefile)
+				if (theBlobtail in readback) and (readback not in theBlob):
+					theResult = (len(readback) is not len(theBlob))
+					
+				else:
+					theResult = False
+				if (theResult is False):
+					print(str("wrote"))
+					print(str(theBlob))
+					print(str(""))
+					print(str("read"))
+					print(str(readback))
+					print(str(""))
+			else:
+				theResult = False
+			if (theResult is False):
+				print(str("write failed"))
+				print(str(theBlob))
+				print(str(""))
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			err = None
+			del err
+			theResult = False
+		assert theResult
 
 if __name__ == '__main__':
 	unittest.main()
