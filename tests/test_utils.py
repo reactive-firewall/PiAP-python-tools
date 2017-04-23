@@ -323,7 +323,7 @@ and this will test reads.""")
 and this will test reads.""")
 			theBlobtail = str("""This will test ammends.""")
 			somefile = str("the_test_file.txt")
-			if (utils.writeFile(somefile, theBlob) is True and (utils.ammendFile(somefile, theBlobtail) is True)):
+			if (utils.writeFile(somefile, theBlob) is True and (utils.appendFile(somefile, theBlobtail) is True)):
 				readback = utils.readFile(somefile)
 				if (theBlobtail in readback) and (readback not in theBlob):
 					theResult = (len(readback) is not len(theBlob))
