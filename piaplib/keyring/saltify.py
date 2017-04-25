@@ -21,15 +21,17 @@ try:
 	import argparse
 	import hashlib
 	import hmac
+	if hmac.__name__ is None:
+		raise ImportError("Failed to import saltify.")
 except Exception:
-	raise ImportError()
+	raise ImportError("Failed to import saltify.")
 	exit(255)
 
 
 def parseArgs(arguments=None):
 	theArgs = None
 	try:
-		parser = argparse.ArgumentParser(description='check for an arp entry')
+		parser = argparse.ArgumentParser(description='saltify a message')
 		parser.add_argument(
 			'-m',
 			'--msg',

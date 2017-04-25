@@ -22,6 +22,13 @@
 # except Exception:
 # 	import config as config
 
+try:
+	import os
+	if os.__name__ is None:
+		raise ImportError("OMG! we could not import os. We're like in the matrix! ABORT. ABORT.")
+except Exception as err:
+	raise ImportError(err)
+	exit(3)
 
 def literal_code(raw_input=None):
 	"""A simple attempt at validating raw python unicode. Always expect CWE-20.
@@ -274,7 +281,7 @@ def appendFile(somefile, somedata):
 	try:
 		with open_func(theWritePath, u'a', encoding='utf-8') as f:
 			write_func(f, somedata)
-		write_func(f, '\n')
+			write_func(f, os.linesep)
 		theResult = True
 	except IOError:
 		theResult = False
