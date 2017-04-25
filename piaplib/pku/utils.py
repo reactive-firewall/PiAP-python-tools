@@ -22,6 +22,7 @@
 # except Exception:
 # 	import config as config
 
+
 try:
 	import os
 	if os.__name__ is None:
@@ -29,6 +30,7 @@ try:
 except Exception as err:
 	raise ImportError(err)
 	exit(3)
+
 
 def literal_code(raw_input=None):
 	"""A simple attempt at validating raw python unicode. Always expect CWE-20.
