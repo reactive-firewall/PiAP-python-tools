@@ -2,13 +2,9 @@
 #argparse
 #subprocess
 #setuptools
-#virtualenv
+virtualenv>=15.0.1
+six>=1.0.0
 tox>=2.3.1
 #time
 #re
-#hashlib
-#hmac
-pyflakes>=1.1.0
-flake8>=2.5.4
 #-e git+https://github.com/reactive-firewall/PiAP-python-tools.git#egg=piaplib
-
