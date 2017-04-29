@@ -124,22 +124,24 @@ def taint_name(rawtxt):
 
 def show_user(user_name=None, is_verbose=False, use_html=False):
 	"""show the given user."""
+	theResult = None
 	try:
-		if use_html:
-			format_pattern = u'{}{}{}{}'
+		if use_html is True:
+			format_pattern = str(u'{}{}{}{}')
 		else:
-			format_pattern = u'{} {} {} {}'
-		theResult = format_pattern.format(
+			format_pattern = str(u'{} {} {} {}')
+		theResult = str(format_pattern).format(
 			get_user_name(user_name, use_html),
 			get_user_ttys(user_name, use_html),
 			get_user_ip(user_name, use_html),
 			get_user_status(get_user_name(user_name, False), use_html)
 		)
 		if use_html:
-			theResult = html_generator.gen_html_tr(
+			the_temp_Result = html_generator.gen_html_tr(
 				theResult,
 				str(u'user_status_row_{}').format(get_user_name(user_name, False))
 			)
+			theResult = utils.literal_str(the_temp_Result)
 	except Exception as cmdErr:
 		print(str(cmdErr))
 		print(str(cmdErr.args))
@@ -394,6 +396,8 @@ def get_user_ttys(user=None, use_html=False):
 	"""Generate output of the user mac."""
 	if (user is None) and (use_html is not True):
 		return None
+	elif (user is None) and (use_html is True):
+		return html_generator.gen_html_label(u'UNKNOWN', u'warning')
 	# otherwise
 	theResult = None
 	try:
@@ -459,9 +463,9 @@ def main(argv=None):
 	try:
 		verbose = False
 		if args.verbose_mode is not None:
-				verbose = args.verbose_mode
+				verbose = (args.verbose_mode is True)
 		if args.output_html is not None:
-				output_html = args.output_html
+				output_html = (args.output_html is True)
 		if args.show_all is True:
 			if output_html:
 				print(
