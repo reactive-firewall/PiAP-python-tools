@@ -51,7 +51,7 @@ except Exception as importErr:
 	exit(255)
 
 
-__prog__ = u'iface_check_status'
+__prog__ = str("""iface_check_status""")
 """The Program's name"""
 
 
@@ -115,7 +115,7 @@ def parseargs(arguments=None):
 		)
 		parser.add_argument(
 			'-V', '--version',
-			action='version', version='%(prog)s 0.2.3'
+			action='version', version='%(prog)s 0.2.4'
 		)
 		theResult = parser.parse_args(arguments)
 	except Exception as parseErr:
@@ -139,10 +139,10 @@ def show_iface(iface_name=None, is_verbose=False, use_html=False):
 	else:
 		try:
 			if use_html:
-				format_pattern = u'{}{}{}{}'
+				format_pattern = str(u'{}{}{}{}')
 			else:
-				format_pattern = u'{} {} {} {}'
-			theResult = format_pattern.format(
+				format_pattern = str(u'{} {} {} {}')
+			theResult = str(format_pattern).format(
 				get_iface_name(iface_name, use_html),
 				get_iface_mac(iface_name, use_html),
 				get_iface_ip_list(iface_name, use_html),
@@ -164,7 +164,7 @@ def get_iface_name(iface_name=None, use_html=False):
 	if iface_name is None:
 		return None
 	if use_html is not True:
-		return iface_name
+		return taint_name(iface_name)
 	else:
 		iface = str(get_iface_name(iface_name, False))
 		return html_generator.gen_html_td(iface, str(u'iface_status_dev_{}').format(iface))
@@ -361,7 +361,9 @@ def main(argv=None):
 if __name__ == '__main__':
 	try:
 		import sys
-		exitcode = main(sys.argv[1:])
+		exitcode = 3
+		if (sys.argv is not None and len(sys.argv) > 0):
+			exitcode = main(sys.argv[1:])
 		exit(exitcode)
 	except Exception as main_err:
 		print(str("iface_check_status: REALLY BAD ERROR: ACTION will not be compleated! ABORT!"))
