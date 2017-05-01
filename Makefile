@@ -68,12 +68,12 @@ init:
 
 install: /opt/PiAP/bin/ /lib/opt/piaplib/ must_be_root
 	$(QUIET)python -m pip install "git+https://github.com/reactive-firewall/PiAP-python-tools.git"
-	$(QUITE) $(WAIT)
+	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
 
 uninstall:
 	$(QUITE)$(QUIET)python -m pip uninstall piaplib
-	$(QUITE) $(WAIT)
+	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
 
 purge: clean uninstall
