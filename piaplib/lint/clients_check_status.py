@@ -129,10 +129,10 @@ def show_client(client_ip=None, is_verbose=False, use_html=False, lan_interface=
 		if lan_interface not in interfaces.INTERFACE_CHOICES:
 			lan_interface = interfaces.INTERFACE_CHOICES[1]
 		if use_html:
-			format_pattern = u'{}{}{}{}'
+			format_pattern = str(u'{}{}{}{}')
 		else:
-			format_pattern = u'{} {} {} {}'
-		theResult = format_pattern.format(
+			format_pattern = str(u'{} {} {} {}')
+		theResult = str(format_pattern).format(
 			get_client_name(client_ip, use_html, lan_interface),
 			get_client_mac(client_ip, use_html, lan_interface),
 			get_client_ip(client_ip, use_html, lan_interface),
