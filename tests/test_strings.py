@@ -258,6 +258,49 @@ class StringsTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
+	def test_case_utils_super_fuzz_literal_str(self):
+		"""Tests the literal string functions with a Pangram"""
+		theResult = True
+		try:
+			from piaplib import pku as pku
+			if pku.__name__ is None:
+				raise ImportError("Failed to import pku")
+			from pku import utils as utils
+			if utils.__name__ is None:
+				raise ImportError("Failed to import utils")
+			import os
+			if os.__name__ is None:
+				raise ImportError("Failed to import os. Are we alive?")
+			for testrun in range(10000):
+				randomTest = os.urandom(10)
+				testcase = [randomTest, utils.literal_str(randomTest)]
+				if theResult is True:
+					if testcase[1] is not None:
+						theResult = (
+							testcase[0] in testcase[1]
+						)
+					if utils.literal_str(testcase[1]) is not None:
+						theResult_temp = (
+							testcase[0] in testcase[1]
+						)
+						theResult = (theResult is True) and (theResult_temp is True)
+						theResult_temp = None
+						del theResult_temp
+						if theResult is not True:
+							print("NEW test")
+							print(str(testcase))
+							print(repr(testcase))
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			err = None
+			del err
+			theResult = False
+		assert theResult
+
 
 if __name__ == '__main__':
 	unittest.main()
