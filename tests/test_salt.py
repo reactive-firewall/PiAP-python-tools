@@ -139,14 +139,10 @@ class StringsTestSuite(unittest.TestCase):
 			if saltify.__name__ is None:
 				theResult = False
 			test_salt_one = str(
-				"""7a9356011e7f6bc42105deee6d49983e0cfa7650c7fce5d5d3b19aacca91605199ee""" +
-				"""017707f627087f8376143f368b17ed927d918eecfe100a7b1b6e39dd3c8a"""
+				"7a9356011e7f6bc42105deee6d49983e0cfa7650c7fce5d5d3b19aacca91605199ee" +
+				"017707f627087f8376143f368b17ed927d918eecfe100a7b1b6e39dd3c8a"
 			)
-			theResult_a = (str(saltify.saltify("Test Message", "testSalt")) in str(test_salt_one))
-			theResult_b = (str(test_salt_one) in str(saltify.saltify("Test Message", "testSalt")))
-			theResult = (theResult_a and theResult_b)
-			del theResult_a
-			del theResult_b
+			theResult = (str(saltify.saltify("Test Message", "testSalt")) is str(test_salt_one))
 			del test_salt_one
 		except Exception as impErr:
 			print(str(""))

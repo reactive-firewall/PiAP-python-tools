@@ -273,7 +273,7 @@ class StringsTestSuite(unittest.TestCase):
 				raise ImportError("Failed to import os. Are we alive?")
 			for testrun in range(10000):
 				randomTest = os.urandom(10)
-				testcase = [randomTest, utils.literal_str(randomTest)]
+				testcase = [str(randomTest), utils.literal_str(randomTest)]
 				if theResult is True:
 					if testcase[1] is not None:
 						theResult = (
