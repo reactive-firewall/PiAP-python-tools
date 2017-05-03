@@ -126,7 +126,7 @@ class StringsTestSuite(unittest.TestCase):
 		return helper
 
 	@_test_try_or_fail
-	def test_keyring_salt_test_salt(self):
+	def _test_keyring_salt_test_salt(self):
 		theResult = True
 		try:
 			from .context import piaplib
@@ -154,7 +154,7 @@ class StringsTestSuite(unittest.TestCase):
 		assert theResult
 
 	@_test_try_or_fail
-	def test_keyring_salt_test_entropy(self):
+	def _test_keyring_salt_test_entropy(self):
 		theResult = True
 		try:
 			from .context import piaplib

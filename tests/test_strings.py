@@ -258,7 +258,7 @@ class StringsTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
-	def test_case_utils_super_fuzz_literal_str(self):
+	def _test_case_utils_super_fuzz_literal_str(self):
 		"""Tests the literal string functions with a Pangram"""
 		theResult = True
 		try:
