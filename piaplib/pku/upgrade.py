@@ -73,7 +73,7 @@ def upgradepip():
 	"""Upgrade pip via pip."""
 	try:
 		pip.main(args=["install", "--upgrade", "pip"])
-	except PermissionError as permErr:
+	except Exception as permErr:
 		print(str(type(permErr)))
 		print(str(permErr))
 		print(str((permErr.args)))
