@@ -91,7 +91,7 @@ def enable_iface(iface_name=None):
 	except Exception as err:
 		print(str(type(err)))
 		print(str(err))
-		print(str(err.args[0]))
+		print(str(err.args))
 		err = None
 		del(err)
 	return theResult
@@ -138,8 +138,8 @@ if __name__ == u'__main__':
 		print(str("interfaces: REALLY BAD ERROR: ACTION will not be compleated! ABORT!"))
 		print(str(type(err)))
 		print(str(err))
-		print(str(err.args[0]))
+		print(str(err.args))
 		err = None
-		del(main_err)
+		del(err)
 	exit(1)
 
