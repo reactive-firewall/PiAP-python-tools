@@ -17,20 +17,123 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 try:
 	from . import config as config
 except Exception:
-	import config as config
+	try:
+		import config as config
+	except Exception:
+		raise ImportError("Error Importing config")
 
 try:
 	from . import utils as utils
 except Exception:
-	import utils as utils
+	try:
+		import utils as utils
+	except Exception:
+		raise ImportError("Error Importing utils")
+
+try:
+	from . import interfaces as interfaces
+except Exception:
+	try:
+		import interfaces as interfaces
+	except Exception:
+		raise ImportError("Error Importing interfaces")
+
+try:
+	from . import upgrade as upgrade
+except Exception as err:
+	try:
+		import upgrade as upgrade
+	except Exception:
+		raise ImportError("Error Importing upgrade tools")
+
+try:
+	import argparse
+except Exception:
+	raise ImportError("Error Importing argparse tools")
+
+
+__prog__ = """piaplib.pku"""
+"""The name of this PiAPLib tool is Pocket Knife Unit"""
+
+
+PKU_UNITS = {u'config': config, u'backup': None, u'upgrade': upgrade, u'help': None}
+""" The Pocket Knife Unit actions.
+	config -  (FUTURE/configuration stuff)
+	backup -  (FUTURE/RESERVED)
+	upgrade -  (see reactive-firewall/PiAP-python-tools#1)
+	help -  (FUTURE/RESERVED)
+	"""
+
+
+def parseArgs(arguments=None):
+	"""Parses the CLI arguments."""
+	parser = argparse.ArgumentParser(
+		prog=__prog__,
+		description='Handles PiAP pockets',
+		epilog="PiAP Pocket Controller for main tools."
+	)
+	parser.add_argument(
+		'pku_unit',
+		choices=PKU_UNITS.keys(),
+		help='the pocket pku service option.'
+	)
+	return parser.parse_known_args(arguments)
+
+
+def getTimeStamp():
+	"""Returns the time stamp."""
+	theDate = None
+	try:
+		import time
+		theDate = time.strftime("%a %b %d %H:%M:%S %Z %Y", time.localtime())
+	except Exception:
+		theDate = str("")
+	return str(theDate)
+
+
+def usePKUTool(tool, arguments=[None]):
+	"""Handler for launching pocket-tools."""
+	if tool is None:
+		return None
+	if tool in PKU_UNITS.keys():
+		try:
+			try:
+				# print(str("pku launching: "+tool))
+				PKU_UNITS[tool].main(arguments)
+			except Exception:
+				timestamp = getTimeStamp()
+				theResult = str(
+					timestamp +
+					" - WARNING - An error occured while handling the PKU tool. " +
+					"Cascading failure."
+				)
+		except Exception:
+			theResult = str("CRITICAL - An error occured while handling the cascading failure.")
+		return theResult
+	else:
+		return None
 
 
 def main(argv=None):
-	"""The Main Event."""
-	print("PKU not implemented yet")
+	"""The main event"""
+	# print("PiAP PKU")
+	try:
+		try:
+			args, extra = parseArgs(argv)
+			lint_cmd = args.lint_unit
+			usePKUTool(lint_cmd, extra)
+		except Exception as cerr:
+			print(str(cerr))
+			print(str(cerr.args))
+			print(str(" UNKNOWN - An error occured while handling the arguments. Command failure."))
+			exit(3)
+	except Exception:
+		print(str(" UNKNOWN - An error occured while handling the failure. Cascading failure."))
+		exit(3)
 	exit(0)
 
 
@@ -39,6 +142,18 @@ if __name__ in u'__main__':
 		raise ImportError("Error Importing utils")
 	if config.__name__ is None:
 		raise ImportError("Error Importing config")
-	import sys
-	main(sys.argv[1:])
+	if interfaces.__name__ is None:
+		raise ImportError("Error Importing interfaces")
+	if upgrade.__name__ is None:
+		raise ImportError("Error Importing upgrade")
+	try:
+		import sys
+		if (sys.argv is not None and (sys.argv is not []) and (len(sys.argv) > 1)):
+			main(sys.argv[1:])
+		else:
+			main(["--help"])
+			exit(3)
+	except Exception:
+		raise ImportError("Error running main")
+	exit(0)
 

@@ -1,7 +1,7 @@
 PiAP-python-tools beta
 ======================
 
-This is still in beta. Not production ready. USE AT OWN RISK.
+This is still in beta. THINGS ARE STILL JUST PoC. USE AT OWN RISK.
 
 .. image:: https://travis-ci.org/reactive-firewall/PiAP-python-tools.svg?branch=master
     :target: https://travis-ci.org/reactive-firewall/PiAP-python-tools
@@ -34,8 +34,5 @@ copies or substantial portions of the Software.
 Possible Improvements:
 ---------------------
 - always more
-- fix CVE-2007-6750 false positive
-- fix normilization error
-- harden ntp
 - add encryption and file signing
 - add more examples to docs

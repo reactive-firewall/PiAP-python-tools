@@ -200,7 +200,7 @@ class UtilsTestSuite(unittest.TestCase):
 			from pku import utils as utils
 			if utils.__name__ is None:
 				raise ImportError("Failed to import utils")
-			validIPv4 = ["10.0.40.1"]
+			validIPv4 = ["10.20.30.40"]
 			temp = utils.extractIPv4(
 				"""test.PiAP.local (10.20.30.40) at 00:FF:00:FF:00:FF [ether] on wlan5"""
 			)
@@ -216,6 +216,134 @@ class UtilsTestSuite(unittest.TestCase):
 			if (theResult is False):
 				print(str(""))
 				print(str(temp))
+				print(str(""))
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			err = None
+			del err
+			theResult = False
+		assert theResult
+
+	def test_case_utils_regex_mac_clients_output(self):
+		"""Tests the mac addr regex logic on clients output"""
+		theResult = True
+		try:
+			from piaplib import pku as pku
+			if pku.__name__ is None:
+				raise ImportError("Failed to import pku")
+			from pku import utils as utils
+			if utils.__name__ is None:
+				raise ImportError("Failed to import utils")
+			validMAC = ["00:FF:00:FF:00:FF"]
+			temp = utils.extractMACAddr(
+				"""00:FF:00:FF:00:FF"""
+			)
+			theResult = (len(validMAC) is len(temp))
+			for x in temp:
+				if x in validMAC:
+					theResult = (theResult is True)
+				else:
+					theResult = False
+					print(str(""))
+					print(str(x))
+					print(str(""))
+			if (theResult is False):
+				print(str(""))
+				print(str(temp))
+				print(str(""))
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			err = None
+			del err
+			theResult = False
+		assert theResult
+
+	def test_case_utils_read_write_file(self):
+		"""Tests the read and write functions"""
+		theResult = False
+		try:
+			from piaplib import pku as pku
+			if pku.__name__ is None:
+				raise ImportError("Failed to import pku")
+			from pku import utils as utils
+			if utils.__name__ is None:
+				raise ImportError("Failed to import utils")
+			theBlob = str("""This will test writes,
+and this will test reads.""")
+			somefile = str("the_test_file.txt")
+			if (utils.writeFile(somefile, theBlob) is True):
+				readback = utils.readFile(somefile)
+				if (theBlob in readback) and (readback in theBlob):
+					theResult = (len(readback) is len(theBlob))
+				else:
+					theResult = False
+				if (theResult is False):
+					print(str("wrote"))
+					print(str(theBlob))
+					print(str(""))
+					print(str("read"))
+					print(str(readback))
+					print(str(""))
+			else:
+				theResult = False
+			if (theResult is False):
+				print(str("write failed"))
+				print(str(theBlob))
+				print(str(""))
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			err = None
+			del err
+			theResult = False
+		assert theResult
+
+	def test_case_utils_read_ammend_file(self):
+		"""Tests the read and write functions"""
+		theResult = False
+		try:
+			from piaplib import pku as pku
+			if pku.__name__ is None:
+				raise ImportError("Failed to import pku")
+			from pku import utils as utils
+			if utils.__name__ is None:
+				raise ImportError("Failed to import utils")
+			theBlob = str("""This will test writes,
+and this will test reads.""")
+			theBlobtail = str("""This will test ammends.""")
+			somefile = str("the_test_file.txt")
+			if (utils.writeFile(somefile, theBlob) is True):
+				if (utils.appendFile(somefile, theBlobtail) is True):
+					readback = utils.readFile(somefile)
+					if (theBlobtail in readback) and (readback not in theBlob):
+						theResult = (len(readback) is not len(theBlob))
+					else:
+						theResult = False
+					if (theResult is False):
+						print(str("wrote"))
+						print(str(theBlob))
+						print(str(""))
+						print(str("read"))
+						print(str(readback))
+						print(str(""))
+				else:
+					theResult = False
+			else:
+				theResult = False
+			if (theResult is False):
+				print(str("write failed"))
+				print(str(theBlob))
 				print(str(""))
 		except Exception as err:
 			print(str(""))

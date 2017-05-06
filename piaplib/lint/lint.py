@@ -90,7 +90,7 @@ def useLintTool(tool, arguments=[None]):
 				timestamp = getTimeStamp()
 				theResult = str(
 					timestamp +
-					" - WARNING - An error occured while handling the keyring tool. " +
+					" - WARNING - An error occured while handling the lint tool. " +
 					"Cascading failure."
 				)
 		except Exception:

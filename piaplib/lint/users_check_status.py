@@ -124,22 +124,24 @@ def taint_name(rawtxt):
 
 def show_user(user_name=None, is_verbose=False, use_html=False):
 	"""show the given user."""
+	theResult = None
 	try:
-		if use_html:
-			format_pattern = u'{}{}{}{}'
+		if use_html is True:
+			format_pattern = str(u'{}{}{}{}')
 		else:
-			format_pattern = u'{} {} {} {}'
-		theResult = format_pattern.format(
+			format_pattern = str(u'{} {} {} {}')
+		theResult = str(format_pattern).format(
 			get_user_name(user_name, use_html),
 			get_user_ttys(user_name, use_html),
 			get_user_ip(user_name, use_html),
 			get_user_status(get_user_name(user_name, False), use_html)
 		)
 		if use_html:
-			theResult = html_generator.gen_html_tr(
+			the_temp_Result = html_generator.gen_html_tr(
 				theResult,
 				str(u'user_status_row_{}').format(get_user_name(user_name, False))
 			)
+			theResult = utils.literal_str(the_temp_Result)
 	except Exception as cmdErr:
 		print(str(cmdErr))
 		print(str(cmdErr.args))
@@ -332,7 +334,7 @@ def get_user_status(user_name=None, use_html=False):
 				})
 				for theWork in theWorks:
 					temp_txt = "UNKNOWN"
-					if (u'SYSTEM' in theWork):
+					if ("SYSTEM" in theWork):
 						temp_txt = "SYSTEM"
 					else:
 						for known_case in known_work_cases.keys():
@@ -346,11 +348,13 @@ def get_user_status(user_name=None, use_html=False):
 						elif (u'DEFENSE' in temp_txt):
 							temp_txt = html_generator.gen_html_label(u'Defense', u'success')
 						elif (u'OFFENSE' in temp_txt):
-							temp_txt = html_generator.gen_html_label(u'Offense', u'default')
+							temp_txt = html_generator.gen_html_label(u'Offense', u'primary')
 						elif (u'NETWORK SERVICES' in temp_txt):
 							temp_txt = html_generator.gen_html_label(u'Network', u'info')
 						elif (u'LOGGING SERVICES' in temp_txt):
 							temp_txt = html_generator.gen_html_label(u'Logging', u'info')
+						elif (u'TIMEKEEPING SERVICES' in temp_txt):
+							temp_txt = html_generator.gen_html_label(u'Clock', u'info')
 						elif (u'DNS-DHCP-SERVER' in temp_txt):
 							temp_txt = html_generator.gen_html_label(u'Local Domain', u'info')
 						elif (u'SYSTEM' in temp_txt):
@@ -362,7 +366,10 @@ def get_user_status(user_name=None, use_html=False):
 					status_list.append(str(temp_txt))
 				status_list = utils.compactList(status_list)
 			else:
-				status_list = ["SYSTEM"]
+				if use_html is True:
+					status_list = [str(html_generator.gen_html_label(u'System', u'info'))]
+				else:
+					status_list = ["SYSTEM"]
 		if use_html is not True:
 			theResult = status_list
 		else:
@@ -389,6 +396,8 @@ def get_user_ttys(user=None, use_html=False):
 	"""Generate output of the user mac."""
 	if (user is None) and (use_html is not True):
 		return None
+	elif (user is None) and (use_html is True):
+		return html_generator.gen_html_label(u'UNKNOWN', u'warning')
 	# otherwise
 	theResult = None
 	try:
@@ -454,14 +463,14 @@ def main(argv=None):
 	try:
 		verbose = False
 		if args.verbose_mode is not None:
-				verbose = args.verbose_mode
+				verbose = (args.verbose_mode is True)
 		if args.output_html is not None:
-				output_html = args.output_html
+				output_html = (args.output_html is True)
 		if args.show_all is True:
 			if output_html:
 				print(
 					"<table class=\"table table-striped\">" +
-					"<thead><th>User</th><th>TTYs</th><th>Host</th><th>Status</th></thead><tbody>"
+					"<thead><th>User</th><th>TTYs</th><th>Host</th><th>Activity</th></thead><tbody>"
 				)
 			for user_name in get_user_list():
 				print(show_user(user_name, verbose, output_html))

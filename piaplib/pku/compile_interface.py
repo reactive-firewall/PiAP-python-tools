@@ -223,7 +223,7 @@ def parseArgs():
 			default=MEDIA_TYPES[0],
 			choices=MEDIA_TYPES,
 			required=True,
-			help='ethernet or wireless'
+			help='usb or ethernet or wireless'
 		)
 		parser.add_argument(
 			'-z',

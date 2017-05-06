@@ -129,10 +129,10 @@ def show_client(client_ip=None, is_verbose=False, use_html=False, lan_interface=
 		if lan_interface not in interfaces.INTERFACE_CHOICES:
 			lan_interface = interfaces.INTERFACE_CHOICES[1]
 		if use_html:
-			format_pattern = u'{}{}{}{}'
+			format_pattern = str(u'{}{}{}{}')
 		else:
-			format_pattern = u'{} {} {} {}'
-		theResult = format_pattern.format(
+			format_pattern = str(u'{} {} {} {}')
+		theResult = str(format_pattern).format(
 			get_client_name(client_ip, use_html, lan_interface),
 			get_client_mac(client_ip, use_html, lan_interface),
 			get_client_ip(client_ip, use_html, lan_interface),
@@ -143,7 +143,10 @@ def show_client(client_ip=None, is_verbose=False, use_html=False, lan_interface=
 			)
 		)
 		if use_html:
-			theResult = gen_html_tr(theResult, str(u'client_status_row_{}').format(client_ip))
+			theResult = html_generator.gen_html_tr(
+				theResult,
+				str(u'client_status_row_{}').format(client_ip)
+			)
 	except Exception as cmdErr:
 		print(str("ERROR: show_client"))
 		print(str(type(cmdErr)))
@@ -162,7 +165,7 @@ def get_client_name(client_ip=None, use_html=False, lan_interface=None):
 		return get_client_arp_status_raw(client_ip, lan_interface).split(u' ', 1)[0]
 	else:
 		client = str(get_client_name(client_ip, False))
-		return gen_html_td(client, str(u'client_status_{}').format(client))
+		return html_generator.gen_html_td(client, str(u'client_status_{}').format(client))
 
 
 # TODO: memoize this function
@@ -174,7 +177,7 @@ def get_client_sta_status_raw():
 		try:
 			# hard-coded white-list cmd
 			output = subprocess.check_output(
-				[str("""/opt/PiAP/hostapd_actions/clients""")],
+				[str("/opt/PiAP/hostapd_actions/clients")],
 				stderr=subprocess.STDOUT
 			)
 			if (output is not None) and (len(output) > 0):
@@ -186,11 +189,17 @@ def get_client_sta_status_raw():
 				del lines
 			else:
 				theRawClientState = None
-		except FileNotFoundError as depErr:
+		except FileNotFoundError as depErr: # noqa F821
+			print(str(type(depErr)))
+			print(str(depErr))
+			print(str(depErr.args))
 			depErr = None
 			del depErr
 			theRawClientState = u'UNKNOWN'
 		except subprocess.CalledProcessError as subErr:
+			print(str(type(subErr)))
+			print(str(subErr))
+			print(str(subErr.args))
 			subErr = None
 			del subErr
 			theRawClientState = u'UNKNOWN'
@@ -270,11 +279,13 @@ def get_client_arp_status_raw(client_ip=None, lan_interface=interfaces.INTERFACE
 # TODO: memoize this function
 def get_client_sta_status(client_mac=None):
 	"""list the raw status of client sta."""
-	theClientState = u'disassociated'
+	theClientState = str("disassociated")
 	if client_mac is not None:
+		matches = []
 		try:
-			if str(client_mac).upper() in utils.extractMACAddr(get_client_sta_status_raw()):
-				theClientState = u'associated'
+			matches = utils.extractMACAddr(get_client_sta_status_raw())
+			if str(client_mac) in matches:
+				theClientState = str("associated")
 		except Exception as cmdErr:
 			print(str("ERROR: get_client_sta_status"))
 			print(str(type(cmdErr)))
@@ -286,7 +297,7 @@ def get_client_sta_status(client_mac=None):
 
 # TODO: memoize this function
 def get_client_list(lan_interface=None):
-	"""list the available clients."""
+	"""list the availabel clients."""
 	theResult = None
 	try:
 		theRawClientState = get_client_arp_status_raw(None, lan_interface)
@@ -315,27 +326,27 @@ def get_client_status(client=None, use_html=False, lan_interface=None):
 			status_txt = get_client_sta_status(client_mac)
 		if use_html is not True:
 			if status_txt is not None:
-				if (" DOWN" in status_txt):
+				if (str("disassociated") in status_txt):
 					theResult = u'disassociated'
-				elif (" UP" in status_txt):
+				elif (str("associated") in status_txt):
 					theResult = u'associated'
 				else:
 					theResult = u'UNKNOWN'
 		else:
 			if status_txt is not None:
-				if (u' DOWN' in status_txt):
-					theResult = gen_html_td(
-						gen_html_label(u'disassociated', u'danger'),
+				if (str("disassociated") in status_txt):
+					theResult = html_generator.gen_html_td(
+						html_generator.gen_html_label(u'disassociated', u'danger'),
 						str(u'client_status_value_{}').format(client)
 					)
-				elif (u' UP' in status_txt):
-					theResult = gen_html_td(
-						gen_html_label(u'associated', u'success'),
+				elif (str("associated") in status_txt):
+					theResult = html_generator.gen_html_td(
+						html_generator.gen_html_label(u'associated', u'success'),
 						str(u'client_status_value_{}').format(client)
 					)
 				else:
-					theResult = gen_html_td(
-						gen_html_label(u'UNKNOWN', u'default'),
+					theResult = html_generator.gen_html_td(
+						html_generator.gen_html_label(u'UNKNOWN', u'default'),
 						str(u'client_status_value_{}').format(client)
 					)
 	except Exception as errcrit:
@@ -361,13 +372,13 @@ def get_client_mac(client=None, use_html=False, lan_interface=None):
 				theResult = None
 		else:
 			if mac_list_txt is not None and len(mac_list_txt) > 0:
-				theResult = gen_html_td(
+				theResult = html_generator.gen_html_td(
 					str(mac_list_txt[0]),
 					str(u'client_status_macs_{}')
 				).format(client)
 			else:
-				theResult = gen_html_td(
-					gen_html_label(u'No IP', html_generator.HTML_LABEL_ROLES[3]),
+				theResult = html_generator.gen_html_td(
+					html_generator.gen_html_label(u'No IP', html_generator.HTML_LABEL_ROLES[3]),
 					str(u'client_status_macs_{}').format(client)
 				)
 	except Exception as errcrit:
@@ -391,177 +402,19 @@ def get_client_ip(client=None, use_html=False, lan_interface=None):
 				theResult = None
 		else:
 			if ip_list_txt is not None and len(ip_list_txt) > 0:
-				theResult = gen_html_td(
-					gen_html_ul(ip_list_txt),
+				theResult = html_generator.gen_html_td(
+					html_generator.gen_html_ul(ip_list_txt),
 					str(u'client_status_ips_{}')
 				).format(client)
 			else:
-				theResult = gen_html_td(
-					gen_html_label(u'No IP', html_generator.HTML_LABEL_ROLES[3]),
+				theResult = html_generator.gen_html_td(
+					html_generator.gen_html_label(u'No IP', html_generator.HTML_LABEL_ROLES[3]),
 					str(u'client_status_ips_{}').format(client)
 				)
 	except Exception as errcrit:
 		print(str(errcrit))
 		print(str(errcrit.args))
 		theResult = None
-	return theResult
-
-
-# duplicate
-def gen_html_tr(content=None, id=None, name=None):
-	"""
-	Generates a table row html tr taglet.
-	param content -- The content of the tr taglet.
-	param name -- The optional name of the tr taglet.
-	param id -- The optional id of the tr taglet.
-	Returns:
-	str -- the html string of the tr taglet.
-	"""
-	if id is not None and has_special_html_chars(id) is not True:
-		if name is not None and has_special_html_chars(name) is not True:
-			return str(
-				u'<tr name=\"{}\" id=\"{}\">{}</tr>'
-			).format(str(name), str(id), str(content))
-		else:
-			return str(u'<tr id=\"{}\">{}</tr>').format(id, str(content))
-	elif name is not None and has_special_html_chars(name) is not True:
-		return str(u'<tr name=\"{}\">{}</tr>').format(id, str(content))
-	else:
-		return str(u'<tr>{}</tr>').format(str(content))
-
-
-# duplicate
-def has_special_html_chars(somestr=None):
-	"""
-	Determins if the string have special html charterers.
-	param somestr -- The string to test.
-	Returns:
-	True -- if the string has special charterers.
-	False -- otherwise.
-	"""
-	try:
-		if somestr is None:
-			return True
-		badchars = [u'\"', u'\'', u'\\', u'%', u'>', u'<', u'=']
-		for badchar in badchars:
-			if badchar in somestr:
-				return True
-	except Exception as badinput:
-		print(str("Bad html render string input."))
-		del badinput
-		return True
-	return False
-
-
-# duplicate
-def gen_html_td(content=None, id=None, name=None):
-	"""
-	Generates a table data html td taglet.
-	param content -- The content of the td taglet.
-	param name -- The optional name of the td taglet.
-	param id -- The optional id of the td taglet.
-	Returns:
-	str -- the html string of the td taglet.
-	"""
-	if id is not None and has_special_html_chars(id) is not True:
-		if name is not None and has_special_html_chars(name) is not True:
-			return str(
-				u'<td name=\"{}\" id=\"{}\">{}</td>'
-			).format(str(name), str(id), str(content))
-		else:
-			return str(u'<td id=\"{}\">{}</td>').format(id, str(content))
-	elif name is not None and has_special_html_chars(name) is not True:
-		return str(u'<td name=\"{}\">{}</td>').format(id, str(content))
-	else:
-		return str(u'<td>{}</td>').format(str(content))
-
-
-# duplicate
-def gen_html_ul(somelist=None, id=None, name=None):
-	"""
-	Generates a list html ul taglet.
-	param somelist -- The content of the ul taglet.
-	param name -- The optional name of the li taglet.
-	param id -- The optional id of the li taglet.
-	Returns:
-	str -- the html string of the li taglet.
-	"""
-	if somelist is None or somelist is [None]:
-		return None
-	items = [gen_html_li(x) for x in somelist]
-	theresult = None
-	if id is not None and has_special_html_chars(id) is not True:
-		if name is not None and has_special_html_chars(name) is not True:
-			theresult = str(u'<ul name=\"{}\" id=\"{}\">').format(str(name), str(id))
-			for item in items:
-				theresult = str(theresult + item)
-		else:
-			theresult = str(u'<ul id=\"{}\">').format(str(id))
-			for item in items:
-				theresult = str(theresult + item)
-	elif name is not None and has_special_html_chars(name) is not True:
-		theresult = str(u'<ul name=\"{}\">').format(str(name))
-		for item in items:
-			theresult = str(theresult + item)
-	else:
-		theresult = str(u'<ul>')
-		for item in items:
-			theresult = str(theresult + item)
-	theresult = str(theresult + u'</ul>')
-	return theresult
-
-
-# duplicate
-def gen_html_li(item=None, id=None, name=None):
-	"""
-	Generates a list item html li taglet.
-	param item -- The content of the li taglet.
-	param name -- The optional name of the li taglet.
-	param id -- The optional id of the li taglet.
-	Returns:
-	str -- the html string of the li taglet.
-	"""
-	if id is not None and has_special_html_chars(id) is not True:
-		if name is not None and has_special_html_chars(name) is not True:
-			return str(u'<li name=\"{}\" id=\"{}\">{}</li>').format(str(name), str(id), str(item))
-		else:
-			return str(u'<li id=\"{}\">{}</li>').format(id, str(item))
-	elif name is not None and has_special_html_chars(name) is not True:
-		return str(u'<li name=\"{}\">{}</li>').format(id, str(item))
-	else:
-		return str(u'<li>{}</li>').format(str(item))
-
-
-# duplicate
-def gen_html_label(content=None, role=html_generator.HTML_LABEL_ROLES[0], id=None, name=None):
-	"""
-	Generates a table data html lable taglet.
-	param content -- The content of the td taglet.
-	param role -- The lable class of the span taglet.
-	param name -- The optional name of the td taglet.
-	param id -- The optional id of the td taglet.
-	Returns:
-	str -- the html string of the td taglet.
-	"""
-	# WARN:not ready for prod - check types, errors, etc,
-	# security auditors: if you are reading this you found somthing
-	# I forgot to make ready for prod. patches welcome.
-	theResult = None
-	if id is not None and has_special_html_chars(id) is not True:
-		if name is not None and has_special_html_chars(name) is not True:
-			theResult = str(
-				u'<span class=\"lable lable-{}\" name=\"{}\" id=\"{}\">{}</span>'
-			).format(role, str(name), str(id), str(content))
-		else:
-			theResult = str(
-				u'<span class=\"lable lable-{}\" id=\"{}\">{}</span>'
-			).format(role, id, str(content))
-	elif name is not None and has_special_html_chars(name) is not True:
-		theResult = str(
-			u'<span class=\"lable lable-{}\" name=\"{}\">{}</span>'
-		).format(role, id, str(content))
-	else:
-		theResult = str(u'<span class=\"lable lable-{}\">{}</span>').format(role, str(content))
 	return theResult
 
 

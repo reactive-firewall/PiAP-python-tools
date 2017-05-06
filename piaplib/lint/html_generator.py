@@ -47,7 +47,7 @@ HTML_LABEL_STATUS = {
 	u'UNKNOWN': u'disabled',
 	u'DEBUG': u'info'
 }
-"""The basic status mappings to lables"""
+"""The basic status mappings to labels"""
 
 
 HTML_LABEL_ROLES = [
@@ -195,9 +195,9 @@ def gen_html_li(item=None, id=None, name=None):
 
 def gen_html_label(content=None, role=HTML_LABEL_ROLES[0], id=None, name=None):
 	"""
-	Generates a table data html lable taglet.
+	Generates a table data html label taglet.
 	param content -- The content of the td taglet.
-	param role -- The lable class of the span taglet.
+	param role -- The label class of the span taglet.
 	param name -- The optional name of the td taglet.
 	param id -- The optional id of the td taglet.
 	Returns:
@@ -209,18 +209,18 @@ def gen_html_label(content=None, role=HTML_LABEL_ROLES[0], id=None, name=None):
 	if id is not None and has_special_html_chars(id) is not True:
 		if name is not None and has_special_html_chars(name) is not True:
 			return str(
-				u'<span class=\"lable lable-{}\" name=\"{}\" id=\"{}\">{}</span>'
+				u'<span class=\"label label-{}\" name=\"{}\" id=\"{}\">{}</span>'
 			).format(role, str(name), str(id), str(content))
 		else:
 			return str(
-				u'<span class=\"lable lable-{}\" id=\"{}\">{}</span>'
+				u'<span class=\"label label-{}\" id=\"{}\">{}</span>'
 			).format(role, id, str(content))
 	elif name is not None and has_special_html_chars(name) is not True:
 			return str(
-				u'<span class=\"lable lable-{}\" name=\"{}\">{}</span>'
+				u'<span class=\"label label-{}\" name=\"{}\">{}</span>'
 			).format(role, id, str(content))
 	else:
 		return str(
-			u'<span class=\"lable lable-{}\">{}</span>'
+			u'<span class=\"label label-{}\">{}</span>'
 		).format(role, str(content))
 

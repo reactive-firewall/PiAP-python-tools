@@ -37,8 +37,8 @@ try:
 except Exception:
 	import lint as lint
 
-__prog__ = "PiAP-util.py"
-"""The name of this program is PiAP-util.py"""
+__prog__ = "pocket"
+"""The name of this program is pocket"""
 
 POCKET_UNITS = {
 	u'pku': pku.pku,
@@ -56,14 +56,6 @@ POCKET_UNITS = {
 	lint - the extra pocket stuff tool. Small things always in the pocket.
 	fruitsnack - the little Pi in the pocket. Wrapper for all things RaspberryPi.
 	book - the little pocket-book for storage and the like. (FUTURE/RESERVED)
-	"""
-
-PKU_OPTIONS = [u'config', u'backup', u'upgrade']
-""" The Pocket Knife Unit actions.
-	config -  (FUTURE/RESERVED)
-	backup -  (FUTURE/RESERVED)
-	upgrade -  (FUTURE/RESERVED)
-	help -  (FUTURE/RESERVED)
 	"""
 
 PROTECTOR_OPTIONS = [u'fw', u'ids', u'acl']
@@ -114,7 +106,7 @@ def getTimeStamp():
 
 
 def doRunHandle(theInputStr):
-	"""Handler for Error state."""
+	"""Handler for running sub commands state."""
 	try:
 		import subprocess
 		try:
@@ -183,6 +175,5 @@ def main(argv=None):
 
 
 if __name__ == '__main__':
-	import sys
 	main(sys.argv[1:])
 

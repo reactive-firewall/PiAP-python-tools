@@ -139,11 +139,72 @@ class StringsTestSuite(unittest.TestCase):
 			if saltify.__name__ is None:
 				theResult = False
 			test_salt_one = str(
-				u'7a9356011e7f6bc42105deee6d49983e0cfa7650c7fce5d' +
-				u'5d3b19aacca91605199ee017707f627087f8376143f368b17ed927d918eecfe100a7b1b6e39dd3c8a'
+				"7a9356011e7f6bc42105deee6d49983e0cfa7650c7fce5d5d3b19aacca91605199ee" +
+				"017707f627087f8376143f368b17ed927d918eecfe100a7b1b6e39dd3c8a"
 			)
 			theResult = (str(saltify.saltify("Test Message", "testSalt")) is str(test_salt_one))
 			del test_salt_one
+		except Exception as impErr:
+			print(str(""))
+			print(str(type(impErr)))
+			print(str(impErr))
+			print(str((impErr.args)))
+			print(str(""))
+			theResult = False
+		assert theResult
+
+	@_test_try_or_fail
+	def _test_keyring_salt_test_entropy(self):
+		theResult = True
+		try:
+			from .context import piaplib
+			if piaplib.__name__ is None:
+				theResult = False
+			from piaplib import keyring as keyring
+			if keyring.__name__ is None:
+				theResult = False
+			from keyring import saltify as saltify
+			if saltify.__name__ is None:
+				theResult = False
+			import os
+			if os.__name__ is None:
+				theResult = False
+			randomSalt = str(os.urandom(10))
+			randomSalt_shift1 = randomSalt + str(""" """)
+			randomSalt_shift2 = randomSalt_shift1 + str(""" """)
+			randomSalt_shift3 = randomSalt_shift2 + str(""" """)
+			randomSalt_shift4 = randomSalt_shift3 + str(""" """)
+			randomSalt_shift5 = randomSalt_shift4 + str(""" """)
+			salt_list = [
+				randomSalt, randomSalt_shift1,
+				randomSalt_shift2, randomSalt_shift3,
+				randomSalt_shift4, randomSalt_shift5
+			]
+			for someRandomTest in range(100000):
+				if theResult is not True:
+					continue
+				this_test = str(os.urandom(10))
+				that_test = str(os.urandom(10))
+				for test_salt in salt_list:
+					temp = (str(saltify.saltify(
+						this_test,
+						randomSalt
+					)) is not str(saltify.saltify(
+						that_test,
+						test_salt
+					)))
+					theResult = ((theResult is True) and (temp is True))
+					if (temp is False):
+						print(str("COLLISION - NEW TEST FOUND:"))
+						try:
+							print(str("salt( {}, {} ) != salt( {}, {} )").format(
+								this_test,
+								randomSalt,
+								that_test,
+								test_salt
+							))
+						except Exception:
+							print("unprintable test")
 		except Exception as impErr:
 			print(str(""))
 			print(str(type(impErr)))

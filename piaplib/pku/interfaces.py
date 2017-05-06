@@ -73,7 +73,7 @@ def parseargs(arguments=None):
 
 
 def taint_name(rawtxt):
-	"""check the interface arguments"""
+	"""Checks the interface arguments."""
 	tainted_input = str(rawtxt).lower()
 	for test_iface in INTERFACE_CHOICES:
 		if tainted_input in test_iface:
@@ -81,11 +81,19 @@ def taint_name(rawtxt):
 	return None
 
 
-def enable_iface(iface_name="lo"):
+def enable_iface(iface_name=None):
 	"""enable the given interface by calling ifup."""
-	tainted_name = taint_name(iface_name)
-	import subprocess
-	theResult = subprocess.check_output(['ifup', tainted_name])
+	theResult = str("")
+	try:
+		tainted_name = taint_name(iface_name)
+		import subprocess
+		theResult = subprocess.check_output([str("ifup"), str(tainted_name)])
+	except Exception as err:
+		print(str(type(err)))
+		print(str(err))
+		print(str(err.args))
+		err = None
+		del(err)
 	return theResult
 
 
@@ -111,9 +119,10 @@ def restart_iface(iface_name="lo"):
 	return True
 
 
-if __name__ == '__main__':
+if __name__ == u'__main__':
 	import sys
-	args = parseargs(sys.argv[:1])
+	if (sys.argv is not None and (sys.argv is not []) and (len(sys.argv) > 1)):
+		args = parseargs(sys.argv[:1])
 	try:
 		interface = args.interface
 		if args.enable_action is True:
@@ -125,8 +134,12 @@ if __name__ == '__main__':
 		elif args.restart_action is True:
 			restart_iface(interface)
 			exit(0)
-	except Exception as main_err:
-		print(str("iface_pwr_mgr: REALLY BAD ERROR: ACTION will not be compleated! ABORT!"))
-		print(str(main_err.args[0]))
+	except Exception as err:
+		print(str("interfaces: REALLY BAD ERROR: ACTION will not be compleated! ABORT!"))
+		print(str(type(err)))
+		print(str(err))
+		print(str(err.args))
+		err = None
+		del(err)
 	exit(1)
 
