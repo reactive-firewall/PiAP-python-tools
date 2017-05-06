@@ -3,6 +3,7 @@ sudo: false
 
 branches:
   only:
+    - stable
     - master
 
 addons:

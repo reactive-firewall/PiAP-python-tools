@@ -19,7 +19,7 @@
 try:
 	import sys
 	import os
-	if 'pku' in __file__:
+	if u'pku' in __file__:
 		sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 except Exception as ImportErr:
 	print(str(type(ImportErr)))
@@ -29,20 +29,14 @@ except Exception as ImportErr:
 	del ImportErr
 	raise ImportError(u'Pocket Knife Unit PKU failed to import.')
 
+
 try:
 	from . import pku as pku
-	if pku.__name__ is None:
+	if pku.__name__ is False:
 		raise ImportError("pku Failed to import.")
 except Exception as impErr:
 	impErr = None
 	del impErr
-	try:
-		import pku as pku
-		if pku.__name__ is None:
-			raise ImportError("pku Failed to import.")
-	except Exception as importErr:
-		ImportErr = None
-		del ImportErr
-		raise ImportError(u'Pocket Knife Unit PKU failed to import.')
+	import pku as pku
 
 
