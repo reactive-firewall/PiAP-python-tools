@@ -293,6 +293,18 @@ def appendFile(somefile, somedata):
 	return theResult
 
 
+def getFileList(someURL, outFile):
+	"""Downloads a file from the given URL."""
+	import urllib
+	try:
+		tempfile = urllib.FancyURLopener()
+	except Exception:
+		import urllib.request
+		tempfile = urllib.request.FancyURLopener()
+	tempfile.retrieve(someURL, outFile)
+	return True
+
+
 def main(argv=None):
 	"""The Main Event makes no sense to utils."""
 	raise NotImplementedError("CRITICAL - PKU Uitls main() not implemented. yet?")

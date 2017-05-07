@@ -124,8 +124,8 @@ def main(argv=None):
 	try:
 		try:
 			args, extra = parseArgs(argv)
-			lint_cmd = args.lint_unit
-			usePKUTool(lint_cmd, extra)
+			pku_cmd = args.pku_unit
+			usePKUTool(pku_cmd, extra)
 		except Exception as cerr:
 			print(str(cerr))
 			print(str(cerr.args))
