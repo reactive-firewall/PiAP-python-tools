@@ -148,7 +148,7 @@ class BasicTestSuite(unittest.TestCase):
 						str("-m"),
 						str("piaplib.pocket"),
 						str("--help")
-					])
+					], stderr=subprocess.STDOUT)
 					if (str("usage:") in str(theOutputtext)):
 						theResult = True
 					else:
