@@ -81,7 +81,7 @@ purge: clean uninstall
 	$(QUIET)$(ECHO) "$@: Done."
 
 test: cleanup
-	$(QUIET)python -m unittest tests.test_basic tests.test_strings tests.test_salt tests.test_utils
+	$(QUIET)python3 -m unittest tests.test_basic tests.test_strings tests.test_salt tests.test_utils || python -m unittest tests.test_basic tests.test_strings tests.test_salt tests.test_utils
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-tox: cleanup
@@ -105,6 +105,7 @@ cleanup:
 	$(QUIET)rmdir piaplib.egg-info 2>/dev/null || true
 	$(QUIET)rm -f ./*/*~ 2>/dev/null || true
 	$(QUIET)rm -f ./*~ 2>/dev/null || true
+	$(QUIET)rm -f ./.*~ 2>/dev/null || true
 	$(QUIET)rm -Rf ./.tox/ 2>/dev/null || true
 	$(QUIET)rm -f ./the_test_file.txt 2>/dev/null || true
 
