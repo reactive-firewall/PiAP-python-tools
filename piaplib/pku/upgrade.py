@@ -21,7 +21,7 @@
 try:
 	import pip
 except Exception:
-	raise ImportError("Error Importing pip tools")
+	raise ImportError("Not Implemented.")
 
 try:
 	import argparse
