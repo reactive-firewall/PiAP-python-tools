@@ -147,6 +147,14 @@ class BasicTestSuite(unittest.TestCase):
 				])
 				if (str("usage:") in str(theOutputtext)):
 					theResult = True
+				else:
+					print(str(""))
+					print(str("python cmd is {}").format(str(thepython)))
+					print(str(""))
+					print(str("actual output was..."))
+					print(str(""))
+					print(str("{}").format(str(theOutputtext)))
+					print(str(""))
 			except Exception:
 				theResult = False
 		except Exception:
