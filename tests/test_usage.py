@@ -129,7 +129,7 @@ class BasicTestSuite(unittest.TestCase):
 		assert theResult
 
 	def test_c_python_command_pocket(self):
-		"""Test case for backend library."""
+		"""Test case for piaplib.pocket help."""
 		theResult = False
 		try:
 			import subprocess
@@ -138,25 +138,30 @@ class BasicTestSuite(unittest.TestCase):
 				thepython = subprocess.check_output(["which", "python"])
 				if (str("/python") not in str(thepython)):
 					theResult = False
-			try:
-				theOutputtext = subprocess.check_output([
-					str(thepython),
-					str("-m"),
-					str("piaplib.pocket"),
-					str("--help")
-				])
-				if (str("usage:") in str(theOutputtext)):
-					theResult = True
-				else:
 					print(str(""))
-					print(str("python cmd is {}").format(str(thepython)))
+					print(str("there is no python. Extensional problem."))
 					print(str(""))
-					print(str("actual output was..."))
-					print(str(""))
-					print(str("{}").format(str(theOutputtext)))
-					print(str(""))
-			except Exception:
-				theResult = False
+			if (str("/python") in str(thepython)):
+				try:
+					theOutputtext = subprocess.check_output([
+						str(thepython),
+						str("-m"),
+						str("piaplib.pocket"),
+						str("--help")
+					])
+					if (str("usage:") in str(theOutputtext)):
+						theResult = True
+					else:
+						theResult = False
+						print(str(""))
+						print(str("python cmd is {}").format(str(thepython)))
+						print(str(""))
+						print(str("actual output was..."))
+						print(str(""))
+						print(str("{}").format(str(theOutputtext)))
+						print(str(""))
+				except Exception:
+					theResult = False
 		except Exception:
 			theResult = False
 		assert theResult
