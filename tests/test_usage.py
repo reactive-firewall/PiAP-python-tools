@@ -134,14 +134,11 @@ class BasicTestSuite(unittest.TestCase):
 		try:
 			import subprocess
 			thepython = subprocess.check_output(["which", "python3"])
-			if (str("/python3") not in str(thepython)):
-				thepython = subprocess.check_output(["which", "python"])
-				if (str("/python") not in str(thepython)):
-					theResult = False
-					print(str(""))
-					print(str("There is no python. Extensional problem."))
-					print(str(""))
-			if (str("/python") in str(thepython)):
+			if (str("/python3") in str(thepython)):
+				thepython = "python3"
+			else:
+				thepython = "python"
+			if (thepython is not None):
 				try:
 					theOutputtext = subprocess.check_output([
 						str(thepython),
