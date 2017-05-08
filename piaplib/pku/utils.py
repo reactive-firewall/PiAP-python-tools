@@ -293,7 +293,7 @@ def appendFile(somefile, somedata):
 	return theResult
 
 
-def getFileList(someURL, outFile):
+def getFileResource(someURL, outFile):
 	"""Downloads a file from the given URL."""
 	import urllib
 	try:
@@ -301,7 +301,21 @@ def getFileList(someURL, outFile):
 	except Exception:
 		import urllib.request
 		tempfile = urllib.request.FancyURLopener()
-	tempfile.retrieve(someURL, outFile)
+	try:
+		tempfile.retrieve(someURL, outFile)
+	except Exception:
+		return False
+	return True
+
+
+def cleanFileResource(theFile):
+	"""cleans up a downloaded given file."""
+	import os
+	try:
+		os.remove(str(theFile))
+	except Exception:
+		print("Error: Failed to remove file.")
+		return False
 	return True
 
 

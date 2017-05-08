@@ -98,6 +98,23 @@ def upgradePiAPlib():
 	return None
 
 
+def upgradePiAPlib_depends():
+	"""Upgrade piaplib via pip."""
+	try:
+		upsream_repo_depends = str("https://raw.githubusercontent.com/reactive-firewall/PiAP-python-tools/master/requirements.txt")
+		utils.getFileResource("https://raw.githubusercontent.com/reactive-firewall/PiAP-python-tools/master/requirements.txt", "temp_req.txt")
+		pip.main(args=["install", "--upgrade-strategy", "only-if-needed", "--upgrade", "-r", "temp_req.txt"])
+		utils.cleanFileResource("temp_req.txt")
+	except Exception as permErr:
+		print(str(type(permErr)))
+		print(str(permErr))
+		print(str((permErr.args)))
+		permErr = ""
+		permErr = None
+		del(permErr)
+	return None
+
+
 def upgradeAll():
 	"""Upgrade piaplib and requirements via pip."""
 	try:
