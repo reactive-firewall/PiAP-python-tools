@@ -198,7 +198,7 @@ class BasicTestSuite(unittest.TestCase):
 						str("users"),
 						str("--all")
 					], stderr=subprocess.STDOUT)
-					if (str("python") in str(theOutputtext)):
+					if (str("root console ") in str(theOutputtext)):
 						theResult = True
 					else:
 						theResult = False
