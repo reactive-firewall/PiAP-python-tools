@@ -229,7 +229,7 @@ class BasicTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
-	def test_d_python_command_check_users(self):
+	def test_d_python_command_check_iface(self):
 		"""Test case for piaplib.pocket.lint check iface."""
 		theResult = False
 		try:
