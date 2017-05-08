@@ -139,7 +139,7 @@ class BasicTestSuite(unittest.TestCase):
 				if (str("/python") not in str(thepython)):
 					theResult = False
 					print(str(""))
-					print(str("there is no python. Extensional problem."))
+					print(str("There is no python. Extensional problem."))
 					print(str(""))
 			if (str("/python") in str(thepython)):
 				try:
@@ -160,9 +160,23 @@ class BasicTestSuite(unittest.TestCase):
 						print(str(""))
 						print(str("{}").format(str(theOutputtext)))
 						print(str(""))
-				except Exception:
+				except Exception as othererr:
+					print(str(""))
+					print(str(type(othererr)))
+					print(str(othererr))
+					print(str((othererr.args)))
+					print(str(""))
+					othererr = None
+					del othererr
 					theResult = False
-		except Exception:
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			othererr = None
+			del othererr
 			theResult = False
 		assert theResult
 
