@@ -5,10 +5,10 @@
 ## Status
 
 ### master:
-[[status](image:: https://travis-ci.org/reactive-firewall/PiAP-python-tools.svg?branch=master)](https://travis-ci.org/reactive-firewall/PiAP-python-tools)
+[![status](https://travis-ci.org/reactive-firewall/PiAP-python-tools.svg?branch=master)](https://travis-ci.org/reactive-firewall/PiAP-python-tools)
 
 ### Stable:
-[[status](image:: https://travis-ci.org/reactive-firewall/PiAP-python-tools.svg?branch=stable)](https://travis-ci.org/reactive-firewall/PiAP-python-tools)
+[![status](https://travis-ci.org/reactive-firewall/PiAP-python-tools.svg?branch=stable)](https://travis-ci.org/reactive-firewall/PiAP-python-tools)
 
 
 ## License
