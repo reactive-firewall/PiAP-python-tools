@@ -19,6 +19,11 @@
 
 """
 	The PiAP equivilant of the execve call.
+	while probably the point of failure for the security of PiAP, this function
+	does attempt to add some security to the workflow of calling other tools.
+	considerations:
+	CWE-20
+	POSIX.1-2008 Sec. 11.2.3
 	With great power comes great responsibility. This is the only command that
 	should be called to run sudo. Oh and fear the CWE-20.
 """
@@ -130,6 +135,7 @@ def runUnsafeCommand(arguments, error_fd=None):
 	"""Run the actual Unsafe command. Mighty creator help us."""
 	theRawOutput = None
 	err_fd = None
+	# POSIX.1-2008 Sec. 11.2.3 - refork
 	if os.fork():
 		exit(0)
 	try:

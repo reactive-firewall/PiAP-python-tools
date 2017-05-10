@@ -17,11 +17,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+try:
+	from . import utils as utils
+except Exception:
+	try:
+		import utils as utils
+	except Exception:
+		raise ImportError("Error Importing utils")
 
 try:
-	import pip
+	import warnings
+	with warnings.catch_warnings():
+		warnings.filterwarnings("ignore", category=PendingDeprecationWarning)
+		import imp
+		if imp.__name__ is None:
+			raise ImportError("Not Implemented.")
+	import pip as pip
+except PendingDeprecationWarning as junkErr:
+	"""mute junk errors"""
+	junkErr = None
+	del(junkErr)
 except Exception:
-	raise ImportError("Error Importing pip tools")
+	raise ImportError("Not Implemented.")
 
 try:
 	import argparse
@@ -87,7 +104,41 @@ def upgradePiAPlib():
 	"""Upgrade piaplib via pip."""
 	try:
 		upsream_repo = str("git+https://github.com/reactive-firewall/PiAP-python-tools.git")
-		pip.main(args=["install", "--upgrade", upsream_repo])
+		try:
+			pip.main(args=["install", "--upgrade", upsream_repo])
+		except PendingDeprecationWarning as junkErr:
+			"""mute junk errors"""
+			junkErr = None
+			del(junkErr)
+	except Exception as permErr:
+		print(str(type(permErr)))
+		print(str(permErr))
+		print(str((permErr.args)))
+		permErr = ""
+		permErr = None
+		del(permErr)
+	return None
+
+
+def upgradePiAPlib_depends():
+	"""Upgrade piaplib via pip."""
+	try:
+		upsream_repo_depends = str(
+			"https://raw.githubusercontent.com/reactive-firewall" +
+			"/PiAP-python-tools/master/requirements.txt"
+		)
+		utils.getFileResource(upsream_repo_depends, "temp_req.txt")
+		try:
+			pip.main(args=[
+				"install", "--upgrade-strategy",
+				"only-if-needed", "--upgrade",
+				"-r", "temp_req.txt"
+			])
+		except PendingDeprecationWarning as junkErr:
+			"""mute junk errors"""
+			junkErr = None
+			del(junkErr)
+		utils.cleanFileResource("temp_req.txt")
 	except Exception as permErr:
 		print(str(type(permErr)))
 		print(str(permErr))
@@ -103,11 +154,11 @@ def upgradeAll():
 	try:
 		upgradepip()
 		upgradePiAPlib()
+		upgradePiAPlib_depends()
 	except Exception as permErr:
 		print(str(type(permErr)))
 		print(str(permErr))
 		print(str((permErr.args)))
-		permErr = ""
 		permErr = None
 		del(permErr)
 	return None

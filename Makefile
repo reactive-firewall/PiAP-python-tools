@@ -67,21 +67,21 @@ init:
 	$(QUIET)$(ECHO) "$@: Done."
 
 install: /opt/PiAP/bin/ /lib/opt/piaplib/ must_be_root
-	$(QUIET)python -m pip install "git+https://github.com/reactive-firewall/PiAP-python-tools.git"
+	$(QUIET)python3 -m pip install "git+https://github.com/reactive-firewall/PiAP-python-tools.git"
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
 
 uninstall:
-	$(QUITE)$(QUIET)python -m pip uninstall piaplib
+	$(QUITE)$(QUIET)python3 -m pip uninstall piaplib || true
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
 
 purge: clean uninstall
-	$(QUIET)python -m pip uninstall piaplib
+	$(QUIET)python3 -m pip uninstall piaplib && python -m pip uninstall piaplib || true
 	$(QUIET)$(ECHO) "$@: Done."
 
 test: cleanup
-	$(QUIET)python -m unittest tests.test_basic tests.test_strings tests.test_salt tests.test_utils
+	$(QUIET)python3 -m unittest tests.test_basic tests.test_strings tests.test_salt tests.test_utils tests.test_usage || python -m unittest tests.test_basic tests.test_strings tests.test_salt tests.test_utils tests.test_usage
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-tox: cleanup
@@ -105,6 +105,7 @@ cleanup:
 	$(QUIET)rmdir piaplib.egg-info 2>/dev/null || true
 	$(QUIET)rm -f ./*/*~ 2>/dev/null || true
 	$(QUIET)rm -f ./*~ 2>/dev/null || true
+	$(QUIET)rm -f ./.*~ 2>/dev/null || true
 	$(QUIET)rm -Rf ./.tox/ 2>/dev/null || true
 	$(QUIET)rm -f ./the_test_file.txt 2>/dev/null || true
 

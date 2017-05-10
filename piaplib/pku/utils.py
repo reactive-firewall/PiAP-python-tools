@@ -293,6 +293,32 @@ def appendFile(somefile, somedata):
 	return theResult
 
 
+def getFileResource(someURL, outFile):
+	"""Downloads a file from the given URL."""
+	import urllib
+	try:
+		tempfile = urllib.FancyURLopener()
+	except Exception:
+		import urllib.request
+		tempfile = urllib.request.FancyURLopener()
+	try:
+		tempfile.retrieve(someURL, outFile)
+	except Exception:
+		return False
+	return True
+
+
+def cleanFileResource(theFile):
+	"""cleans up a downloaded given file."""
+	import os
+	try:
+		os.remove(str(theFile))
+	except Exception:
+		print("Error: Failed to remove file.")
+		return False
+	return True
+
+
 def main(argv=None):
 	"""The Main Event makes no sense to utils."""
 	raise NotImplementedError("CRITICAL - PKU Uitls main() not implemented. yet?")
