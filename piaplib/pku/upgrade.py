@@ -26,6 +26,12 @@ except Exception:
 		raise ImportError("Error Importing utils")
 
 try:
+	import warnings
+	with warnings.catch_warnings():
+		warnings.filterwarnings("ignore", category=PendingDeprecationWarning)
+		import imp
+		if imp.__name__ is None:
+			raise ImportError("Not Implemented.")
 	import pip as pip
 except PendingDeprecationWarning as junkErr:
 	"""mute junk errors"""
@@ -153,7 +159,6 @@ def upgradeAll():
 		print(str(type(permErr)))
 		print(str(permErr))
 		print(str((permErr.args)))
-		permErr = ""
 		permErr = None
 		del(permErr)
 	return None

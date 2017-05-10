@@ -18,6 +18,7 @@
 # limitations under the License.
 
 try:
+	import functools
 	import argparse
 	import hashlib
 	import hmac
@@ -58,8 +59,30 @@ def parseArgs(arguments=None):
 	return theArgs
 
 
+def memoize(func):
+	cache = func.cache = {}
+
+	@functools.wraps(func)
+	def memoized_func(*args, **kwargs):
+		key = str(args) + str(kwargs)
+		if key not in cache:
+			cache[key] = func(*args, **kwargs)
+		return cache[key]
+
+	return memoized_func
+
+
+@memoize
 def saltify(raw_msg, raw_salt):
-	return str(hmac.new(raw_salt, raw_msg, hashlib.sha512).hexdigest())
+	the_salted_msg = str(hmac.new(
+		str(raw_salt).encode("utf8"),
+		str(raw_msg).encode("utf8"),
+		hashlib.sha512).hexdigest()
+	)
+	if (the_salted_msg is not None):
+		return the_salted_msg
+	else:
+		return None
 
 
 def main(argv=None):

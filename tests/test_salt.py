@@ -23,6 +23,7 @@ try:
 	try:
 		import sys
 		import os
+		import functools
 		sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), str('..'))))
 		sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), str('.'))))
 	except Exception as ImportErr:
@@ -38,7 +39,28 @@ except Exception:
 	raise ImportError("Failed to import test context")
 
 
-class StringsTestSuite(unittest.TestCase):
+def _test_try_or_fail(func):
+	""" decorator for try-except wrapping tests """
+	@functools.wraps(func)
+	def helper_func(*args, **kwargs):
+		theResult = False
+		try:
+			func(*args, **kwargs)
+			theResult = True
+		except Exception as failErr:
+			print(str(""))
+			print(str(type(failErr)))
+			print(str(failErr))
+			print(str((failErr.args)))
+			print(str(""))
+			failErr = None
+			del failErr
+			theResult = False
+		return theResult
+	return helper_func
+
+
+class SaltTestSuite(unittest.TestCase):
 	"""Basic test cases."""
 
 	def test_absolute_truth_and_meaning(self):
@@ -111,22 +133,7 @@ class StringsTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
-	def _test_try_or_fail(f):
-		""" decorator for try-except wrapping tests """
-		def helper(self):
-			theResult = False
-			try:
-				f(self)
-				theResult = True
-			except Exception as failErr:
-				failErr = None
-				del failErr
-				theResult = False
-			assert theResult
-		return helper
-
-	@_test_try_or_fail
-	def _test_keyring_salt_test_salt(self):
+	def test_keyring_salt_test_salt(self):
 		theResult = True
 		try:
 			from .context import piaplib
@@ -142,7 +149,9 @@ class StringsTestSuite(unittest.TestCase):
 				"7a9356011e7f6bc42105deee6d49983e0cfa7650c7fce5d5d3b19aacca91605199ee" +
 				"017707f627087f8376143f368b17ed927d918eecfe100a7b1b6e39dd3c8a"
 			)
-			theResult = (str(saltify.saltify("Test Message", "testSalt")) is str(test_salt_one))
+			a = (str(saltify.saltify("Test Message", "testSalt")) in str(test_salt_one))
+			b = (str(test_salt_one) in str(saltify.saltify("Test Message", "testSalt")))
+			theResult = (a and b)
 			del test_salt_one
 		except Exception as impErr:
 			print(str(""))
@@ -153,8 +162,7 @@ class StringsTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
-	@_test_try_or_fail
-	def _test_keyring_salt_test_entropy(self):
+	def test_keyring_salt_test_entropy(self):
 		theResult = True
 		try:
 			from .context import piaplib
@@ -167,14 +175,13 @@ class StringsTestSuite(unittest.TestCase):
 			if saltify.__name__ is None:
 				theResult = False
 			import os
-			if os.__name__ is None:
-				theResult = False
 			randomSalt = str(os.urandom(10))
-			randomSalt_shift1 = randomSalt + str(""" """)
-			randomSalt_shift2 = randomSalt_shift1 + str(""" """)
-			randomSalt_shift3 = randomSalt_shift2 + str(""" """)
-			randomSalt_shift4 = randomSalt_shift3 + str(""" """)
-			randomSalt_shift5 = randomSalt_shift4 + str(""" """)
+			space = str(""" """)
+			randomSalt_shift1 = randomSalt + space
+			randomSalt_shift2 = randomSalt_shift1 + space
+			randomSalt_shift3 = randomSalt_shift2 + space
+			randomSalt_shift4 = randomSalt_shift3 + space
+			randomSalt_shift5 = randomSalt_shift4 + space
 			salt_list = [
 				randomSalt, randomSalt_shift1,
 				randomSalt_shift2, randomSalt_shift3,
@@ -186,13 +193,12 @@ class StringsTestSuite(unittest.TestCase):
 				this_test = str(os.urandom(10))
 				that_test = str(os.urandom(10))
 				for test_salt in salt_list:
-					temp = (str(saltify.saltify(
-						this_test,
-						randomSalt
-					)) is not str(saltify.saltify(
-						that_test,
-						test_salt
-					)))
+					a = saltify.saltify(str(this_test), str(randomSalt))
+					b = saltify.saltify(str(that_test), str(test_salt))
+					if (a is not None) and (b is not None) and (a is not b):
+						temp = True
+					else:
+						temp = False
 					theResult = ((theResult is True) and (temp is True))
 					if (temp is False):
 						print(str("COLLISION - NEW TEST FOUND:"))
@@ -205,12 +211,15 @@ class StringsTestSuite(unittest.TestCase):
 							))
 						except Exception:
 							print("unprintable test")
-		except Exception as impErr:
+		except Exception as testErr:
+			print(str("fuzzing"))
 			print(str(""))
-			print(str(type(impErr)))
-			print(str(impErr))
-			print(str((impErr.args)))
+			print(str(type(testErr)))
+			print(str(testErr))
+			print(str((testErr.args)))
 			print(str(""))
+			testErr = None
+			del(testErr)
 			theResult = False
 		assert theResult
 

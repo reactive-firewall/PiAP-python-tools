@@ -321,6 +321,7 @@ def get_user_status(user_name=None, use_html=False):
 					u'usb0': u'NETWORK SERVICES',
 					u'eth0': u'NETWORK SERVICES',
 					u'wlan0': u'NETWORK SERVICES',
+					u'wlan2': u'NETWORK SERVICES',
 					u'wpa_supplicant': u'WPA SERVICES',
 					u'/usr/sbin/hostapd': u'AP SERVICES',
 					u'/sbin/dhcpcd': u'DHCP-CLIENT SERVICES',
@@ -329,6 +330,7 @@ def get_user_status(user_name=None, use_html=False):
 					u'/usr/bin/denyhosts.py': u'SYSTEM DEFENSE',
 					u'/usr/bin/rkhunter': u'SYSTEM DEFENSE',
 					u'/usr/bin/nmap': u'COUNTER OFFENSE',
+					u'piaplib': u'PiAP SERVICES',
 					u'nginx: ': u'WEB SERVICES',
 					u'php-fpm': u'WEB SERVICES'
 				})
@@ -432,23 +434,30 @@ def get_user_ip(user=None, use_html=False):
 	"""Generate output of the user IP."""
 	theResult = None
 	try:
-		ip_list_txt = utils.extractIPv4(get_user_work_status_raw(user))
-		if use_html is not True:
-			if ip_list_txt is not None and len(ip_list_txt) > 0:
-				theResult = str(ip_list_txt[0])
+		raw_data = get_user_work_status_raw(user)
+		if raw_data is not None:
+			ip_list_txt = utils.extractIPv4(raw_data)
+			if use_html is not True:
+				if ip_list_txt is not None and len(ip_list_txt) > 0:
+					theResult = str(ip_list_txt[0])
+				else:
+					theResult = getLocalhostName()
 			else:
-				theResult = getLocalhostName()
+				if ip_list_txt is not None and len(ip_list_txt) > 0:
+					theResult = html_generator.gen_html_td(
+						html_generator.gen_html_ul(ip_list_txt),
+						str(u'user_status_ips_{}').format(user)
+					)
+				else:
+					theResult = html_generator.gen_html_td(
+						html_generator.gen_html_label(getLocalhostName(), u'disabled'),
+						str(u'user_status_ips_{}').format(user)
+					)
 		else:
-			if ip_list_txt is not None and len(ip_list_txt) > 0:
-				theResult = html_generator.gen_html_td(
-					html_generator.gen_html_ul(ip_list_txt),
-					str(u'user_status_ips_{}').format(user)
-				)
+			if (use_html is True):
+				theResult = html_generator.gen_html_label(u'UNKNOWN', u'warning')
 			else:
-				theResult = html_generator.gen_html_td(
-					html_generator.gen_html_label(getLocalhostName(), u'disabled'),
-					str(u'user_status_ips_{}').format(user)
-				)
+				theResult = "UNKNOWN"
 	except Exception as errcrit:
 		print(str("user_check_status.get_user_ip: ERROR: ACTION will not be compleated! ABORT!"))
 		print(str(errcrit))
@@ -472,8 +481,20 @@ def main(argv=None):
 					"<table class=\"table table-striped\">" +
 					"<thead><th>User</th><th>TTYs</th><th>Host</th><th>Activity</th></thead><tbody>"
 				)
-			for user_name in get_user_list():
-				print(show_user(user_name, verbose, output_html))
+			try:
+				for user_name in get_user_list():
+					print(show_user(user_name, verbose, output_html))
+			except Exception as content_err:
+				if output_html:
+					# might need to add error alert here
+					content_err = None
+					del(content_err)
+				else:
+					print(str(type(content_err)))
+					print(str(content_err))
+					print(str(content_err.args))
+					content_err = None
+					del(content_err)
 			if output_html:
 				print("</tbody></table>")
 		else:
