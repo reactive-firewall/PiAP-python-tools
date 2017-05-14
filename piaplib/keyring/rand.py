@@ -17,8 +17,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 try:
-	import functools
 	import argparse
 	import os
 	if os.__name__ is None:
@@ -70,6 +70,7 @@ def rand(count=None):
 		del err
 		os.abort(3)
 
+
 def randStr(count=None):
 	"""wrapper for str(os.urandom())"""
 	import os
@@ -87,6 +88,7 @@ def randStr(count=None):
 		err = None
 		del err
 		os.abort(3)
+
 
 def randInt(count=None, min=0, max=512):
 	"""wrapper for str(os.urandom())"""
@@ -106,6 +108,7 @@ def randInt(count=None, min=0, max=512):
 		del err
 		os.abort(3)
 
+
 def randChar(count=None):
 	"""wrapper for str(os.urandom())"""
 	import os
@@ -123,6 +126,7 @@ def randChar(count=None):
 		err = None
 		del err
 		os.abort(3)
+
 
 def main(argv=None):
 	args = parseArgs(argv)
