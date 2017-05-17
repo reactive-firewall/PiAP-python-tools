@@ -55,7 +55,8 @@ def readJsonFile(somefile):
 	"""Reads the raw json file."""
 	read_data = None
 	try:
-		with utils.open_func(somefile, 'r', encoding='utf-8') as json_data_file:
+		someFilePath = addExtension(somefile, str('json'))
+		with utils.open_func(someFilePath, 'r', encoding='utf-8') as json_data_file:
 			read_data = json.load(fp=json_data_file, ensure_ascii=True)
 	except Exception as jsonerr:
 		print("")
@@ -64,7 +65,7 @@ def readJsonFile(somefile):
 		print(str(jsonerr))
 		print(str((jsonerr.args)))
 		print("")
-		read_data = None
+		read_data = dict({u'Error': u'Failed to load JSON file.'})
 	return read_data
 
 
