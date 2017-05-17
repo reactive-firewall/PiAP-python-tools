@@ -81,7 +81,7 @@ purge: clean uninstall
 	$(QUIET)$(ECHO) "$@: Done."
 
 test: cleanup
-	$(QUIET)python3 -m unittest tests.test_basic tests.test_strings tests.test_salt tests.test_rand tests.test_utils tests.test_usage || python -m unittest tests.test_basic tests.test_strings tests.test_salt tests.test_rand tests.test_utils tests.test_usage
+	$(QUIET)python3 -m unittest tests.test_basic tests.test_strings tests.test_salt tests.test_rand tests.test_utils tests.test_config tests.test_usage || python -m unittest tests.test_basic tests.test_strings tests.test_salt tests.test_rand tests.test_utils tests.test_config tests.test_usage
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-tox: cleanup
@@ -109,6 +109,8 @@ cleanup:
 	$(QUIET)rm -f ./.*~ 2>/dev/null || true
 	$(QUIET)rm -Rf ./.tox/ 2>/dev/null || true
 	$(QUIET)rm -f ./the_test_file.txt 2>/dev/null || true
+	$(QUIET)rm -f ./the_test_file.json 2>/dev/null || true
+	$(QUIET)rm -f ./the_test_file.yml 2>/dev/null || true
 
 clean: cleanup
 	$(QUIET)$(MAKE) -s -C ./docs/ -f Makefile clean 2>/dev/null || true

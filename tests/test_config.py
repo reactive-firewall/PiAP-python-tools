@@ -1,0 +1,165 @@
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+
+# Pocket PiAP
+# ..................................
+# Copyright (c) 2017, Kendrick Walls
+# ..................................
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# ..........................................
+# http://www.apache.org/licenses/LICENSE-2.0
+# ..........................................
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import unittest
+
+try:
+	try:
+		import sys
+		import os
+		sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), str('..'))))
+		sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), str('.'))))
+	except Exception as ImportErr:
+		print(str(''))
+		print(str(type(ImportErr)))
+		print(str(ImportErr))
+		print(str((ImportErr.args)))
+		print(str(''))
+		ImportErr = None
+		del ImportErr
+		raise ImportError(str("Test module failed completely."))
+except Exception:
+	raise ImportError("Failed to import test context")
+
+
+class ConfigTestSuite(unittest.TestCase):
+	"""Basic config test cases."""
+
+	def test_absolute_truth_and_meaning(self):
+		"""Insanitty Test."""
+		assert True
+
+	def test_syntax(self):
+		"""Test case importing code."""
+		theResult = False
+		try:
+			from .context import piaplib
+			if piaplib.__name__ is None:
+				theResult = False
+			from piaplib import pocket
+			if pocket.__name__ is None:
+				theResult = False
+			theResult = True
+		except Exception as impErr:
+			print(str(type(impErr)))
+			print(str(impErr))
+			theResult = False
+		assert theResult
+
+	def test_case_json_read_write_file(self):
+		"""Tests the read and write functions"""
+		theResult = False
+		try:
+			from piaplib import pku as pku
+			if pku.__name__ is None:
+				raise ImportError("Failed to import pku")
+			from pku import config as config
+			if config.__name__ is None:
+				raise ImportError("Failed to import config")
+			theBlob = dict({
+				u'test': {
+					u'write_test': u'This will test writes',
+					u'read_test': u'and this will test reads.'
+				}
+			})
+			somefile = str("the_test_file.json")
+			if (config.writeJsonFile(somefile, theBlob) is True):
+				readback = config.readJsonFile(somefile)
+				if (theBlob[u'test'] in readback[u'test']) and (readback[u'test'] in theBlob[u'test']):
+					theResult = True
+				else:
+					theResult = False
+				if (theResult is False):
+					print(str("wrote"))
+					print(str(theBlob))
+					print(str(""))
+					print(str("read"))
+					print(str(readback))
+					print(str(""))
+			else:
+				theResult = False
+			if (theResult is False):
+				print(str("write failed"))
+				print(str(theBlob))
+				print(str(""))
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			err = None
+			del err
+			theResult = False
+		assert theResult
+
+	def test_case_yaml_read_write_file(self):
+		"""Tests the read and write functions"""
+		theResult = False
+		try:
+			from piaplib import pku as pku
+			if pku.__name__ is None:
+				raise ImportError("Failed to import pku")
+			from pku import config as config
+			if config.__name__ is None:
+				raise ImportError("Failed to import config")
+			if config.hasYamlSupport() is True:
+				theBlob = dict({
+					u'test': {
+						u'write_test': u'This will test writes',
+						u'read_test': u'and this will test reads.'
+					}
+				})
+				somefile = str("the_test_file.yml")
+				if (config.writeYamlFile(somefile, theBlob) is True):
+					readback = config.writeYamlFile(somefile)
+					if (theBlob[u'test'] in readback[u'test']) and (readback[u'test'] in theBlob[u'test']):
+						theResult = True
+					else:
+						theResult = False
+					if (theResult is False):
+						print(str("wrote"))
+						print(str(theBlob))
+						print(str(""))
+						print(str("read"))
+						print(str(readback))
+						print(str(""))
+				else:
+					theResult = False
+				if (theResult is False):
+					print(str("write failed"))
+					print(str(theBlob))
+					print(str(""))
+			else:
+				print(str("SKIPPED: no yaml support"))
+				theResult = True
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			err = None
+			del err
+			theResult = False
+		assert theResult
+
+
+if __name__ == '__main__':
+	unittest.main()
