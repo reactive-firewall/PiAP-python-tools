@@ -68,7 +68,7 @@ def readJsonFile(somefile):
 	return read_data
 
 
-def writeJsonFile(data, somefile):
+def writeJsonFile(somefile, data):
 	"""Reads the raw json file."""
 	did_write = False
 	try:
@@ -112,7 +112,7 @@ try:
 			read_data = None
 		return read_data
 
-	def writeYamlFile(data, somefile):
+	def writeYamlFile(somefile, data):
 		"""Writes the Yaml file."""
 		did_write = False
 		try:
