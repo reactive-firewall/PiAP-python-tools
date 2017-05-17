@@ -81,9 +81,11 @@ class ConfigTestSuite(unittest.TestCase):
 			somefile = str("the_test_file.json")
 			if (config.writeJsonFile(somefile, theBlob) is True):
 				readback = config.readJsonFile(somefile)
-				a = (theBlob[u'test'] in readback[u'test'])
-				b = (readback[u'test'] in theBlob[u'test'])
-				theResult = (a and b)
+				a = (theBlob[u'test'][u'write_test'] in readback[u'test'][u'write_test'])
+				b = (readback[u'test'][u'write_test'] in theBlob[u'test'][u'write_test'])
+				c = (theBlob[u'test'][u'read_test'] in readback[u'test'][u'read_test'])
+				d = (readback[u'test'][u'read_test'] in theBlob[u'test'][u'read_test'])
+				theResult = (a and b and c and d)
 				if theResult:
 					theResult = True
 				else:
@@ -103,6 +105,7 @@ class ConfigTestSuite(unittest.TestCase):
 				print(str(""))
 		except Exception as err:
 			print(str(""))
+			print(str("Error in test of json write-read"))
 			print(str(type(err)))
 			print(str(err))
 			print(str((err.args)))
@@ -156,6 +159,7 @@ class ConfigTestSuite(unittest.TestCase):
 				theResult = True
 		except Exception as err:
 			print(str(""))
+			print(str("Error in test of yaml write-read"))
 			print(str(type(err)))
 			print(str(err))
 			print(str((err.args)))
