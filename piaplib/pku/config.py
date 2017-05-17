@@ -51,6 +51,15 @@ def addExtension(somefile, extension):
 		return str("{}.{}").format(somefile, extension)
 
 
+def hasJsonSupport():
+	support_json = False
+	try:
+		support_json = (json.__name__ is not None)
+	except:
+		support_json = False
+	return support_json
+
+
 def readJsonFile(somefile):
 	"""Reads the raw json file."""
 	read_data = None
@@ -96,50 +105,8 @@ try:
 			import ruamel.yaml as yaml
 		except Exception:
 			raise ImportError("Error Importing yaml utils for config")
-
-	def readYamlFile(somefile):
-		"""Reads the raw Yaml file."""
-		read_data = None
-		try:
-			with utils.open_func(somefile, 'r', encoding='utf-8') as ymalfile:
-				read_data = yaml.load(ymalfile)
-		except Exception as yamlerr:
-			print("")
-			print("Error: Failed to load YAML file.")
-			print(str(type(yamlerr)))
-			print(str(yamlerr))
-			print(str((yamlerr.args)))
-			print("")
-			read_data = None
-		return read_data
-
-	def writeYamlFile(somefile, data):
-		"""Writes the Yaml file."""
-		did_write = False
-		try:
-			someFilePath = addExtension(somefile, str('yaml'))
-			did_write = utils.writeFile(someFilePath, yaml.dump(data))
-		except Exception as yamlerr:
-			print("")
-			print("Error: Failed to load YAML file.")
-			print(str(type(yamlerr)))
-			print(str(yamlerr))
-			print(str((yamlerr.args)))
-			print("")
-			did_write = None
-		return did_write
-
 except Exception:
 	pass
-
-
-def hasJsonSupport():
-	support_json = False
-	try:
-		support_json = (json.__name__ is not None)
-	except:
-		support_json = False
-	return support_json
 
 
 def hasYamlSupport():
@@ -149,6 +116,44 @@ def hasYamlSupport():
 	except:
 		support_yaml = False
 	return support_yaml
+
+
+def readYamlFile(somefile):
+	"""Reads the raw Yaml file."""
+	if hasYamlSupport() is not True:
+		return None
+	read_data = None
+	try:
+		with utils.open_func(somefile, 'r', encoding='utf-8') as ymalfile:
+			read_data = yaml.load(ymalfile)
+	except Exception as yamlerr:
+		print("")
+		print("Error: Failed to load YAML file.")
+		print(str(type(yamlerr)))
+		print(str(yamlerr))
+		print(str((yamlerr.args)))
+		print("")
+		read_data = None
+	return read_data
+
+
+def writeYamlFile(somefile, data):
+	"""Writes the Yaml file."""
+	if hasYamlSupport() is not True:
+		return False
+	did_write = False
+	try:
+		someFilePath = addExtension(somefile, str('yaml'))
+		did_write = utils.writeFile(someFilePath, yaml.dump(data))
+	except Exception as yamlerr:
+		print("")
+		print("Error: Failed to load YAML file.")
+		print(str(type(yamlerr)))
+		print(str(yamlerr))
+		print(str((yamlerr.args)))
+		print("")
+		did_write = None
+	return did_write
 
 
 if __name__ in u'__main__':
