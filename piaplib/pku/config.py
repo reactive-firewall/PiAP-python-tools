@@ -73,12 +73,12 @@ def writeJsonFile(data, somefile):
 	did_write = False
 	try:
 		someFilePath = addExtension(somefile, str('json'))
-		with utils.open_func(someFilePath, 'w', encoding='utf-8') as outfile:
+		with utils.open_func(someFilePath, 'w+', encoding='utf-8') as outfile:
 			json.dump(data, fp=outfile, indent=1, separators=(',', ': '))
 			did_write = True
 	except Exception as jsonerr:
 		print("")
-		print("Error: Failed to load JSON file.")
+		print("Error: Failed to write JSON file.")
 		print(str(type(jsonerr)))
 		print(str(jsonerr))
 		print(str((jsonerr.args)))

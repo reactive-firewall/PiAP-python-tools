@@ -81,7 +81,10 @@ class ConfigTestSuite(unittest.TestCase):
 			somefile = str("the_test_file.json")
 			if (config.writeJsonFile(somefile, theBlob) is True):
 				readback = config.readJsonFile(somefile)
-				if (theBlob[u'test'] in readback[u'test']) and (readback[u'test'] in theBlob[u'test']):
+				a = (theBlob[u'test'] in readback[u'test'])
+				b = (readback[u'test'] in theBlob[u'test'])
+				theResult = (a and b)
+				if theResult:
 					theResult = True
 				else:
 					theResult = False
@@ -129,7 +132,9 @@ class ConfigTestSuite(unittest.TestCase):
 				somefile = str("the_test_file.yml")
 				if (config.writeYamlFile(somefile, theBlob) is True):
 					readback = config.writeYamlFile(somefile)
-					if (theBlob[u'test'] in readback[u'test']) and (readback[u'test'] in theBlob[u'test']):
+					a = (theBlob[u'test'] in readback[u'test'])
+					b = (readback[u'test'] in theBlob[u'test'])
+					if a and b:
 						theResult = True
 					else:
 						theResult = False
