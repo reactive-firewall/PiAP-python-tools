@@ -1,0 +1,10 @@
+Standards checklist:
+	Code Style:
+	 - PEP8 for python files
+	saltify.py:
+	 - RFC 2104 HMAC class.
+	 - Also complies with RFC 4231.
+	 - see HMAC API in PEP 247.
+
+	Other Misc (just for navigation):
+	PEP324 - subproccess

@@ -6,10 +6,11 @@
 
 ### master:
 [![status](https://travis-ci.org/reactive-firewall/PiAP-python-tools.svg?branch=master)](https://travis-ci.org/reactive-firewall/PiAP-python-tools)
+[![Dependency Status](https://www.versioneye.com/user/projects/59141686eb858e002d45d36e/badge.svg?style=flat-round)](https://www.versioneye.com/user/projects/59141686eb858e002d45d36e)
 
 ### Stable:
 [![status](https://travis-ci.org/reactive-firewall/PiAP-python-tools.svg?branch=stable)](https://travis-ci.org/reactive-firewall/PiAP-python-tools)
-
+[![Dependency Status](https://www.versioneye.com/user/projects/59141688eb858e0050aa7d7b/badge.svg?style=flat-round)](https://www.versioneye.com/user/projects/59141688eb858e0050aa7d7b)
 
 ## License
 
