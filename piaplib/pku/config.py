@@ -57,7 +57,7 @@ def readJsonFile(somefile):
 	try:
 		someFilePath = addExtension(somefile, str('json'))
 		with utils.open_func(someFilePath, 'r', encoding='utf-8') as json_data_file:
-			read_data = json.load(fp=json_data_file, ensure_ascii=True)
+			read_data = json.load(fp=json_data_file)
 	except Exception as jsonerr:
 		print("")
 		print("Error: Failed to load JSON file.")
@@ -75,7 +75,7 @@ def writeJsonFile(somefile, data):
 	try:
 		someFilePath = addExtension(somefile, str('json'))
 		with utils.open_func(someFilePath, 'w+', encoding='utf-8') as outfile:
-			json.dump(data, fp=outfile, indent=1, separators=(',', ': '))
+			json.dump(data, fp=outfile, ensure_ascii=True, indent=1, separators=(',', ': '))
 			did_write = True
 	except Exception as jsonerr:
 		print("")
