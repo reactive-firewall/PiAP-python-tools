@@ -30,10 +30,10 @@ except Exception:
 	requirements = None
 
 try:
-	with open(u'./README.rst') as f:
+	with open(u'./README.md') as f:
 		readme = f.read()
 except Exception:
-	readme = str("""See https://github.com/reactive-firewall/PiAP-python-tools/README.rst""")
+	readme = str("""See https://github.com/reactive-firewall/PiAP-python-tools/README.md""")
 
 try:
 	with open(u'./LICENSE.rst') as f:
@@ -44,7 +44,7 @@ except Exception:
 
 setup(
 	name='piaplib',
-	version='0.2.3',
+	version='0.2.4',
 	description='Beta for PiAP python tools',
 	long_description=readme,
 	install_requires=requirements,
