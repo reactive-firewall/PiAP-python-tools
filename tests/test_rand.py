@@ -125,7 +125,7 @@ class SaltTestSuite(unittest.TestCase):
 		assert theResult
 
 	def test_keyring_rand_test(self):
-	"""Test generate random output test-case."""
+		"""Test generate random output test-case."""
 		theResult = True
 		try:
 			temp = None
@@ -151,9 +151,8 @@ class SaltTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
-
 	def test_keyring_rand_test_bias(self):
-	"""Test generate random output of multiple domains in 1000 tries test-case."""
+		"""Test generate random output of multiple domains in 1000 tries test-case."""
 		theResult = True
 		seen_alpha = False
 		seen_digit = False
