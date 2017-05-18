@@ -60,7 +60,7 @@ def _test_try_or_fail(func):
 	return helper_func
 
 
-class SaltTestSuite(unittest.TestCase):
+class RandTestSuite(unittest.TestCase):
 	"""Basic test cases."""
 
 	def test_absolute_truth_and_meaning(self):

@@ -20,8 +20,8 @@
 import unittest
 
 
-class BasicTestSuite(unittest.TestCase):
-	"""Basic test cases."""
+class BasicUsageTestSuite(unittest.TestCase):
+	"""Basic functional test cases."""
 
 	def test_absolute_truth_and_meaning(self):
 		"""Insanitty Test."""
@@ -261,6 +261,77 @@ class BasicTestSuite(unittest.TestCase):
 						print(str(""))
 						print(str("{}").format(str(theOutputtext)))
 						print(str(""))
+				except Exception as othererr:
+					print(str(""))
+					print(str(type(othererr)))
+					print(str(othererr))
+					print(str((othererr.args)))
+					print(str(""))
+					othererr = None
+					del othererr
+					theResult = False
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			othererr = None
+			del othererr
+			theResult = False
+		assert theResult
+
+	def test_d_python_command_saltify(self):
+		"""Test case for piaplib.pocket.lint check users."""
+		theResult = False
+		try:
+			from piaplib import pku as pku
+			if pku.__name__ is None:
+				raise ImportError("Failed to import pku")
+			from pku import utils as utils
+			if utils.__name__ is None:
+				raise ImportError("Failed to import utils")
+			import subprocess
+			thepython = subprocess.check_output(["which", "python3"])
+			if (str("/python3") in str(thepython)):
+				thepython = "python3"
+			else:
+				thepython = "python"
+			if (thepython is not None):
+				test_salt_one = str(
+					"7a9356011e7f6bc42105deee6d49983e0cfa7650c7fce5d5d3b19aacca91605199ee" +
+					"017707f627087f8376143f368b17ed927d918eecfe100a7b1b6e39dd3c8a" +
+					"\n"
+				)
+				try:
+					theOutputtext = subprocess.check_output([
+						str(thepython),
+						str("-m"),
+						str("piaplib.pocket"),
+						str("keyring"),
+						str("saltify"),
+						str("""--msg={}""").format(str("Test Message")),
+						str("""--salt={}""").format(str("testSalt"))
+					], stderr=subprocess.STDOUT)
+					a = (utils.literal_str(theOutputtext) in utils.literal_str(test_salt_one))
+					b = (utils.literal_str(test_salt_one) in utils.literal_str(theOutputtext))
+					if (a and b):
+						theResult = True
+					else:
+						theResult = False
+						print(str(""))
+						print(str("python cmd is {}").format(str(thepython)))
+						print(str(""))
+						print(str("actual output was..."))
+						print(str(""))
+						print(str("{}").format(str(theOutputtext)))
+						print(str(""))
+						print(str("expected output was..."))
+						print(str(""))
+						print(str("{}").format(str(test_salt_one)))
+						print(str(""))
+					del theOutputtext
+					del test_salt_one
 				except Exception as othererr:
 					print(str(""))
 					print(str(type(othererr)))
