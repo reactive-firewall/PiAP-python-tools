@@ -54,7 +54,6 @@ def parseArgs(arguments=None):
 
 def rand(count=None):
 	"""wrapper for os.urandom()"""
-	import os
 	if count is None or count < 0:
 		x_count = 512
 	else:
@@ -73,7 +72,6 @@ def rand(count=None):
 
 def randStr(count=None):
 	"""wrapper for str(os.urandom())"""
-	import os
 	if count is None or count < 0:
 		x_count = 512
 	else:
@@ -91,8 +89,7 @@ def randStr(count=None):
 
 
 def randInt(count=None, min=0, max=512):
-	"""wrapper for str(os.urandom())"""
-	import os
+	"""wrapper for int(os.urandom())"""
 	if count is None or count < 0:
 		x_count = 32
 	else:
@@ -109,15 +106,39 @@ def randInt(count=None, min=0, max=512):
 		os.abort(3)
 
 
+def randBool(count=None):
+	"""wrapper for str(os.urandom())"""
+	if count is None or count < 0:
+		x_count = 1
+	else:
+		x_count = (count % 2)
+	try:
+		return (bool(randInt(x_count)) is True)
+	except Exception as err:
+		print(str(u'FAILED DURRING RAND. ABORT.'))
+		print(str(type(err)))
+		print(str(err))
+		print(str(err.args))
+		err = None
+		del err
+		os.abort(3)
+
+
 def randChar(count=None):
 	"""wrapper for str(os.urandom())"""
 	import os
-	if count is None or count < 15:
-		x_count = count % 128
+	if count is None or count < 0:
+		x_count = 1
 	else:
 		x_count = count
 	try:
-		return str(rand(x_count))[2:2]
+		theRandomResult = str("")
+		for char_x in range(x_count):
+			char_rand_seed = rand(1)
+			while str(char_rand_seed).isalnum() is False:
+				char_rand_seed = rand(1)
+			theRandomResult = str("{}{}").format(theRandomResult, str(char_rand_seed))
+		return theRandomResult
 	except Exception as err:
 		print(str(u'FAILED DURRING RAND. ABORT.'))
 		print(str(type(err)))
