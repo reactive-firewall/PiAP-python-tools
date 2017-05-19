@@ -313,8 +313,8 @@ class BasicUsageTestSuite(unittest.TestCase):
 						str("""--msg={}""").format(str("Test Message")),
 						str("""--salt={}""").format(str("testSalt"))
 					], stderr=subprocess.STDOUT)
-					a = (utils.literal_str(theOutputtext) in utils.literal_str(test_salt_one))
-					b = (utils.literal_str(test_salt_one) in utils.literal_str(theOutputtext))
+					a = (utils.literal_str(theOutputtext)[-129:] in utils.literal_str(test_salt_one))
+					b = (utils.literal_str(test_salt_one) in utils.literal_str(theOutputtext)[-129:])
 					if (a and b):
 						theResult = True
 					else:
