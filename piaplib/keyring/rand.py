@@ -21,11 +21,28 @@
 try:
 	import argparse
 	import os
+	import sys
 	if os.__name__ is None:
+		raise ImportError("Failed to import rand.")
+	if sys.__name__ is None:
 		raise ImportError("Failed to import rand.")
 except Exception:
 	raise ImportError("Failed to import rand.")
 	exit(255)
+
+
+RAND_CHARS = [
+	"a", "b", "c", "d", "e", "f", "g", "h",
+	"i", "j", "k", "l", "m", "n", "o", "p",
+	"q", "r", "s", "t", "u", "v", "w", "x",
+	"y", "z", "1", "2", "3", "4", "5", "6",
+	"7", "8", "9", "0", "!", "@", "#", "$",
+	"%", "^", "&", "*", "(", ")", "_", "-",
+	"+", "=", "<", ">", ",", ".", "?", "/",
+	"'", ";", "[", "]", "{", "}", "|", "~",
+	"\"", " "
+]
+"""Posible Chars for randChar (which is not so random, as it is very qwerty based)"""
 
 
 def parseArgs(arguments=None):
@@ -95,7 +112,7 @@ def randInt(count=None, min=0, max=512):
 	else:
 		x_count = count
 	try:
-		return (int(rand(x_count)) + min) % max
+		return (int.from_bytes(os.urandom(1), sys.byteorder) + min) % max
 	except Exception as err:
 		print(str(u'FAILED DURRING RAND. ABORT.'))
 		print(str(type(err)))
@@ -134,9 +151,9 @@ def randChar(count=None):
 	try:
 		theRandomResult = str("")
 		for char_x in range(x_count):
-			char_rand_seed = rand(1)
+			char_rand_seed = RAND_CHARS[randInt(1, 0, len(RAND_CHARS))]
 			while str(char_rand_seed).isalnum() is False:
-				char_rand_seed = rand(1)
+				char_rand_seed = RAND_CHARS[randInt(1, 0, len(RAND_CHARS))]
 			theRandomResult = str("{}{}").format(theRandomResult, str(char_rand_seed))
 		return theRandomResult
 	except Exception as err:

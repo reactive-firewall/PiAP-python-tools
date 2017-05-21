@@ -27,6 +27,10 @@ try:
 	except Exception:
 		import pku.utils as utils
 	try:
+		from .. import remediation as remediation
+	except Exception:
+		import pku.remediation as remediation
+	try:
 		from . import html_generator as html_generator
 	except Exception as ImpErr:
 		ImpErr = None
@@ -38,6 +42,8 @@ try:
 		import pku.interfaces as interfaces
 	if utils.__name__ is None:
 		raise ImportError("Failed to open PKU Utils")
+	if remediation.__name__ is None:
+		raise ImportError("Failed to open PKU Remediation")
 	if interfaces.__name__ is None:
 		raise ImportError("Failed to open PKU Interfaces")
 	if html_generator.__name__ is None:
@@ -55,24 +61,21 @@ __prog__ = str("""clients_check_status.py""")
 """The Program's name"""
 
 
-def error_handling(func):
-	"""Runs a function in try-except"""
-	def helper(**kwargs):
-		"""Wraps a function in try-except"""
-		theOutput = None
-		try:
-			theOutput = func(kwargs)
-		except Exception as err:
-			print(str(err))
-			print(str((err.args)))
-			print(str(
-				"{}: REALLY BAD ERROR: ACTION will not be compleated! ABORT!"
-			).format(__prog__))
-			theOutput = None
-		return theOutput
-	return helper
+def memoize(func):
+	cache = func.cache = {}
+	import functools
+
+	@functools.wraps(func)
+	def memoized_func(*args, **kwargs):
+		key = str(args) + str(kwargs)
+		if key not in cache:
+			cache[key] = func(*args, **kwargs)
+		return cache[key]
+
+	return memoized_func
 
 
+@remediation.error_handling
 def parseargs(arguments=None):
 	"""Parse the arguments"""
 	import argparse
@@ -114,12 +117,13 @@ def parseargs(arguments=None):
 			dest='verbose_mode', default=False,
 			action='store_false', help='Disable the given interface.'
 		)
-		parser.add_argument('-V', '--version', action='version', version='%(prog)s 0.2.3')
+		parser.add_argument('-V', '--version', action='version', version='%(prog)s 0.2.4')
 		theResult = parser.parse_args(arguments)
 	except Exception as parseErr:
 		parser.error(str("ERROR: parseargs"))
 		parser.error(str(type(parseErr)))
 		parser.error(str(parseErr))
+		raise RuntimeError("Could not parse Args")
 	return theResult
 
 
@@ -155,7 +159,7 @@ def show_client(client_ip=None, is_verbose=False, use_html=False, lan_interface=
 		theResult = "UNKNOWN"
 	return theResult
 
-
+@remediation.error_handling
 def get_client_name(client_ip=None, use_html=False, lan_interface=None):
 	if lan_interface not in interfaces.INTERFACE_CHOICES:
 		lan_interface = interfaces.INTERFACE_CHOICES[1]
@@ -168,7 +172,7 @@ def get_client_name(client_ip=None, use_html=False, lan_interface=None):
 		return html_generator.gen_html_td(client, str(u'client_status_{}').format(client))
 
 
-# TODO: memoize this function
+@memoize
 def get_client_sta_status_raw():
 	"""list the raw status of client sta."""
 	theRawClientState = None
@@ -218,6 +222,7 @@ def get_client_sta_status_raw():
 	return theRawClientState
 
 
+@memoize
 def isLineForSTA(someLine=None, staname=None):
 	"""determins if a raw output line is for a STA"""
 	doesMatch = False
@@ -238,6 +243,7 @@ def isLineForSTA(someLine=None, staname=None):
 	return doesMatch
 
 
+@memoize
 def get_client_arp_status_raw(client_ip=None, lan_interface=interfaces.INTERFACE_CHOICES[1]):
 	"""list the raw status of client sta."""
 	if lan_interface not in interfaces.INTERFACE_CHOICES:
@@ -276,7 +282,21 @@ def get_client_arp_status_raw(client_ip=None, lan_interface=interfaces.INTERFACE
 	return theRawClientState
 
 
-# TODO: memoize this function
+def get_client_lease_status_raw(client_row=None):
+	"""list the raw status of client leases."""
+	try:
+		# should probably move to config file
+		theRawLeaseStatus = utils.readFile("/var/lib/misc/dnsmasq.leases")
+	except Exception as importErr:
+		print(str("ERROR: get_client_sta_status"))
+		print(str(type(cmdErr)))
+		print(str(cmdErr))
+		print(str(cmdErr.args))
+		theRawLeaseStatus = u'UNKNOWN'
+	return theRawLeaseStatus
+
+
+@memoize
 def get_client_sta_status(client_mac=None):
 	"""list the raw status of client sta."""
 	theClientState = str("disassociated")
@@ -295,7 +315,26 @@ def get_client_sta_status(client_mac=None):
 	return theClientState
 
 
-# TODO: memoize this function
+@memoize
+def get_client_lease_status(client_mac=None):
+	"""list the raw status of client lease."""
+	theClientState = str("No Lease")
+	if client_mac is not None:
+		matches = []
+		try:
+			matches = utils.extractMACAddr(get_client_lease_status_raw())
+			if str(client_mac) in matches:
+				theClientState = str("Valid Lease")
+		except Exception as cmdErr:
+			print(str("ERROR: get_client_lease_status"))
+			print(str(type(cmdErr)))
+			print(str(cmdErr))
+			print(str(cmdErr.args))
+			theClientState = u'UNKNOWN'
+	return theClientState
+
+
+@memoize
 def get_client_list(lan_interface=None):
 	"""list the availabel clients."""
 	theResult = None

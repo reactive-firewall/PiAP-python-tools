@@ -27,12 +27,17 @@ try:
 except Exception:
 	import saltify as saltify
 
+try:
+	from . import rand as rand
+except Exception:
+	import rand as rand
+
 
 __prog__ = """piaplib.keyring"""
 """The name of this PiAPLib tool is keyring"""
 
 
-KEYRING_UNITS = {u'saltify': saltify, u'keys': None}
+KEYRING_UNITS = {u'saltify': saltify, u'rand':rand, u'keys': None}
 """ The Pocket Knife Unit actions.
 	saltify - HMAC salt functions.
 	keys -  (FUTURE/RESERVED)

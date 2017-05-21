@@ -66,8 +66,8 @@ build:
 init:
 	$(QUIET)$(ECHO) "$@: Done."
 
-install: /opt/PiAP/bin/ /lib/opt/piaplib/ must_be_root
-	$(QUIET)python3 -m pip install "git+https://github.com/reactive-firewall/PiAP-python-tools.git"
+install: must_be_root
+	$(QUIET)python3 -m pip install "git+https://github.com/reactive-firewall/PiAP-python-tools.git#egg=piaplib"
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
 
@@ -117,7 +117,7 @@ clean: cleanup
 	$(QUIET)$(ECHO) "$@: Done."
 
 must_be_root:
-	runner=`whoami` ; \
+	$(QUIET)runner=`whoami` ; \
 	if test $$runner != "root" ; then echo "You are not root." ; exit 1 ; fi
 
 %:

@@ -35,6 +35,14 @@ except Exception:
 		raise ImportError("Error Importing utils")
 
 try:
+	from . import remediation as remediation
+except Exception:
+	try:
+		import remediation as remediation
+	except Exception:
+		raise ImportError("Error Importing remediation")
+
+try:
 	from . import interfaces as interfaces
 except Exception:
 	try:
