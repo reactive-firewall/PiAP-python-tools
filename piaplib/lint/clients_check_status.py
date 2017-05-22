@@ -289,9 +289,11 @@ def get_client_lease_status_raw(client_row=None):
 		theRawLeaseStatus = utils.readFile("/var/lib/misc/dnsmasq.leases")
 	except Exception as importErr:
 		print(str("ERROR: get_client_sta_status"))
-		print(str(type(cmdErr)))
-		print(str(cmdErr))
-		print(str(cmdErr.args))
+		print(str(type(importErr)))
+		print(str(importErr))
+		print(str(importErr.args))
+		importErr = None
+		del importErr
 		theRawLeaseStatus = u'UNKNOWN'
 	return theRawLeaseStatus
 
