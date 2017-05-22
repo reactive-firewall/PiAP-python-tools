@@ -37,7 +37,7 @@ __prog__ = """piaplib.keyring"""
 """The name of this PiAPLib tool is keyring"""
 
 
-KEYRING_UNITS = {u'saltify': saltify, u'rand':rand, u'keys': None}
+KEYRING_UNITS = {u'saltify': saltify, u'rand': rand, u'keys': None}
 """ The Pocket Knife Unit actions.
 	saltify - HMAC salt functions.
 	keys -  (FUTURE/RESERVED)

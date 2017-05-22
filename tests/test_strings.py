@@ -260,7 +260,7 @@ class StringsTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
-	def test_case_utils_fuzz_literal_str(self):
+	def test_case_utils_fuzz_literal_str(self): # noqa
 		"""Tests the literal string functions with a fuzzed input"""
 		theResult = True
 		try:
