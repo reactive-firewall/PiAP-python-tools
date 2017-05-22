@@ -159,6 +159,7 @@ def show_client(client_ip=None, is_verbose=False, use_html=False, lan_interface=
 		theResult = "UNKNOWN"
 	return theResult
 
+
 @remediation.error_handling
 def get_client_name(client_ip=None, use_html=False, lan_interface=None):
 	if lan_interface not in interfaces.INTERFACE_CHOICES:

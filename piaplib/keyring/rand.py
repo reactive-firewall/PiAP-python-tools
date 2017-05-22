@@ -112,7 +112,13 @@ def randInt(count=None, min=0, max=512):
 	else:
 		x_count = count
 	try:
-		return (int.from_bytes(os.urandom(1), sys.byteorder) + min) % max
+		if x_count == 1:
+			return (int.from_bytes(os.urandom(1), sys.byteorder) + min) % max
+		else:
+			theResult = []
+			for someInt in range(x_count):
+				theResult.append((int.from_bytes(os.urandom(1), sys.byteorder) + min) % max)
+			return theResult
 	except Exception as err:
 		print(str(u'FAILED DURRING RAND. ABORT.'))
 		print(str(type(err)))

@@ -154,6 +154,8 @@ if __name__ in u'__main__':
 		raise ImportError("Error Importing interfaces")
 	if upgrade.__name__ is None:
 		raise ImportError("Error Importing upgrade")
+	if remediation.__name__ is None:
+		raise ImportError("Error Importing remediation")
 	try:
 		import sys
 		if (sys.argv is not None and (sys.argv is not []) and (len(sys.argv) > 1)):
