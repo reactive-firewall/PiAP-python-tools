@@ -17,10 +17,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-import sys
-import argparse
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+try:
+	import os
+	import sys
+	import argparse
+	sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+except Exception:
+	raise NotImplementedError("OMG! We could not import the os. We're like in the matrix!")
+	exit(3)
 
 try:
 	from . import saltify as saltify
@@ -31,6 +35,11 @@ try:
 	from . import rand as rand
 except Exception:
 	import rand as rand
+
+try:
+	from ..pku import remediation as remediation
+except Exception:
+	import pku.remediation as remediation
 
 
 __prog__ = """piaplib.keyring"""
@@ -44,6 +53,7 @@ KEYRING_UNITS = {u'saltify': saltify, u'rand': rand, u'keys': None}
 	"""
 
 
+@remediation.error_handling
 def parseArgs(arguments=None):
 	"""Parses the CLI arguments."""
 	parser = argparse.ArgumentParser(
@@ -59,17 +69,13 @@ def parseArgs(arguments=None):
 	return parser.parse_known_args(arguments)
 
 
+@remediation.error_handling
 def getTimeStamp():
 	"""Returns the time stamp."""
-	theDate = None
-	try:
-		import time
-		theDate = time.strftime("%a %b %d %H:%M:%S %Z %Y", time.localtime())
-	except Exception:
-		theDate = str("")
-	return str(theDate)
+	return remediation.getTimeStamp()
 
 
+@remediation.error_handling
 def useKeyTool(tool, arguments=[None]):
 	"""Handler for launching pocket-tools."""
 	if tool is None:
@@ -94,27 +100,23 @@ def useKeyTool(tool, arguments=[None]):
 		return None
 
 
+@remediation.error_handling
 def main(argv=None):
 	"""The main event"""
 	# print("PiAP Keyring")
 	try:
-		try:
-			args, extra = parseArgs(argv)
-			keyring_cmd = args.keyring_unit
-			useKeyTool(keyring_cmd, extra)
-		except Exception as cerr:
-			print(str(cerr))
-			print(str(cerr.args))
-			print(str(" UNKNOWN - An error occured while handling the arguments. Command failure."))
-			exit(3)
-	except Exception:
-		print(str(" UNKNOWN - An error occured while handling the failure. Cascading failure."))
+		args, extra = parseArgs(argv)
+		keyring_cmd = args.keyring_unit
+		useKeyTool(keyring_cmd, extra)
+	except Exception as cerr:
+		print(str(cerr))
+		print(str(cerr.args))
+		print(str(" UNKNOWN - An error occured while handling the arguments. Command failure."))
 		exit(3)
 	exit(0)
 
 
 if __name__ in u'__main__':
-	import sys
 	main(sys.argv[1:])
 
 

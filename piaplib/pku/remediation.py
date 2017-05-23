@@ -31,6 +31,14 @@ except Exception as err:
 	raise ImportError(err)
 	exit(3)
 
+try:
+	import sys
+	if sys.__name__ is None:
+		raise NotImplementedError("OMG! We could not import the sys. We're like in the matrix!")
+except Exception as err:
+	raise ImportError(err)
+	exit(3)
+
 
 def getTimeStamp():
 	"""Returns the time stamp."""
@@ -41,6 +49,30 @@ def getTimeStamp():
 	except Exception:
 		theDate = str("")
 	return str(theDate)
+
+
+def error_passing(func):
+	"""Runs a function in try-except-raise"""
+	import functools
+
+	@functools.wraps(func)
+	def helper_func(*args, **kwargs):
+		"""Wraps a function in try-except"""
+		theOutput = None
+		try:
+			theOutput = func(*args, **kwargs)
+		except Exception as err:
+			tb = sys.exc_info()[2]
+			timestamp = getTimeStamp()
+			print(str("{}: {}").format(str(timestamp), str(func)))
+			sys.exc_clear()
+			err = None
+			del err
+			raise RuntimeError("Passing error up").with_traceback(tb)
+			theOutput = None
+		return theOutput
+
+	return helper_func
 
 
 def error_handling(func):
@@ -60,6 +92,7 @@ def error_handling(func):
 			print(str("{}: {}").format(str(timestamp), str(err)))
 			print(str("{}: {}").format(str(timestamp), str(err.args)))
 			print(str(""))
+			sys.exc_clear()
 			err = None
 			del err
 			theOutput = None
@@ -71,7 +104,7 @@ def error_handling(func):
 @error_handling
 def main(argv=None):
 	"""The Main Event makes no sense to utils."""
-	raise NotImplementedError("CRITICAL - PKU Uitls main() not implemented. yet?")
+	raise NotImplementedError("CRITICAL - PKU remediation main() not implemented. yet?")
 	exit(3)
 
 
