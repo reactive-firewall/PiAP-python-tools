@@ -66,8 +66,8 @@ build:
 init:
 	$(QUIET)$(ECHO) "$@: Done."
 
-install: /opt/PiAP/bin/ /lib/opt/piaplib/ must_be_root
-	$(QUIET)python3 -m pip install "git+https://github.com/reactive-firewall/PiAP-python-tools.git"
+install: must_be_root
+	$(QUIET)python3 -m pip install "git+https://github.com/reactive-firewall/PiAP-python-tools.git#egg=piaplib"
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
 
@@ -108,16 +108,16 @@ cleanup:
 	$(QUIET)rm -f ./*~ 2>/dev/null || true
 	$(QUIET)rm -f ./.*~ 2>/dev/null || true
 	$(QUIET)rm -Rf ./.tox/ 2>/dev/null || true
-	$(QUIET)rm -f ./the_test_file.txt 2>/dev/null || true
-	$(QUIET)rm -f ./the_test_file.json 2>/dev/null || true
-	$(QUIET)rm -f ./the_test_file.yml 2>/dev/null || true
+	$(QUIET)rm -f ./the_test_file*.txt 2>/dev/null || true
+	$(QUIET)rm -f ./the_test_file*.json 2>/dev/null || true
+	$(QUIET)rm -f ./the_test_file*.yml 2>/dev/null || true
 
 clean: cleanup
 	$(QUIET)$(MAKE) -s -C ./docs/ -f Makefile clean 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
 
 must_be_root:
-	runner=`whoami` ; \
+	$(QUIET)runner=`whoami` ; \
 	if test $$runner != "root" ; then echo "You are not root." ; exit 1 ; fi
 
 %:

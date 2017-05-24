@@ -35,6 +35,14 @@ except Exception:
 		raise ImportError("Error Importing utils")
 
 try:
+	from . import remediation as remediation
+except Exception:
+	try:
+		import remediation as remediation
+	except Exception:
+		raise ImportError("Error Importing remediation")
+
+try:
 	from . import interfaces as interfaces
 except Exception:
 	try:
@@ -146,6 +154,8 @@ if __name__ in u'__main__':
 		raise ImportError("Error Importing interfaces")
 	if upgrade.__name__ is None:
 		raise ImportError("Error Importing upgrade")
+	if remediation.__name__ is None:
+		raise ImportError("Error Importing remediation")
 	try:
 		import sys
 		if (sys.argv is not None and (sys.argv is not []) and (len(sys.argv) > 1)):

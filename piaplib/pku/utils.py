@@ -32,6 +32,16 @@ except Exception as err:
 	exit(3)
 
 
+try:
+	from . import remediation as remediation
+except Exception:
+	try:
+		import remediation as remediation
+	except Exception:
+		raise ImportError("Error Importing remediation")
+
+
+@remediation.error_handling
 def literal_code(raw_input=None):
 	"""A simple attempt at validating raw python unicode. Always expect CWE-20.
 		param raw_input - the tainted given input.
@@ -51,6 +61,7 @@ def literal_code(raw_input=None):
 	return None
 
 
+@remediation.error_handling
 def literal_str(raw_input=None):
 	"""A simple attempt at validating utf-8 encoding. Always expect CWE-20.
 		param raw_input - the tainted string given as input.
@@ -70,6 +81,7 @@ def literal_str(raw_input=None):
 	return None
 
 
+@remediation.error_handling
 def extractRegexPattern(theInput_Str, theInputPattern):
 	"""
 	Extracts the given regex patern.
@@ -83,6 +95,7 @@ def extractRegexPattern(theInput_Str, theInputPattern):
 	return theList
 
 
+@remediation.error_handling
 def compactSpace(theInput_Str):
 	"""Try to remove the spaces from the input string."""
 	import re
@@ -91,6 +104,7 @@ def compactSpace(theInput_Str):
 	return theList
 
 
+@remediation.error_handling
 def extractMACAddr(theInputStr):
 	"""Extract the MAC addresses from a string."""
 	theResult = []
@@ -109,6 +123,7 @@ def extractMACAddr(theInputStr):
 	return theResult
 
 
+@remediation.error_handling
 def extractIfaceNames(theInputStr):
 	"""Extracts the expected iface names."""
 	return extractRegexPattern(
@@ -117,6 +132,7 @@ def extractIfaceNames(theInputStr):
 	)
 
 
+@remediation.error_handling
 def extractTTYs(theInputStr):
 	"""Extract the TTYs from a string."""
 	theResult = []
@@ -135,6 +151,7 @@ def extractTTYs(theInputStr):
 	return theResult
 
 
+@remediation.error_handling
 def extractIPv4(theInputStr):
 	"""Extract the Ipv4 addresses from a string. Simple x.x.x.x matching, no checks."""
 	theResult = []
@@ -155,6 +172,7 @@ def extractIPv4(theInputStr):
 	return theResult
 
 
+@remediation.error_handling
 def extractIPAddr(theInputStr):
 	"""Extract the Ipv4 addresses from a string. Simple x.x.x.x matching, no checks."""
 	theResult = []
@@ -175,6 +193,7 @@ def extractIPAddr(theInputStr):
 	return theResult
 
 
+@remediation.error_handling
 def isLineForMatch(someLine=None, toMatch=None):
 	"""Determins if a raw output line is for a matching string"""
 	if ((toMatch is None) or (literal_str(
@@ -187,6 +206,7 @@ def isLineForMatch(someLine=None, toMatch=None):
 		return False
 
 
+@remediation.error_handling
 def compactList(list, intern_func=None):
 	"""
 	Compacts Lists
@@ -207,6 +227,7 @@ def compactList(list, intern_func=None):
 	return result
 
 
+@remediation.error_handling
 def xstr(some_str=None):
 	"""
 	buffers strings for comparison.
@@ -222,6 +243,7 @@ def xstr(some_str=None):
 """ I/O and Files """
 
 
+@remediation.error_handling
 def open_func(file, mode='r', buffering=-1, encoding=None):
 	""" cross-python open function """
 	try:
@@ -236,6 +258,7 @@ def open_func(file, mode='r', buffering=-1, encoding=None):
 		return io.open(file, mode, buffering, encoding)
 
 
+@remediation.error_handling
 def write_func(someFile, the_data=None):
 	""" cross-python open function """
 	try:
@@ -248,6 +271,7 @@ def write_func(someFile, the_data=None):
 		return someFile.write(literal_code(the_data))
 
 
+@remediation.error_handling
 def readFile(somefile):
 	"""Reads the raw contents of a file."""
 	read_data = None
@@ -258,6 +282,7 @@ def readFile(somefile):
 	return read_data
 
 
+@remediation.error_handling
 def writeFile(somefile, somedata):
 	"""Writes the raw contents of a file."""
 	theWritePath = str(somefile)
@@ -275,6 +300,7 @@ def writeFile(somefile, somedata):
 	return theResult
 
 
+@remediation.error_handling
 def appendFile(somefile, somedata):
 	"""Apends to the raw contents of a file."""
 	theWritePath = str(somefile)
@@ -293,6 +319,7 @@ def appendFile(somefile, somedata):
 	return theResult
 
 
+@remediation.error_handling
 def getFileResource(someURL, outFile):
 	"""Downloads a file from the given URL."""
 	import urllib
@@ -308,6 +335,7 @@ def getFileResource(someURL, outFile):
 	return True
 
 
+@remediation.error_handling
 def cleanFileResource(theFile):
 	"""cleans up a downloaded given file."""
 	import os
@@ -319,6 +347,7 @@ def cleanFileResource(theFile):
 	return True
 
 
+@remediation.error_handling
 def main(argv=None):
 	"""The Main Event makes no sense to utils."""
 	raise NotImplementedError("CRITICAL - PKU Uitls main() not implemented. yet?")

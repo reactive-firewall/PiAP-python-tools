@@ -21,11 +21,28 @@
 try:
 	import argparse
 	import os
+	import sys
 	if os.__name__ is None:
+		raise ImportError("Failed to import rand.")
+	if sys.__name__ is None:
 		raise ImportError("Failed to import rand.")
 except Exception:
 	raise ImportError("Failed to import rand.")
 	exit(255)
+
+
+RAND_CHARS = [
+	"a", "b", "c", "d", "e", "f", "g", "h",
+	"i", "j", "k", "l", "m", "n", "o", "p",
+	"q", "r", "s", "t", "u", "v", "w", "x",
+	"y", "z", "1", "2", "3", "4", "5", "6",
+	"7", "8", "9", "0", "!", "@", "#", "$",
+	"%", "^", "&", "*", "(", ")", "_", "-",
+	"+", "=", "<", ">", ",", ".", "?", "/",
+	"'", ";", "[", "]", "{", "}", "|", "~",
+	"\"", " "
+]
+"""Posible Chars for randChar (which is not so random, as it is very qwerty based)"""
 
 
 def parseArgs(arguments=None):
@@ -54,7 +71,6 @@ def parseArgs(arguments=None):
 
 def rand(count=None):
 	"""wrapper for os.urandom()"""
-	import os
 	if count is None or count < 0:
 		x_count = 512
 	else:
@@ -73,7 +89,6 @@ def rand(count=None):
 
 def randStr(count=None):
 	"""wrapper for str(os.urandom())"""
-	import os
 	if count is None or count < 0:
 		x_count = 512
 	else:
@@ -91,14 +106,37 @@ def randStr(count=None):
 
 
 def randInt(count=None, min=0, max=512):
-	"""wrapper for str(os.urandom())"""
-	import os
+	"""wrapper for int(os.urandom())"""
 	if count is None or count < 0:
 		x_count = 32
 	else:
 		x_count = count
 	try:
-		return (int(rand(x_count)) + min) % max
+		if x_count == 1:
+			return (int.from_bytes(os.urandom(1), sys.byteorder) + min) % max
+		else:
+			theResult = []
+			for someInt in range(x_count):
+				theResult.append((int.from_bytes(os.urandom(1), sys.byteorder) + min) % max)
+			return theResult
+	except Exception as err:
+		print(str(u'FAILED DURRING RAND. ABORT.'))
+		print(str(type(err)))
+		print(str(err))
+		print(str(err.args))
+		err = None
+		del err
+		os.abort(3)
+
+
+def randBool(count=None):
+	"""wrapper for str(os.urandom())"""
+	if count is None or count < 0:
+		x_count = 1
+	else:
+		x_count = (count % 2)
+	try:
+		return (bool(randInt(x_count)) is True)
 	except Exception as err:
 		print(str(u'FAILED DURRING RAND. ABORT.'))
 		print(str(type(err)))
@@ -112,12 +150,18 @@ def randInt(count=None, min=0, max=512):
 def randChar(count=None):
 	"""wrapper for str(os.urandom())"""
 	import os
-	if count is None or count < 15:
-		x_count = count % 128
+	if count is None or count < 0:
+		x_count = 1
 	else:
 		x_count = count
 	try:
-		return str(rand(x_count))[2:2]
+		theRandomResult = str("")
+		for char_x in range(x_count):
+			char_rand_seed = RAND_CHARS[randInt(1, 0, len(RAND_CHARS))]
+			while str(char_rand_seed).isalnum() is False:
+				char_rand_seed = RAND_CHARS[randInt(1, 0, len(RAND_CHARS))]
+			theRandomResult = str("{}{}").format(theRandomResult, str(char_rand_seed))
+		return theRandomResult
 	except Exception as err:
 		print(str(u'FAILED DURRING RAND. ABORT.'))
 		print(str(type(err)))
