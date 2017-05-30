@@ -50,6 +50,17 @@ setup(
 	install_requires=requirements,
 	author='reactive-firewall',
 	author_email='reactive-firewall@users.noreply.github.com',
+	classifiers=[
+		'Development Status :: 4 - Beta',
+		'Operating System :: POSIX :: Linux',
+		'Programming Language :: Python',
+		'Programming Language :: Python :: 3.6',
+		'Programming Language :: Python :: 3.5',
+		'Programming Language :: Python :: 3.4',
+		'Programming Language :: Python :: 3.3',
+		'Programming Language :: Python :: 2.7',
+		'Topic :: Security'
+	],
 	url='https://github.com/reactive-firewall/PiAP-python-tools.git',
 	license=license,
 	packages=find_packages(exclude=('tests', 'docs'))
