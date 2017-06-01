@@ -21,48 +21,48 @@ try:
 	from setuptools import setup
 	from setuptools import find_packages
 except Exception:
-	raise ImportError("Not Implemented.")
+	raise ImportError("""Not Implemented.""")
 
 try:
-	with open(u'./requirements.txt') as f:
+	with open("""./requirements.txt""") as f:
 		requirements = f.read().splitlines()
 except Exception:
 	requirements = None
 
 try:
-	with open(u'./README.md') as f:
+	with open("""./README.md""") as f:
 		readme = f.read()
 except Exception:
 	readme = str("""See https://github.com/reactive-firewall/PiAP-python-tools/README.md""")
 
 try:
-	with open(u'./LICENSE.rst') as f:
+	with open("""./LICENSE.rst""") as f:
 		license = f.read()
 except Exception:
 	readme = str("""See https://github.com/reactive-firewall/PiAP-python-tools/LICENSE.rst""")
 
 
 setup(
-	name='piaplib',
-	version='0.2.4',
-	description='Beta for PiAP python tools',
+	name="""piaplib""",
+	version="""0.2.4""",
+	description="""Beta for PiAP python tools""",
 	long_description=readme,
 	install_requires=requirements,
-	author='reactive-firewall',
-	author_email='reactive-firewall@users.noreply.github.com',
+	author="""reactive-firewall""",
+	author_email="""reactive-firewall@users.noreply.github.com""",
 	classifiers=[
-		'Development Status :: 4 - Beta',
-		'Operating System :: POSIX :: Linux',
-		'Programming Language :: Python',
-		'Programming Language :: Python :: 3.6',
-		'Programming Language :: Python :: 3.5',
-		'Programming Language :: Python :: 3.4',
-		'Programming Language :: Python :: 3.3',
-		'Programming Language :: Python :: 2.7',
-		'Topic :: Security'
+		"""Development Status :: 4 - Beta""",
+		"""Operating System :: POSIX :: Linux""",
+		"""Programming Language :: Python""",
+		"""Programming Language :: Python :: 3.6""",
+		"""Programming Language :: Python :: 3.5""",
+		"""Programming Language :: Python :: 3.4""",
+		"""Programming Language :: Python :: 3.3""",
+		"""Programming Language :: Python :: 2.7""",
+		"""Topic :: Security"""
 	],
-	url='https://github.com/reactive-firewall/PiAP-python-tools.git',
+	url="""https://github.com/reactive-firewall/PiAP-python-tools.git""",
 	license=license,
-	packages=find_packages(exclude=('tests', 'docs'))
+	packages=find_packages(exclude=("""tests""", """docs"""))
 )
 
