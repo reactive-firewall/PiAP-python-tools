@@ -50,7 +50,7 @@ jobs:
   include:
     - stage: test
       install: "make init"
-  	  before_install:
+      before_install:
         - true
       script:
         - make clean
