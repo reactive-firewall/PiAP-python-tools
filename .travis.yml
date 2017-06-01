@@ -48,14 +48,14 @@ matrix:
 
 jobs:
   include:
-    - stage:  test
+    - stage:  unit tests
       install:  "make init"
       before_install:
         - true
       script:
         - make clean
         - if [ $TRAVIS_OS_NAME == osx ] ; then true ; wait ; else make test ; fi ; exit $? ;
-    - # stage name not required, will continue to use `test`
+    - stage: cross python tests
       install:  "make init"
       before_install:
         - if [ $TRAVIS_OS_NAME == osx ] ; then brew upgrade || true ; fi
@@ -68,7 +68,7 @@ jobs:
       script:
         - make clean
         - make test-tox ; exit $? ;
-    - stage: deploy
+    - stage: upgrade tests
       install:  "make init"
       before_install:
         - if [ $TRAVIS_OS_NAME == osx ] ; then brew upgrade || true ; fi
