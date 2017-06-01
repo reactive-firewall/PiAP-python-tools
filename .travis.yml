@@ -59,21 +59,10 @@ before_install:
 
 script:
   - make clean
-  - if [ $TRAVIS_OS_NAME == osx ] ; then make test-tox ; else make test ; fi ; exit $? ;
-
-jobs:
-  include:
-    - stage:  unit tests
-      script:
-        - make clean
-        - if [ $TRAVIS_OS_NAME == osx ] ; then true ; else make test ; fi ; exit $? ;
-    - stage:  cross python tests
-      script:
-        - make clean
-        - make test-tox ; exit $? ;
-    - stage:  upgrade tests
-      script:
-        - make clean
-        - if [ $TRAVIS_OS_NAME == osx ] ; then true ; wait ; else make test ; fi ;
-        - if [ $TRAVIS_OS_NAME == osx ] ; then true ; wait ; else pip install --upgrade -e https://raw.githubusercontent.com/reactive-firewall/PiAP-python-tools.git@${TRAVIS_PULL_REQUEST_SHA:-TRAVIS_COMMIT}#egg=piaplib ; fi ; exit $? ;
+  - if [ $TRAVIS_OS_NAME == osx ] ; then echo "SKIP" ; else make test ; fi ; exit $? ;
+  - make clean
+  - make test-tox ; exit $? ;
+  - make clean
+  - if [ $TRAVIS_OS_NAME == osx ] ; then true ; wait ; else make test ; fi ;
+  - if [ $TRAVIS_OS_NAME == osx ] ; then true ; wait ; else pip install --upgrade -e https://raw.githubusercontent.com/reactive-firewall/PiAP-python-tools.git@${TRAVIS_PULL_REQUEST_SHA:-TRAVIS_COMMIT}#egg=piaplib ; fi ; exit $? ;
 
