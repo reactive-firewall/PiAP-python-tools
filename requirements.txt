@@ -19,6 +19,6 @@ pip>=8.0
 requests>=2.14.2
 urllib3>=1.13.1
 # ruamel.yaml - MIT
-#ruamel.yaml>=0.14.12
-#-e git+https://github.com/reactive-firewall/PiAP-python-tools.git#egg=
+ruamel.yaml>=0.14.12
+#-e git+https://github.com/reactive-firewall/PiAP-python-tools.git#egg=piaplib
 
