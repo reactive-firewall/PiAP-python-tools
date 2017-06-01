@@ -46,38 +46,32 @@ matrix:
     osx_image: xcode8.3
     language: generic
 
+install:  "make init"
+
+before_install:
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew upgrade || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python2.6 $INSTALL || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3.4 $INSTALL || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3.5 $INSTALL || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python2.7 $INSTALL || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3.6 $INSTALL || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then pip install tox || true ; fi
+
+script:
+  - make clean
+  - if [ $TRAVIS_OS_NAME == osx ] ; then make test-tox ; else make test ; fi ; exit $? ;
+
 jobs:
   include:
     - stage:  unit tests
-      install:  "make init"
-      before_install:
-        - true
       script:
         - make clean
-        - if [ $TRAVIS_OS_NAME == osx ] ; then true ; wait ; else make test ; fi ; exit $? ;
-    - stage: cross python tests
-      install:  "make init"
-      before_install:
-        - if [ $TRAVIS_OS_NAME == osx ] ; then brew upgrade || true ; fi
-        - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python2.6 $INSTALL || true ; fi
-        - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3.4 $INSTALL || true ; fi
-        - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3.5 $INSTALL || true ; fi
-        - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python2.7 $INSTALL || true ; fi
-        - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3.6 $INSTALL || true ; fi
-        - if [ $TRAVIS_OS_NAME == osx ] ; then pip install tox || true ; fi
+        - if [ $TRAVIS_OS_NAME == osx ] ; then true ; else make test ; fi ; exit $? ;
+    - stage:  cross python tests
       script:
         - make clean
         - make test-tox ; exit $? ;
-    - stage: upgrade tests
-      install:  "make init"
-      before_install:
-        - if [ $TRAVIS_OS_NAME == osx ] ; then brew upgrade || true ; fi
-        - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python2.6 $INSTALL || true ; fi
-        - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3.4 $INSTALL || true ; fi
-        - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3.5 $INSTALL || true ; fi
-        - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python2.7 $INSTALL || true ; fi
-        - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3.6 $INSTALL || true ; fi
-        - if [ $TRAVIS_OS_NAME == osx ] ; then pip install tox || true ; fi
+    - stage:  upgrade tests
       script:
         - make clean
         - if [ $TRAVIS_OS_NAME == osx ] ; then true ; wait ; else make test ; fi ;
