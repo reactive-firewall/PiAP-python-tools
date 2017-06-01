@@ -46,13 +46,40 @@ matrix:
     osx_image: xcode8.3
     language: generic
 
-before_install:
-  - if [ $TRAVIS_OS_NAME == osx ] ; then brew upgrade || true ; fi
-  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python2.6 python3.5 python3.4 $INSTALL || true ; fi
-  - if [ $TRAVIS_OS_NAME == osx ] ; then pip install tox || true ; fi
+jobs:
+  include:
+    - stage: test
+      install: "make init"
+  	  before_install:
+        - true
+      script:
+        - make clean
+        - if [ $TRAVIS_OS_NAME == osx ] ; then true ; wait ; else make test ; fi ; exit $? ;
+    - # stage name not required, will continue to use `test`
+      install: "make init"
+      before_install:
+        - if [ $TRAVIS_OS_NAME == osx ] ; then brew upgrade || true ; fi
+        - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python2.6 $INSTALL || true ; fi
+        - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3.4 $INSTALL || true ; fi
+        - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3.5 $INSTALL || true ; fi
+        - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python2.7 $INSTALL || true ; fi
+        - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3.6 $INSTALL || true ; fi
+        - if [ $TRAVIS_OS_NAME == osx ] ; then pip install tox || true ; fi
+      script:
+        - make clean
+        - make test-tox ; exit $? ;
+    - stage: deploy
+      install: "make init"
+      before_install:
+        - if [ $TRAVIS_OS_NAME == osx ] ; then brew upgrade || true ; fi
+        - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python2.6 $INSTALL || true ; fi
+        - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3.4 $INSTALL || true ; fi
+        - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3.5 $INSTALL || true ; fi
+        - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python2.7 $INSTALL || true ; fi
+        - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3.6 $INSTALL || true ; fi
+        - if [ $TRAVIS_OS_NAME == osx ] ; then pip install tox || true ; fi
+	  script:
+        - make clean
+        - if [ $TRAVIS_OS_NAME == osx ] ; then true ; wait ; else make test ; fi ;
+        - if [ $TRAVIS_OS_NAME == osx ] ; then true ; wait ; else pip install --upgrade -e https://raw.githubusercontent.com/reactive-firewall/PiAP-python-tools.git@${TRAVIS_PULL_REQUEST_SHA:-TRAVIS_COMMIT}#egg=piaplib ; fi ; exit $? ;
 
-install: "make init"
-# command to run tests
-script:
-  - make clean
-  - if [ $TRAVIS_OS_NAME == osx ] ; then make test-tox ; wait ; else make test ; fi ; exit $? ;
