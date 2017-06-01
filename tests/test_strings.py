@@ -100,15 +100,15 @@ class StringsTestSuite(unittest.TestCase):
 			from pku import utils as utils
 			if utils.__name__ is None:
 				raise ImportError("Failed to import utils")
-			u_test = str(u'test')
+			some_test = str(u'test')
 			try:
-				b_test = b'test'
+				other_test = b'test'
 			except Exception:
-				b_test = str(b'test')
-			theResult = utils.literal_str(b_test) in utils.literal_str(u_test)
+				other_test = str(b'test')
+			theResult = utils.literal_str(other_test) in utils.literal_str(some_test)
 			theResult = (
 				(theResult is True) and (
-					utils.literal_str(u_test) in utils.literal_str(b_test)
+					utils.literal_str(some_test) in utils.literal_str(other_test)
 				)
 			)
 		except Exception as err:
@@ -185,16 +185,16 @@ class StringsTestSuite(unittest.TestCase):
 			from pku import utils as utils
 			if utils.__name__ is None:
 				raise ImportError("Failed to import utils")
-			u_test = str(u'')
+			some_test = str(u'')
 			try:
-				b_test = b''
+				other_test = b''
 			except Exception:
-				b_test = str(b'')
+				other_test = str(b'')
 			theResult = (
-				utils.literal_str(b_test) in utils.literal_str(u_test)
+				utils.literal_str(other_test) in utils.literal_str(some_test)
 			)
 			theResult_temp = (
-				utils.literal_str(u_test) in utils.literal_str(b_test)
+				utils.literal_str(some_test) in utils.literal_str(other_test)
 			)
 			theResult = (theResult is True) and (theResult_temp is True)
 			theResult_temp = None
