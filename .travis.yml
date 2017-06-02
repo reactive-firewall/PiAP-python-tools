@@ -14,18 +14,14 @@ matrix:
   include:
   - os: linux
     python:  "2.7"
-    dist:
-     - precise
-     - trusty
+    dist: trusty
   - os: linux
     python:  "3.3"
   - os: linux
     python:  "3.4"
   - os: linux
     python:  "3.5"
-    dist:
-      - precise
-      - trusty
+    dist: trusty
   - os: linux
     python:  "3.6"
   - os: linux
