@@ -87,7 +87,7 @@ def parseArgs(arguments=None):
 		choices=POCKET_UNITS.keys(),
 		help='the pocket service option.'
 	)
-	parser.add_argument('-V', '--version', action='version', version='%(prog)s 0.2.3')
+	parser.add_argument('-V', '--version', action='version', version='%(prog)s 0.2.4')
 	return parser.parse_known_args(arguments)
 
 

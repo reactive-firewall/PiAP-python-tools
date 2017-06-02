@@ -114,9 +114,12 @@ class BasicUsageTestSuite(unittest.TestCase):
 		"""Test case for backend library."""
 		theResult = False
 		try:
+			import sys
+			if sys.__name__ is None:
+				raise ImportError("Failed to import system. WTF?!!")
 			import subprocess
-			theOutputtext = subprocess.check_output(["which", "python3"])
-			if (str("/python3") in str(theOutputtext)):
+			thepython = subprocess.check_output(["which", "python3"])
+			if (str("/python3") in str(thepython)) or (sys.version_info <= (3, 2)):
 				theResult = True
 		except Exception:
 			theResult = False
@@ -132,9 +135,12 @@ class BasicUsageTestSuite(unittest.TestCase):
 		"""Test case for piaplib.pocket help."""
 		theResult = False
 		try:
+			import sys
+			if sys.__name__ is None:
+				raise ImportError("Failed to import system. WTF?!!")
 			import subprocess
 			thepython = subprocess.check_output(["which", "python3"])
-			if (str("/python3") in str(thepython)):
+			if (str("/python3") in str(thepython)) and (sys.version_info >= (3, 3)):
 				thepython = "python3"
 			else:
 				thepython = "python"
@@ -181,9 +187,12 @@ class BasicUsageTestSuite(unittest.TestCase):
 		"""Test case for piaplib.pocket.lint check users."""
 		theResult = False
 		try:
+			import sys
+			if sys.__name__ is None:
+				raise ImportError("Failed to import system. WTF?!!")
 			import subprocess
 			thepython = subprocess.check_output(["which", "python3"])
-			if (str("/python3") in str(thepython)):
+			if (str("/python3") in str(thepython)) and (sys.version_info >= (3, 3)):
 				thepython = "python3"
 			else:
 				thepython = "python"
@@ -199,6 +208,8 @@ class BasicUsageTestSuite(unittest.TestCase):
 						str("--all")
 					], stderr=subprocess.STDOUT)
 					if (str("root console ") in str(theOutputtext)):
+						theResult = True
+					elif (str("travis UNKNOWN UNKNOWN None") in str(theOutputtext)):
 						theResult = True
 					else:
 						theResult = False
@@ -233,9 +244,12 @@ class BasicUsageTestSuite(unittest.TestCase):
 		"""Test case for piaplib.pocket.lint check iface."""
 		theResult = False
 		try:
+			import sys
+			if sys.__name__ is None:
+				raise ImportError("Failed to import system. WTF?!!")
 			import subprocess
 			thepython = subprocess.check_output(["which", "python3"])
-			if (str("/python3") in str(thepython)):
+			if (str("/python3") in str(thepython)) and (sys.version_info >= (3, 3)):
 				thepython = "python3"
 			else:
 				thepython = "python"
@@ -291,9 +305,12 @@ class BasicUsageTestSuite(unittest.TestCase):
 			from pku import utils as utils
 			if utils.__name__ is None:
 				raise ImportError("Failed to import utils")
+			import sys
+			if sys.__name__ is None:
+				raise ImportError("Failed to import system. WTF?!!")
 			import subprocess
 			thepython = subprocess.check_output(["which", "python3"])
-			if (str("/python3") in str(thepython)):
+			if (str("/python3") in str(thepython)) and (sys.version_info >= (3, 3)):
 				thepython = "python3"
 			else:
 				thepython = "python"

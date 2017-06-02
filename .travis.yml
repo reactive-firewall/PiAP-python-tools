@@ -13,21 +13,27 @@ addons:
 matrix:
   include:
   - os: linux
-    python: "2.6"
-  - os: linux
     python:  "2.7"
-  - os: linux
-    python:  "3.2"
+    dist: trusty
   - os: linux
     python:  "3.3"
   - os: linux
     python:  "3.4"
   - os: linux
     python:  "3.5"
+    dist: trusty
   - os: linux
     python:  "3.6"
   - os: linux
     python:  "3.5-dev" # 3.5 development branch
+  - os: linux
+    python:  "3.6-dev"
+  - os: linux
+    python:  "3.7-dev"
+  - os: linux
+    python: "pypy"  # PyPy2 2.5.0
+  - os: linux
+    python:  "pypy-5.3.1"
   - os: linux
     python:  "nightly" # currently points to 3.6-dev
   - os: osx
@@ -45,14 +51,42 @@ matrix:
   - os: osx
     osx_image: xcode8.3
     language: generic
+  allow_failure:
+  - os: linux
+    python:  "2.6"
+  - os: linux
+    python:  "3.2"
+  - os: linux
+    python: "pypy"
+  - os: linux
+    python:  "pypy3"
+  - os: linux
+    python:  "pypy-5.3.1"
+
+install:  "make init"
 
 before_install:
-  - if [ $TRAVIS_OS_NAME == osx ] ; then brew upgrade || true ; fi
-  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python2.6 python3.5 python3.4 $INSTALL || true ; fi
-  - if [ $TRAVIS_OS_NAME == osx ] ; then pip install tox || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then travis_retry brew upgrade || brew upgrade || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python2.6 $INSTALL || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3 $INSTALL || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3.3 $INSTALL || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install py3.3 $INSTALL || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3.4 $INSTALL || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install py3.4 $INSTALL || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3.5 $INSTALL || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install py3.5 $INSTALL || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python2.7 $INSTALL || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install py2.7 $INSTALL || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3.6 $INSTALL || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3.7 $INSTALL || true ; fi
+  - travis_retry pip install tox || pip install tox || true ;
+  - travis_retry python3 -m pip install tox || python3 -m pip install tox || true ;
 
-install: "make init"
-# command to run tests
 script:
-  - make clean
-  - if [ $TRAVIS_OS_NAME == osx ] ; then make test-tox ; wait ; else make test ; fi ; exit $? ;
+  - make clean ;
+  - if [ $TRAVIS_OS_NAME == osx ] ; then echo "SKIP" ; else make test || exit $? ; fi ;
+  - make clean || exit $? ; 
+  - make test-tox || exit $? ;
+  - make clean ;
+  - if [ $TRAVIS_OS_NAME == osx ] ; then true ; wait ; else pip install --upgrade -e git+https://github.com/reactive-firewall/PiAP-python-tools.git@${TRAVIS_PULL_REQUEST_SHA:-${TRAVIS_COMMIT}}#egg=piaplib ; fi ; wait ;
+

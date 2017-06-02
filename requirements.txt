@@ -9,12 +9,16 @@ argparse>=1.4.0
 setuptools>=35.0.2
 # virtualenv - MIT
 virtualenv>=15.0.1
+# six - MIT
 six>=1.0.0
+# pgpy - BSD 3-Clause licensed
+#pgpy>=0.4.1
 tox>=2.7.0
 #py>=1.4.33
 pip>=8.0
 requests>=2.14.2
 urllib3>=1.13.1
 # ruamel.yaml - MIT
-ruamel.yaml>=0.14.12
+#ruamel.yaml>=0.14.12
 #-e git+https://github.com/reactive-firewall/PiAP-python-tools.git#egg=piaplib
+
