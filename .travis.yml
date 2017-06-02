@@ -89,5 +89,5 @@ script:
   - make clean || exit $? ; 
   - make test-tox || exit $? ;
   - make clean ;
-  - if [ $TRAVIS_OS_NAME == osx ] ; then true ; wait ; else pip install --upgrade -e git+https://raw.githubusercontent.com/reactive-firewall/PiAP-python-tools.git@${TRAVIS_PULL_REQUEST_SHA:-TRAVIS_COMMIT}#egg=piaplib ; fi ; wait ;
+  - if [ $TRAVIS_OS_NAME == osx ] ; then true ; wait ; else pip install --upgrade -e git+https://github.com/reactive-firewall/PiAP-python-tools.git@${TRAVIS_PULL_REQUEST_SHA:-${TRAVIS_COMMIT}}#egg=piaplib ; fi ; wait ;
 
