@@ -13,11 +13,7 @@ addons:
 matrix:
   include:
   - os: linux
-    python:  "2.6"
-  - os: linux
     python:  "2.7"
-  - os: linux
-    python:  "3.2"
   - os: linux
     python:  "3.3"
   - os: linux
@@ -30,6 +26,10 @@ matrix:
     python:  "3.5-dev" # 3.5 development branch
   - os: linux
     python:  "nightly" # currently points to 3.6-dev
+  - os: linux
+    python:  "2.6"
+  - os: linux
+    python:  "3.2"
   - os: osx
     osx_image: xcode6.4
     language: generic
@@ -45,18 +45,25 @@ matrix:
   - os: osx
     osx_image: xcode8.3
     language: generic
+  allow_failure:
+  - os: linux
+    python:  "2.6"
+  - os: linux
+    python:  "3.2"
 
 install:  "make init"
 
 before_install:
-  - if [ $TRAVIS_OS_NAME == osx ] ; then brew upgrade || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then travis_retry brew upgrade || brew upgrade || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python2.6 $INSTALL || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3.3 $INSTALL || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3.3 $INSTALL || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3.4 $INSTALL || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3.5 $INSTALL || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python2.7 $INSTALL || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3.6 $INSTALL || true ; fi
-  - pip install tox || true ;
-  - python3 -m pip install tox || true ;
+  - travis_retry pip install tox || pip install tox || true ;
+  - travis_retry python3 -m pip install tox || python3 -m pip install tox || true ;
 
 script:
   - make clean ;
@@ -64,6 +71,5 @@ script:
   - make clean || exit $? ; 
   - make test-tox || exit $? ;
   - make clean ;
-  - if [ $TRAVIS_OS_NAME == osx ] ; then true ; wait ; else make test ; fi ;
   - if [ $TRAVIS_OS_NAME == osx ] ; then true ; wait ; else pip install --upgrade -e https://raw.githubusercontent.com/reactive-firewall/PiAP-python-tools.git@${TRAVIS_PULL_REQUEST_SHA:-TRAVIS_COMMIT}#egg=piaplib ; fi ; wait ;
 
