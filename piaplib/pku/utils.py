@@ -41,6 +41,15 @@ except Exception:
 		raise ImportError("Error Importing remediation")
 
 
+try:
+	from .logs import logs as logs
+except Exception:
+	try:
+		from logs import logs as logs
+	except Exception:
+		raise ImportError("Error Importing remediation")
+
+
 @remediation.error_handling
 def literal_code(raw_input=None):
 	"""A simple attempt at validating raw python unicode. Always expect CWE-20.

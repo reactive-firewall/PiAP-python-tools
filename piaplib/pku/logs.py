@@ -141,6 +141,8 @@ class logs:
 			logs.logging_level[loglevel.lower()],
 			str("{}{}{}").format(logs.logging_color[loglevel.lower()], msg, ANSIColors.ENDC)
 		)
+	
+	__ALL__ = [logging_level, logging_color]
 
 @remediation.error_handling
 def main(argv=None):
