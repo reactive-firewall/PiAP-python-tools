@@ -81,7 +81,8 @@ purge: clean uninstall
 	$(QUIET)$(ECHO) "$@: Done."
 
 test: cleanup
-	$(QUIET)python3 -m unittest tests.test_basic tests.test_strings tests.test_salt tests.test_rand tests.test_utils tests.test_config tests.test_usage || python -m unittest tests.test_basic tests.test_strings tests.test_salt tests.test_rand tests.test_utils tests.test_config tests.test_usage
+	$(QUIET)coverage run -m unittest tests.test_basic tests.test_strings tests.test_salt tests.test_rand tests.test_utils tests.test_config tests.test_usage || python3 -m unittest tests.test_basic tests.test_strings tests.test_salt tests.test_rand tests.test_utils tests.test_config tests.test_usage || python -m unittest tests.test_basic tests.test_strings tests.test_salt tests.test_rand tests.test_utils tests.test_config tests.test_usage
+	$(QUIET)coverage report --include=piaplib* 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-tox: cleanup
