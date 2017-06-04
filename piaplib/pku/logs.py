@@ -40,12 +40,12 @@ except Exception as err:
 	exit(3)
 
 try:
-	from . import remediation as remediation
-except Exception:
-	try:
-		import remediation as remediation
-	except Exception:
-		raise ImportError("Error Importing remediation")
+	import logging as logging
+	if logging.__name__ is None:
+		raise NotImplementedError("OMG! We could not import the builtin logs!")
+except Exception as err:
+	raise ImportError(err)
+	exit(3)
 
 
 class ANSIColors:
@@ -103,13 +103,12 @@ class ANSIColors:
 
 class logs:
 	"""Class for Pocket PKU logs"""
-	import logging as logging
 	logging.basicConfig(
-		level=logging.DEBUG,
-		format=str("%(asctime)s [%(name)s] %(message)s"),
+		level=logging.INFO,
+		format=str("%(asctime)s [piaplib] %(message)s"),
 		datefmt=str("%m/%d/%Y %I:%M:%S %p")
 	)
-	
+
 	logging_level = {
 		'debug': logging.DEBUG, 'info': logging.INFO, 'warn': logging.WARNING,
 		'warning': logging.WARNING, 'error': logging.ERROR, 'crit': logging.CRITICAL,
@@ -127,8 +126,11 @@ class logs:
 
 	def log(msg=str("Checked in"), loglevel="info"):
 		"""Logs a message."""
-		import logging as logging
 		logger = logging.getLogger(__name__)
+		context_details = logger.findCaller()
+		myName = str("piaplib")
+		if context_details is not None:
+			myName = context_details[2]
 		if not isinstance(msg, str):
 			raise ValueError(str("Invalid log message"))
 		if not isinstance(loglevel, str):
@@ -139,16 +141,25 @@ class logs:
 			raise ValueError(str("Invalid log level"))
 		logger.log(
 			logs.logging_level[loglevel.lower()],
-			str("{}{}{}").format(logs.logging_color[loglevel.lower()], msg, ANSIColors.ENDC)
+			str("{} -- {}{}{}").format(
+				str(myName),
+				logs.logging_color[loglevel.lower()],
+				msg, ANSIColors.ENDC
+			)
 		)
-	
+
 	__ALL__ = [logging_level, logging_color]
 
-@remediation.error_handling
+
 def main(argv=None):
 	"""The Main Event makes no sense to utils."""
-	raise NotImplementedError("CRITICAL - PKU logs main() not implemented. yet?")
-	exit(3)
+	try:
+		raise NotImplementedError("CRITICAL - PKU logs main() not implemented. yet?")
+		exit(3)
+	except Exception as err:
+		logs.log(str(type(err)), "Critical")
+		logs.log(str(err), "Critical")
+		logs.log(str(err.args), "Critical")
 
 
 if __name__ in u'__main__':

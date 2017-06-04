@@ -88,6 +88,10 @@ test-tox: cleanup
 	$(QUIET)tox --
 	$(QUIET)$(ECHO) "$@: Done."
 
+test-style: cleanup
+	$(QUIET)flake8 --ignore=W191,W391 --max-line-length=100 --count
+	$(QUIET)$(ECHO) "$@: Done."
+
 cleanup:
 	$(QUIET)rm -f tests/*.pyc 2>/dev/null || true
 	$(QUIET)rm -f tests/*~ 2>/dev/null || true

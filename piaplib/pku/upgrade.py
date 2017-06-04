@@ -18,14 +18,6 @@
 # limitations under the License.
 
 try:
-	from . import utils as utils
-except Exception:
-	try:
-		import utils as utils
-	except Exception:
-		raise ImportError("Error Importing utils")
-
-try:
 	import warnings
 	with warnings.catch_warnings():
 		warnings.filterwarnings("ignore", category=PendingDeprecationWarning)
@@ -39,6 +31,14 @@ except PendingDeprecationWarning as junkErr:
 	del(junkErr)
 except Exception:
 	raise ImportError("Not Implemented.")
+
+try:
+	from . import utils as utils
+except Exception:
+	try:
+		import utils as utils
+	except Exception:
+		raise ImportError("Error Importing utils")
 
 try:
 	import argparse

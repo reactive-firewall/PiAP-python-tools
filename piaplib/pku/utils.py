@@ -47,7 +47,7 @@ except Exception:
 	try:
 		from logs import logs as logs
 	except Exception:
-		raise ImportError("Error Importing remediation")
+		raise ImportError("Error Importing logs")
 
 
 @remediation.error_handling
@@ -64,6 +64,7 @@ def literal_code(raw_input=None):
 		elif isinstance(raw_input, str):
 			return raw_input.encode("utf-8").decode("utf-8")
 	except Exception as malformErr:
+		logs.log("[CWE-20] Possible malformed string attack occured.", "info")
 		malformErr = None
 		del malformErr
 		return None
@@ -84,6 +85,7 @@ def literal_str(raw_input=None):
 		elif isinstance(raw_input, str):
 			return str(raw_input.encode("utf-8").decode("utf-8"))
 	except Exception as malformErr:
+		logs.log("[CWE-20] Possible malformed string attack occured.", "info")
 		malformErr = None
 		del malformErr
 		return None
@@ -288,6 +290,10 @@ def readFile(somefile):
 	with open_func(theReadPath, u'r', encoding='utf-8') as f:
 		read_data = f.read()
 	f.close()
+	try:
+		logs.log(str("read file {}").format(somefile), "debug")
+	except Exception:
+		pass
 	return read_data
 
 
@@ -306,6 +312,10 @@ def writeFile(somefile, somedata):
 	finally:
 		if f:
 			f.close()
+	try:
+		logs.log(str("wrote to file {}").format(somefile), "debug")
+	except Exception:
+		pass
 	return theResult
 
 
@@ -325,6 +335,10 @@ def appendFile(somefile, somedata):
 	finally:
 		if f:
 			f.close()
+	try:
+		logs.log(str("wrote to file {}").format(somefile), "debug")
+	except Exception:
+		pass
 	return theResult
 
 
@@ -341,6 +355,10 @@ def getFileResource(someURL, outFile):
 		tempfile.retrieve(someURL, outFile)
 	except Exception:
 		return False
+	try:
+		logs.log(str("fetched file {}").format(someURL), "debug")
+	except Exception:
+		pass
 	return True
 
 
@@ -353,6 +371,10 @@ def cleanFileResource(theFile):
 	except Exception:
 		print("Error: Failed to remove file.")
 		return False
+	try:
+		logs.log(str("purged file {}").format(theFile), "debug")
+	except Exception:
+		pass
 	return True
 
 

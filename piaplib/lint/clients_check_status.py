@@ -194,7 +194,7 @@ def get_client_sta_status_raw():
 				del lines
 			else:
 				theRawClientState = None
-		except FileNotFoundError as depErr: # noqa F821
+		except FileNotFoundError as depErr:  # noqa F821
 			print(str(type(depErr)))
 			print(str(depErr))
 			print(str(depErr.args))

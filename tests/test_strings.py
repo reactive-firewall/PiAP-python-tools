@@ -162,8 +162,8 @@ class StringsTestSuite(unittest.TestCase):
 			from pku import utils as utils
 			if utils.__name__ is None:
 				raise ImportError("Failed to import utils")
-			theResult = utils.literal_str(b'The quick brown fox jumps over the lazy dog') in utils.literal_str(str(u'The quick brown fox jumps over the lazy dog')) # noqa
-			theResult = (theResult is True) and (utils.literal_str(str(u'The quick brown fox jumps over the lazy dog')) in utils.literal_str(b'The quick brown fox jumps over the lazy dog')) # noqa
+			theResult = utils.literal_str(b'The quick brown fox jumps over the lazy dog') in utils.literal_str(str(u'The quick brown fox jumps over the lazy dog'))  # noqa
+			theResult = (theResult is True) and (utils.literal_str(str(u'The quick brown fox jumps over the lazy dog')) in utils.literal_str(b'The quick brown fox jumps over the lazy dog'))  # noqa
 		except Exception as err:
 			print(str(""))
 			print(str(type(err)))
@@ -260,7 +260,7 @@ class StringsTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
-	def test_case_utils_fuzz_literal_str(self): # noqa
+	def test_case_utils_fuzz_literal_str(self):  # noqa
 		"""Tests the literal string functions with a fuzzed input"""
 		theResult = True
 		try:

@@ -40,6 +40,19 @@ except Exception as err:
 	exit(3)
 
 
+try:
+	from piaplib.pku.logs import logs as logs
+except Exception:
+	try:
+		from .logs import logs as logs
+	except Exception as err:
+		print(str(type(err)))
+		print(str(err))
+		print(str(err.args))
+		print("")
+		raise ImportError("Error Importing logs")
+
+
 def getTimeStamp():
 	"""Returns the time stamp."""
 	theDate = None
@@ -87,11 +100,12 @@ def error_handling(func):
 			theOutput = func(*args, **kwargs)
 		except Exception as err:
 			timestamp = getTimeStamp()
-			print(str("{}: {}").format(str(timestamp), str(func)))
-			print(str("{}: {}").format(str(timestamp), str(type(err))))
-			print(str("{}: {}").format(str(timestamp), str(err)))
-			print(str("{}: {}").format(str(timestamp), str(err.args)))
-			print(str(""))
+			logs.log(str("An error occured at {}").format(timestamp), "Error")
+			logs.log(str(func), "Error")
+			logs.log(str(type(err)), "Error")
+			logs.log(str(err), "Error")
+			logs.log(str(err.args), "Error")
+			logs.log(str(""), "Critical")
 			sys.exc_clear()
 			err = None
 			del err
