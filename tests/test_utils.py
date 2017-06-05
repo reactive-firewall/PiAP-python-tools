@@ -266,6 +266,44 @@ class UtilsTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
+	def test_case_utils_regex_tty_clients_output(self):
+		"""Tests the tty name regex logic on user output"""
+		theResult = True
+		try:
+			from piaplib import pku as pku
+			if pku.__name__ is None:
+				raise ImportError("Failed to import pku")
+			from pku import utils as utils
+			if utils.__name__ is None:
+				raise ImportError("Failed to import utils")
+			validMAC = ["tty2", "pts2", "tty1"]
+			temp = utils.extractTTYs(
+				"""the ptty2 terminal is a tty like the pts2 session but unlike the tty1 console"""
+			)
+			theResult = (len(validMAC) is len(temp))
+			for x in temp:
+				if x in validMAC:
+					theResult = (theResult is True)
+				else:
+					theResult = False
+					print(str(""))
+					print(str(x))
+					print(str(""))
+			if (theResult is False):
+				print(str(""))
+				print(str(temp))
+				print(str(""))
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			err = None
+			del err
+			theResult = False
+		assert theResult
+
 	def test_case_utils_read_write_file(self):
 		"""Tests the read and write functions"""
 		theResult = False
@@ -345,6 +383,36 @@ and this will test reads.""")
 				print(str("write failed"))
 				print(str(theBlob))
 				print(str(""))
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			err = None
+			del err
+			theResult = False
+		assert theResult
+
+	def test_case_utils_remediation_error_pass(self):
+		"""Tests the tty name regex logic on user output"""
+		theResult = True
+		try:
+			from piaplib import pku as pku
+			if pku.__name__ is None:
+				raise ImportError("Failed to import pku")
+			from pku import remediation as remediation
+			if remediation.__name__ is None:
+				raise ImportError("Failed to import remediation")
+
+			@remediation.error_passing
+			def force_error():
+				raise ValueError("False Error")
+				return True
+
+			with self.assertRaises(RuntimeError):
+				force_error()
+			theResult = True
 		except Exception as err:
 			print(str(""))
 			print(str(type(err)))

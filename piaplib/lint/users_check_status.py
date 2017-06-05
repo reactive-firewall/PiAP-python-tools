@@ -45,7 +45,7 @@ except Exception as importErr:
 	exit(255)
 
 
-__prog__ = u'users_check_status'
+__prog__ = """users_check_status"""
 """The Program's name"""
 
 
@@ -106,7 +106,7 @@ def parseargs(arguments=None):
 			dest='verbose_mode', default=False,
 			action='store_false', help='Disable the given interface.'
 		)
-		parser.add_argument('-V', '--version', action='version', version='%(prog)s 0.2.3')
+		parser.add_argument('-V', '--version', action='version', version='%(prog)s 0.2.4')
 		theResult = parser.parse_args(arguments)
 	except Exception as parseErr:
 		parser.error(str(parseErr))

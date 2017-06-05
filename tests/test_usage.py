@@ -249,6 +249,9 @@ class BasicUsageTestSuite(unittest.TestCase):
 				thepython = "python3"
 			else:
 				thepython = "python"
+			from .context import piaplib as piaplib
+			if piaplib.__version__ is not None:
+				theResult = False
 			if (thepython is not None):
 				try:
 					for unit in ["pocket"]:
@@ -258,7 +261,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 							str("piaplib.{}").format(str(unit)),
 							str("--version")
 						], stderr=subprocess.STDOUT)
-						if (str("pocket") in str(theOutputtext)):
+						if (str(piaplib.__version__) in str(theOutputtext)):
 							theResult = True
 						else:
 							theResult = False
@@ -331,6 +334,54 @@ class BasicUsageTestSuite(unittest.TestCase):
 					othererr = None
 					del othererr
 					theResult = False
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			othererr = None
+			del othererr
+			theResult = False
+		assert theResult
+
+	def test_e_python_command_lint_check_units(self):
+		"""Test case for piaplib.lint.check* --version."""
+		theResult = False
+		try:
+			import sys
+			if sys.__name__ is None:
+				raise ImportError("Failed to import system. WTF?!!")
+			import subprocess
+			thepython = subprocess.check_output(["which", "python3"])
+			if (str("/python3") in str(thepython)) and (sys.version_info >= (3, 3)):
+				thepython = "python3"
+			else:
+				thepython = "python"
+			from .context import piaplib as piaplib
+			if piaplib.__version__ is not None:
+				theResult = False
+			if (thepython is not None):
+				for unit in ["iface", "clients", "users"]:
+					theOutputtext = subprocess.check_output([
+						str(thepython),
+						str("-m"),
+						str("piaplib.lint.check"),
+						str(unit),
+						str("--version")
+					], stderr=subprocess.STDOUT)
+					if (str(piaplib.__version__) in str(theOutputtext)):
+						theResult = True
+					else:
+						theResult = False
+						print(str(""))
+						print(str("python cmd is {}").format(str(thepython)))
+						print(str("check unit is {}").format(str(unit)))
+						print(str(""))
+						print(str("actual version was..."))
+						print(str(""))
+						print(str("{}").format(str(theOutputtext)))
+						print(str(""))
 		except Exception as err:
 			print(str(""))
 			print(str(type(err)))

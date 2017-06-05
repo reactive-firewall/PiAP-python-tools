@@ -85,6 +85,7 @@ PKU_UNITS = {u'config': config, u'backup': None, u'upgrade': upgrade, u'help': N
 	"""
 
 
+@remediation.error_handling
 def parseArgs(arguments=None):
 	"""Parses the CLI arguments."""
 	parser = argparse.ArgumentParser(
@@ -129,6 +130,7 @@ def usePKUTool(tool, arguments=[None]):
 		return None
 
 
+@remediation.bug_handling
 def main(argv=None):
 	"""The main event"""
 	# print("PiAP PKU")
@@ -170,10 +172,9 @@ if __name__ in u'__main__':
 	try:
 		import sys
 		if (sys.argv is not None and (sys.argv is not []) and (len(sys.argv) > 1)):
-			main(sys.argv[1:])
+			exit(main(sys.argv[1:]))
 		else:
-			main(["--help"])
-			exit(3)
+			exit(main(["--help"]))
 	except Exception:
 		raise ImportError("Error running main")
 	exit(0)
