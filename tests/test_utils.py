@@ -394,6 +394,56 @@ and this will test reads.""")
 			theResult = False
 		assert theResult
 
+	def test_case_utils_missing_file(self):
+		"""Tests the read and write functions on missing files"""
+		theResult = False
+		try:
+			from piaplib import pku as pku
+			if pku.__name__ is None:
+				raise ImportError("Failed to import pku")
+			from pku import utils as utils
+			if utils.__name__ is None:
+				raise ImportError("Failed to import utils")
+			theBlob = str("""This is just a test for failure.""")
+			somefile = str(os.path.join(
+				os.path.join(
+					os.path.join(os.path.dirname(__file__), str('..')),
+					str('some_long')
+				),
+				os.path.join(
+					os.path.join(str('very'), str('long')),
+					str('filename.tmp')
+				)
+			))
+			if (utils.writeFile(somefile, theBlob) is False):
+				if (utils.appendFile(somefile, theBlob) is False):
+					readback = utils.readFile(somefile)
+					if readback is None:
+						theResult = True
+					else:
+						theResult = False
+					if (theResult is False):
+						print(str("wrote"))
+						print(str(theBlob))
+						print(str(""))
+						print(str("read"))
+						print(str(readback))
+						print(str(""))
+				else:
+					theResult = False
+			else:
+				theResult = False
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			err = None
+			del err
+			theResult = False
+		assert theResult
+
 	def test_case_utils_remediation_error_pass(self):
 		"""Tests the tty name regex logic on user output"""
 		theResult = True

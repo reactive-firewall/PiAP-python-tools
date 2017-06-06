@@ -309,6 +309,16 @@ def writeFile(somefile, somedata):
 		theResult = True
 	except IOError:
 		theResult = False
+	except FileNotFoundError:
+		theResult = False
+	except Exception as err:
+		logs.log(str("Write Failed on file {}").format(somefile), "Warning")
+		logs.log(str(type(err)), "Warning")
+		logs.log(str(err), "Warning")
+		logs.log(str((err.args)), "Warning")
+		err = None
+		del err
+		theResult = False
 	finally:
 		if f:
 			f.close()
@@ -331,6 +341,16 @@ def appendFile(somefile, somedata):
 			write_func(f, os.linesep)
 		theResult = True
 	except IOError:
+		theResult = False
+	except FileNotFoundError:
+		theResult = False
+	except Exception as err:
+		logs.log(str("Write Failed on file {}").format(somefile), "Warning")
+		logs.log(str(type(err)), "Warning")
+		logs.log(str(err), "Warning")
+		logs.log(str((err.args)), "Warning")
+		err = None
+		del err
 		theResult = False
 	finally:
 		if f:

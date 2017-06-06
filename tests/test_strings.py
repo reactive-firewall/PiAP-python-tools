@@ -309,6 +309,55 @@ class StringsTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
+	def test_case_utils_fuzz_x_str(self):  # noqa
+		"""Tests the literal string functions with a fuzzed input"""
+		theResult = True
+		try:
+			from piaplib import pku as pku
+			if pku.__name__ is None:
+				raise ImportError("Failed to import pku")
+			from piaplib import keyring as keyring
+			if keyring.__name__ is None:
+				raise ImportError("Failed to import keyring")
+			from pku import utils as utils
+			if utils.__name__ is None:
+				raise ImportError("Failed to import utils")
+			from keyring import rand as rand
+			if rand.__name__ is None:
+				raise ImportError("Failed to import rand")
+			the_test_cases = []
+			for test_count in range(300):
+				temp = rand.randChar(1)
+				the_test_cases.append((utils.literal_str(temp), utils.literal_str(str(temp))))
+			for testcase in the_test_cases:
+				if theResult is True:
+					if testcase[0] is not None:
+						if testcase[1] is not None:
+							theResult = (
+								utils.xstr(testcase[0]) in utils.xstr(testcase[1])
+							)
+						if utils.literal_str(testcase[1]) is not None:
+							theResult_temp = (
+								utils.xstr(testcase[0]) in utils.xstr(testcase[1])
+							)
+							theResult = (theResult is True) and (theResult_temp is True)
+							if theResult is not True:
+								print("NEW test")
+								print(str(testcase))
+								print(repr(testcase))
+							theResult_temp = None
+							del theResult_temp
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			err = None
+			del err
+			theResult = False
+		assert theResult
+
 	def _test_case_utils_super_fuzz_literal_str(self):
 		"""Tests the literal string functions with random strings"""
 		theResult = True
