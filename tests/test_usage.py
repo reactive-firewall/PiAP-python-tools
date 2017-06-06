@@ -446,6 +446,53 @@ class BasicUsageTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
+	def test_f_python_command_keyring_units(self):
+		"""Test case for piaplib.lint.check.* --list."""
+		theResult = False
+		try:
+			import sys
+			if sys.__name__ is None:
+				raise ImportError("Failed to import system. WTF?!!")
+			import subprocess
+			thepython = subprocess.check_output(["which", "python3"])
+			if (str("/python3") in str(thepython)) and (sys.version_info >= (3, 3)):
+				thepython = "python3"
+			else:
+				thepython = "python"
+			if (thepython is not None):
+				try:
+					for unit in ["iface", "users"]:
+						theOutputtext = subprocess.check_output([
+							str(thepython),
+							str("-m"),
+							str("piaplib.lint.check"),
+							str("{}").format(str(unit)),
+							str("--list")
+						], stderr=subprocess.STDOUT)
+						if (theOutputtext is not None):
+							theResult = True
+						else:
+							theResult = False
+				except Exception as othererr:
+					print(str(""))
+					print(str(type(othererr)))
+					print(str(othererr))
+					print(str((othererr.args)))
+					print(str(""))
+					othererr = None
+					del othererr
+					theResult = False
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			othererr = None
+			del othererr
+			theResult = False
+		assert theResult
+
 	def test_d_python_command_check_users(self):
 		"""Test case for piaplib.pocket.lint check users."""
 		theResult = False

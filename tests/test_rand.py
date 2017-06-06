@@ -151,6 +151,114 @@ class RandTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
+	def test_keyring_rand_int_test(self):
+		"""Test generate random output test-case."""
+		theResult = True
+		try:
+			temp = None
+			from .context import piaplib
+			if piaplib.__name__ is None:
+				theResult = False
+			from piaplib import keyring as keyring
+			if keyring.__name__ is None:
+				theResult = False
+			from keyring import rand as rand
+			if rand.__name__ is None:
+				theResult = False
+			temp = rand.randInt(256)
+			if temp is not None:
+				theResult = True
+			del temp
+		except Exception as impErr:
+			print(str(""))
+			print(str(type(impErr)))
+			print(str(impErr))
+			print(str((impErr.args)))
+			print(str(""))
+			theResult = False
+		assert theResult
+
+	def test_keyring_rand_bool_test(self):
+		"""Test generate random output test-case."""
+		theResult = True
+		try:
+			temp = None
+			from .context import piaplib
+			if piaplib.__name__ is None:
+				theResult = False
+			from piaplib import keyring as keyring
+			if keyring.__name__ is None:
+				theResult = False
+			from keyring import rand as rand
+			if rand.__name__ is None:
+				theResult = False
+			temp = rand.randBool(256)
+			if temp is not None:
+				theResult = True
+			del temp
+		except Exception as impErr:
+			print(str(""))
+			print(str(type(impErr)))
+			print(str(impErr))
+			print(str((impErr.args)))
+			print(str(""))
+			theResult = False
+		assert theResult
+
+	def test_keyring_rand_str_test(self):
+		"""Test generate random output test-case."""
+		theResult = True
+		try:
+			temp = None
+			from .context import piaplib
+			if piaplib.__name__ is None:
+				theResult = False
+			from piaplib import keyring as keyring
+			if keyring.__name__ is None:
+				theResult = False
+			from keyring import rand as rand
+			if rand.__name__ is None:
+				theResult = False
+			temp = rand.randStr(256)
+			if temp is not None:
+				theResult = True
+			del temp
+		except Exception as impErr:
+			print(str(""))
+			print(str(type(impErr)))
+			print(str(impErr))
+			print(str((impErr.args)))
+			print(str(""))
+			theResult = False
+		assert theResult
+
+	def test_keyring_rand_Char_test(self):
+		"""Test generate random output test-case."""
+		theResult = True
+		try:
+			temp = None
+			from .context import piaplib
+			if piaplib.__name__ is None:
+				theResult = False
+			from piaplib import keyring as keyring
+			if keyring.__name__ is None:
+				theResult = False
+			from keyring import rand as rand
+			if rand.__name__ is None:
+				theResult = False
+			temp = rand.randChar(256)
+			if temp is not None:
+				theResult = True
+			del temp
+		except Exception as impErr:
+			print(str(""))
+			print(str(type(impErr)))
+			print(str(impErr))
+			print(str((impErr.args)))
+			print(str(""))
+			theResult = False
+		assert theResult
+
 	def test_keyring_rand_test_bias(self):
 		"""Test generate random output of multiple domains in 1000 tries test-case."""
 		theResult = True

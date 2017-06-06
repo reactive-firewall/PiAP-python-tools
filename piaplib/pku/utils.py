@@ -388,11 +388,14 @@ def cleanFileResource(theFile):
 	import os
 	try:
 		os.remove(str(theFile))
+	except FileNotFoundError:
+		theResult = False
 	except Exception:
-		print("Error: Failed to remove file.")
-		return False
+		logs.log(str("Error: Failed to remove file"), "Warning")
+		theResult = False
 	try:
-		logs.log(str("purged file {}").format(theFile), "debug")
+		if theResult:
+			logs.log(str("purged file {}").format(theFile), "debug")
 	except Exception:
 		pass
 	return True
