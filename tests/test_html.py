@@ -78,10 +78,16 @@ class BasicHTMLTestSuite(unittest.TestCase):
 			import lint.html_generator as html_generator
 		if html_generator.__name__ is None:
 			theResult = False
+		try:
+			from pku import utils as utils
+		except Exception:
+			import pku.utils as utils
+		if html_generator.__name__ is None:
+			theResult = False
 		else:
 			try:
 				for fuzz_test in [str("""\""""), str("""\'"""), str("""\\""")]:
-					if (html_generatorhas_special_html_chars(utils.xstr(fuzz_test)):
+					if (html_generator.has_special_html_chars(utils.xstr(fuzz_test))):
 						theResult = True
 					else:
 						theResult = False
@@ -91,13 +97,13 @@ class BasicHTMLTestSuite(unittest.TestCase):
 				print(str(err))
 				print(str((err.args)))
 				print(str(""))
-				othererr = None
-				del othererr
+				err = None
+				del err
 				theResult = False
 		assert theResult
 
 	def test_d_html_gen_tr(self):
-		"""Test case for piaplib.* --help."""
+		"""Test case for gen TR."""
 		theResult = False
 		try:
 			from .. import html_generator as html_generator
@@ -107,9 +113,111 @@ class BasicHTMLTestSuite(unittest.TestCase):
 			theResult = False
 		else:
 			try:
-				for fuzz_test in [str("""\""""), str("""\'"""), str("""\\""")]:
-				output_gen = html_generator.gen_html_tr(content=None, id=None, name=None):
+				output_gen = html_generator.gen_html_tr(
+					content="this is a test",
+					id="test_id",
+					name="test_tr"
+				)
+				if (str("<tr") in output_gen and str("</tr>") in output_gen):
 						theResult = True
+				else:
+					theResult = False
+			except Exception as err:
+				print(str(""))
+				print(str(type(err)))
+				print(str(err))
+				print(str((err.args)))
+				print(str(""))
+				err = None
+				del err
+				theResult = False
+		assert theResult
+
+	def test_d_html_gen_td(self):
+		"""Test case for gen TD"""
+		theResult = False
+		try:
+			from .. import html_generator as html_generator
+		except Exception:
+			import lint.html_generator as html_generator
+		if html_generator.__name__ is None:
+			theResult = False
+		else:
+			try:
+				output_gen = html_generator.gen_html_td(
+					content="this is a test",
+					id="test_id",
+					name="test_td"
+				)
+				if (str("<td") in output_gen and str("</td>") in output_gen):
+					theResult = True
+				else:
+					theResult = False
+			except Exception as err:
+				print(str(""))
+				print(str(type(err)))
+				print(str(err))
+				print(str((err.args)))
+				print(str(""))
+				err = None
+				del err
+				theResult = False
+		assert theResult
+
+	def test_d_html_gen_ul(self):
+		"""Test case for gen UL"""
+		theResult = False
+		try:
+			from .. import html_generator as html_generator
+		except Exception:
+			import lint.html_generator as html_generator
+		if html_generator.__name__ is None:
+			theResult = False
+		else:
+			try:
+				output_gen = html_generator.gen_html_ul(
+					["this is a test"],
+					"test_id",
+					"test_ul"
+				)
+				if (str("<ul") in output_gen and str("</ul>") in output_gen):
+					theResult = True
+				else:
+					theResult = False
+			except Exception as err:
+				print(str(""))
+				print(str(type(err)))
+				print(str(err))
+				print(str((err.args)))
+				print(str(""))
+				err = None
+				del err
+				theResult = False
+		assert theResult
+
+	def test_d_html_gen_li(self):
+		"""Test case for gen TD"""
+		theResult = False
+		try:
+			from .. import html_generator as html_generator
+		except Exception:
+			import lint.html_generator as html_generator
+		if html_generator.__name__ is None:
+			theResult = False
+		else:
+			try:
+				for role_label in range(5):
+					output_gen = html_generator.gen_html_label(
+						"this is a test",
+						html_generator.HTML_LABEL_ROLES[role_label],
+						"test_id",
+						"test_li"
+					)
+					if (str("<span") in output_gen and str("</span>") in output_gen):
+						if (str(html_generator.HTML_LABEL_ROLES[role_label]) in output_gen):
+							theResult = True
+						else:
+							theResult = False
 					else:
 						theResult = False
 			except Exception as err:
@@ -118,8 +226,8 @@ class BasicHTMLTestSuite(unittest.TestCase):
 				print(str(err))
 				print(str((err.args)))
 				print(str(""))
-				othererr = None
-				del othererr
+				err = None
+				del err
 				theResult = False
 		assert theResult
 
