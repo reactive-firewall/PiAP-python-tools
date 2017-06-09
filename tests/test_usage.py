@@ -446,7 +446,63 @@ class BasicUsageTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
-	def test_f_python_command_keyring_units(self):
+	def test_c_python_command_keyring_rand(self):
+		"""Test case for piaplib.keyring.* --help."""
+		theResult = False
+		try:
+			import sys
+			if sys.__name__ is None:
+				raise ImportError("Failed to import system. WTF?!!")
+			import subprocess
+			thepython = subprocess.check_output(["which", "python3"])
+			if (str("/python3") in str(thepython)) and (sys.version_info >= (3, 3)):
+				thepython = "python3"
+			else:
+				thepython = "python"
+			if (thepython is not None):
+				try:
+					for unit in ["rand"]:
+						theOutputtext = subprocess.check_output([
+							str(thepython),
+							str("-m"),
+							str("piaplib.pocket"),
+							str("keyring"),
+							str("{}").format(str(unit)),
+							str("--count"),
+							str("5")
+						], stderr=subprocess.STDOUT)
+						if (theOutputtext is not None and len(str(theOutputtext)) > 0):
+							theResult = True
+						else:
+							theResult = False
+							print(str(""))
+							print(str("python cmd is {}").format(str(thepython)))
+							print(str(""))
+							print(str("actual output was..."))
+							print(str(""))
+							print(str("{}").format(str(theOutputtext)))
+							print(str(""))
+				except Exception as othererr:
+					print(str(""))
+					print(str(type(othererr)))
+					print(str(othererr))
+					print(str((othererr.args)))
+					print(str(""))
+					othererr = None
+					del othererr
+					theResult = False
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			othererr = None
+			del othererr
+			theResult = False
+		assert theResult
+
+	def test_f_python_command_check_list_units(self):
 		"""Test case for piaplib.lint.check.* --list."""
 		theResult = False
 		try:
@@ -520,6 +576,121 @@ class BasicUsageTestSuite(unittest.TestCase):
 					if (str("root console ") in str(theOutputtext)):
 						theResult = True
 					elif (str("travis UNKNOWN UNKNOWN None") in str(theOutputtext)):
+						theResult = True
+					else:
+						theResult = False
+						print(str(""))
+						print(str("python cmd is {}").format(str(thepython)))
+						print(str(""))
+						print(str("actual output was..."))
+						print(str(""))
+						print(str("{}").format(str(theOutputtext)))
+						print(str(""))
+				except Exception as othererr:
+					print(str(""))
+					print(str(type(othererr)))
+					print(str(othererr))
+					print(str((othererr.args)))
+					print(str(""))
+					othererr = None
+					del othererr
+					theResult = False
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			othererr = None
+			del othererr
+			theResult = False
+		assert theResult
+
+	def test_d_python_command_check_users_html(self):
+		"""Test case for piaplib.pocket.lint check users."""
+		theResult = False
+		try:
+			import sys
+			if sys.__name__ is None:
+				raise ImportError("Failed to import system. WTF?!!")
+			import subprocess
+			thepython = subprocess.check_output(["which", "python3"])
+			if (str("/python3") in str(thepython)) and (sys.version_info >= (3, 3)):
+				thepython = "python3"
+			else:
+				thepython = "python"
+			if (thepython is not None):
+				try:
+					theOutputtext = subprocess.check_output([
+						str(thepython),
+						str("-m"),
+						str("piaplib.pocket"),
+						str("lint"),
+						str("check"),
+						str("users"),
+						str("--all"),
+						str("--html")
+					], stderr=subprocess.STDOUT)
+					if (str("</tbody></table>") in str(theOutputtext)):
+						if str("<table") in str(theOutputtext):
+							theResult = True
+						else:
+							theResult = False
+					else:
+						theResult = False
+						print(str(""))
+						print(str("python cmd is {}").format(str(thepython)))
+						print(str(""))
+						print(str("actual output was..."))
+						print(str(""))
+						print(str("{}").format(str(theOutputtext)))
+						print(str(""))
+				except Exception as othererr:
+					print(str(""))
+					print(str(type(othererr)))
+					print(str(othererr))
+					print(str((othererr.args)))
+					print(str(""))
+					othererr = None
+					del othererr
+					theResult = False
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			othererr = None
+			del othererr
+			theResult = False
+		assert theResult
+
+	def test_d_python_command_check_users_single(self):
+		"""Test case for piaplib.pocket.lint check users."""
+		theResult = False
+		try:
+			import sys
+			if sys.__name__ is None:
+				raise ImportError("Failed to import system. WTF?!!")
+			import subprocess
+			thepython = subprocess.check_output(["which", "python3"])
+			if (str("/python3") in str(thepython)) and (sys.version_info >= (3, 3)):
+				thepython = "python3"
+			else:
+				thepython = "python"
+			if (thepython is not None):
+				try:
+					theOutputtext = subprocess.check_output([
+						str(thepython),
+						str("-m"),
+						str("piaplib.pocket"),
+						str("lint"),
+						str("check"),
+						str("users"),
+						str("--user"),
+						str("root")
+					], stderr=subprocess.STDOUT)
+					if (str("root") in str(theOutputtext)):
 						theResult = True
 					else:
 						theResult = False
