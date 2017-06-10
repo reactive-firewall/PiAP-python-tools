@@ -22,6 +22,10 @@ import sys
 import argparse
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
+try:
+	import piaplib as piaplib
+except Exception:
+	from .. import piaplib as piaplib
 
 try:
 	from . import clients_check_status as clients_check_status
@@ -68,6 +72,9 @@ def parseArgs(arguments=None):
 		choices=CHECK_UNITS.keys(),
 		help='the pocket service check option.'
 	)
+	parser.add_argument('-V', '--version', action='version', version=str(
+		"%(prog)s {}"
+	).format(str(piaplib.__version__)))
 	return parser.parse_known_args(arguments)
 
 

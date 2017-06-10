@@ -17,6 +17,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+try:
+	import piaplib as piaplib
+except Exception:
+	from . import piaplib as piaplib
 
 try:
 	from . import upgrade as upgrade
@@ -98,6 +102,9 @@ def parseArgs(arguments=None):
 		choices=PKU_UNITS.keys(),
 		help='the pocket pku service option.'
 	)
+	parser.add_argument('-V', '--version', action='version', version=str(
+		"%(prog)s {}"
+	).format(str(piaplib.__version__)))
 	return parser.parse_known_args(arguments)
 
 

@@ -36,6 +36,10 @@ try:
 	import subprocess
 	sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 	try:
+		import piaplib as piaplib
+	except Exception:
+		from .. import piaplib as piaplib
+	try:
 		from .. import utils as utils
 	except Exception:
 		import pku.utils as utils
@@ -118,6 +122,11 @@ def parseargs(tainted_arguments=None):
 			dest='unsafe_input', action='append',
 			help='The command.'
 		)
+		parser.add_argument(
+			'-V', '--version',
+			action='version', version=str(
+				"%(prog)s {}"
+			).format(str(piaplib.__version__)))
 		theResult = parser.parse_args(tainted_arguments)
 	except Exception as parseErr:
 		try:

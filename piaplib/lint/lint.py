@@ -28,6 +28,10 @@ try:
 	import sys
 	sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 	try:
+		import piaplib as piaplib
+	except Exception:
+		from . import piaplib as piaplib
+	try:
 		from .. import utils as utils
 	except Exception:
 		import pku.utils as utils
@@ -97,6 +101,9 @@ def parseArgs(arguments=None):
 		choices=LINT_UNITS.keys(),
 		help='the pocket lint service option.'
 	)
+	parser.add_argument('-V', '--version', action='version', version=str(
+		"%(prog)s {}"
+	).format(str(piaplib.__version__)))
 	return parser.parse_known_args(arguments)
 
 

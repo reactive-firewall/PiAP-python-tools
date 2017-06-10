@@ -18,6 +18,11 @@
 # limitations under the License.
 
 try:
+	import piaplib as piaplib
+except Exception:
+	from . import piaplib as piaplib
+
+try:
 	import warnings
 	with warnings.catch_warnings():
 		warnings.filterwarnings("ignore", category=PendingDeprecationWarning)
@@ -90,6 +95,14 @@ def parseargs(arguments=None):
 		default=False,
 		action='store_true',
 		help='Upgrade the piaplib. This is the default.'
+	)
+	parser.add_argument(
+		'-V',
+		'--version',
+		action='version',
+		version=str(
+			"%(prog)s {}"
+		).format(str(piaplib.__version__))
 	)
 	theResult = parser.parse_args(arguments)
 	return theResult
