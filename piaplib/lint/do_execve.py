@@ -109,9 +109,6 @@ def parseargs(tainted_arguments=None):
 			dest='verbose_mode', default=False,
 			action='store_false', help='Disable the given interface.'
 		)
-		parser.add_argument('-V', '--version', action='version', version=str(
-			"%(prog)s {}"
-		).format(str(piaplib.__version__)))
 		parser.add_argument(
 			'-c', '--cmd',
 			dest='unsafe_input', action='append',

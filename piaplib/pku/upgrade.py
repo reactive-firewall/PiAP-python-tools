@@ -64,10 +64,15 @@ Upgrades are basicly just done via pip right now.
 """
 
 
+__prog__ = """piaplib.pku.upgrades"""
+"""The name of this PiAPLib tool is Pocket Knife Upgrade Unit"""
+
+
 @remediation.error_passing
 def parseargs(arguments=None):
 	"""Parse the arguments"""
 	parser = argparse.ArgumentParser(
+		prog=__prog__,
 		description='Run piaplib upgrade functions.',
 		epilog='Basicly a python wrapper for pip install --upgrade.'
 	)

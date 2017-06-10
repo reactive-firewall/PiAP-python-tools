@@ -345,7 +345,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
-	def test_e_python_command_lint_check_units(self):
+	def test_e_python_command_lint_units_versions(self):
 		"""Test case for piaplib.lint.* --version."""
 		theResult = False
 		try:
