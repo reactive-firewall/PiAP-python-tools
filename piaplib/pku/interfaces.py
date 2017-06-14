@@ -52,56 +52,65 @@ INTERFACE_CHOICES = [str('{}{}').format(str(x), str(y)) for x in IFACE_PREFIXES 
 def parseargs(arguments=None):
 	"""Parse the arguments"""
 	import argparse
-	parser = argparse.ArgumentParser(
-		prog=__prog__,
-		description='Alter the state of a given interface.',
-		epilog='Basicly a python wrapper for iface.'
-	)
-	parser.add_argument(
-		'-i',
-		'--interface',
-		default=INTERFACE_CHOICES[1],
-		choices=INTERFACE_CHOICES,
-		help='The interface to use.'
-	)
-	the_action = parser.add_mutually_exclusive_group(required=True)
-	the_action.add_argument(
-		'-u',
-		'--up',
-		'--enable',
-		dest='enable_action',
-		default=False,
-		action='store_true',
-		help='Enable the given interface.'
-	)
-	the_action.add_argument(
-		'-d',
-		'--down',
-		'--disable',
-		dest='disable_action',
-		default=False,
-		action='store_true',
-		help='Disable the given interface.'
-	)
-	the_action.add_argument(
-		'-r',
-		'--down-up',
-		'--restart',
-		dest='restart_action',
-		default=True,
-		action='store_true',
-		help='Disable and then re-enable the given interface. (default)'
-	)
-	parser.add_argument(
-		'-V',
-		'--version',
-		action='version',
-		version=str(
-			"%(prog)s {}"
-		).format(str(piaplib.__version__))
-	)
-	theResult = parser.parse_args(arguments)
-	return theResult
+	theResult = None
+	extras = None
+	try:
+		parser = argparse.ArgumentParser(
+			prog=__prog__,
+			description='Alter the state of a given interface.',
+			epilog='Basicly a python wrapper for iface.'
+		)
+		parser.add_argument(
+			'-i',
+			'--interface',
+			default=INTERFACE_CHOICES[1],
+			choices=INTERFACE_CHOICES,
+			help='The interface to use.'
+		)
+		the_action = parser.add_mutually_exclusive_group()
+		the_action.add_argument(
+			'-u',
+			'--up',
+			'--enable',
+			dest='enable_action',
+			default=False,
+			action='store_true',
+			help='Enable the given interface.'
+		)
+		the_action.add_argument(
+			'-d',
+			'--down',
+			'--disable',
+			dest='disable_action',
+			default=False,
+			action='store_true',
+			help='Disable the given interface.'
+		)
+		the_action.add_argument(
+			'-r',
+			'--down-up',
+			'--restart',
+			dest='restart_action',
+			default=True,
+			action='store_true',
+			help='Disable and then re-enable the given interface. (default)'
+		)
+		parser.add_argument(
+			'-V',
+			'--version',
+			action='version',
+			version=str(
+				"%(prog)s {}"
+			).format(str(piaplib.__version__))
+		)
+		(theResult, extras) = parser.parse_known_args(arguments)
+	except Exception as err:
+		print(str(type(err)))
+		print(str(err))
+		print(str(err.args))
+		err = None
+		del(err)
+	return (theResult, extras)
 
 
 @remediation.error_handling
@@ -159,7 +168,7 @@ def restart_iface(iface_name="lo"):
 def main(argv=None):
 	try:
 		if (argv is not None and (argv is not []) and (len(argv) >= 1)):
-			args = parseargs(argv)
+			(args, extras) = parseargs(argv)
 		if args is None:
 			return 3
 		interface = args.interface
@@ -179,11 +188,10 @@ def main(argv=None):
 		print(str(err.args))
 		err = None
 		del(err)
-		return 2
 	return 0
 
 
 if __name__ == u'__main__':
 	if (sys.argv is not None and (sys.argv is not []) and (len(sys.argv) > 1)):
-		exit(main(sys.argv[:1]))
+		exit(main(sys.argv[1:]))
 

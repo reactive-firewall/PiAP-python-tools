@@ -76,7 +76,7 @@ def parseargs(arguments=None):
 		description='Run piaplib upgrade functions.',
 		epilog='Basicly a python wrapper for pip install --upgrade.'
 	)
-	the_action = parser.add_mutually_exclusive_group(required=True)
+	the_action = parser.add_mutually_exclusive_group()
 	the_action.add_argument(
 		'-u',
 		'--upgrade',
@@ -109,7 +109,7 @@ def parseargs(arguments=None):
 			"%(prog)s {}"
 		).format(str(piaplib.__version__))
 	)
-	theResult = parser.parse_args(arguments)
+	theResult = parser.parse_known_args(arguments)
 	return theResult
 
 
@@ -175,7 +175,7 @@ def upgradeAll():
 @remediation.bug_handling
 def main(argv=None):
 	"""The Main Event. Upgrade Time."""
-	args = parseargs(argv)
+	(args, extras) = parseargs(argv)
 	if args.upgrade_core is True:
 		upgradePiAPlib()
 		return 0
@@ -192,7 +192,7 @@ if __name__ == u'__main__':
 	try:
 		import sys
 		if (sys.argv is not None and (sys.argv is not []) and (len(sys.argv) > 1)):
-			main(sys.argv[:1])
+			main(sys.argv[1:])
 	except Exception as main_err:
 		print(str("upgrade: REALLY BAD ERROR: PiAPLib Refused to upgrade! ABORT!"))
 		print(str(type(main_err)))

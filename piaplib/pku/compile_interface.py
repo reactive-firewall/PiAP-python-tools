@@ -25,6 +25,12 @@ THERE MAY BE REGULATIONS GOVERNING USE OF WIFI SETTINGS IN MANY AREAS.
 """ THIS CODE IS NOT IN A USEABLE STATE """
 
 try:
+	import piaplib as piaplib
+except Exception:
+	from . import piaplib as piaplib
+
+
+try:
 	import argparse
 except Exception as importError:
 	print(str("Error Importing argparse lib"))
@@ -137,11 +143,14 @@ WIFI_SEC_MODES = [None, u'WEP', u'WPA2', u'WPA-legacy', u'WPA-Enterprise']
 WPA2_MODE = u'RSN'
 
 
-def addWiFiArgs(parent):
+def parseWiFiArgs(args=None):
 	"""Parses the arguments for the WAN WiFi client mode."""
 	wifi_parser = None
 	try:
-		wifi_parser = parent.add_argument_group(title='wireless', description='wireles options')
+		wifi_parser = argparse.ArgumentParser(
+			prog='wireless',
+			description='wireless options'
+		)
 		wifi_parser.add_argument(
 			'--mode', dest='wireless_mode_type',
 			default=WIFI_MODE_TYPES[0],
@@ -204,16 +213,15 @@ def addWiFiArgs(parent):
 		print(str(err))
 		print(str((err.args)))
 		raise argparse.ArgumentError(err)
-	return parent
+	return wifi_parser.parse_known_args(args)
 
 
-def parseArgs():
+def parseArgs(args=None):
 	"""Parses the arguments."""
 	parser = None
 	try:
 		parser = argparse.ArgumentParser(
 			prog='compile_interface',
-			version='0.5',
 			description='compile iface def'
 		)
 		parser.add_argument(
@@ -222,7 +230,6 @@ def parseArgs():
 			dest='media_type',
 			default=MEDIA_TYPES[0],
 			choices=MEDIA_TYPES,
-			required=True,
 			help='usb or ethernet or wireless'
 		)
 		parser.add_argument(
@@ -230,7 +237,6 @@ def parseArgs():
 			'--zone',
 			default=ZONE_TYPES[0],
 			choices=ZONE_TYPES,
-			required=True,
 			help='WAN or LAN'
 		)
 		group_static = parser.add_mutually_exclusive_group()
@@ -251,14 +257,24 @@ def parseArgs():
 		parser.add_argument('-i', '--ip', default=None, help='STATIC - IP')
 		parser.add_argument('-n', '--netmask', default=None, help='STATIC - Netmask')
 		parser.add_argument('-g', '--gw', default=None, help='STATIC - the gw IP')
-		parser.add_argument('-V', '--vlanid', default=None, help='the vlan')
-		parser = addWiFiArgs(parser)
+		parser.add_argument('-v', '--vlanid', default=None, help='the vlan')
+		parser.add_argument(
+			'-V',
+			'--version',
+			action='version',
+			version=str(
+				"%(prog)s {}"
+			).format(str(piaplib.__version__))
+		)
+		(args_wifi, argv) = parseWiFiArgs(args)
+		newargs = parser.parse_known_args(argv)
 	except Exception as err:
+		print(str(type(err)))
 		print(str(err))
 		print(str((err.args)))
 		parser.error("parser tool bug")
 		return None
-	return parser.parse_args()
+	return (newargs, args_wifi)
 
 
 def readFile(somefile):
@@ -373,7 +389,7 @@ def compile_iface(
 def main(argv=None):
 	"""The Main Event."""
 	try:
-		args = parseArgs(argv)
+		(args, wifi_args, extras) = parseArgs(argv)
 		interface_type = args.media_type
 		interface_zone = args.zone
 		if str(str(interface_zone).upper()) in "WAN":

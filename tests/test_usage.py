@@ -292,6 +292,106 @@ class BasicUsageTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
+	def test_c_python_command_pku_units(self):
+		"""Test case for piaplib.pku.* --help."""
+		theResult = False
+		try:
+			import sys
+			if sys.__name__ is None:
+				raise ImportError("Failed to import system. WTF?!!")
+			import subprocess
+			thepython = subprocess.check_output(["which", "python3"])
+			if (str("/python3") in str(thepython)) and (sys.version_info >= (3, 3)):
+				thepython = "python3"
+			else:
+				thepython = "python"
+			if (thepython is not None):
+				try:
+					for unit in ["pku.interfaces", "pku.compile_interface", "pku.upgrade"]:
+						theOutputtext = subprocess.check_output([
+							str(thepython),
+							str("-m"),
+							str("piaplib.{}").format(str(unit)),
+							str("--help")
+						], stderr=subprocess.STDOUT)
+						if (str("usage:") in str(theOutputtext)):
+							theResult = True
+						else:
+							theResult = False
+							print(str(""))
+							print(str("python cmd is {}").format(str(thepython)))
+							print(str(""))
+							print(str("actual output was..."))
+							print(str(""))
+							print(str("{}").format(str(theOutputtext)))
+							print(str(""))
+				except Exception as othererr:
+					print(str(""))
+					print(str(type(othererr)))
+					print(str(othererr))
+					print(str((othererr.args)))
+					print(str(""))
+					othererr = None
+					del othererr
+					theResult = False
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			othererr = None
+			del othererr
+			theResult = False
+		assert theResult
+
+	def test_e_python_command_pku_units_versions(self):
+		"""Test case for piaplib.pku.* --version."""
+		theResult = False
+		try:
+			import sys
+			if sys.__name__ is None:
+				raise ImportError("Failed to import system. WTF?!!")
+			import subprocess
+			thepython = subprocess.check_output(["which", "python3"])
+			if (str("/python3") in str(thepython)) and (sys.version_info >= (3, 3)):
+				thepython = "python3"
+			else:
+				thepython = "python"
+			from .context import piaplib as piaplib
+			if piaplib.__version__ is not None:
+				theResult = False
+			if (thepython is not None):
+				for unit in ["pku.interfaces", "pku.compile_interface", "pku.upgrade"]:
+					theOutputtext = subprocess.check_output([
+						str(thepython),
+						str("-m"),
+						str("piaplib.{}").format(str(unit)),
+						str("--version")
+					], stderr=subprocess.STDOUT)
+					if (str(piaplib.__version__) in str(theOutputtext)):
+						theResult = True
+					else:
+						theResult = False
+						print(str(""))
+						print(str("python cmd is {}").format(str(thepython)))
+						print(str("pku unit is {}").format(str(unit)))
+						print(str(""))
+						print(str("actual version was..."))
+						print(str(""))
+						print(str("{}").format(str(theOutputtext)))
+						print(str(""))
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			othererr = None
+			del othererr
+			theResult = False
+		assert theResult
+
 	def test_c_python_command_lint_units(self):
 		"""Test case for piaplib.lint.* --help."""
 		theResult = False
