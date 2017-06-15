@@ -69,7 +69,7 @@ class BasicHTMLTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
-	def test_c_html_special_chars(self):
+	def test_c_html_special_chars(self): # noqa
 		"""Test case for piaplib.* --help."""
 		theResult = False
 		try:

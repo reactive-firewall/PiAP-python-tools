@@ -253,34 +253,17 @@ class BasicUsageTestSuite(unittest.TestCase):
 			if piaplib.__version__ is not None:
 				theResult = False
 			if (thepython is not None):
-				try:
-					for unit in ["pocket"]:
-						theOutputtext = subprocess.check_output([
-							str(thepython),
-							str("-m"),
-							str("piaplib.{}").format(str(unit)),
-							str("--version")
-						], stderr=subprocess.STDOUT)
-						if (str(piaplib.__version__) in str(theOutputtext)):
-							theResult = True
-						else:
-							theResult = False
-							print(str(""))
-							print(str("python cmd is {}").format(str(thepython)))
-							print(str(""))
-							print(str("actual output was..."))
-							print(str(""))
-							print(str("{}").format(str(theOutputtext)))
-							print(str(""))
-				except Exception as othererr:
-					print(str(""))
-					print(str(type(othererr)))
-					print(str(othererr))
-					print(str((othererr.args)))
-					print(str(""))
-					othererr = None
-					del othererr
-					theResult = False
+				for unit in ["pocket"]:
+					theOutputtext = subprocess.check_output([
+						str(thepython),
+						str("-m"),
+						str("piaplib.{}").format(str(unit)),
+						str("--version")
+					], stderr=subprocess.STDOUT)
+					if (str(piaplib.__version__) in str(theOutputtext)):
+						theResult = True
+					else:
+						theResult = False
 		except Exception as err:
 			print(str(""))
 			print(str(type(err)))
