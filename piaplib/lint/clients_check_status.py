@@ -118,7 +118,7 @@ def parseargs(arguments=None):
 			action='store_false', help='Disable the given interface.'
 		)
 		parser.add_argument('-V', '--version', action='version', version='%(prog)s 0.2.4')
-		theResult = parser.parse_args(arguments)
+		(theResult, junk) = parser.parse_known_args(arguments)
 	except Exception as parseErr:
 		parser.error(str("ERROR: parseargs"))
 		parser.error(str(type(parseErr)))
@@ -194,7 +194,7 @@ def get_client_sta_status_raw():
 				del lines
 			else:
 				theRawClientState = None
-		except FileNotFoundError as depErr: # noqa F821
+		except FileNotFoundError as depErr:  # noqa F821
 			print(str(type(depErr)))
 			print(str(depErr))
 			print(str(depErr.args))

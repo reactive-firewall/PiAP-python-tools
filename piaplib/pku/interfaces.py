@@ -17,6 +17,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+try:
+	import sys
+except Exception:
+	raise ImportError("WTF, no system?!?!")
+
+try:
+	import piaplib as piaplib
+except Exception:
+	from . import piaplib as piaplib
+
+try:
+	from . import remediation as remediation
+except Exception:
+	try:
+		import remediation as remediation
+	except Exception:
+		raise ImportError("Error Importing remediation")
+
+
+__prog__ = """piaplib.pku.interfaces"""
+"""The name of this PiAPLib tool is Pocket Knife Interfaces Unit"""
+
 
 IFACE_PREFIXES = [str("wlan"), str("eth"), str("usb"), str("br"), str("mon")]
 """whitelist of valid iface prefixes"""
@@ -26,52 +48,72 @@ INTERFACE_CHOICES = [str('{}{}').format(str(x), str(y)) for x in IFACE_PREFIXES 
 """whitelist of valid iface names"""
 
 
+@remediation.error_handling
 def parseargs(arguments=None):
 	"""Parse the arguments"""
 	import argparse
-	parser = argparse.ArgumentParser(
-		description='Alter the state of a given interface.',
-		epilog='Basicly a python wrapper for iface.'
-	)
-	parser.add_argument(
-		'-i',
-		'--interface',
-		default=INTERFACE_CHOICES[1],
-		choices=INTERFACE_CHOICES,
-		help='The interface to use.'
-	)
-	the_action = parser.add_mutually_exclusive_group(required=True)
-	the_action.add_argument(
-		'-u',
-		'--up',
-		'--enable',
-		dest='enable_action',
-		default=False,
-		action='store_true',
-		help='Enable the given interface.'
-	)
-	the_action.add_argument(
-		'-d',
-		'--down',
-		'--disable',
-		dest='disable_action',
-		default=False,
-		action='store_true',
-		help='Disable the given interface.'
-	)
-	the_action.add_argument(
-		'-r',
-		'--down-up',
-		'--restart',
-		dest='restart_action',
-		default=True,
-		action='store_true',
-		help='Disable and then re-enable the given interface. (default)'
-	)
-	theResult = parser.parse_args(arguments)
-	return theResult
+	theResult = None
+	extras = None
+	try:
+		parser = argparse.ArgumentParser(
+			prog=__prog__,
+			description='Alter the state of a given interface.',
+			epilog='Basicly a python wrapper for iface.'
+		)
+		parser.add_argument(
+			'-i',
+			'--interface',
+			default=INTERFACE_CHOICES[1],
+			choices=INTERFACE_CHOICES,
+			help='The interface to use.'
+		)
+		the_action = parser.add_mutually_exclusive_group()
+		the_action.add_argument(
+			'-u',
+			'--up',
+			'--enable',
+			dest='enable_action',
+			default=False,
+			action='store_true',
+			help='Enable the given interface.'
+		)
+		the_action.add_argument(
+			'-d',
+			'--down',
+			'--disable',
+			dest='disable_action',
+			default=False,
+			action='store_true',
+			help='Disable the given interface.'
+		)
+		the_action.add_argument(
+			'-r',
+			'--down-up',
+			'--restart',
+			dest='restart_action',
+			default=True,
+			action='store_true',
+			help='Disable and then re-enable the given interface. (default)'
+		)
+		parser.add_argument(
+			'-V',
+			'--version',
+			action='version',
+			version=str(
+				"%(prog)s {}"
+			).format(str(piaplib.__version__))
+		)
+		(theResult, extras) = parser.parse_known_args(arguments)
+	except Exception as err:
+		print(str(type(err)))
+		print(str(err))
+		print(str(err.args))
+		err = None
+		del(err)
+	return (theResult, extras)
 
 
+@remediation.error_handling
 def taint_name(rawtxt):
 	"""Checks the interface arguments."""
 	tainted_input = str(rawtxt).lower()
@@ -81,6 +123,7 @@ def taint_name(rawtxt):
 	return None
 
 
+@remediation.error_handling
 def enable_iface(iface_name=None):
 	"""enable the given interface by calling ifup."""
 	theResult = str("")
@@ -97,6 +140,7 @@ def enable_iface(iface_name=None):
 	return theResult
 
 
+@remediation.error_handling
 def disable_iface(iface_name="lo", force=False):
 	"""disable the given interface by calling ifdown."""
 	tainted_name = taint_name(iface_name)
@@ -108,6 +152,7 @@ def disable_iface(iface_name="lo", force=False):
 	return theResult
 
 
+@remediation.error_handling
 def restart_iface(iface_name="lo"):
 	"""
 	Disable the given interface by calling ifdown,
@@ -119,21 +164,23 @@ def restart_iface(iface_name="lo"):
 	return True
 
 
-if __name__ == u'__main__':
-	import sys
-	if (sys.argv is not None and (sys.argv is not []) and (len(sys.argv) > 1)):
-		args = parseargs(sys.argv[:1])
+@remediation.bug_handling
+def main(argv=None):
 	try:
+		if (argv is not None and (argv is not []) and (len(argv) >= 1)):
+			(args, extras) = parseargs(argv)
+		if args is None:
+			return 3
 		interface = args.interface
 		if args.enable_action is True:
 			enable_iface(interface)
-			exit(0)
+			return 0
 		elif args.disable_action is True:
 			disable_iface(interface, False)
-			exit(0)
+			return 0
 		elif args.restart_action is True:
 			restart_iface(interface)
-			exit(0)
+			return 0
 	except Exception as err:
 		print(str("interfaces: REALLY BAD ERROR: ACTION will not be compleated! ABORT!"))
 		print(str(type(err)))
@@ -141,5 +188,10 @@ if __name__ == u'__main__':
 		print(str(err.args))
 		err = None
 		del(err)
-	exit(1)
+	return 0
+
+
+if __name__ == u'__main__':
+	if (sys.argv is not None and (sys.argv is not []) and (len(sys.argv) > 1)):
+		exit(main(sys.argv[1:]))
 

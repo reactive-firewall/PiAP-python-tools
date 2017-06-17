@@ -18,12 +18,9 @@
 # limitations under the License.
 
 try:
-	from . import utils as utils
+	import piaplib as piaplib
 except Exception:
-	try:
-		import utils as utils
-	except Exception:
-		raise ImportError("Error Importing utils")
+	from . import piaplib as piaplib
 
 try:
 	import warnings
@@ -41,6 +38,22 @@ except Exception:
 	raise ImportError("Not Implemented.")
 
 try:
+	from . import utils as utils
+except Exception:
+	try:
+		import utils as utils
+	except Exception:
+		raise ImportError("Error Importing utils")
+
+try:
+	from . import remediation as remediation
+except Exception:
+	try:
+		import remediation as remediation
+	except Exception:
+		raise ImportError("Error Importing remediation")
+
+try:
 	import argparse
 except Exception:
 	raise ImportError("Error Importing argparse tools")
@@ -51,13 +64,19 @@ Upgrades are basicly just done via pip right now.
 """
 
 
+__prog__ = """piaplib.pku.upgrades"""
+"""The name of this PiAPLib tool is Pocket Knife Upgrade Unit"""
+
+
+@remediation.error_passing
 def parseargs(arguments=None):
 	"""Parse the arguments"""
 	parser = argparse.ArgumentParser(
+		prog=__prog__,
 		description='Run piaplib upgrade functions.',
 		epilog='Basicly a python wrapper for pip install --upgrade.'
 	)
-	the_action = parser.add_mutually_exclusive_group(required=True)
+	the_action = parser.add_mutually_exclusive_group()
 	the_action.add_argument(
 		'-u',
 		'--upgrade',
@@ -70,22 +89,31 @@ def parseargs(arguments=None):
 		'-P',
 		'--upgrade-pip',
 		dest='upgrade_pip',
-		default=True,
-		action='store_false',
+		default=False,
+		action='store_true',
 		help='Upgrade the pip module. This is needed for hashes in the future. EXPEREMENTAL.'
 	)
 	the_action.add_argument(
 		'-A',
 		'--upgrade-all',
 		dest='upgrade_all',
-		default=True,
-		action='store_false',
+		default=False,
+		action='store_true',
 		help='Upgrade the piaplib. This is the default.'
 	)
-	theResult = parser.parse_args(arguments)
+	parser.add_argument(
+		'-V',
+		'--version',
+		action='version',
+		version=str(
+			"%(prog)s {}"
+		).format(str(piaplib.__version__))
+	)
+	theResult = parser.parse_known_args(arguments)
 	return theResult
 
 
+@remediation.error_passing
 def upgradepip():
 	"""Upgrade pip via pip."""
 	try:
@@ -100,100 +128,71 @@ def upgradepip():
 	return None
 
 
+@remediation.error_passing
 def upgradePiAPlib():
 	"""Upgrade piaplib via pip."""
+	upsream_repo = str("git+https://github.com/reactive-firewall/PiAP-python-tools.git")
 	try:
-		upsream_repo = str("git+https://github.com/reactive-firewall/PiAP-python-tools.git")
-		try:
-			pip.main(args=["install", "--upgrade", upsream_repo])
-		except PendingDeprecationWarning as junkErr:
-			"""mute junk errors"""
-			junkErr = None
-			del(junkErr)
-	except Exception as permErr:
-		print(str(type(permErr)))
-		print(str(permErr))
-		print(str((permErr.args)))
-		permErr = ""
-		permErr = None
-		del(permErr)
+		pip.main(args=["install", "--upgrade", upsream_repo])
+	except PendingDeprecationWarning as junkErr:
+		"""mute junk errors"""
+		junkErr = None
+		del(junkErr)
 	return None
 
 
+@remediation.error_passing
 def upgradePiAPlib_depends():
 	"""Upgrade piaplib via pip."""
+	upsream_repo_depends = str(
+		"https://raw.githubusercontent.com/reactive-firewall" +
+		"/PiAP-python-tools/master/requirements.txt"
+	)
+	utils.getFileResource(upsream_repo_depends, "temp_req.txt")
 	try:
-		upsream_repo_depends = str(
-			"https://raw.githubusercontent.com/reactive-firewall" +
-			"/PiAP-python-tools/master/requirements.txt"
-		)
-		utils.getFileResource(upsream_repo_depends, "temp_req.txt")
-		try:
-			pip.main(args=[
-				"install", "--upgrade-strategy",
-				"only-if-needed", "--upgrade",
-				"-r", "temp_req.txt"
-			])
-		except PendingDeprecationWarning as junkErr:
-			"""mute junk errors"""
-			junkErr = None
-			del(junkErr)
-		utils.cleanFileResource("temp_req.txt")
-	except Exception as permErr:
-		print(str(type(permErr)))
-		print(str(permErr))
-		print(str((permErr.args)))
-		permErr = ""
-		permErr = None
-		del(permErr)
+		pip.main(args=[
+			"install", "--upgrade-strategy",
+			"only-if-needed", "--upgrade",
+			"-r", "temp_req.txt"
+		])
+	except PendingDeprecationWarning as junkErr:
+		"""mute junk errors"""
+		junkErr = None
+		del(junkErr)
+	utils.cleanFileResource("temp_req.txt")
 	return None
 
 
+@remediation.error_passing
 def upgradeAll():
 	"""Upgrade piaplib and requirements via pip."""
-	try:
-		upgradepip()
-		upgradePiAPlib()
-		upgradePiAPlib_depends()
-	except Exception as permErr:
-		print(str(type(permErr)))
-		print(str(permErr))
-		print(str((permErr.args)))
-		permErr = None
-		del(permErr)
+	upgradepip()
+	upgradePiAPlib()
+	upgradePiAPlib_depends()
 	return None
 
 
+@remediation.bug_handling
 def main(argv=None):
 	"""The Main Event. Upgrade Time."""
-	args = parseargs(argv)
-	try:
-		if args.upgrade_core is True:
-			upgradePiAPlib()
-			exit(0)
-		elif args.upgrade_pip is True:
-			upgradepip()
-			exit(0)
-		elif args.upgrade_all is True:
-			upgradeAll()
-			exit(0)
-	except Exception as main_err:
-		print(str("upgrade: REALLY BAD ERROR: UPGRADE will not be compleated! ABORT!"))
-		print(str(type(main_err)))
-		print(str(main_err))
-		print(str(main_err.args[0]))
-		main_err = None
-		del(main_err)
-		exit(2)
-	print(str("upgrade: You found a bug. Please report this to my creator."))
-	exit(3)
+	(args, extras) = parseargs(argv)
+	if args.upgrade_core is True:
+		upgradePiAPlib()
+		return 0
+	elif args.upgrade_pip is True:
+		upgradepip()
+		return 0
+	elif args.upgrade_all is True:
+		upgradeAll()
+		return 0
+	return 3
 
 
 if __name__ == u'__main__':
 	try:
 		import sys
 		if (sys.argv is not None and (sys.argv is not []) and (len(sys.argv) > 1)):
-			main(sys.argv[:1])
+			main(sys.argv[1:])
 	except Exception as main_err:
 		print(str("upgrade: REALLY BAD ERROR: PiAPLib Refused to upgrade! ABORT!"))
 		print(str(type(main_err)))

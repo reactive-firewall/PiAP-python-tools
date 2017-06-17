@@ -81,11 +81,16 @@ purge: clean uninstall
 	$(QUIET)$(ECHO) "$@: Done."
 
 test: cleanup
-	$(QUIET)python3 -m unittest tests.test_basic tests.test_strings tests.test_salt tests.test_rand tests.test_utils tests.test_config tests.test_usage || python -m unittest tests.test_basic tests.test_strings tests.test_salt tests.test_rand tests.test_utils tests.test_config tests.test_usage
+	$(QUIET)coverage run --concurrency=thread --source=piaplib,piaplib/lint,piaplib/keyring,piaplib/pku -m unittest tests.test_basic tests.test_html tests.test_strings tests.test_salt tests.test_rand tests.test_utils tests.test_config tests.test_usage || python3 -m unittest tests.test_basic tests.test_html tests.test_strings tests.test_salt tests.test_rand tests.test_utils tests.test_config tests.test_usage || python -m unittest tests.test_basic tests.test_html tests.test_strings tests.test_salt tests.test_rand tests.test_utils tests.test_config tests.test_usage
+	$(QUIET)coverage report --include=piaplib* 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-tox: cleanup
 	$(QUIET)tox --
+	$(QUIET)$(ECHO) "$@: Done."
+
+test-style: cleanup
+	$(QUIET)flake8 --ignore=W191,W391 --max-line-length=100 --count
 	$(QUIET)$(ECHO) "$@: Done."
 
 cleanup:

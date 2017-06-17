@@ -23,6 +23,11 @@ import argparse
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 try:
+	import piaplib as piaplib
+except Exception:
+	from . import piaplib as piaplib
+
+try:
 	from . import pku as pku
 except Exception:
 	import pku as pku
@@ -87,7 +92,9 @@ def parseArgs(arguments=None):
 		choices=POCKET_UNITS.keys(),
 		help='the pocket service option.'
 	)
-	parser.add_argument('-V', '--version', action='version', version='%(prog)s 0.2.4')
+	parser.add_argument('-V', '--version', action='version', version=str(
+		"%(prog)s {}"
+	).format(str(piaplib.__version__)))
 	return parser.parse_known_args(arguments)
 
 

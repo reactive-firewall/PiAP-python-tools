@@ -41,6 +41,15 @@ except Exception:
 		raise ImportError("Error Importing remediation")
 
 
+try:
+	from .logs import logs as logs
+except Exception:
+	try:
+		from logs import logs as logs
+	except Exception:
+		raise ImportError("Error Importing logs")
+
+
 @remediation.error_handling
 def literal_code(raw_input=None):
 	"""A simple attempt at validating raw python unicode. Always expect CWE-20.
@@ -55,6 +64,7 @@ def literal_code(raw_input=None):
 		elif isinstance(raw_input, str):
 			return raw_input.encode("utf-8").decode("utf-8")
 	except Exception as malformErr:
+		logs.log("[CWE-20] Possible malformed string attack occured.", "info")
 		malformErr = None
 		del malformErr
 		return None
@@ -75,6 +85,7 @@ def literal_str(raw_input=None):
 		elif isinstance(raw_input, str):
 			return str(raw_input.encode("utf-8").decode("utf-8"))
 	except Exception as malformErr:
+		logs.log("[CWE-20] Possible malformed string attack occured.", "info")
 		malformErr = None
 		del malformErr
 		return None
@@ -279,6 +290,10 @@ def readFile(somefile):
 	with open_func(theReadPath, u'r', encoding='utf-8') as f:
 		read_data = f.read()
 	f.close()
+	try:
+		logs.log(str("read file {}").format(somefile), "debug")
+	except Exception:
+		pass
 	return read_data
 
 
@@ -294,9 +309,23 @@ def writeFile(somefile, somedata):
 		theResult = True
 	except IOError:
 		theResult = False
+	except FileNotFoundError:
+		theResult = False
+	except Exception as err:
+		logs.log(str("Write Failed on file {}").format(somefile), "Warning")
+		logs.log(str(type(err)), "Warning")
+		logs.log(str(err), "Warning")
+		logs.log(str((err.args)), "Warning")
+		err = None
+		del err
+		theResult = False
 	finally:
 		if f:
 			f.close()
+	try:
+		logs.log(str("wrote to file {}").format(somefile), "debug")
+	except Exception:
+		pass
 	return theResult
 
 
@@ -313,9 +342,23 @@ def appendFile(somefile, somedata):
 		theResult = True
 	except IOError:
 		theResult = False
+	except FileNotFoundError:
+		theResult = False
+	except Exception as err:
+		logs.log(str("Write Failed on file {}").format(somefile), "Warning")
+		logs.log(str(type(err)), "Warning")
+		logs.log(str(err), "Warning")
+		logs.log(str((err.args)), "Warning")
+		err = None
+		del err
+		theResult = False
 	finally:
 		if f:
 			f.close()
+	try:
+		logs.log(str("wrote to file {}").format(somefile), "debug")
+	except Exception:
+		pass
 	return theResult
 
 
@@ -332,6 +375,10 @@ def getFileResource(someURL, outFile):
 		tempfile.retrieve(someURL, outFile)
 	except Exception:
 		return False
+	try:
+		logs.log(str("fetched file {}").format(someURL), "debug")
+	except Exception:
+		pass
 	return True
 
 
@@ -341,9 +388,16 @@ def cleanFileResource(theFile):
 	import os
 	try:
 		os.remove(str(theFile))
+	except FileNotFoundError:
+		theResult = False
 	except Exception:
-		print("Error: Failed to remove file.")
-		return False
+		logs.log(str("Error: Failed to remove file"), "Warning")
+		theResult = False
+	try:
+		if theResult:
+			logs.log(str("purged file {}").format(theFile), "debug")
+	except Exception:
+		pass
 	return True
 
 
@@ -357,8 +411,12 @@ def main(argv=None):
 if __name__ in u'__main__':
 	try:
 		import sys
-		main(sys.argv[1:])
+		if (sys.argv is not None and (sys.argv is not []) and (len(sys.argv) > 1)):
+			exit(main(sys.argv[1:]))
+		else:
+			exit(main(["--help"]))
 	except Exception:
-		exit(3)
+		raise ImportError("Error running main")
+	exit(0)
 
 

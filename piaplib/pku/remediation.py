@@ -40,6 +40,19 @@ except Exception as err:
 	exit(3)
 
 
+try:
+	from piaplib.pku.logs import logs as logs
+except Exception:
+	try:
+		from .logs import logs as logs
+	except Exception as err:
+		print(str(type(err)))
+		print(str(err))
+		print(str(err.args))
+		print("")
+		raise ImportError("Error Importing logs")
+
+
 def getTimeStamp():
 	"""Returns the time stamp."""
 	theDate = None
@@ -64,11 +77,13 @@ def error_passing(func):
 		except Exception as err:
 			tb = sys.exc_info()[2]
 			timestamp = getTimeStamp()
-			print(str("{}: {}").format(str(timestamp), str(func)))
-			sys.exc_clear()
+			logs.log(str("An error occured at {}").format(timestamp), "Error")
+			logs.log(str(func), "Error")
+			baton = RuntimeError("Passing error up").with_traceback(tb)
+			# sys.exc_clear()
 			err = None
 			del err
-			raise RuntimeError("Passing error up").with_traceback(tb)
+			raise baton
 			theOutput = None
 		return theOutput
 
@@ -80,38 +95,100 @@ def error_handling(func):
 	import functools
 
 	@functools.wraps(func)
-	def helper_func(*args, **kwargs):
+	def safety_func(*args, **kwargs):
 		"""Wraps a function in try-except"""
 		theOutput = None
 		try:
 			theOutput = func(*args, **kwargs)
 		except Exception as err:
 			timestamp = getTimeStamp()
-			print(str("{}: {}").format(str(timestamp), str(func)))
-			print(str("{}: {}").format(str(timestamp), str(type(err))))
-			print(str("{}: {}").format(str(timestamp), str(err)))
-			print(str("{}: {}").format(str(timestamp), str(err.args)))
-			print(str(""))
+			logs.log(str("An error occured at {}").format(timestamp), "Error")
+			logs.log(str(func), "Error")
+			logs.log(str(type(err)), "Error")
+			logs.log(str(err), "Error")
+			logs.log(str(err.args), "Error")
+			logs.log(str(""), "Error")
+			# sys.exc_clear()
+			err = None
+			del err
+			theOutput = None
+		return theOutput
+
+	return safety_func
+
+
+def bug_handling(func):
+	"""Runs a function in try-except"""
+	import functools
+
+	@functools.wraps(func)
+	def main_func(*args, **kwargs):
+		"""Wraps a function in try-except"""
+		theOutput = 5
+		try:
+			theOutput = func(*args, **kwargs)
+		except Exception as err:
+			timestamp = getTimeStamp()
+			logs.log(str("An error occured at {}").format(timestamp), "CRITICAL")
+			logs.log(str(func), "CRITICAL")
+			logs.log(str(type(err)), "CRITICAL")
+			logs.log(str(err), "CRITICAL")
+			logs.log(str(err.args), "CRITICAL")
+			logs.log(str(""), "CRITICAL")
+			logs.log(str("Action will not be compleated! ABORT!"), "CRITICAL")
+			logs.log(str("You found a bug. Please report this to my creator."), "CRITICAL")
+			logs.log(str(""), "CRITICAL")
+			sys.exc_clear()
+			err = None
+			del err
+			theOutput = 3
+		return theOutput
+
+	return main_func
+
+
+def warning_handling(func):
+	"""
+		Runs a function in try-except.
+		Exceptions will be logged only as warnings.
+		func - a function to call.
+	"""
+	import functools
+
+	@functools.wraps(func)
+	def warned_func(*args, **kwargs):
+		"""Wraps a function in try-except"""
+		theOutput = None
+		try:
+			theOutput = func(*args, **kwargs)
+		except Exception as err:
+			timestamp = getTimeStamp()
+			logs.log(str("An error occured at {}").format(timestamp), "Warning")
+			logs.log(str(func), "Warning")
+			logs.log(str(type(err)), "Warning")
+			logs.log(str(err), "Warning")
+			logs.log(str(err.args), "Warning")
+			logs.log(str(""), "Warning")
 			sys.exc_clear()
 			err = None
 			del err
 			theOutput = None
 		return theOutput
 
-	return helper_func
+	return warned_func
 
 
-@error_handling
+@bug_handling
 def main(argv=None):
 	"""The Main Event makes no sense to utils."""
 	raise NotImplementedError("CRITICAL - PKU remediation main() not implemented. yet?")
-	exit(3)
+	return 3
 
 
 if __name__ in u'__main__':
 	try:
 		import sys
-		main(sys.argv[1:])
+		exit(main(sys.argv[1:]))
 	except Exception:
 		exit(3)
 

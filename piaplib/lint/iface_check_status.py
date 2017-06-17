@@ -17,15 +17,29 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 try:
 	import os
 	import sys
 	sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 	try:
+		from ..pku.logs import logs as logs
+	except Exception:
+		try:
+			from pku.logs import logs as logs
+		except Exception as err:
+			print(str(type(err)))
+			print(str(err))
+			print(str(err.args))
+			print("")
+			raise ImportError("Error Importing logs")
+	try:
 		from .. import utils as utils
 	except Exception:
 		import pku.utils as utils
+	try:
+		from .. import remediation as remediation
+	except Exception:
+		import pku.remediation as remediation
 	try:
 		from . import html_generator as html_generator
 	except Exception as ImpErr:
@@ -38,6 +52,8 @@ try:
 		import pku.interfaces as interfaces
 	if utils.__name__ is None:
 		raise ImportError("Failed to open PKU Utils")
+	if remediation.__name__ is None:
+		raise ImportError("Failed to open PKU Remediation")
 	if interfaces.__name__ is None:
 		raise ImportError("Failed to open PKU Interfaces")
 	if html_generator.__name__ is None:
@@ -53,24 +69,6 @@ except Exception as importErr:
 
 __prog__ = str("""iface_check_status""")
 """The Program's name"""
-
-
-def error_handling(func):
-	"""Runs a function in try-except"""
-	def helper(**kwargs):
-		"""Wraps a function in try-except"""
-		theOutput = None
-		try:
-			theOutput = func(kwargs)
-		except Exception as err:
-			print(str(err))
-			print(str((err.args)))
-			print(str(
-				"{}: REALLY BAD ERROR: ACTION will not be compleated! ABORT!"
-			).format(__prog__))
-			theOutput = None
-		return theOutput
-	return helper
 
 
 def parseargs(arguments=None):
@@ -123,6 +121,7 @@ def parseargs(arguments=None):
 	return theResult
 
 
+@remediation.error_handling
 def taint_name(rawtxt):
 	"""check the interface arguments"""
 	tainted_input = str(rawtxt).lower()
@@ -154,12 +153,13 @@ def show_iface(iface_name=None, is_verbose=False, use_html=False):
 					str(u'iface_status_row_{}').format(iface_name)
 				)
 		except Exception as cmdErr:
-			print(str(cmdErr))
-			print(str(cmdErr.args))
+			logs.log(str(cmdErr), "Error")
+			logs.log(str(cmdErr.args), "Error")
 			theResult = "UNKNOWN"
 	return theResult
 
 
+@remediation.error_handling
 def get_iface_name(iface_name=None, use_html=False):
 	if iface_name is None:
 		return None
@@ -170,7 +170,7 @@ def get_iface_name(iface_name=None, use_html=False):
 		return html_generator.gen_html_td(iface, str(u'iface_status_dev_{}').format(iface))
 
 
-# TODO: memoize this function
+@remediation.error_handling
 def get_iface_status_raw(interface=None):
 	"""list the raw status of interfaces."""
 	arguments = [str("ip"), str("addr")]
@@ -178,148 +178,125 @@ def get_iface_status_raw(interface=None):
 		tainted_name = taint_name(interface)
 		arguments = [str("ip"), str("addr"), str("show"), str(tainted_name)]
 	theRawIfaceState = None
+	import subprocess
 	try:
-		import subprocess
-		try:
-			theRawIfaceState = subprocess.check_output(arguments, stderr=subprocess.STDOUT)
-		except subprocess.CalledProcessError as subErr:
-			print(str("ERROR"))
-			print(str(type(subErr)))
-			print(str(subErr))
-			print(str(subErr.args))
-			print(str(""))
-			subErr = None
-			del subErr
-			theRawIfaceState = None
-		except Exception as cmdErr:
-			print(str(cmdErr))
-			print(str(cmdErr.args))
-			theRawIfaceState = None
-	except Exception as importErr:
-		print(str(importErr))
-		print(str(importErr.args))
+		theRawIfaceState = subprocess.check_output(arguments, stderr=subprocess.STDOUT)
+	except subprocess.CalledProcessError as subErr:
+		logs.log(str("ERROR"), "Error")
+		logs.log(str(type(subErr)), "Error")
+		logs.log(str(subErr), "Error")
+		logs.log(str(subErr.args), "Error")
+		logs.log(str(""), "Error")
+		subErr = None
+		del subErr
+		theRawIfaceState = None
+	except Exception as cmdErr:
+		logs.log(str(cmdErr), "Error")
+		logs.log(str(cmdErr.args), "Error")
+		cmdErr = None
+		del cmdErr
 		theRawIfaceState = None
 	return theRawIfaceState
 
 
-# TODO: memoize this function
+@remediation.error_handling
 def get_iface_list():
 	"""list the available interfaces."""
 	theResult = []
-	try:
-		theRawIfaceState = get_iface_status_raw(None)
-		for x in utils.extractIfaceNames(theRawIfaceState):
-			if x in interfaces.INTERFACE_CHOICES:
-				theResult.append(x)
-		theResult = utils.compactList([x for x in theResult])
-		"""while '[aehltw]{3}[n]?[0-9]+' would probably work well here, best to whitelist. """
-	except Exception as parseErr:
-		print(str(parseErr))
-		print(str(parseErr.args))
-		print(str(utils.extractIfaceNames(theRawIfaceState)))
-		theResult = None
+	theRawIfaceState = get_iface_status_raw(None)
+	for x in utils.extractIfaceNames(theRawIfaceState):
+		if x in interfaces.INTERFACE_CHOICES:
+			theResult.append(x)
+	theResult = utils.compactList([x for x in theResult])
+	"""while '[aehltw]{3}[n]?[0-9]+' would probably work well here, best to whitelist. """
 	return theResult
 
 
+@remediation.error_handling
 def get_iface_status(iface=u'lo', use_html=False):
 	"""Generate the status"""
 	theResult = None
-	try:
-		status_txt = get_iface_status_raw(iface)
-		if use_html is False:
-			if status_txt is not None:
-				if (str(" DOWN") in str(status_txt)):
-					theResult = str("DOWN")
-				elif (str(" UP") in str(status_txt)):
-					theResult = str("UP")
-				else:
-					theResult = str("UNKNOWN")
+	status_txt = get_iface_status_raw(iface)
+	if use_html is False:
+		if status_txt is not None:
+			if (str(" DOWN") in str(status_txt)):
+				theResult = str("DOWN")
+			elif (str(" UP") in str(status_txt)):
+				theResult = str("UP")
 			else:
 				theResult = str("UNKNOWN")
 		else:
-			if status_txt is not None:
-				if (str(" DOWN") in str(status_txt)):
-					theResult = html_generator.gen_html_td(
-						html_generator.gen_html_label(str("DOWN"), u'danger'),
-						str(u'iface_status_value_{}').format(iface)
-					)
-				elif (str(" UP") in str(status_txt)):
-					theResult = html_generator.gen_html_td(
-						html_generator.gen_html_label(str("UP"), u'success'),
-						str(u'iface_status_value_{}').format(iface)
-					)
-				else:
-					theResult = html_generator.gen_html_td(
-						html_generator.gen_html_label(str("UNKNOWN"), u'default'),
-						str(u'iface_status_value_{}').format(iface)
-					)
+			theResult = str("UNKNOWN")
+	else:
+		if status_txt is not None:
+			if (str(" DOWN") in str(status_txt)):
+				theResult = html_generator.gen_html_td(
+					html_generator.gen_html_label(str("DOWN"), u'danger'),
+					str(u'iface_status_value_{}').format(iface)
+				)
+			elif (str(" UP") in str(status_txt)):
+				theResult = html_generator.gen_html_td(
+					html_generator.gen_html_label(str("UP"), u'success'),
+					str(u'iface_status_value_{}').format(iface)
+				)
 			else:
 				theResult = html_generator.gen_html_td(
 					html_generator.gen_html_label(str("UNKNOWN"), u'default'),
 					str(u'iface_status_value_{}').format(iface)
 				)
-	except Exception as errcrit:
-		print(str("Status ERROR"))
-		print(str(type(errcrit)))
-		print(str(errcrit))
-		print(str(errcrit.args))
-		theResult = None
+		else:
+			theResult = html_generator.gen_html_td(
+				html_generator.gen_html_label(str("UNKNOWN"), u'default'),
+				str(u'iface_status_value_{}').format(iface)
+			)
 	return theResult
 
 
+@remediation.error_handling
 def get_iface_mac(iface=u'lo', use_html=False):
 	"""Generate output of the iface mac."""
 	theResult = None
-	try:
-		mac_list_txt = utils.extractMACAddr(get_iface_status_raw(iface))
-		if use_html is False:
-			if mac_list_txt is not None and len(mac_list_txt) > 0:
-				theResult = str(mac_list_txt[0])
-			else:
-				theResult = None
+	mac_list_txt = utils.extractMACAddr(get_iface_status_raw(iface))
+	if use_html is False:
+		if mac_list_txt is not None and len(mac_list_txt) > 0:
+			theResult = str(mac_list_txt[0])
 		else:
-			if mac_list_txt is not None and len(mac_list_txt) > 0:
-				theResult = html_generator.gen_html_td(
-					str(mac_list_txt[0]),
-					str(u'iface_status_mac_{}').format(iface)
-				)
-			else:
-				theResult = html_generator.gen_html_td(
-					"",
-					str(u'iface_status_mac_{}').format(iface)
-				)
-	except Exception as errcrit:
-		print(str(errcrit))
-		print(str(errcrit.args))
-		theResult = None
+			theResult = None
+	else:
+		if mac_list_txt is not None and len(mac_list_txt) > 0:
+			theResult = html_generator.gen_html_td(
+				str(mac_list_txt[0]),
+				str(u'iface_status_mac_{}').format(iface)
+			)
+		else:
+			theResult = html_generator.gen_html_td(
+				"",
+				str(u'iface_status_mac_{}').format(iface)
+			)
 	return theResult
 
 
+@remediation.error_handling
 def get_iface_ip_list(iface=u'lo', use_html=False):
 	"""Generate output of the iface IP."""
 	theResult = None
-	try:
-		ip_list_txt = utils.extractIPAddr(get_iface_status_raw(iface))
-		if use_html is False:
-			if ip_list_txt is not None and len(ip_list_txt) > 0:
-				theResult = str(ip_list_txt)
-			else:
-				theResult = None
+	ip_list_txt = utils.extractIPAddr(get_iface_status_raw(iface))
+	if use_html is False:
+		if ip_list_txt is not None and len(ip_list_txt) > 0:
+			theResult = str(ip_list_txt)
 		else:
-			if ip_list_txt is not None and len(ip_list_txt) > 0:
-				theResult = html_generator.gen_html_td(
-					html_generator.gen_html_ul(ip_list_txt),
-					str(u'iface_status_ips_{}').format(iface)
-				)
-			else:
-				theResult = html_generator.gen_html_td(
-					html_generator.gen_html_label(u'No IP', html_generator.HTML_LABEL_ROLES[3]),
-					str(u'iface_status_ips_{}').format(iface)
-				)
-	except Exception as errcrit:
-		print(str(errcrit))
-		print(str(errcrit.args))
-		theResult = None
+			theResult = None
+	else:
+		if ip_list_txt is not None and len(ip_list_txt) > 0:
+			theResult = html_generator.gen_html_td(
+				html_generator.gen_html_ul(ip_list_txt),
+				str(u'iface_status_ips_{}').format(iface)
+			)
+		else:
+			theResult = html_generator.gen_html_td(
+				html_generator.gen_html_label(u'No IP', html_generator.HTML_LABEL_ROLES[3]),
+				str(u'iface_status_ips_{}').format(iface)
+			)
 	return theResult
 
 
@@ -352,13 +329,16 @@ def main(argv=None):
 				return 0
 			return 0
 	except Exception as main_err:
-		print(str("iface_check_status: REALLY BAD ERROR: ACTION will not be compleated! ABORT!"))
-		print(str(main_err))
-		print(str(main_err.args))
+		logs.log(
+			str("iface_check_status: REALLY BAD ERROR: ACTION will not be compleated! ABORT!"),
+			"Error"
+		)
+		logs.log(str(main_err), "Error")
+		logs.log(str(main_err.args), "Error")
 	return 1
 
 
-if __name__ == '__main__':
+if __name__ == u'__main__':
 	try:
 		import sys
 		exitcode = 3
@@ -366,8 +346,11 @@ if __name__ == '__main__':
 			exitcode = main(sys.argv[1:])
 		exit(exitcode)
 	except Exception as main_err:
-		print(str("iface_check_status: REALLY BAD ERROR: ACTION will not be compleated! ABORT!"))
-		print(str(main_err))
-		print(str(main_err.args))
+		logs.log(
+			str("iface_check_status: REALLY BAD ERROR: ACTION will not be compleated! ABORT!"),
+			"Error"
+		)
+		logs.log(str(main_err), "Error")
+		logs.log(str(main_err.args), "Error")
 	exit(3)
 

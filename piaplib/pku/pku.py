@@ -17,6 +17,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+try:
+	import piaplib as piaplib
+except Exception:
+	from . import piaplib as piaplib
+
+try:
+	from . import upgrade as upgrade
+except Exception as err:
+	try:
+		import upgrade as upgrade
+	except Exception:
+		raise ImportError("Error Importing upgrade tools")
 
 try:
 	from . import config as config
@@ -51,12 +63,12 @@ except Exception:
 		raise ImportError("Error Importing interfaces")
 
 try:
-	from . import upgrade as upgrade
-except Exception as err:
+	from piaplib.pku.logs import logs as logs
+except Exception:
 	try:
-		import upgrade as upgrade
+		from .logs import logs as logs
 	except Exception:
-		raise ImportError("Error Importing upgrade tools")
+		raise ImportError("Error Importing interfaces")
 
 try:
 	import argparse
@@ -77,6 +89,7 @@ PKU_UNITS = {u'config': config, u'backup': None, u'upgrade': upgrade, u'help': N
 	"""
 
 
+@remediation.error_handling
 def parseArgs(arguments=None):
 	"""Parses the CLI arguments."""
 	parser = argparse.ArgumentParser(
@@ -89,18 +102,16 @@ def parseArgs(arguments=None):
 		choices=PKU_UNITS.keys(),
 		help='the pocket pku service option.'
 	)
+	parser.add_argument('-V', '--version', action='version', version=str(
+		"%(prog)s {}"
+	).format(str(piaplib.__version__)))
 	return parser.parse_known_args(arguments)
 
 
 def getTimeStamp():
 	"""Returns the time stamp."""
-	theDate = None
-	try:
-		import time
-		theDate = time.strftime("%a %b %d %H:%M:%S %Z %Y", time.localtime())
-	except Exception:
-		theDate = str("")
-	return str(theDate)
+	theDate = remediation.getTimeStamp()
+	return theDate
 
 
 def usePKUTool(tool, arguments=[None]):
@@ -110,7 +121,7 @@ def usePKUTool(tool, arguments=[None]):
 	if tool in PKU_UNITS.keys():
 		try:
 			try:
-				# print(str("pku launching: "+tool))
+				logs.log(str("pku launching: {}").format(str(tool)), "debug")
 				PKU_UNITS[tool].main(arguments)
 			except Exception:
 				timestamp = getTimeStamp()
@@ -126,6 +137,7 @@ def usePKUTool(tool, arguments=[None]):
 		return None
 
 
+@remediation.bug_handling
 def main(argv=None):
 	"""The main event"""
 	# print("PiAP PKU")
@@ -135,12 +147,18 @@ def main(argv=None):
 			pku_cmd = args.pku_unit
 			usePKUTool(pku_cmd, extra)
 		except Exception as cerr:
-			print(str(cerr))
-			print(str(cerr.args))
-			print(str(" UNKNOWN - An error occured while handling the arguments. Command failure."))
+			logs.log(str(cerr), "Error")
+			logs.log(str(cerr.args), "Error")
+			logs.log(
+				str(" UNKNOWN - An error occured while handling the arguments. Command failure."),
+				"Error"
+			)
 			exit(3)
 	except Exception:
-		print(str(" UNKNOWN - An error occured while handling the failure. Cascading failure."))
+		logs.log(
+			str(" UNKNOWN - An error occured while handling the failure. Cascading failure."),
+			"Error"
+		)
 		exit(3)
 	exit(0)
 
@@ -156,13 +174,14 @@ if __name__ in u'__main__':
 		raise ImportError("Error Importing upgrade")
 	if remediation.__name__ is None:
 		raise ImportError("Error Importing remediation")
+	if logs.__name__ is None:
+		raise ImportError("Error Importing logs")
 	try:
 		import sys
 		if (sys.argv is not None and (sys.argv is not []) and (len(sys.argv) > 1)):
-			main(sys.argv[1:])
+			exit(main(sys.argv[1:]))
 		else:
-			main(["--help"])
-			exit(3)
+			exit(main(["--help"]))
 	except Exception:
 		raise ImportError("Error running main")
 	exit(0)
