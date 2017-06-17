@@ -36,6 +36,5 @@
 
 
 ## Possible Improvements:
-- always more
-- add encryption and file signing
+- always more (checkout issues)
 - add more examples to docs

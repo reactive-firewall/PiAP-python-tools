@@ -180,7 +180,7 @@ def warning_handling(func):
 
 @bug_handling
 def main(argv=None):
-	"""The Main Event makes no sense to utils."""
+	"""The Main Event makes no sense to remediation."""
 	raise NotImplementedError("CRITICAL - PKU remediation main() not implemented. yet?")
 	return 3
 

@@ -62,6 +62,7 @@ __prog__ = str("""clients_check_status.py""")
 
 
 def memoize(func):
+	"""memoize wrapper"""
 	cache = func.cache = {}
 	import functools
 
