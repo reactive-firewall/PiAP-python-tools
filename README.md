@@ -1,6 +1,6 @@
 # PiAP-python-tools beta
 
-## This is still in an awesome beta. THINGS ARE STILL JUST PoC. USE AT OWN RISK.
+## This is still in beta. THINGS ARE STILL JUST PoC. USE AT OWN RISK.
 
 ## Status
 
