@@ -403,7 +403,11 @@ class BasicUsageTestSuite(unittest.TestCase):
 			thepython = getPythonCommand()
 			if (thepython is not None):
 				try:
-					for unit in ["lint.lint", "lint.check", "lint.do_execve"]:
+					mod_tests = [
+						"lint.lint", "lint.check", "lint.clients_check_status",
+						"lint.iface_check_status", "lint.users_check_status", "lint.do_execve"
+					]
+					for unit in mod_tests:
 						theOutputtext = checkPythonCommand([
 							str(thepython),
 							str("-m"),
@@ -635,7 +639,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 			thepython = getPythonCommand()
 			if (thepython is not None):
 				try:
-					for unit in ["iface", "users"]:
+					for unit in ["iface", "clients", "users"]:
 						theOutputtext = checkPythonCommand([
 							str(thepython),
 							str("-m"),
