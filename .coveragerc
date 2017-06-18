@@ -2,6 +2,7 @@
 parallel = True
 
 [report]
+include = piaplib*
 # Regexes for lines to exclude from consideration
 exclude_lines =
     # Have to re-enable the standard pragma
@@ -16,10 +17,3 @@ exclude_lines =
 
 ignore_errors = True
 
-[paths]
-source =
-    piaplib/
-    piaplib/keyring/
-    piaplib/pku/
-    piaplib/lint/
-    tests/
