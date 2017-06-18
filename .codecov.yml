@@ -1,0 +1,21 @@
+coverage:
+  status:
+    project:
+      default: off
+      piaplib:
+        target: 45%
+        flags: piaplib
+      tests:
+        target: 50%
+        flags: tests
+
+flags:
+  piaplib:
+    paths:
+      - piaplib/
+      - piaplib/lint
+      - piaplib/pku
+      - piaplib/keyring
+  tests:
+    paths:
+      - tests/

@@ -389,6 +389,7 @@ def compile_iface(
 		)
 	return theResult
 
+
 @remediation.bug_handling
 def main(argv=None):
 	"""The Main Event."""
@@ -402,7 +403,8 @@ def main(argv=None):
 	interface_is_static = (args.is_static is True)
 	if (args.vlanid is not None):
 		interface_vlanID = args.vlanid
-		raise NotImplementedError("BUG - Not Implemented Yet.")
+		if interface_vlanID is not None:
+			raise NotImplementedError("BUG - Not Implemented Yet.")
 	interface_mode = u'manual'
 	interface_gateway = None
 	interface_ip = None

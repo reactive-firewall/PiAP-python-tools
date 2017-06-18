@@ -138,7 +138,7 @@ def bug_handling(func):
 			logs.log(str("Action will not be compleated! ABORT!"), "CRITICAL")
 			logs.log(str("You found a bug. Please report this to my creator."), "CRITICAL")
 			logs.log(str(""), "CRITICAL")
-			sys.exc_clear()
+			# sys.exc_clear()
 			err = None
 			del err
 			theOutput = 3
