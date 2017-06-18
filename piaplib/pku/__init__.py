@@ -19,15 +19,10 @@
 try:
 	import sys
 	import os
-	if u'pku' in __file__:
+	if str("pku") in __file__:
 		sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-except Exception as ImportErr:
-	print(str(type(ImportErr)))
-	print(str(ImportErr))
-	print(str((ImportErr.args)))
-	ImportErr = None
-	del ImportErr
-	raise ImportError(u'Pocket Knife Unit PKU failed to import.')
+except Exception:
+	raise ImportError("Pocket Knife Unit PKU failed to import.")
 
 
 try:

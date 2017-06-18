@@ -69,7 +69,7 @@ def memoize(func):
 	@functools.wraps(func)
 	def memoized_func(*args, **kwargs):
 		key = str(args) + str(kwargs)
-		if key not in cache:
+		if key not in cache.keys():
 			cache[key] = func(*args, **kwargs)
 		return cache[key]
 

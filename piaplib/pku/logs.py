@@ -106,7 +106,7 @@ class logs:
 	logging.basicConfig(
 		level=logging.INFO,
 		format=str("%(asctime)s [piaplib] %(message)s"),
-		datefmt=str("%m/%d/%Y %I:%M:%S %p")
+		datefmt=str("%a %b %d %H:%M:%S %Z %Y")
 	)
 
 	logging_level = {

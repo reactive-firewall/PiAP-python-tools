@@ -17,15 +17,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-import sys
-import argparse
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
 
 try:
 	import os
 	import sys
+	import argparse
 	sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 	try:
 		import piaplib as piaplib

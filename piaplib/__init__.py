@@ -62,6 +62,6 @@ if __name__ in u'__main__':
 		raise ImportError(str(u'Failed to find Pocket Keyring'))
 	if lint.__name__ is None:
 		raise ImportError(str(u'Failed to gather Pocket Lint'))
-	pocket.main()
+	pocket.main(sys.argv[1:])
 	exit(0)
 
