@@ -63,6 +63,14 @@ except Exception:
 		raise ImportError("Error Importing interfaces")
 
 try:
+	from . import compile_interface as compile_interface
+except Exception:
+	try:
+		import compile_interface as compile_interface
+	except Exception:
+		raise ImportError("Error Importing compile_interface")
+
+try:
 	from piaplib.pku.logs import logs as logs
 except Exception:
 	try:

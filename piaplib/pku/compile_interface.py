@@ -31,6 +31,15 @@ except Exception:
 
 
 try:
+	from . import remediation as remediation
+except Exception:
+	try:
+		import remediation as remediation
+	except Exception:
+		raise ImportError("Error Importing remediation")
+
+
+try:
 	import argparse
 except Exception as importError:
 	print(str("Error Importing argparse lib"))
@@ -143,14 +152,10 @@ WIFI_SEC_MODES = [None, u'WEP', u'WPA2', u'WPA-legacy', u'WPA-Enterprise']
 WPA2_MODE = u'RSN'
 
 
-def parseWiFiArgs(args=None):
+def addWiFiArgs(parser=None):
 	"""Parses the arguments for the WAN WiFi client mode."""
-	wifi_parser = None
+	wifi_parser = parser.add_argument_group(title="Wireless", description="Wireless options")
 	try:
-		wifi_parser = argparse.ArgumentParser(
-			prog='wireless',
-			description='wireless options'
-		)
 		wifi_parser.add_argument(
 			'--mode', dest='wireless_mode_type',
 			default=WIFI_MODE_TYPES[0],
@@ -213,7 +218,7 @@ def parseWiFiArgs(args=None):
 		print(str(err))
 		print(str((err.args)))
 		raise argparse.ArgumentError(err)
-	return wifi_parser.parse_known_args(args)
+	return parser
 
 
 def parseArgs(args=None):
@@ -257,7 +262,7 @@ def parseArgs(args=None):
 		parser.add_argument('-i', '--ip', default=None, help='STATIC - IP')
 		parser.add_argument('-n', '--netmask', default=None, help='STATIC - Netmask')
 		parser.add_argument('-g', '--gw', default=None, help='STATIC - the gw IP')
-		parser.add_argument('-v', '--vlanid', default=None, help='the vlan')
+		parser.add_argument('-v', '--vlanid', dest='vlanid', default=None, help='the vlan')
 		parser.add_argument(
 			'-V',
 			'--version',
@@ -266,15 +271,14 @@ def parseArgs(args=None):
 				"%(prog)s {}"
 			).format(str(piaplib.__version__))
 		)
-		(args_wifi, argv) = parseWiFiArgs(args)
-		newargs = parser.parse_known_args(argv)
+		parser = addWiFiArgs(parser)
 	except Exception as err:
 		print(str(type(err)))
 		print(str(err))
 		print(str((err.args)))
 		parser.error("parser tool bug")
 		return None
-	return (newargs, args_wifi)
+	return parser.parse_args(args)
 
 
 def readFile(somefile):
@@ -333,7 +337,7 @@ def compile_pre_up_line(iface='vnet1', use_ipv6=False, gateway_ip=None):
 	if use_ipv6 is False:
 		theResult = str(
 			str(
-				u'pre-up sysctl -w net.ipv6.conf.{}.disable_ipv6=1' +
+				u'pre-up sysctl -w net.ipv6.conf.{}.disable_ipv6=1 ' +
 				u'2>/dev/null ; wait ; ip link set {} up'
 			).format(iface, iface)
 		)
@@ -385,46 +389,42 @@ def compile_iface(
 		)
 	return theResult
 
-
+@remediation.bug_handling
 def main(argv=None):
 	"""The Main Event."""
-	try:
-		(args, wifi_args, extras) = parseArgs(argv)
-		interface_type = args.media_type
-		interface_zone = args.zone
-		if str(str(interface_zone).upper()) in "WAN":
-			interface_index = 0
-		elif str(str(interface_zone).upper()) in "LAN":
-			interface_index = 1
-		interface_is_static = (args.is_static is True)
-		if (args.vlanid is not None):
-			interface_vlanID = args.vlanid
-		if (interface_vlanID is not None):
-			raise NotImplementedError("Not Implemented Yet.")
-		interface_mode = u'manual'
-		interface_gateway = None
-		interface_ip = None
-		interface_netmask = u'255.255.255.0'
-		if interface_is_static is True:
-			interface_mode = u'static'
-			interface_gateway = args.gw
-			interface_ip = args.ip
-			interface_netmask = args.netmask
-		else:
-			interface_mode = u'dhcp'
-		print(
-			str(
-				compile_iface(
-					interface_type, interface_index,
-					None, interface_mode,
-					interface_ip, interface_netmask,
-					interface_gateway, False
-				)
+	args = parseArgs(argv)
+	interface_type = args.media_type
+	interface_zone = args.zone
+	if str(str(interface_zone).upper()) in "WAN":
+		interface_index = 0
+	elif str(str(interface_zone).upper()) in "LAN":
+		interface_index = 1
+	interface_is_static = (args.is_static is True)
+	if (args.vlanid is not None):
+		interface_vlanID = args.vlanid
+		raise NotImplementedError("BUG - Not Implemented Yet.")
+	interface_mode = u'manual'
+	interface_gateway = None
+	interface_ip = None
+	interface_netmask = u'255.255.255.0'
+	if interface_is_static is True:
+		interface_mode = u'static'
+		interface_gateway = args.gw
+		interface_ip = args.ip
+		interface_netmask = args.netmask
+	else:
+		interface_mode = u'dhcp'
+	print(
+		str(
+			compile_iface(
+				interface_type, interface_index,
+				None, interface_mode,
+				interface_ip, interface_netmask,
+				interface_gateway, False
 			)
 		)
-	except Exception as err:
-		print(str(err))
-		print(str((err.args)))
+	)
+	return 0
 
 
 if __name__ in u'__main__':
