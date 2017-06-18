@@ -96,6 +96,7 @@ before_install:
 script:
   - make clean ;
   - if [ $TRAVIS_OS_NAME == osx ] ; then echo "SKIP" ; else make test || exit $? ; fi ;
+  - codecov || true
   - make clean || exit $? ; 
   - make test-tox || exit $? ;
   - make clean ;
