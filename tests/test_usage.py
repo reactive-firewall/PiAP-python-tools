@@ -64,6 +64,25 @@ def checkPythonCommand(args=[None], stderr=None):
 	return theOutput
 
 
+def checkPythonFuzzing(args=[None], stderr=None):
+	"""function for backend subprocess check_output command"""
+	theOutput = None
+	try:
+		if args is None or args is [None]:
+			theOutput = subprocess.check_output(["exit 1 ; #"])
+		else:
+			if str("coverage ") in args[0]:
+				args[0] = str("coverage")
+				args.insert(1, "run")
+				args.insert(2, "--source=piaplib,piaplib/lint,piaplib/keyring,piaplib/pku")
+				args.insert(2, "-p")
+			theOutput = subprocess.check_output(args, stderr=stderr)
+	except Exception as err:
+		theOutput = None
+		raise RuntimeError(err)
+	return theOutput
+
+
 class BasicUsageTestSuite(unittest.TestCase):
 	"""Basic functional test cases."""
 
@@ -830,6 +849,60 @@ class BasicUsageTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
+	def test_d_python_command_check_clientss_html(self):
+		"""Test case for piaplib.pocket.lint check users."""
+		theResult = False
+		try:
+			import sys
+			if sys.__name__ is None:
+				raise ImportError("Failed to import system. WTF?!!")
+			thepython = getPythonCommand()
+			if (thepython is not None):
+				try:
+					theOutputtext = checkPythonCommand([
+						str(thepython),
+						str("-m"),
+						str("piaplib.pocket"),
+						str("lint"),
+						str("check"),
+						str("clients"),
+						str("--all"),
+						str("--html")
+					], stderr=subprocess.STDOUT)
+					if (str("</tbody></table>") in str(theOutputtext)):
+						if str("<table") in str(theOutputtext):
+							theResult = True
+						else:
+							theResult = False
+					else:
+						theResult = False
+						print(str(""))
+						print(str("python cmd is {}").format(str(thepython)))
+						print(str(""))
+						print(str("actual output was..."))
+						print(str(""))
+						print(str("{}").format(str(theOutputtext)))
+						print(str(""))
+				except Exception as othererr:
+					print(str(""))
+					print(str(type(othererr)))
+					print(str(othererr))
+					print(str((othererr.args)))
+					print(str(""))
+					othererr = None
+					del othererr
+					theResult = False
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			othererr = None
+			del othererr
+			theResult = False
+		assert theResult
+
 	def test_d_python_command_check_users_single(self):
 		"""Test case for piaplib.pocket.lint check users."""
 		theResult = False
@@ -1100,6 +1173,108 @@ class BasicUsageTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
+	def test_d_python_command_bad_saltify(self):
+		"""Test case for piaplib.pocket.lint check users."""
+		theResult = True
+		try:
+			from piaplib import pku as pku
+			if pku.__name__ is None:
+				raise ImportError("Failed to import pku")
+			from pku import utils as utils
+			if utils.__name__ is None:
+				raise ImportError("Failed to import utils")
+			import sys
+			if sys.__name__ is None:
+				raise ImportError("Failed to import system. WTF?!!")
+			thepython = getPythonCommand()
+			if (thepython is not None):
+				theOutputtext = None
+				with self.assertRaises(Exception):
+					theOutputtext = checkPythonFuzzing([
+						str(thepython),
+						str("-m"),
+						str("piaplib.pocket"),
+						str("keyring"),
+						str("saltify"),
+						str("""--salt={}""").format(str("testSalt"))
+					], stderr=subprocess.STDOUT)
+				self.assertIsNone(theOutputtext)
+				with self.assertRaises(Exception):
+					theOutputtext = checkPythonFuzzing([
+						str(thepython),
+						str("-m"),
+						str("piaplib.pocket"),
+						str("keyring"),
+						str("saltify"),
+						str("""--msg={}""").format(str("Test Message"))
+					], stderr=subprocess.STDOUT)
+				self.assertIsNone(theOutputtext)
+				with self.assertRaises(Exception):
+					theOutputtext = checkPythonFuzzing([
+						str(thepython),
+						str("-m"),
+						str("piaplib.pocket"),
+						str("keyring"),
+						str("saltify")
+					], stderr=subprocess.STDOUT)
+				self.assertIsNone(theOutputtext)
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			othererr = None
+			del othererr
+			theResult = False
+		assert theResult
+
+	def test_d_python_command_bad_interface(self):
+		"""Test case for piaplib.pocket.lint check users."""
+		theResult = True
+		try:
+			from piaplib import pku as pku
+			if pku.__name__ is None:
+				raise ImportError("Failed to import pku")
+			from pku import utils as utils
+			if utils.__name__ is None:
+				raise ImportError("Failed to import utils")
+			import sys
+			if sys.__name__ is None:
+				raise ImportError("Failed to import system. WTF?!!")
+			thepython = getPythonCommand()
+			if (thepython is not None):
+				theOutputtext = None
+				with self.assertRaises(Exception):
+					theOutputtext = checkPythonFuzzing([
+						str(thepython),
+						str("-m"),
+						str("piaplib.pocket"),
+						str("pku"),
+						str("interfaces"),
+						str("""-i {}""").format(str("eth0"))
+					], stderr=subprocess.STDOUT)
+				self.assertIsNone(theOutputtext)
+				with self.assertRaises(Exception):
+					theOutputtext = checkPythonFuzzing([
+						str(thepython),
+						str("-m"),
+						str("piaplib.pocket"),
+						str("pku"),
+						str("interfaces"),
+						str("""-i {} -r""").format(str("eth0"))
+					], stderr=subprocess.STDOUT)
+				self.assertIsNone(theOutputtext)
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			othererr = None
+			del othererr
+			theResult = False
+		assert theResult
 
 if __name__ == '__main__':
 	unittest.main()

@@ -155,8 +155,8 @@ class ConfigTestSuite(unittest.TestCase):
 					print(str(theBlob))
 					print(str(""))
 			else:
+				theResult = True	
 				print(str("SKIPPED: no yaml support"))
-				theResult = True
 		except Exception as err:
 			print(str(""))
 			print(str("Error in test of yaml write-read"))
