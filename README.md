@@ -39,4 +39,3 @@
 
 ## Possible Improvements:
 - always more (checkout issues)
-- add more examples to docs
