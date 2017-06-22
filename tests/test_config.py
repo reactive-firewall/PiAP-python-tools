@@ -155,7 +155,7 @@ class ConfigTestSuite(unittest.TestCase):
 					print(str(theBlob))
 					print(str(""))
 			else:
-				theResult = True	
+				theResult = True
 				print(str("SKIPPED: no yaml support"))
 		except Exception as err:
 			print(str(""))
