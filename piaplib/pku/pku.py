@@ -153,14 +153,14 @@ def main(argv=None):
 				str(" UNKNOWN - An error occured while handling the arguments. Command failure."),
 				"Error"
 			)
-			exit(3)
+			return 3
 	except Exception:
 		logs.log(
 			str(" UNKNOWN - An error occured while handling the failure. Cascading failure."),
 			"Error"
 		)
-		exit(3)
-	exit(0)
+		return 3
+	return 0
 
 
 if __name__ in u'__main__':
@@ -181,8 +181,8 @@ if __name__ in u'__main__':
 		if (sys.argv is not None and (sys.argv is not []) and (len(sys.argv) > 1)):
 			exit(main(sys.argv[1:]))
 		else:
-			exit(main(["--help"]))
+			exit_code = main(["--help"])
 	except Exception:
 		raise ImportError("Error running main")
-	exit(0)
+	exit(exit_code)
 
