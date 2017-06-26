@@ -129,6 +129,10 @@ def randStr(count=None):
 @remediation.error_handling
 def randInt(count=None, min=0, max=512):
 	"""wrapper for int(os.urandom())"""
+	if min is None:
+		min = 0
+	if max is None:
+		max = 512
 	if count is None or count < 0:
 		x_count = 32
 	else:
