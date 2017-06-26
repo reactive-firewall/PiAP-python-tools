@@ -169,7 +169,7 @@ def warning_handling(func):
 			logs.log(str(err), "Warning")
 			logs.log(str(err.args), "Warning")
 			logs.log(str(""), "Warning")
-			sys.exc_clear()
+			# sys.exc_clear()
 			err = None
 			del err
 			theOutput = None

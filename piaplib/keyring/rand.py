@@ -32,15 +32,15 @@ except Exception:
 
 
 RAND_CHARS = [
-	"a", "b", "c", "d", "e", "f", "g", "h",
-	"i", "j", "k", "l", "m", "n", "o", "p",
-	"q", "r", "s", "t", "u", "v", "w", "x",
-	"y", "z", "1", "2", "3", "4", "5", "6",
-	"7", "8", "9", "0", "!", "@", "#", "$",
-	"%", "^", "&", "*", "(", ")", "_", "-",
-	"+", "=", "<", ">", ",", ".", "?", "/",
-	"'", ";", "[", "]", "{", "}", "|", "~",
-	"\"", " "
+	"""a""", """b""", """c""", """d""", """e""", """f""", """g""", """h""",
+	"""i""", """j""", """k""", """l""", """m""", """n""", """o""", """p""",
+	"""q""", """r""", """s""", """t""", """u""", """v""", """w""", """x""",
+	"""y""", """z""", """1""", """2""", """3""", """4""", """5""", """6""",
+	"""7""", """8""", """9""", """0""", """!""", """@""", """#""", """$""",
+	"""%""", """^""", """&""", """*""", """(""", """)""", """_""", """-""",
+	"""+""", """=""", """<""", """>""", """,""", """.""", """?""", """/""",
+	"""'""", """;""", """[""", """]""", """{""", """}""", """|""", """~""",
+	"""\"""", """ """
 ]
 """Posible Chars for randChar (which is not so random, as it is very qwerty based)"""
 
@@ -136,7 +136,7 @@ def randBool(count=None):
 	else:
 		x_count = (count % 2)
 	try:
-		return (bool(randInt(x_count)) is True)
+		return (bool(((randInt(x_count) % 2) == 0)) is True)
 	except Exception as err:
 		print(str(u'FAILED DURRING RAND. ABORT.'))
 		print(str(type(err)))
@@ -149,27 +149,26 @@ def randBool(count=None):
 
 def randChar(count=None):
 	"""wrapper for str(os.urandom())"""
-	import os
 	if count is None or count < 0:
 		x_count = 1
 	else:
-		x_count = count
+		x_count = int(count)
 	try:
 		theRandomResult = str("")
 		for char_x in range(x_count):
-			char_rand_seed = RAND_CHARS[randInt(1, 0, len(RAND_CHARS))]
+			char_rand_seed = str(RAND_CHARS[randInt(1, 0, len(RAND_CHARS))])
 			while str(char_rand_seed).isalnum() is False:
 				char_rand_seed = RAND_CHARS[randInt(1, 0, len(RAND_CHARS))]
 			theRandomResult = str("{}{}").format(theRandomResult, str(char_rand_seed))
 		return theRandomResult
 	except Exception as err:
-		print(str(u'FAILED DURRING RAND. ABORT.'))
+		print(str(u'FAILED DURRING RANDCHAR. ABORT.'))
 		print(str(type(err)))
 		print(str(err))
 		print(str(err.args))
 		err = None
 		del err
-		os.abort(3)
+	return None
 
 
 def main(argv=None):

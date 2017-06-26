@@ -292,12 +292,12 @@ class StringsTestSuite(unittest.TestCase):
 								testcase[0] in testcase[1]
 							)
 							theResult = (theResult is True) and (theResult_temp is True)
-							if theResult is not True:
-								print("NEW test")
-								print(str(testcase))
-								print(repr(testcase))
 							theResult_temp = None
 							del theResult_temp
+					if theResult is not True:
+						print("NEW test")
+						print(str(testcase))
+						print(repr(testcase))
 		except Exception as err:
 			print(str(""))
 			print(str(type(err)))
