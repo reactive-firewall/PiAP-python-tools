@@ -32,7 +32,7 @@ except Exception:
 
 
 try:
-	from pku import remediation as remediation
+	from ..pku import remediation as remediation
 except Exception:
 	try:
 		import pku.remediation as remediation
@@ -41,7 +41,7 @@ except Exception:
 
 
 try:
-	from pku import utils as utils
+	from ..pku import utils as utils
 except Exception:
 	try:
 		import pku.utils as utils
@@ -135,11 +135,18 @@ def randInt(count=None, min=0, max=512):
 		x_count = count
 	try:
 		if x_count == 1:
-			return (int(utils.extractInt(str(os.urandom(1))), 10) + min) % max
+			try:
+				import six
+				if six.PY2:
+					return (int(utils.extractInt(str(os.urandom(20))), 10) + min) % max
+				else:
+					return (int.from_bytes(os.urandom(1), sys.byteorder) + min) % max
+			except Exception:
+				return (int(utils.extractInt(str(os.urandom(20))), 10) + min) % max
 		else:
 			theResult = []
 			for someInt in range(x_count):
-				theResult.append(((randInt(1) + min) % max))
+				theResult.append((randInt(1) + min) % max)
 			return theResult
 	except Exception as err:
 		print(str(u'FAILED DURRING RAND. ABORT.'))
@@ -151,6 +158,7 @@ def randInt(count=None, min=0, max=512):
 		return None
 
 
+@remediation.error_handling
 def randBool(count=None):
 	"""wrapper for str(os.urandom())"""
 	if count is None or count < 0:
@@ -169,6 +177,7 @@ def randBool(count=None):
 		return None
 
 
+@remediation.error_handling
 def randChar(count=None):
 	"""wrapper for str(os.urandom())"""
 	if count is None or count < 0:
@@ -193,18 +202,21 @@ def randChar(count=None):
 	return None
 
 
+@remediation.bug_handling
 def main(argv=None):
 	args = parseArgs(argv)
 	if args.count is None:
-		exit(2)
+		return 2
 	else:
 		print(str(rand(args.count)))
+	return 0
 
 
 if __name__ in u'__main__':
 	try:
 		import sys
-		main(sys.argv[1:])
+		error_code = main(sys.argv[1:])
+		exit(error_code)
 	except Exception as err:
 		print(str(u'MAIN FAILED DURRING RAND. ABORT.'))
 		print(str(type(err)))
