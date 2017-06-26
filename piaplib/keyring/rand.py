@@ -104,7 +104,7 @@ def rand(count=None):
 		print(str(err.args))
 		err = None
 		del err
-		return None
+	return None
 
 
 @remediation.error_handling
@@ -117,13 +117,13 @@ def randStr(count=None):
 	try:
 		return str(rand(x_count))
 	except Exception as err:
-		print(str(u'FAILED DURRING RAND. ABORT.'))
+		print(str(u'FAILED DURRING RAND-STR. ABORT.'))
 		print(str(type(err)))
 		print(str(err))
 		print(str(err.args))
 		err = None
 		del err
-		return None
+	return None
 
 
 @remediation.error_handling
@@ -153,13 +153,13 @@ def randInt(count=None, min=0, max=512):
 				theResult.append((randInt(1) + min) % max)
 			return theResult
 	except Exception as err:
-		print(str(u'FAILED DURRING RAND. ABORT.'))
+		print(str(u'FAILED DURRING RAND-INT. ABORT.'))
 		print(str(type(err)))
 		print(str(err))
 		print(str(err.args))
 		err = None
 		del err
-		return None
+	return None
 
 
 @remediation.error_handling
@@ -170,15 +170,21 @@ def randBool(count=None):
 	else:
 		x_count = (count % 2)
 	try:
-		return (bool(((randInt(x_count) % 2) == 0)) is True)
+		if x_count == 1:
+			return (bool(((randInt(1, 0, 512) % 2) == 0)) is True)
+		else:
+			theResult = []
+			for someInt in range(x_count):
+				theResult.append(randBool(1))
+			return theResult
 	except Exception as err:
-		print(str(u'FAILED DURRING RAND. ABORT.'))
+		print(str(u'FAILED DURRING RAND-BOOL. ABORT.'))
 		print(str(type(err)))
 		print(str(err))
 		print(str(err.args))
 		err = None
 		del err
-		return None
+	return None
 
 
 @remediation.error_handling
@@ -197,7 +203,7 @@ def randChar(count=None):
 			theRandomResult = str("{}{}").format(theRandomResult, str(char_rand_seed))
 		return theRandomResult
 	except Exception as err:
-		print(str(u'FAILED DURRING RANDCHAR. ABORT.'))
+		print(str(u'FAILED DURRING RAND-CHAR. ABORT.'))
 		print(str(type(err)))
 		print(str(err))
 		print(str(err.args))
