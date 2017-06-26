@@ -91,7 +91,7 @@ def parseArgs(arguments=None):
 @remediation.error_handling
 def rand(count=None):
 	"""wrapper for os.urandom()"""
-	if count is None or count < 0:
+	if count is None or (isinstance(count, int) is False) or count <= 0:
 		x_count = 512
 	else:
 		x_count = count
@@ -110,7 +110,7 @@ def rand(count=None):
 @remediation.error_handling
 def randStr(count=None):
 	"""wrapper for str(os.urandom())"""
-	if count is None or count < 0:
+	if count is None or (isinstance(count, int) is False) or count <= 0:
 		x_count = 512
 	else:
 		x_count = count
@@ -133,7 +133,7 @@ def randInt(count=None, min=0, max=512):
 		min = 0
 	if max is None:
 		max = 512
-	if count is None or count < 0:
+	if count is None or (isinstance(count, int) is False) or count <= 0:
 		x_count = 32
 	else:
 		x_count = count
@@ -165,10 +165,10 @@ def randInt(count=None, min=0, max=512):
 @remediation.error_handling
 def randBool(count=None):
 	"""wrapper for str(os.urandom())"""
-	if count is None or count < 0:
+	if count is None or (isinstance(count, int) is False) or count <= 0:
 		x_count = 1
 	else:
-		x_count = (count % 2)
+		x_count = count
 	try:
 		if x_count == 1:
 			return (bool(((randInt(1, 0, 512) % 2) == 0)) is True)
