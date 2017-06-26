@@ -31,6 +31,24 @@ except Exception:
 	exit(255)
 
 
+try:
+	from pku import remediation as remediation
+except Exception:
+	try:
+		import pku.remediation as remediation
+	except Exception:
+		raise ImportError("Error Importing remediation")
+
+
+try:
+	from pku import utils as utils
+except Exception:
+	try:
+		import pku.utils as utils
+	except Exception:
+		raise ImportError("Error Importing remediation")
+
+
 RAND_CHARS = [
 	"""a""", """b""", """c""", """d""", """e""", """f""", """g""", """h""",
 	"""i""", """j""", """k""", """l""", """m""", """n""", """o""", """p""",
@@ -45,6 +63,7 @@ RAND_CHARS = [
 """Posible Chars for randChar (which is not so random, as it is very qwerty based)"""
 
 
+@remediation.error_handling
 def parseArgs(arguments=None):
 	theArgs = None
 	try:
@@ -69,6 +88,7 @@ def parseArgs(arguments=None):
 	return theArgs
 
 
+@remediation.error_handling
 def rand(count=None):
 	"""wrapper for os.urandom()"""
 	if count is None or count < 0:
@@ -84,9 +104,10 @@ def rand(count=None):
 		print(str(err.args))
 		err = None
 		del err
-		os.abort(3)
+		return None
 
 
+@remediation.error_handling
 def randStr(count=None):
 	"""wrapper for str(os.urandom())"""
 	if count is None or count < 0:
@@ -102,9 +123,10 @@ def randStr(count=None):
 		print(str(err.args))
 		err = None
 		del err
-		os.abort(3)
+		return None
 
 
+@remediation.error_handling
 def randInt(count=None, min=0, max=512):
 	"""wrapper for int(os.urandom())"""
 	if count is None or count < 0:
@@ -113,11 +135,11 @@ def randInt(count=None, min=0, max=512):
 		x_count = count
 	try:
 		if x_count == 1:
-			return (int.from_bytes(os.urandom(1), sys.byteorder) + min) % max
+			return (int(utils.extractInt(str(os.urandom(1))), 10) + min) % max
 		else:
 			theResult = []
 			for someInt in range(x_count):
-				theResult.append((int.from_bytes(os.urandom(1), sys.byteorder) + min) % max)
+				theResult.append(((randInt(1) + min) % max))
 			return theResult
 	except Exception as err:
 		print(str(u'FAILED DURRING RAND. ABORT.'))
@@ -126,7 +148,7 @@ def randInt(count=None, min=0, max=512):
 		print(str(err.args))
 		err = None
 		del err
-		os.abort(3)
+		return None
 
 
 def randBool(count=None):
@@ -144,7 +166,7 @@ def randBool(count=None):
 		print(str(err.args))
 		err = None
 		del err
-		os.abort(3)
+		return None
 
 
 def randChar(count=None):

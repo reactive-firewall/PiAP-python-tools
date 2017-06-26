@@ -135,6 +135,20 @@ def extractMACAddr(theInputStr):
 
 
 @remediation.error_handling
+def extractInts(theInputStr):
+	"""Extract the ints from a string."""
+	theResult = extractRegexPattern(theInputStr, """(?:[1234567890]{1})+""")
+	return theResult
+
+
+@remediation.error_handling
+def extractInt(theInputStr):
+	"""Extract an int from a string."""
+	theResult = extractInts(theInputStr)
+	return theResult[0]
+
+
+@remediation.error_handling
 def extractIfaceNames(theInputStr):
 	"""Extracts the expected iface names."""
 	return extractRegexPattern(
