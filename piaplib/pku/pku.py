@@ -26,7 +26,7 @@ try:
 	from . import upgrade as upgrade
 except Exception as err:
 	try:
-		import upgrade as upgrade
+		import piaplib.pku.upgrade as upgrade
 	except Exception:
 		raise ImportError("Error Importing upgrade tools")
 

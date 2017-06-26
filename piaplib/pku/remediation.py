@@ -83,8 +83,8 @@ def error_passing(func):
 			# sys.exc_clear()
 			err = None
 			del err
-			raise baton
 			theOutput = None
+			raise baton
 		return theOutput
 
 	return helper_func

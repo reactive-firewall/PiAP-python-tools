@@ -200,6 +200,8 @@ def randChar(count=None):
 			char_rand_seed = str(RAND_CHARS[randInt(1, 0, len(RAND_CHARS))])
 			while str(char_rand_seed).isalnum() is False:
 				char_rand_seed = RAND_CHARS[randInt(1, 0, len(RAND_CHARS))]
+			if (randBool(1)):
+				char_rand_seed = str(char_rand_seed).upper()
 			theRandomResult = str("{}{}").format(theRandomResult, str(char_rand_seed))
 		return theRandomResult
 	except Exception as err:

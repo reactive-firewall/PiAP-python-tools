@@ -231,7 +231,7 @@ def isLineForMatch(someLine=None, toMatch=None):
 		return False
 
 
-@remediation.error_handling
+@remediation.warning_handling
 def compactList(list, intern_func=None):
 	"""
 	Compacts Lists
@@ -268,7 +268,7 @@ def xstr(some_str=None):
 """ I/O and Files """
 
 
-@remediation.error_handling
+@remediation.warning_handling
 def open_func(file, mode='r', buffering=-1, encoding=None):
 	""" cross-python open function """
 	try:
@@ -283,7 +283,7 @@ def open_func(file, mode='r', buffering=-1, encoding=None):
 		return io.open(file, mode, buffering, encoding)
 
 
-@remediation.error_handling
+@remediation.warning_handling
 def write_func(someFile, the_data=None):
 	""" cross-python open function """
 	try:
@@ -415,7 +415,7 @@ def cleanFileResource(theFile):
 	return True
 
 
-@remediation.error_handling
+@remediation.bug_handling
 def main(argv=None):
 	"""The Main Event makes no sense to utils."""
 	raise NotImplementedError("CRITICAL - PKU Uitls main() not implemented. yet?")
