@@ -286,6 +286,7 @@ def get_client_arp_status_raw(client_ip=None, lan_interface=interfaces.INTERFACE
 
 def get_client_lease_status_raw(client_row=None):
 	"""list the raw status of client leases."""
+	theRawLeaseStatus = u'UNKNOWN'
 	try:
 		# should probably move to config file
 		theRawLeaseStatus = utils.readFile("/var/lib/misc/dnsmasq.leases")
@@ -344,6 +345,8 @@ def get_client_list(lan_interface=None):
 	theResult = None
 	try:
 		theRawClientState = get_client_arp_status_raw(None, lan_interface)
+		if theRawClientState is None:
+			theRawClientState = [None]
 		theResult = utils.compactList(
 			[x for x in utils.extractIPv4(theRawClientState) if u'10.0.40.' in x]
 		)
@@ -483,13 +486,19 @@ def main(argv=None):
 					u'<table class=\"table table-striped\">' +
 					u'<thead><th>Client</th><th>MAC</th><th>IP</th><th>Status</th></thead><tbody>'
 				))
-			for client_name in get_client_list(client_interface):
+			client_list = get_client_list(client_interface)
+			if client_list is None:
+				client_list = []
+			for client_name in client_list:
 				print(show_client(str(client_name), verbose, output_html, client_interface))
 			if output_html:
 				print("</tbody></table>")
 		else:
 			if args.list is True:
-				for client_name in get_client_list(client_interface):
+				client_list = get_client_list(client_interface)
+				if client_list is None:
+					client_list = []
+				for client_name in client_list:
 					print(str(client_name))
 			else:
 				ip = args.ip
