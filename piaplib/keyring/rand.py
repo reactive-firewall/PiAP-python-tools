@@ -136,9 +136,9 @@ def randInt(count=None, min=0, max=512):
 	if max is None:
 		max = 512
 	if count is None or (isinstance(count, int) is False) or count <= 0:
-		x_count = 32
+		x_count = 1
 	else:
-		x_count = count
+		x_count = int(count)
 	try:
 		if x_count == 1:
 			try:
@@ -148,7 +148,7 @@ def randInt(count=None, min=0, max=512):
 				else:
 					return (int.from_bytes(os.urandom(1), sys.byteorder) + min) % max
 			except Exception:
-				return (int(utils.extractInt(str(os.urandom(20))), 10) + min) % max
+				return int((int(str(utils.extractInt(str(os.urandom(20)))), 10) + min) % max)
 		else:
 			theResult = []
 			for someInt in range(x_count):
@@ -192,7 +192,7 @@ def randBool(count=None):
 @remediation.error_handling
 def randChar(count=None):
 	"""wrapper for str(os.urandom())"""
-	if count is None or count < 0:
+	if count is None or (isinstance(count, int) is False) or count <= 0:
 		x_count = 1
 	else:
 		x_count = int(count)
