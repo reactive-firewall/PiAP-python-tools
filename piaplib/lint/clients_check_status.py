@@ -356,6 +356,7 @@ def get_client_list(lan_interface=None):
 	return theResult
 
 
+@remediation.error_handling
 def get_client_status(client=None, use_html=False, lan_interface=None):
 	"""Generate the status"""
 	theResult = None
@@ -399,6 +400,7 @@ def get_client_status(client=None, use_html=False, lan_interface=None):
 	return theResult
 
 
+@remediation.error_handling
 def get_client_mac(client=None, use_html=False, lan_interface=None):
 	"""Generate output of the client mac."""
 	if client is None and use_html is not True:
@@ -431,6 +433,7 @@ def get_client_mac(client=None, use_html=False, lan_interface=None):
 	return theResult
 
 
+@remediation.error_handling
 def get_client_ip(client=None, use_html=False, lan_interface=None):
 	"""Generate output of the client IP."""
 	theResult = None
@@ -461,6 +464,7 @@ def get_client_ip(client=None, use_html=False, lan_interface=None):
 	return theResult
 
 
+@remediation.bug_handling
 def main(argv=None):
 	"""The main function."""
 	args = parseargs(argv)

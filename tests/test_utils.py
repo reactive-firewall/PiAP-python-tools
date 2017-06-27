@@ -475,5 +475,5 @@ and this will test reads.""")
 		assert theResult
 
 
-if __name__ == '__main__':
+if __name__ == u'__main__':
 	unittest.main()

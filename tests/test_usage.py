@@ -33,8 +33,8 @@ def getPythonCommand():
 			thepython = str("coverage run -p")
 		else:
 			thepython = checkPythonCommand(["which", "python3"])
-			if (str("/python3") in str(thepython)) or (sys.version_info <= (3, 2)):
-				thepython = "python"
+			if (str("/python3") not in str(thepython)) or (sys.version_info <= (3, 2)):
+				thepython = "python3"
 	except Exception:
 		thepython = "exit 1 ; #"
 		try:
@@ -56,8 +56,8 @@ def checkPythonCommand(args=[None], stderr=None):
 			if str("coverage ") in args[0]:
 				args[0] = str("coverage")
 				args.insert(1, "run")
-				args.insert(2, "--source=piaplib,piaplib/lint,piaplib/keyring,piaplib/pku")
 				args.insert(2, "-p")
+				args.insert(2, "--source=piaplib,piaplib/lint,piaplib/keyring,piaplib/pku,piaplib/book")
 			theOutput = subprocess.check_output(args, stderr=stderr)
 	except Exception:
 		theOutput = None
@@ -74,7 +74,7 @@ def checkPythonFuzzing(args=[None], stderr=None):
 			if str("coverage ") in args[0]:
 				args[0] = str("coverage")
 				args.insert(1, "run")
-				args.insert(2, "--source=piaplib,piaplib/lint,piaplib/keyring,piaplib/pku")
+				args.insert(2, "--source=piaplib,piaplib/lint,piaplib/keyring,piaplib/pku,piaplib/book")
 				args.insert(2, "-p")
 			theOutput = subprocess.check_output(args, stderr=stderr)
 	except Exception as err:
@@ -252,7 +252,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 			thepython = getPythonCommand()
 			if (thepython is not None):
 				try:
-					for unit in ["lint.lint", "pku.pku", "pku.book", "keyring.keyring"]:
+					for unit in ["lint.lint", "pku.pku", "book.book", "keyring.keyring"]:
 						theOutputtext = checkPythonCommand([
 							str(thepython),
 							str("-m"),
@@ -879,6 +879,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 					else:
 						theResult = False
 						print(str(""))
+						print(str("TEST: check clients's html"))
 						print(str("python cmd is {}").format(str(thepython)))
 						print(str(""))
 						print(str("actual output was..."))
@@ -1288,12 +1289,12 @@ class BasicUsageTestSuite(unittest.TestCase):
 			thepython = getPythonCommand()
 			if (thepython is not None):
 				try:
-					self.assertIsNone(checkPythonCommand([
+					self.assertIsNotNone(checkPythonCommand([
 						str(thepython),
 						str("-m"),
 						str("piaplib.pocket"),
 						str("lint"),
-						str("do_execve"),
+						str("execve"),
 						str("""--cmd={}""").format(str("echo")),
 						str("""--args={}""").format(str("test"))
 					], stderr=subprocess.STDOUT))

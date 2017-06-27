@@ -363,20 +363,13 @@ class RandTestSuite(unittest.TestCase):
 				temp = rand.rand(1)
 				for rand_roll in range(1000):
 					seen_alpha = ((seen_alpha is True) or str(temp).isalpha())
-					if str(temp).isalpha():
-						temp = rand.rand(1)
-						continue
 					seen_digit = ((seen_digit is True) or str(temp).isdigit())
-					if str(temp).isdigit():
-						temp = rand.rand(1)
-						continue
 					seen_special = ((seen_special is True) or (str(temp).isalnum() is False))
-					if (seen_alpha is True) and (seen_digit is True) and (seen_special is True):
-						continue
 					temp = rand.rand(1)
 			if (seen_alpha is True) and (seen_digit is True) and (seen_special is True):
 				theResult = (theResult is True)
-			del temp
+			temp = None
+			del(temp)
 		except Exception as impErr:
 			print(str(""))
 			print(str(type(impErr)))
