@@ -63,12 +63,12 @@ except Exception:
 		raise ImportError("Error Importing interfaces")
 
 try:
-	from piaplib.pku.logs import logs as logs
+	from piaplib.book.logs import logs as logs
 except Exception:
 	try:
-		from .logs import logs as logs
+		from ..book.logs import logs as logs
 	except Exception:
-		raise ImportError("Error Importing interfaces")
+		raise ImportError("Error Importing logs")
 
 try:
 	import argparse

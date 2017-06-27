@@ -42,12 +42,15 @@ except Exception:
 
 
 try:
-	from .logs import logs as logs
+	from ..book.logs import logs as logs
 except Exception:
 	try:
-		from logs import logs as logs
+		from book.logs import logs as logs
 	except Exception:
-		raise ImportError("Error Importing logs")
+		try:
+			from piaplib.book.logs import logs as logs
+		except Exception:
+			raise ImportError("Error Importing logs")
 
 
 @remediation.error_handling

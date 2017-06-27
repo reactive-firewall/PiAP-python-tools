@@ -152,9 +152,9 @@ class logs:
 
 
 def main(argv=None):
-	"""The Main Event makes no sense to utils."""
+	"""The Main Event makes no sense to logs yet."""
 	try:
-		raise NotImplementedError("CRITICAL - PKU logs main() not implemented. yet?")
+		raise NotImplementedError("CRITICAL - Pocket Book logs main() not implemented.")
 		exit(3)
 	except Exception as err:
 		logs.log(str(type(err)), "Critical")
@@ -165,8 +165,9 @@ def main(argv=None):
 if __name__ in u'__main__':
 	try:
 		import sys
-		main(sys.argv[1:])
+		exitcode = main(sys.argv[1:])
 	except Exception:
-		exit(3)
+		exitcode = 3
+	exit(exitcode)
 
 

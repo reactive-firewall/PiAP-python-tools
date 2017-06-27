@@ -22,10 +22,10 @@ try:
 	import sys
 	sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 	try:
-		from ..pku.logs import logs as logs
+		from ..book.logs import logs as logs
 	except Exception:
 		try:
-			from pku.logs import logs as logs
+			from book.logs import logs as logs
 		except Exception as err:
 			print(str(type(err)))
 			print(str(err))

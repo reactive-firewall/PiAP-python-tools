@@ -51,10 +51,10 @@ except Exception:
 		raise ImportError("Error Importing remediation")
 
 try:
-	from piaplib.pku.logs import logs as logs
+	from piaplib.book.logs import logs as logs
 except Exception:
 	try:
-		from piaplib.pku.logs import logs as logs
+		from piaplib.book.logs import logs as logs
 	except Exception:
 		raise ImportError("Error Importing logs")
 
@@ -107,7 +107,7 @@ def useCheckTool(tool, arguments=[None]):
 		except Exception:
 			logs.log(
 				str(
-					"An error occured while handling the keyring tool. Cascading failure."
+					"An error occured while handling the health check tool. Cascading failure."
 				),
 				"WARNING"
 			)

@@ -41,10 +41,10 @@ except Exception as err:
 
 
 try:
-	from piaplib.pku.logs import logs as logs
+	from piaplib.book.logs import logs as logs
 except Exception:
 	try:
-		from .logs import logs as logs
+		from book.logs import logs as logs
 	except Exception as err:
 		print(str(type(err)))
 		print(str(err))

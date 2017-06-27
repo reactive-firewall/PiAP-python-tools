@@ -183,6 +183,8 @@ class BasicUsageTestSuite(unittest.TestCase):
 				theResult = True
 			elif (str("coverage") in str(thepython)) or (sys.version_info <= (3, 2)):
 				theResult = True
+			elif (str("python") in str(thepython)) or (sys.version_info >= (3, 2)):
+				theResult = True
 		except Exception:
 			theResult = False
 			try:
@@ -250,7 +252,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 			thepython = getPythonCommand()
 			if (thepython is not None):
 				try:
-					for unit in ["lint.lint", "pku.pku", "keyring.keyring"]:
+					for unit in ["lint.lint", "pku.pku", "pku.book", "keyring.keyring"]:
 						theOutputtext = checkPythonCommand([
 							str(thepython),
 							str("-m"),
@@ -1265,6 +1267,46 @@ class BasicUsageTestSuite(unittest.TestCase):
 						str("""-i {} -r""").format(str("eth0"))
 					], stderr=subprocess.STDOUT)
 				self.assertIsNone(theOutputtext)
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			othererr = None
+			del othererr
+			theResult = False
+		assert theResult
+
+	def test_o_exec_command_run(self):
+		"""Test case for piaplib.pocket.lint do_execve calls."""
+		theResult = False
+		try:
+			import sys
+			if sys.__name__ is None:
+				raise ImportError("Failed to import system. WTF?!!")
+			thepython = getPythonCommand()
+			if (thepython is not None):
+				try:
+					self.assertIsNone(checkPythonCommand([
+						str(thepython),
+						str("-m"),
+						str("piaplib.pocket"),
+						str("lint"),
+						str("do_execve"),
+						str("""--cmd={}""").format(str("echo")),
+						str("""--args={}""").format(str("test"))
+					], stderr=subprocess.STDOUT))
+					theResult = True
+				except Exception as othererr:
+					print(str(""))
+					print(str(type(othererr)))
+					print(str(othererr))
+					print(str((othererr.args)))
+					print(str(""))
+					othererr = None
+					del othererr
+					theResult = False
 		except Exception as err:
 			print(str(""))
 			print(str(type(err)))
