@@ -102,7 +102,7 @@ def useCheckTool(tool, arguments=[None]):
 		return None
 	if tool in CHECK_UNITS.keys():
 		try:
-			# print(str("check launching: "+tool))
+			logs.log(str("check launching: " + str(tool)), "DEBUG")
 			theResult = CHECK_UNITS[tool].main(arguments)
 		except Exception:
 			logs.log(
@@ -129,11 +129,11 @@ def main(argv=None):
 			print(str(cerr))
 			print(str(cerr.args))
 			print(str(" UNKNOWN - An error occured while handling the arguments. Command failure."))
-			exit(3)
+			return 3
 	except Exception:
 		print(str(" UNKNOWN - An error occured while handling the failure. Cascading failure."))
-		exit(3)
-	exit(0)
+		return 3
+	return 0
 
 
 if __name__ in u'__main__':

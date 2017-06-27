@@ -195,6 +195,8 @@ class PocketUsageTestSuite(unittest.TestCase):
 						], stderr=subprocess.STDOUT)
 						if (str("usage:") in str(theOutputtext)):
 							theResult = True
+						elif (theOutputtext is None):
+							theResult = True
 						else:
 							theResult = False
 							print(str(""))
@@ -224,8 +226,8 @@ class PocketUsageTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
-	def test_d_python_command_bad_saltify(self):
-		"""Test case for piaplib.pocket.lint check users."""
+	def test_d_python_command_bad_pocket(self):
+		"""Test case for piaplib.pocket check null."""
 		theResult = True
 		try:
 			from piaplib import pku as pku
@@ -244,29 +246,7 @@ class PocketUsageTestSuite(unittest.TestCase):
 					theOutputtext = checkPythonFuzzing([
 						str(thepython),
 						str("-m"),
-						str("piaplib.pocket"),
-						str("keyring"),
-						str("saltify"),
-						str("""--salt={}""").format(str("testSalt"))
-					], stderr=subprocess.STDOUT)
-				self.assertIsNone(theOutputtext)
-				with self.assertRaises(Exception):
-					theOutputtext = checkPythonFuzzing([
-						str(thepython),
-						str("-m"),
-						str("piaplib.pocket"),
-						str("keyring"),
-						str("saltify"),
-						str("""--msg={}""").format(str("Test Message"))
-					], stderr=subprocess.STDOUT)
-				self.assertIsNone(theOutputtext)
-				with self.assertRaises(Exception):
-					theOutputtext = checkPythonFuzzing([
-						str(thepython),
-						str("-m"),
-						str("piaplib.pocket"),
-						str("keyring"),
-						str("saltify")
+						str("piaplib.pocket")
 					], stderr=subprocess.STDOUT)
 				self.assertIsNone(theOutputtext)
 		except Exception as err:
