@@ -192,27 +192,17 @@ class SaltTestSuite(unittest.TestCase):
 					continue
 				this_test = str(os.urandom(10))
 				that_test = str(os.urandom(10))
+				self.assertIsNotNone(that_test)
+				self.assertIsNotNone(this_test)
+				self.assertNotEqual(this_test, that_test)
 				for test_salt in salt_list:
 					a = saltify.saltify(str(this_test), str(randomSalt))
 					b = saltify.saltify(str(that_test), str(test_salt))
-					if (a is not None) and (b is not None) and (a is not b):
-						temp = True
-					else:
-						temp = False
-					theResult = ((theResult is True) and (temp is True))
-					if (temp is False):
-						print(str("COLLISION - NEW TEST FOUND:"))
-						try:
-							print(str("salt( {}, {} ) != salt( {}, {} )").format(
-								this_test,
-								randomSalt,
-								that_test,
-								test_salt
-							))
-						except Exception:
-							print("unprintable test")
+					self.assertIsNotNone(a)
+					self.assertIsNotNone(b)
+					self.assertNotEqual(a, b)
 		except Exception as testErr:
-			print(str("fuzzing"))
+			print(str("Entropy - Fuzzing Crash Found new test"))
 			print(str(""))
 			print(str(type(testErr)))
 			print(str(testErr))
