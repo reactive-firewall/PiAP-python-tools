@@ -131,9 +131,9 @@ def randStr(count=None):
 @remediation.error_handling
 def randInt(count=None, min=0, max=512):
 	"""wrapper for int(os.urandom())"""
-	if min is None:
+	if min is None or (isinstance(min, int) is False) or min <= 0:
 		min = 0
-	if max is None:
+	if max is None or (isinstance(max, int) is False) or max <= 0:
 		max = 512
 	if count is None or (isinstance(count, int) is False) or count <= 0:
 		x_count = 1
@@ -144,11 +144,25 @@ def randInt(count=None, min=0, max=512):
 			try:
 				import six
 				if six.PY2:
-					return (int(utils.extractInt(str(os.urandom(20))), 10) + min) % max
+					rand_int_seed = None
+					while rand_int_seed is None:
+						try:
+							rand_int_seed = str(os.urandom(max % 1000)).index(str(os.urandom(1)))
+						except ValueError:
+							continue
+					entropy = utils.extractInt(str(rand_int_seed))
+					return (int(entropy, 10) + min) % max
 				else:
 					return (int.from_bytes(os.urandom(1), sys.byteorder) + min) % max
 			except Exception:
-				return int((int(str(utils.extractInt(str(os.urandom(20)))), 10) + min) % max)
+				rand_int_seed = None
+				while rand_int_seed is None:
+					try:
+						rand_int_seed = str(os.urandom(max % 1000)).index(str(os.urandom(1)))
+					except ValueError:
+						continue
+				entropy = utils.extractInt(str(rand_int_seed))
+				return (int(entropy, 10) + min) % max
 		else:
 			theResult = []
 			for someInt in range(x_count):

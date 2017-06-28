@@ -140,7 +140,7 @@ def extractMACAddr(theInputStr):
 @remediation.error_handling
 def extractInts(theInputStr):
 	"""Extract the ints from a string."""
-	theResult = extractRegexPattern(theInputStr, """(?:[1234567890]{1})+""")
+	theResult = extractRegexPattern(theInputStr, """([1234567890]{1})+""")
 	return theResult
 
 
