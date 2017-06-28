@@ -52,6 +52,14 @@ except Exception:
 		except Exception:
 			raise ImportError("Error Importing logs")
 
+try:
+	import six
+	if six.PY3:
+		class unicode(str):
+			pass
+except Exception:
+	raise ImportError("Error Importing utils")
+
 
 @remediation.error_handling
 def literal_code(raw_input=None):
@@ -69,7 +77,7 @@ def literal_code(raw_input=None):
 	except Exception as malformErr:
 		logs.log("[CWE-20] Possible malformed string attack occured.", "info")
 		malformErr = None
-		del malformErr
+		del(malformErr)
 		return None
 	return None
 
@@ -87,10 +95,12 @@ def literal_str(raw_input=None):
 			return str(raw_input.decode("utf-8"))
 		elif isinstance(raw_input, str):
 			return str(raw_input.encode("utf-8").decode("utf-8"))
+		elif isinstance(raw_input, unicode):
+			return str(raw_input.encode("utf-8").decode("utf-8"))
 	except Exception as malformErr:
 		logs.log("[CWE-20] Possible malformed string attack occured.", "info")
 		malformErr = None
-		del malformErr
+		del(malformErr)
 		return None
 	return None
 

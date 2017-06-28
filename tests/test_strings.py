@@ -234,21 +234,27 @@ class StringsTestSuite(unittest.TestCase):
 				(utils.literal_str(b'c'), utils.literal_str("c")),
 				(utils.literal_str(b'C'), utils.literal_str("C")),
 				(utils.literal_str(b'\x1f'), utils.literal_str(str(u'\x1f'))),
-				(utils.literal_str(b'\x1f'), utils.literal_str("\x1f"))
+				(utils.literal_str(b'\x1f'), utils.literal_str("\x1f")),
+				(utils.literal_str(b'\xee'), utils.literal_str(str(u'\xee'))),
+				(utils.literal_str(b'\xee'), utils.literal_str("\xee")),
+				(utils.literal_str(b'\x05'), utils.literal_str(str(u'\x05'))),
+				(utils.literal_str(b'\x05'), utils.literal_str("\x05"))
 			]
 			for testcase in the_test_cases:
 				if theResult is True:
+					if testcase[0] is None:
+						continue
 					if testcase[1] is not None:
 						theResult = (
 							testcase[0] in testcase[1]
 						)
 					if utils.literal_str(testcase[1]) is not None:
 						theResult_temp = (
-							testcase[0] in testcase[1]
+							utils.literal_str(testcase[0]) in utils.literal_str(testcase[1])
 						)
 						theResult = (theResult is True) and (theResult_temp is True)
 						theResult_temp = None
-						del theResult_temp
+						del(theResult_temp)
 		except Exception as err:
 			print(str(""))
 			print(str(type(err)))
