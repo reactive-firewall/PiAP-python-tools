@@ -72,7 +72,6 @@ matrix:
 install:  "make init"
 
 before_install:
-  - travis_fold
   - if [ $TRAVIS_OS_NAME == osx ] ; then travis_retry brew tap homebrew/versions || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then travis_wait brew upgrade || travis_retry brew upgrade || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python2.6 $INSTALL || true ; fi
@@ -97,15 +96,16 @@ before_install:
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install coverage $INSTALL || true ; fi
   - travis_retry pip install tox || pip install tox || true ;
   - travis_retry python3 -m pip install tox || python3 -m pip install tox || true ;
+  - travis_retry pip install coverage || true ;
+  - travis_retry pip install codecov || true ;
   - travis_retry python3 -m pip install coverage || python3 -m pip install coverage || true ;
   - travis_retry python3 -m pip install codecov || python3 -m pip install codecov || true ;
   - travis_retry python -m pip install coverage || python -m pip install coverage || true ;
   - travis_retry python -m pip install codecov || python -m pip install codecov || true ;
-  - travis_retry pip install codecov || true ;
 
 script:
   - make clean ;
-  - if [ $TRAVIS_OS_NAME == osx ] ; then echo "SKIP" ; else travis_wait make test || exit $? ; fi ;
+  - if [ $TRAVIS_OS_NAME == osx ] ; then echo "SKIP" ; else make test || exit $? ; fi ;
   - codecov || true
   - make clean || exit $? ; 
   - travis_wait make test-tox || exit $? ;
