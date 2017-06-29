@@ -26,6 +26,9 @@ matrix:
     python:  "3.5"
     dist: trusty
   - os: linux
+    python:  "3.5"
+    dist: precice
+  - os: linux
     python:  "3.6"
   - os: linux
     python:  "3.5-dev" # 3.5 development branch
@@ -102,7 +105,7 @@ before_install:
 
 script:
   - make clean ;
-  - if [ $TRAVIS_OS_NAME == osx ] ; then echo "SKIP" ; else make test || exit $? ; fi ;
+  - if [ $TRAVIS_OS_NAME == osx ] ; then echo "SKIP" ; else travis_wait make test || exit $? ; fi ;
   - codecov || true
   - make clean || exit $? ; 
   - travis_wait make test-tox || exit $? ;
