@@ -404,6 +404,9 @@ and this will test reads.""")
 			from pku import utils as utils
 			if utils.__name__ is None:
 				raise ImportError("Failed to import utils")
+			from keyring import rand as rand
+			if rand.__name__ is None:
+				raise ImportError("Failed to import rand")
 			theBlob = str("""This is just a test for failure.""")
 			somefile = str(os.path.join(
 				os.path.join(
@@ -411,7 +414,13 @@ and this will test reads.""")
 					str('some_long')
 				),
 				os.path.join(
-					os.path.join(str('very'), str('long')),
+					os.path.join(
+						os.path.join(str('very'), str('long')),
+						os.path.join(
+							os.path.join(str(rand.randInt(1, 50, 900)), str('blahblah')),
+							str(rand.randInt(1, 50, 900))
+						)
+					),
 					str('filename.tmp')
 				)
 			))

@@ -120,9 +120,12 @@ class logs:
 		'debug': ANSIColors.BLUE, 'info': ANSIColors.GREEN,
 		'warn': ANSIColors.AMBER, 'warning': ANSIColors.AMBER,
 		'error': ANSIColors.FAIL, 'crit': str(ANSIColors.FAIL + ANSIColors.BLINK),
-		'critical': str(ANSIColors.FAIL + ANSIColors.BLINK)
+		'critical': str(str(ANSIColors.FAIL) + str(ANSIColors.BLINK))
 	}
 	"""Mappings from different log levels to colors."""
+
+	def __call__(self, *args, **kwargs):
+		return self.log(args, kwargs)
 
 	def log(msg=str("Checked in"), loglevel="info"):
 		"""Logs a message."""

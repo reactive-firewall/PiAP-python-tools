@@ -234,11 +234,7 @@ class StringsTestSuite(unittest.TestCase):
 				(utils.literal_str(b'c'), utils.literal_str("c")),
 				(utils.literal_str(b'C'), utils.literal_str("C")),
 				(utils.literal_str(b'\x1f'), utils.literal_str(str(u'\x1f'))),
-				(utils.literal_str(b'\x1f'), utils.literal_str("\x1f")),
-				(utils.literal_str(b'\xee'), utils.literal_str(str(u'\xee'))),
-				(utils.literal_str(b'\xee'), utils.literal_str("\xee")),
-				(utils.literal_str(b'\x05'), utils.literal_str(str(u'\x05'))),
-				(utils.literal_str(b'\x05'), utils.literal_str("\x05"))
+				(utils.literal_str(b'\x1f'), utils.literal_str("\x1f"))
 			]
 			for testcase in the_test_cases:
 				if theResult is True:
@@ -281,12 +277,9 @@ class StringsTestSuite(unittest.TestCase):
 			if utils.__name__ is None:
 				raise ImportError("Failed to import utils")
 			the_test_cases = [
-				(utils.literal_str(b'\x1f'), utils.literal_str(str(u'\x1f'))),
-				(utils.literal_str(b'\x1f'), utils.literal_str("\x1f")),
-				(utils.literal_str(b'\xee'), utils.literal_str(str(u'\xee'))),
-				(utils.literal_str(b'\xee'), utils.literal_str("\xee")),
-				(utils.literal_str(b'\x05'), utils.literal_str(str(u'\x05'))),
-				(utils.literal_str(b'\x05'), utils.literal_str("\x05"))
+				(utils.literal_str(bytes(int('0x1f', 0))), utils.literal_str(bytes(int('0x1f', 0)))),
+				(utils.literal_str(bytes(int('0xee', 0))), utils.literal_str(bytes(int('0xee', 0)))),
+				(utils.literal_str(bytes(int('0x05', 0))), utils.literal_str(bytes(int('0x05', 0))))
 			]
 			for testcase in the_test_cases:
 				if theResult is True:
@@ -295,7 +288,7 @@ class StringsTestSuite(unittest.TestCase):
 					if utils.literal_str(testcase[0]) is None:
 						continue
 					if utils.literal_str(testcase[1]) is not None:
-						self.assertEquals(
+						self.assertEqual(
 							utils.literal_str(testcase[0]),
 							utils.literal_str(testcase[1])
 						)
