@@ -81,8 +81,8 @@ def parseArgs(arguments=None):
 	"""Parses the CLI arguments."""
 	parser = argparse.ArgumentParser(
 		prog=__prog__,
-		description='Handles PiAP pocket lint',
-		epilog="PiAP Lint Controller for extra tools."
+		description='Handles PiAP pocket checks',
+		epilog="PiAP Pocket Check Controller for health checks."
 	)
 	parser.add_argument(
 		'check_unit',
@@ -126,12 +126,25 @@ def main(argv=None):
 			lint_cmd = args.check_unit
 			useCheckTool(lint_cmd, extra)
 		except Exception as cerr:
-			print(str(cerr))
-			print(str(cerr.args))
-			print(str(" UNKNOWN - An error occured while handling the arguments. Command failure."))
+			logs.log(
+				str(
+					"An error occured while handling the arguments. Command failure."
+				),
+				"ERROR"
+			)
+			logs.log(str(type(cerr)), "ERROR")
+			logs.log(str(cerr), "ERROR")
+			logs.log(str((cerr.args)), "ERROR")
+			cerr = None
+			del(cerr)
 			return 3
 	except Exception:
-		print(str(" UNKNOWN - An error occured while handling the failure. Cascading failure."))
+		logs.log(
+			str(
+				"An error occured while handling the failure. Cascading failure."
+			),
+			"ERROR"
+		)
 		return 3
 	return 0
 
