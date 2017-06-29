@@ -187,7 +187,7 @@ class SaltTestSuite(unittest.TestCase):
 				randomSalt_shift2, randomSalt_shift3,
 				randomSalt_shift4, randomSalt_shift5
 			]
-			for someRandomTest in range(100000):
+			for someRandomTest in range(10000):
 				if theResult is not True:
 					continue
 				this_test = str(os.urandom(10))
