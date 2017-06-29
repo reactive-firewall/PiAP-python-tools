@@ -31,6 +31,14 @@ except Exception as err:
 	raise ImportError(err)
 	exit(3)
 
+try:
+	import sys
+	if sys.__name__ is None:
+		raise ImportError("OMG! we could not import os. We're like in the matrix! ABORT. ABORT.")
+except Exception as err:
+	raise ImportError(err)
+	exit(3)
+
 
 try:
 	from . import remediation as remediation
@@ -53,8 +61,7 @@ except Exception:
 			raise ImportError("Error Importing logs")
 
 try:
-	import six
-	if six.PY3:
+	if (sys.version_info >= (3, 2)):
 		class unicode(str):
 			pass
 except Exception:
