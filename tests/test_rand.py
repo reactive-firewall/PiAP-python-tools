@@ -362,7 +362,7 @@ class RandTestSuite(unittest.TestCase):
 			if rand.__name__ is None:
 				theResult = False
 			temp = str(rand.rand(1))
-			for rand_roll in range(1000):
+			for rand_roll in range(10000):
 				seen_alpha = ((seen_alpha is True) or str(temp).isalpha())
 				seen_digit = ((seen_digit is True) or str(temp).isdigit())
 				seen_special = ((seen_special is True) or (str(temp).isalnum() is False))
