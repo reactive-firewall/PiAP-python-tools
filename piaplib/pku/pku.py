@@ -108,39 +108,31 @@ def parseArgs(arguments=None):
 	return parser.parse_known_args(arguments)
 
 
-def getTimeStamp():
-	"""Returns the time stamp."""
-	theDate = remediation.getTimeStamp()
-	return theDate
-
-
 def usePKUTool(tool, arguments=[None]):
 	"""Handler for launching pocket-tools."""
 	if tool is None:
-		return None
+		return 0
 	if tool in PKU_UNITS.keys():
 		try:
 			try:
-				logs.log(str("pku launching: {}").format(str(tool)), "debug")
+				logs.log(str("pku launching: {}").format(str(tool)), "DEBUG")
 				PKU_UNITS[tool].main(arguments)
 			except Exception:
-				timestamp = getTimeStamp()
-				theResult = str(
-					timestamp +
-					" - WARNING - An error occured while handling the PKU tool. " +
-					"Cascading failure."
-				)
+				logs.log(str("An error occured while handling the PKU tool. "), "WARNING")
+				logs.log(str("Cascading failure."), "Error")
+				return 3
 		except Exception:
-			theResult = str("CRITICAL - An error occured while handling the cascading failure.")
-		return theResult
+			logs.log(str("An error occured while handling the cascading failure."), "CRITICAL")
+			return 3
+		return 0
 	else:
-		return None
+		return 1
 
 
 @remediation.bug_handling
 def main(argv=None):
 	"""The main event"""
-	# print("PiAP PKU")
+	# logs.log(str(__prog__), "DEBUG")
 	try:
 		try:
 			args, extra = parseArgs(argv)
@@ -153,14 +145,14 @@ def main(argv=None):
 				str(" UNKNOWN - An error occured while handling the arguments. Command failure."),
 				"Error"
 			)
-			return 3
+			return 2
 	except Exception:
 		logs.log(
 			str(" UNKNOWN - An error occured while handling the failure. Cascading failure."),
 			"Error"
 		)
-		return 3
-	return 0
+		return 2
+	return 3
 
 
 if __name__ in u'__main__':

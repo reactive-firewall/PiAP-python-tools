@@ -69,11 +69,12 @@ matrix:
 install:  "make init"
 
 before_install:
+  - travis_fold
   - if [ $TRAVIS_OS_NAME == osx ] ; then travis_retry brew tap homebrew/versions || true ; fi
-  - if [ $TRAVIS_OS_NAME == osx ] ; then travis_retry brew upgrade || brew upgrade || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then travis_wait brew upgrade || travis_retry brew upgrade || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python2.6 $INSTALL || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python26 $INSTALL || true ; fi
-  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3 $INSTALL || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then travis_wait brew install python3 $INSTALL || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3.3 $INSTALL || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install py3.3 $INSTALL || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3.4 $INSTALL || true ; fi
@@ -86,6 +87,7 @@ before_install:
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python36 $INSTALL || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install py3.6 $INSTALL || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python2.7 $INSTALL || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python27 $INSTALL || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install py2.7 $INSTALL || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3.6 $INSTALL || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3.7 $INSTALL || true ; fi
@@ -103,11 +105,11 @@ script:
   - if [ $TRAVIS_OS_NAME == osx ] ; then echo "SKIP" ; else make test || exit $? ; fi ;
   - codecov || true
   - make clean || exit $? ; 
-  - make test-tox || exit $? ;
+  - travis_wait make test-tox || exit $? ;
   - make clean ;
   - if [ $TRAVIS_OS_NAME == osx ] ; then true ; wait ; else pip install --upgrade -e git+https://github.com/reactive-firewall/PiAP-python-tools.git@${TRAVIS_PULL_REQUEST_SHA:-${TRAVIS_COMMIT}}#egg=piaplib ; fi ; wait ;
 
 after_success:
   - codecov || true
-  - if [ $TRAVIS_OS_NAME == osx ] ; then true ; wait ; else coverage -p -m piaplib.pocket pku upgrade --upgrade-all || true ; wait ; codecov || true ; fi ; wait ;
+  - if [ $TRAVIS_OS_NAME == osx ] ; then true ; wait ; else coverage run -p -m piaplib.pocket pku upgrade --upgrade-all || true ; wait ; codecov || true ; fi ; wait ;
   - codecov || true
