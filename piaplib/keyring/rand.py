@@ -40,15 +40,6 @@ except Exception:
 		raise ImportError("Error Importing remediation")
 
 
-try:
-	from ..pku import utils as utils
-except Exception:
-	try:
-		import pku.utils as utils
-	except Exception:
-		raise ImportError("Error Importing remediation")
-
-
 RAND_CHARS = [
 	str("""a"""), str("""b"""), str("""c"""), str("""d"""), str("""e"""), str("""f"""),
 	str("""g"""), str("""h"""), str("""i"""), str("""j"""), str("""k"""), str("""l"""),
@@ -93,7 +84,7 @@ def parseArgs(arguments=None):
 @remediation.error_handling
 def rand(count=None):
 	"""wrapper for os.urandom()"""
-	if count is None or (isinstance(count, int) is False) or count <= 0:
+	if count is None or (isinstance(count, int) is False) or count <= 1:
 		x_count = 512
 	else:
 		x_count = count
@@ -112,7 +103,7 @@ def rand(count=None):
 @remediation.error_handling
 def randStr(count=None):
 	"""wrapper for str(os.urandom())"""
-	if count is None or (isinstance(count, int) is False) or count <= 0:
+	if count is None or (isinstance(count, int) is False) or count <= 1:
 		x_count = 512
 	else:
 		x_count = count
@@ -133,40 +124,22 @@ def randInt(count=None, min=0, max=512):
 	"""wrapper for int(os.urandom())"""
 	if min is None or (isinstance(min, int) is False) or min <= 0:
 		min = 0
-	if max is None or (isinstance(max, int) is False) or max <= 0:
+	if max is None or (isinstance(max, int) is False) or max <= 0 or max <= min:
 		max = 512
-	if count is None or (isinstance(count, int) is False) or count <= 0:
+	if count is None or (isinstance(count, int) is False) or count <= 1:
 		x_count = 1
 	else:
 		x_count = int(count)
 	try:
-		if x_count == 1:
-			try:
-				import six
-				if six.PY2:
-					rand_int_seed = None
-					while rand_int_seed is None:
-						try:
-							rand_int_seed = str(os.urandom(max % 1000)).index(str(os.urandom(1)))
-						except ValueError:
-							continue
-					entropy = utils.extractInt(str(rand_int_seed))
-					return (int(entropy, 10) + min) % max
-				else:
-					return (int.from_bytes(os.urandom(1), sys.byteorder) + min) % max
-			except Exception:
-				rand_int_seed = None
-				while rand_int_seed is None:
-					try:
-						rand_int_seed = str(os.urandom(max % 1000)).index(str(os.urandom(1)))
-					except ValueError:
-						continue
-				entropy = utils.extractInt(str(rand_int_seed))
-				return (int(entropy, 10) + min) % max
+		if x_count <= 1:
+			import random
+			entropy = random.Random()
+			entropy.seed(a=os.urandom(128))
+			return random.randint(min, max)
 		else:
 			theResult = []
 			for someInt in range(x_count):
-				theResult.append((randInt(1) + min) % max)
+				theResult.append(randInt(1, min, max))
 			return theResult
 	except Exception as err:
 		print(str(u'FAILED DURRING RAND-INT. ABORT.'))
@@ -181,7 +154,7 @@ def randInt(count=None, min=0, max=512):
 @remediation.error_handling
 def randBool(count=None):
 	"""wrapper for str(os.urandom())"""
-	if count is None or (isinstance(count, int) is False) or count <= 0:
+	if count is None or (isinstance(count, int) is False) or count <= 1:
 		x_count = 1
 	else:
 		x_count = count
@@ -206,16 +179,16 @@ def randBool(count=None):
 @remediation.error_handling
 def randChar(count=None):
 	"""wrapper for str(os.urandom())"""
-	if count is None or (isinstance(count, int) is False) or count <= 0:
+	if count is None or (isinstance(count, int) is False) or count <= 1:
 		x_count = 1
 	else:
 		x_count = int(count)
 	try:
 		theRandomResult = str("")
 		for char_x in range(x_count):
-			char_rand_seed = str(RAND_CHARS[randInt(1, 0, len(RAND_CHARS))])
+			char_rand_seed = str(RAND_CHARS[randInt(1, 0, 65)])
 			while str(char_rand_seed).isalnum() is False:
-				char_rand_seed = RAND_CHARS[randInt(1, 0, len(RAND_CHARS))]
+				char_rand_seed = str(RAND_CHARS[randInt(1, 0, 65)])
 			if (randBool(1)):
 				char_rand_seed = str(char_rand_seed).upper()
 			theRandomResult = str("{}{}").format(theRandomResult, str(char_rand_seed))
@@ -225,6 +198,8 @@ def randChar(count=None):
 		print(str(type(err)))
 		print(str(err))
 		print(str(err.args))
+		print(str(RAND_CHARS))
+		print(str(len(RAND_CHARS)))
 		err = None
 		del err
 	return None
