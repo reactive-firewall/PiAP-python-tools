@@ -266,7 +266,47 @@ class StringsTestSuite(unittest.TestCase):
 			print(str((err.args)))
 			print(str(""))
 			err = None
-			del err
+			del(err)
+			theResult = False
+		assert theResult
+
+	def test_case_utils_bad_literal_str(self):
+		"""Tests the literal string functions with ABC"""
+		theResult = True
+		try:
+			from piaplib import pku as pku
+			if pku.__name__ is None:
+				raise ImportError("Failed to import pku")
+			from pku import utils as utils
+			if utils.__name__ is None:
+				raise ImportError("Failed to import utils")
+			the_test_cases = [
+				(utils.literal_str(b'\x1f'), utils.literal_str(str(u'\x1f'))),
+				(utils.literal_str(b'\x1f'), utils.literal_str("\x1f")),
+				(utils.literal_str(b'\xee'), utils.literal_str(str(u'\xee'))),
+				(utils.literal_str(b'\xee'), utils.literal_str("\xee")),
+				(utils.literal_str(b'\x05'), utils.literal_str(str(u'\x05'))),
+				(utils.literal_str(b'\x05'), utils.literal_str("\x05"))
+			]
+			for testcase in the_test_cases:
+				if theResult is True:
+					if testcase[0] is None:
+						continue
+					if utils.literal_str(testcase[0]) is None:
+						continue
+					if utils.literal_str(testcase[1]) is not None:
+						self.assertEquals(
+							utils.literal_str(testcase[0]),
+							utils.literal_str(testcase[1])
+						)
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			err = None
+			del(err)
 			theResult = False
 		assert theResult
 
