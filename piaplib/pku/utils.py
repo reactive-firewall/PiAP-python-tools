@@ -104,6 +104,8 @@ def literal_str(raw_input=None):
 			return str(raw_input.encode("utf-8").decode("utf-8"))
 		elif isinstance(raw_input, unicode):
 			return str(raw_input.encode("utf-8").decode("utf-8"))
+		else:
+			raise UnicodeDecodeError("Malformed Raw String")
 	except Exception as malformErr:
 		logs.log("[CWE-20] Possible malformed string attack occured.", "info")
 		malformErr = None

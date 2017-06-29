@@ -248,6 +248,10 @@ class StringsTestSuite(unittest.TestCase):
 						theResult = (
 							testcase[0] in testcase[1]
 						)
+					else:
+						continue
+					if utils.literal_str(testcase[0]) is None:
+						continue
 					if utils.literal_str(testcase[1]) is not None:
 						theResult_temp = (
 							utils.literal_str(testcase[0]) in utils.literal_str(testcase[1])
