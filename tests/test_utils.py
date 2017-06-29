@@ -417,8 +417,8 @@ and this will test reads.""")
 					os.path.join(
 						os.path.join(str('very'), str('long')),
 						os.path.join(
-							os.path.join(str(rand.randInt(1, 50, 900)), str('blahblah')),
-							str(rand.randInt(1, 50, 900))
+							os.path.join(str(rand.randInt(1)), str('blahblah')),
+							str(rand.randInt(1))
 						)
 					),
 					str('filename.tmp')

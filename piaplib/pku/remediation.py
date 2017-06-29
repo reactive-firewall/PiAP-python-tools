@@ -106,7 +106,7 @@ def error_handling(func):
 			logs.log(str(func), "Error")
 			logs.log(str(type(err)), "Error")
 			logs.log(str(err), "Error")
-			logs.log(str(err.args), "Error")
+			logs.log(str((err.args)), "Error")
 			logs.log(str(""), "Error")
 			# sys.exc_clear()
 			err = None
@@ -167,7 +167,7 @@ def warning_handling(func):
 			logs.log(str(func), "Warning")
 			logs.log(str(type(err)), "Warning")
 			logs.log(str(err), "Warning")
-			logs.log(str(err.args), "Warning")
+			logs.log(str((err.args)), "Warning")
 			logs.log(str(""), "Warning")
 			# sys.exc_clear()
 			err = None

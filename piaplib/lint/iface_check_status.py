@@ -22,7 +22,7 @@ try:
 	import sys
 	sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 	try:
-		from ..book.logs import logs as logs
+		from piaplib.book.logs import logs as logs
 	except Exception:
 		try:
 			from book.logs import logs as logs
@@ -154,7 +154,7 @@ def show_iface(iface_name=None, is_verbose=False, use_html=False):
 				)
 		except Exception as cmdErr:
 			logs.log(str(cmdErr), "Error")
-			logs.log(str(cmdErr.args), "Error")
+			logs.log(str((cmdErr.args)), "Error")
 			theResult = "UNKNOWN"
 	return theResult
 
