@@ -38,6 +38,12 @@ except Exception as importErr:
 	import pocket as pocket
 
 try:
+	from . import book as book
+except Exception as importErr:
+	del importErr
+	import book as book
+
+try:
 	from . import pku as pku
 except Exception as importErr:
 	del importErr
@@ -62,6 +68,8 @@ if __name__ in u'__main__':
 		raise ImportError(str(u'Failed to find Pocket Keyring'))
 	if lint.__name__ is None:
 		raise ImportError(str(u'Failed to gather Pocket Lint'))
+	if book.__name__ is None:
+		raise ImportError(str(u'Failed to open Pocket Book'))
 	pocket.main(sys.argv[1:])
 	exit(0)
 

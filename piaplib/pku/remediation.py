@@ -133,7 +133,7 @@ def bug_handling(func):
 			logs.log(str(func), "CRITICAL")
 			logs.log(str(type(err)), "CRITICAL")
 			logs.log(str(err), "CRITICAL")
-			logs.log(str(err.args), "CRITICAL")
+			logs.log(str((err.args)), "CRITICAL")
 			logs.log(str(""), "CRITICAL")
 			logs.log(str("Action will not be compleated! ABORT!"), "CRITICAL")
 			logs.log(str("You found a bug. Please report this to my creator."), "CRITICAL")
