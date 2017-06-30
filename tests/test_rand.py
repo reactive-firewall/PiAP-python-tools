@@ -380,6 +380,5 @@ class RandTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
-
 if __name__ == '__main__':
 	unittest.main()

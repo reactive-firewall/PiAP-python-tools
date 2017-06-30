@@ -101,14 +101,13 @@ def useCheckTool(tool, arguments=[None]):
 	if tool is None:
 		return None
 	if tool in CHECK_UNITS.keys():
+		theResult = None
 		try:
 			logs.log(str("check launching: " + str(tool)), "DEBUG")
 			theResult = CHECK_UNITS[tool].main(arguments)
 		except Exception:
 			logs.log(
-				str(
-					"An error occured while handling the health check tool. Cascading failure."
-				),
+				str("An error occured while handling the health check tool. Cascading failure."),
 				"WARNING"
 			)
 			theResult = None

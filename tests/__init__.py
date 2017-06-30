@@ -128,6 +128,34 @@ try:
 		del impErr
 		raise ImportError(str("Test module failed completely."))
 		exit(1)
+	try:
+		from tests import test_lint
+		if test_lint.__name__ is None:
+			raise ImportError(str("Test module failed to import even the lint special tests."))
+	except Exception as impErr:
+		print(str(''))
+		print(str(type(impErr)))
+		print(str(impErr))
+		print(str((impErr.args)))
+		print(str(''))
+		impErr = None
+		del impErr
+		raise ImportError(str("Test module failed completely."))
+		exit(1)
+	try:
+		from tests import test_book
+		if test_book.__name__ is None:
+			raise ImportError(str("Test module failed to import even the book special tests."))
+	except Exception as impErr:
+		print(str(''))
+		print(str(type(impErr)))
+		print(str(impErr))
+		print(str((impErr.args)))
+		print(str(''))
+		impErr = None
+		del impErr
+		raise ImportError(str("Test module failed completely."))
+		exit(1)
 except Exception as badErr:
 	print(str(''))
 	print(str(type(badErr)))

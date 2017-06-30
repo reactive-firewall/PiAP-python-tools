@@ -103,7 +103,7 @@ def error_handling(func):
 		except Exception as err:
 			timestamp = getTimeStamp()
 			logs.log(str("An error occured at {}").format(timestamp), "Error")
-			logs.log(str(func), "Error")
+			logs.log(str(func), "Debug")
 			logs.log(str(type(err)), "Error")
 			logs.log(str(err), "Error")
 			logs.log(str((err.args)), "Error")
@@ -130,7 +130,7 @@ def bug_handling(func):
 		except Exception as err:
 			timestamp = getTimeStamp()
 			logs.log(str("An error occured at {}").format(timestamp), "CRITICAL")
-			logs.log(str(func), "CRITICAL")
+			logs.log(str(func), "Debug")
 			logs.log(str(type(err)), "CRITICAL")
 			logs.log(str(err), "CRITICAL")
 			logs.log(str((err.args)), "CRITICAL")
@@ -164,7 +164,7 @@ def warning_handling(func):
 		except Exception as err:
 			timestamp = getTimeStamp()
 			logs.log(str("An error occured at {}").format(timestamp), "Warning")
-			logs.log(str(func), "Warning")
+			logs.log(str(func), "Debug")
 			logs.log(str(type(err)), "Warning")
 			logs.log(str(err), "Warning")
 			logs.log(str((err.args)), "Warning")

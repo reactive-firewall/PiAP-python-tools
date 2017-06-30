@@ -97,7 +97,7 @@ def rand(count=None):
 		print(str(err.args))
 		err = None
 		del err
-	return None
+	raise AssertionError("IMPOSIBLE STATE REACHED IN RAND. ABORT.")
 
 
 @remediation.error_handling
@@ -116,7 +116,7 @@ def randStr(count=None):
 		print(str(err.args))
 		err = None
 		del err
-	return None
+	raise AssertionError("BUG: BAD STATE REACHED IN RAND-STR. ABORT.")
 
 
 @remediation.error_handling
@@ -148,7 +148,7 @@ def randInt(count=None, min=0, max=512):
 		print(str(err.args))
 		err = None
 		del err
-	return None
+	raise AssertionError("IMPOSIBLE STATE REACHED IN RAND-INT. ABORT.")
 
 
 @remediation.error_handling
@@ -173,7 +173,7 @@ def randBool(count=None):
 		print(str(err.args))
 		err = None
 		del err
-	return None
+	raise AssertionError("IMPOSIBLE STATE REACHED IN RAND-BOOL. ABORT.")
 
 
 @remediation.error_handling
@@ -202,16 +202,14 @@ def randChar(count=None):
 		print(str(len(RAND_CHARS)))
 		err = None
 		del err
-	return None
+	raise AssertionError("IMPOSIBLE STATE REACHED IN RAND-CHAR. ABORT.")
 
 
 @remediation.bug_handling
 def main(argv=None):
+	"""Simple but Random Main event."""
 	args = parseArgs(argv)
-	if args.count is None:
-		return 2
-	else:
-		print(str(rand(args.count)))
+	print(str(rand(args.count)))
 	return 0
 
 
