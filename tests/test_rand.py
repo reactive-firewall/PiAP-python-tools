@@ -19,6 +19,7 @@
 
 import unittest
 
+
 try:
 	try:
 		import sys
@@ -379,6 +380,7 @@ class RandTestSuite(unittest.TestCase):
 			print(str(""))
 			theResult = False
 		assert theResult
+
 
 if __name__ == '__main__':
 	unittest.main()
