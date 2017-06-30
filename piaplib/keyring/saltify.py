@@ -66,10 +66,13 @@ def memoize(func):
 
 	@functools.wraps(func)
 	def memoized_func(*args, **kwargs):
-		key = str(args) + str(kwargs)
-		if key not in cache:
-			cache[key] = func(*args, **kwargs)
-		return cache[key]
+		try:
+			key = str(args) + str(kwargs)
+			if key not in cache:
+				cache[key] = func(*args, **kwargs)
+			return cache[key]
+		except Exception:
+			return func(*args, **kwargs)
 
 	return memoized_func
 
