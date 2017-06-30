@@ -28,18 +28,20 @@ try:
 	except Exception:
 		from . import piaplib as piaplib
 	try:
-		from piaplib.pku import utils as utils
+		from pku import utils as utils
 	except Exception:
 		import piaplib.pku.utils as utils
 	try:
-		from piaplib.pku import remediation as remediation
+		from pku import remediation as remediation
 	except Exception:
 		import piaplib.pku.remediation as remediation
 	try:
-		from piaplib.book.logs import logs as logs
-	except Exception:
+		from .logs import logs as logs
+	except Exception as impErr:
+		impErr = None
+		del(impErr)
 		try:
-			from .logs import logs as logs
+			import logs.logs as logs
 		except Exception:
 			raise ImportError("Error Importing logs")
 	if utils.__name__ is None:

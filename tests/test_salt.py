@@ -174,8 +174,10 @@ class SaltTestSuite(unittest.TestCase):
 			from keyring import saltify as saltify
 			if saltify.__name__ is None:
 				theResult = False
-			import os
-			randomSalt = str(os.urandom(10))
+			from keyring import rand as rand
+			if rand.__name__ is None:
+				theResult = False
+			randomSalt = str(rand.randStr(10))
 			space = str(""" """)
 			randomSalt_shift1 = randomSalt + space
 			randomSalt_shift2 = randomSalt_shift1 + space
@@ -190,8 +192,8 @@ class SaltTestSuite(unittest.TestCase):
 			for someRandomTest in range(10000):
 				if theResult is not True:
 					continue
-				this_test = str(os.urandom(10))
-				that_test = str(os.urandom(10))
+				this_test = str(rand.randStr(10))
+				that_test = str(rand.randStr(10))
 				self.assertIsNotNone(that_test)
 				self.assertIsNotNone(this_test)
 				self.assertNotEqual(this_test, that_test)

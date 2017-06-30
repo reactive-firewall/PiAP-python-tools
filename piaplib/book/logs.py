@@ -101,7 +101,7 @@ class ANSIColors:
 	FAIL = RED
 
 
-class logs:
+class logs(object):
 	"""Class for Pocket PKU logs"""
 	logging.basicConfig(
 		level=logging.INFO,
@@ -125,8 +125,9 @@ class logs:
 	"""Mappings from different log levels to colors."""
 
 	def __call__(self, *args, **kwargs):
-		return self.log(args, kwargs)
+		return logs.log(args, kwargs)
 
+	@staticmethod
 	def log(msg=str("Checked in"), loglevel="info"):
 		"""Logs a message."""
 		logger = logging.getLogger(__name__)

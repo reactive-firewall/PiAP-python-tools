@@ -39,6 +39,17 @@ except Exception as err:
 	raise ImportError(err)
 	exit(3)
 
+try:
+	from piaplib.book.logs import logs as logs
+except Exception:
+	try:
+		from book.logs import logs as logs
+	except Exception:
+		try:
+			from piaplib.book.logs import logs as logs
+		except Exception:
+			raise ImportError("Error Importing logs")
+
 
 try:
 	from . import remediation as remediation
@@ -50,20 +61,12 @@ except Exception:
 
 
 try:
-	from ..book.logs import logs as logs
-except Exception:
-	try:
-		from book.logs import logs as logs
-	except Exception:
-		try:
-			from piaplib.book.logs import logs as logs
-		except Exception:
-			raise ImportError("Error Importing logs")
-
-try:
 	if (sys.version_info >= (3, 2)):
+		from builtins import str
+
 		class unicode(str):
 			pass
+
 except Exception:
 	raise ImportError("Error Importing utils")
 
@@ -107,7 +110,7 @@ def literal_str(raw_input=None):
 		else:
 			raise UnicodeDecodeError("Malformed Raw String")
 	except Exception as malformErr:
-		logs.log("[CWE-20] Possible malformed string attack occured.", "info")
+		logs.log(str("[CWE-20] Possible malformed string attack occured."), "info")
 		malformErr = None
 		del(malformErr)
 		return None
@@ -290,7 +293,7 @@ def xstr(some_str=None):
 """ I/O and Files """
 
 
-@remediation.warning_handling
+@remediation.error_passing
 def open_func(file, mode='r', buffering=-1, encoding=None):
 	""" cross-python open function """
 	try:
@@ -303,9 +306,10 @@ def open_func(file, mode='r', buffering=-1, encoding=None):
 	except Exception:
 		import io
 		return io.open(file, mode, buffering, encoding)
+	raise AssertionError("File could not be opened")
 
 
-@remediation.warning_handling
+@remediation.error_passing
 def write_func(someFile, the_data=None):
 	""" cross-python open function """
 	try:
@@ -327,7 +331,7 @@ def readFile(somefile):
 		read_data = f.read()
 	f.close()
 	try:
-		logs.log(str("read file {}").format(somefile), "debug")
+		logs.log(str(str("read file {}").format(theReadPath)), "Debug")
 	except Exception:
 		pass
 	return read_data
@@ -340,15 +344,17 @@ def writeFile(somefile, somedata):
 	f = None
 	theResult = False
 	try:
-		with open_func(theWritePath, u'w+', encoding='utf-8') as f:
+		with open_func(file=theWritePath, mode=u'w+', encoding=u'utf-8') as f:
 			write_func(f, somedata)
 		theResult = True
-	except IOError:
+	except IOError as ioErr:
+		logs.log(str(type(ioErr)), "Warning")
 		theResult = False
-	except FileNotFoundError:
+	except OSError as nonerr:
+		logs.log(str(type(nonerr)), "Warning")
 		theResult = False
 	except Exception as err:
-		logs.log(str("Write Failed on file {}").format(somefile), "Warning")
+		logs.log(str("Write Failed on file {}").format(theWritePath), "Warning")
 		logs.log(str(type(err)), "Warning")
 		logs.log(str(err), "Warning")
 		logs.log(str((err.args)), "Warning")
@@ -359,9 +365,12 @@ def writeFile(somefile, somedata):
 		if f:
 			f.close()
 	try:
-		logs.log(str("wrote to file {}").format(somefile), "debug")
-	except Exception:
-		pass
+		logs.log(str("wrote to file {}").format(str(theWritePath)), "Debug")
+	except Exception as err:
+		print(str("logging error"))
+		print(str(err))
+		print(str(type(err)))
+		print(str((err.args)))
 	return theResult
 
 
@@ -378,10 +387,10 @@ def appendFile(somefile, somedata):
 		theResult = True
 	except IOError:
 		theResult = False
-	except FileNotFoundError:
+	except OSError:
 		theResult = False
 	except Exception as err:
-		logs.log(str("Write Failed on file {}").format(somefile), "Warning")
+		logs.log(str("Write Failed on file {}").format(theWritePath), "Warning")
 		logs.log(str(type(err)), "Warning")
 		logs.log(str(err), "Warning")
 		logs.log(str((err.args)), "Warning")
@@ -392,7 +401,7 @@ def appendFile(somefile, somedata):
 		if f:
 			f.close()
 	try:
-		logs.log(str("wrote to file {}").format(somefile), "debug")
+		logs.log(str("wrote to file {}").format(theWritePath), str("Debug"))
 	except Exception:
 		pass
 	return theResult
@@ -412,7 +421,7 @@ def getFileResource(someURL, outFile):
 	except Exception:
 		return False
 	try:
-		logs.log(str("fetched file {}").format(someURL), "debug")
+		logs.log(str("fetched file {}").format(someURL), "Debug")
 	except Exception:
 		pass
 	return True
@@ -422,8 +431,10 @@ def getFileResource(someURL, outFile):
 def cleanFileResource(theFile):
 	"""cleans up a downloaded given file."""
 	import os
+	theResult = False
 	try:
 		os.remove(str(theFile))
+		theResult = True
 	except FileNotFoundError:
 		theResult = False
 	except Exception:
@@ -434,7 +445,7 @@ def cleanFileResource(theFile):
 			logs.log(str("purged file {}").format(theFile), "debug")
 	except Exception:
 		pass
-	return True
+	return theResult
 
 
 @remediation.bug_handling

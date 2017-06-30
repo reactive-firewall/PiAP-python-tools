@@ -156,6 +156,20 @@ try:
 		del impErr
 		raise ImportError(str("Test module failed completely."))
 		exit(1)
+	try:
+		from tests import test_interface
+		if test_interface.__name__ is None:
+			raise ImportError(str("Test module failed to import even the iface special tests."))
+	except Exception as impErr:
+		print(str(''))
+		print(str(type(impErr)))
+		print(str(impErr))
+		print(str((impErr.args)))
+		print(str(''))
+		impErr = None
+		del impErr
+		raise ImportError(str("Test module failed completely."))
+		exit(1)
 except Exception as badErr:
 	print(str(''))
 	print(str(type(badErr)))

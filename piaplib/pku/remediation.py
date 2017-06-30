@@ -53,6 +53,22 @@ except Exception:
 		raise ImportError("Error Importing logs")
 
 
+class PiAPError(RuntimeError):
+	"""An Error class for PiAP errors"""
+	cause = None
+	msg = None
+
+	def __init__(self, cause=None, msg=None):
+		if cause is not None and isinstance(cause, Exception):
+			self.cause = cause
+			self.msg = str(cause)
+		elif cause is not None and isinstance(cause, str):
+			self.msg = str(cause)
+			self.cause = None
+		if msg is not None and isinstance(msg, str):
+			self.msg = str(msg)
+
+
 def getTimeStamp():
 	"""Returns the time stamp."""
 	theDate = None
@@ -75,11 +91,10 @@ def error_passing(func):
 		try:
 			theOutput = func(*args, **kwargs)
 		except Exception as err:
-			tb = sys.exc_info()[2]
 			timestamp = getTimeStamp()
 			logs.log(str("An error occured at {}").format(timestamp), "Error")
-			logs.log(str(func), "Error")
-			baton = RuntimeError("Passing error up").with_traceback(tb)
+			logs.log(str(func), "Debug")
+			baton = PiAPError(err, str("An error occured."))
 			# sys.exc_clear()
 			err = None
 			del err
@@ -107,6 +122,10 @@ def error_handling(func):
 			logs.log(str(type(err)), "Error")
 			logs.log(str(err), "Error")
 			logs.log(str((err.args)), "Error")
+			if isinstance(err, PiAPError):
+				logs.log(str((err.cause)), "Error")
+				logs.log(str(type(err.cause)), "Error")
+				logs.log(str(type(err.args)), "Error")
 			logs.log(str(""), "Error")
 			# sys.exc_clear()
 			err = None
@@ -182,7 +201,6 @@ def warning_handling(func):
 def main(argv=None):
 	"""The Main Event makes no sense to remediation."""
 	raise NotImplementedError("CRITICAL - PKU remediation main() not implemented. yet?")
-	return 3
 
 
 if __name__ in u'__main__':

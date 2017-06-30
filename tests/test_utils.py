@@ -440,8 +440,10 @@ and this will test reads.""")
 						print(str(""))
 				else:
 					theResult = False
+					print(str("append worked"))
 			else:
 				theResult = False
+				print(str("write worked"))
 		except Exception as err:
 			print(str(""))
 			print(str(type(err)))

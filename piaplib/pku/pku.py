@@ -80,7 +80,14 @@ __prog__ = """piaplib.pku"""
 """The name of this PiAPLib tool is Pocket Knife Unit"""
 
 
-PKU_UNITS = {u'config': config, u'backup': None, u'upgrade': upgrade, u'help': None}
+PKU_UNITS = {
+	u'config': config,
+	u'backup': None,
+	u'upgrade': upgrade,
+	u'help': None,
+	u'interfaces': interfaces,
+	u'iface': interfaces
+}
 """ The Pocket Knife Unit actions.
 	config -  (FUTURE/configuration stuff)
 	backup -  (FUTURE/RESERVED)
