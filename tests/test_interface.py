@@ -118,7 +118,7 @@ class iFaceTestSuite(unittest.TestCase):
 			from pku import interfaces as interfaces
 			if interfaces.__name__ is None:
 				raise ImportError("Failed to import iface")
-			self.assertIsNone(pku.interfaces.enable_iface("eth1", False))
+			self.assertIsNone(pku.interfaces.enable_iface("eth1"))
 		except Exception as err:
 			print(str(""))
 			print(str(type(err)))
