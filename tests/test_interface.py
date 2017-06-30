@@ -109,7 +109,7 @@ class iFaceTestSuite(unittest.TestCase):
 		assert theResult
 
 	def test_case_iface_check_nonroot_up(self):
-		"""Tests the imposible state for lint given bad tools"""
+		"""Tests the imposible state for interface given bad tools"""
 		theResult = True
 		try:
 			from piaplib import pku as pku

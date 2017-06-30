@@ -131,6 +131,8 @@ def enable_iface(iface_name=None):
 		tainted_name = taint_name(iface_name)
 		import subprocess
 		theResult = subprocess.check_output([str("ifup"), str(tainted_name)])
+		if theResult is not None and isinstance(theResult, str) and len(theResult) <= 1:
+			theResult = None
 	except Exception as err:
 		print(str(type(err)))
 		print(str(err))
