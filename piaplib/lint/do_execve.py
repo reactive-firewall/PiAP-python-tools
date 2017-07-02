@@ -95,7 +95,7 @@ def parseargs(tainted_arguments=None):
 		)
 		parser.add_argument(
 			'--chroot', dest='chroot_path',
-			default=None, required=False,
+			default=None, type=argparse.FileType('w'), required=False,
 			help='the sandbox to play in.'
 		)
 		the_action = parser.add_mutually_exclusive_group(required=False)
@@ -107,7 +107,7 @@ def parseargs(tainted_arguments=None):
 		the_action.add_argument(
 			'-q', '--quiet',
 			dest='verbose_mode', default=False,
-			action='store_false', help='Disable the given interface.'
+			action='store_false', help='Disable the verbosemode.'
 		)
 		parser.add_argument(
 			'-c', '--cmd',
@@ -117,7 +117,7 @@ def parseargs(tainted_arguments=None):
 		parser.add_argument(
 			'-a', '--args',
 			dest='unsafe_input', action='append',
-			help='The command.'
+			help='The command arguments.'
 		)
 		parser.add_argument(
 			'-V', '--version',

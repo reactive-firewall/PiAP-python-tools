@@ -28,6 +28,11 @@ except Exception:
 	from . import piaplib as piaplib
 
 try:
+	from . import book as book
+except Exception:
+	import book as book
+
+try:
 	from . import pku as pku
 except Exception:
 	import pku as pku
@@ -51,16 +56,17 @@ POCKET_UNITS = {
 	u'blade': None,
 	u'keyring': keyring.keyring,
 	u'lint': lint.lint,
-	u'fruitsnack': None
+	u'fruitsnack': None,
+	u'book': book.book
 }
 """ The Pocket Knife Units available.
 	pku - the pocket knife unit. The everything pocket tool.
-	protector - the pocket protector. The defensive security tool.
+	protector - the pocket protector. The defensive security tool. (FUTURE/RESERVED)
 	blade - the pocket blade. The offensive security tool. (FUTURE/RESERVED)
-	keyring - the pocket keyring. The crypto tool. (FUTURE/RESERVED)
+	keyring - the pocket keyring. The crypto tool.
 	lint - the extra pocket stuff tool. Small things always in the pocket.
 	fruitsnack - the little Pi in the pocket. Wrapper for all things RaspberryPi.
-	book - the little pocket-book for storage and the like. (FUTURE/RESERVED)
+	book - the little pocket-book for storage and the like.
 	"""
 
 PROTECTOR_OPTIONS = [u'fw', u'ids', u'acl']
@@ -72,7 +78,7 @@ PROTECTOR_OPTIONS = [u'fw', u'ids', u'acl']
 
 LINT_OPTIONS = [u'check', u'nrpe', u'help']
 """ The Pocket Lint Unit actions.
-	check - pocket checks.
+	check - pocket health checks.
 	nrpe - nagios/sensu/etc. compatible checks (FUTURE/RESERVED)
 	help -  (FUTURE/RESERVED)
 	"""
@@ -84,7 +90,7 @@ def parseArgs(arguments=None):
 	"""Parses the CLI arguments."""
 	parser = argparse.ArgumentParser(
 		prog=__prog__,
-		description='Handles PiAP python tools',
+		description="Handles PiAP python tools",
 		epilog="PiAP Controller for PiAP tools."
 	)
 	parser.add_argument(

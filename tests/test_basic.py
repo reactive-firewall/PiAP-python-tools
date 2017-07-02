@@ -128,6 +128,26 @@ class BasicTestSuite(unittest.TestCase):
 				theResult = False
 		assert theResult
 
+	def test_y_remote_command(self):
+		"""Test case for backend library."""
+		theResult = False
+		try:
+			from piaplib import pku as pku
+			if pku.__name__ is None:
+				theResult = False
+			from pku import remediation as remediation
+			if remediation.__name__ is None:
+				theResult = False
+			with self.assertRaises(Exception):
+				raise remediation.PiAPError(cause="This is a test")
+			with self.assertRaises(Exception):
+				temp = remediation.PiAPError("This is a test")
+				raise remediation.PiAPError(cause=temp, msg="This is also a test")
+			theResult = True
+		except Exception:
+			theResult = False
+		assert theResult
+
 
 if __name__ == '__main__':
 	unittest.main()

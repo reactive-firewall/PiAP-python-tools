@@ -1,0 +1,43 @@
+coverage:
+  status:
+    project:
+      default: off
+      piaplib:
+        target: 45%
+        flags: piaplib
+      piaplib.book:
+        target: 70%
+        flags: piaplib.book
+      piaplib.pku:
+        target: 50%
+        flags: piaplib.pku
+      piaplib.pku:
+        target: 75%
+        flags: piaplib.keyring
+      tests:
+        target: 50%
+        flags: tests
+
+flags:
+  piaplib:
+    paths:
+      - piaplib/
+      - piaplib/lint
+      - piaplib/pku
+      - piaplib/keyring
+      - piaplib/book
+  piaplib.book:
+    paths:
+      - piaplib/book
+  piaplib.keyring:
+    paths:
+      - piaplib/keyring
+  piaplib.pku:
+    paths:
+      - piaplib/pku
+  piaplib.lint:
+    paths:
+      - piaplib/lint
+  tests:
+    paths:
+      - tests/

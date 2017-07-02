@@ -30,12 +30,48 @@ try:
 		if imp.__name__ is None:
 			raise ImportError("Not Implemented.")
 	import pip as pip
+	try:
+		from . import remediation as remediation
+	except Exception:
+		try:
+			import remediation as remediation
+		except Exception:
+			raise ImportError("Error Importing remediation")
 except PendingDeprecationWarning as junkErr:
 	"""mute junk errors"""
 	junkErr = None
 	del(junkErr)
 except Exception:
-	raise ImportError("Not Implemented.")
+	try:
+		try:
+			from . import remediation as remediation
+		except Exception:
+			try:
+				import remediation as remediation
+			except Exception:
+				raise ImportError("Error Importing remediation")
+
+		class pip():
+			"""on-the-fly monkey patch for calling pip main"""
+
+			@remediation.bug_handling
+			def main(args=None, stderr=None):
+				"""function for backend subprocess check_output command"""
+				import subprocess
+				theOutput = None
+				try:
+					if args is None or args is [None]:
+						theOutput = None
+					else:
+						if str("pip") not in args[0]:
+							args.insert(0, "pip")
+						theOutput = subprocess.check_output(args, stderr=stderr)
+				except Exception:
+					theOutput = None
+				return theOutput
+
+	except Exception:
+		raise ImportError("Not Implemented.")
 
 try:
 	from . import utils as utils

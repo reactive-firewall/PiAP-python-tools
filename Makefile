@@ -81,7 +81,8 @@ purge: clean uninstall
 	$(QUIET)$(ECHO) "$@: Done."
 
 test: cleanup
-	$(QUIET)coverage run --concurrency=thread --source=piaplib,piaplib/lint,piaplib/keyring,piaplib/pku -m unittest tests.test_basic tests.test_html tests.test_strings tests.test_salt tests.test_rand tests.test_utils tests.test_config tests.test_usage || python3 -m unittest tests.test_basic tests.test_html tests.test_strings tests.test_salt tests.test_rand tests.test_utils tests.test_config tests.test_usage || python -m unittest tests.test_basic tests.test_html tests.test_strings tests.test_salt tests.test_rand tests.test_utils tests.test_config tests.test_usage
+	$(QUIET)coverage run -p --source=piaplib,piaplib/lint,piaplib/keyring,piaplib/pku,piaplib/book -m unittest tests.test_basic tests.test_html tests.test_strings tests.test_salt tests.test_rand tests.test_utils tests.test_lint tests.test_book tests.test_interface tests.test_config tests.test_usage tests.test_pocket || python3 -m unittest tests.test_basic tests.test_html tests.test_strings tests.test_salt tests.test_rand tests.test_utils tests.test_lint tests.test_book tests.test_interface tests.test_config tests.test_usage tests.test_pocket || python -m unittest tests.test_basic tests.test_html tests.test_strings tests.test_salt tests.test_rand tests.test_utils tests.test_lint tests.test_interface tests.test_book tests.test_config tests.test_usage tests.test_pocket
+	$(QUIET)coverage combine 2>/dev/null || true
 	$(QUIET)coverage report --include=piaplib* 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
 
@@ -111,6 +112,9 @@ cleanup:
 	$(QUIET)rmdir piaplib.egg-info 2>/dev/null || true
 	$(QUIET)rm -f ./*/*~ 2>/dev/null || true
 	$(QUIET)rm -f ./*~ 2>/dev/null || true
+	$(QUIET)coverage erase 2>/dev/null || true
+	$(QUIET)rm -f ./.coverage 2>/dev/null || true
+	$(QUIET)rm -f ./sitecustomize.py 2>/dev/null || true
 	$(QUIET)rm -f ./.*~ 2>/dev/null || true
 	$(QUIET)rm -Rf ./.tox/ 2>/dev/null || true
 	$(QUIET)rm -f ./the_test_file*.txt 2>/dev/null || true

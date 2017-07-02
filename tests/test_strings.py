@@ -238,17 +238,23 @@ class StringsTestSuite(unittest.TestCase):
 			]
 			for testcase in the_test_cases:
 				if theResult is True:
+					if testcase[0] is None:
+						continue
 					if testcase[1] is not None:
 						theResult = (
 							testcase[0] in testcase[1]
 						)
+					else:
+						continue
+					if utils.literal_str(testcase[0]) is None:
+						continue
 					if utils.literal_str(testcase[1]) is not None:
 						theResult_temp = (
-							testcase[0] in testcase[1]
+							utils.literal_str(testcase[0]) in utils.literal_str(testcase[1])
 						)
 						theResult = (theResult is True) and (theResult_temp is True)
 						theResult_temp = None
-						del theResult_temp
+						del(theResult_temp)
 		except Exception as err:
 			print(str(""))
 			print(str(type(err)))
@@ -256,7 +262,44 @@ class StringsTestSuite(unittest.TestCase):
 			print(str((err.args)))
 			print(str(""))
 			err = None
-			del err
+			del(err)
+			theResult = False
+		assert theResult
+
+	def test_case_utils_bad_literal_str(self):
+		"""Tests the literal string functions with ABC"""
+		theResult = True
+		try:
+			from piaplib import pku as pku
+			if pku.__name__ is None:
+				raise ImportError("Failed to import pku")
+			from pku import utils as utils
+			if utils.__name__ is None:
+				raise ImportError("Failed to import utils")
+			the_test_cases = [
+				(utils.literal_str(bytes(int('0x1f', 0))), utils.literal_str(bytes(int('0x1f', 0)))),
+				(utils.literal_str(bytes(int('0xee', 0))), utils.literal_str(bytes(int('0xee', 0)))),
+				(utils.literal_str(bytes(int('0x05', 0))), utils.literal_str(bytes(int('0x05', 0))))
+			]
+			for testcase in the_test_cases:
+				if theResult is True:
+					if testcase[0] is None:
+						continue
+					if utils.literal_str(testcase[0]) is None:
+						continue
+					if utils.literal_str(testcase[1]) is not None:
+						self.assertEqual(
+							utils.literal_str(testcase[0]),
+							utils.literal_str(testcase[1])
+						)
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			err = None
+			del(err)
 			theResult = False
 		assert theResult
 
@@ -292,12 +335,12 @@ class StringsTestSuite(unittest.TestCase):
 								testcase[0] in testcase[1]
 							)
 							theResult = (theResult is True) and (theResult_temp is True)
-							if theResult is not True:
-								print("NEW test")
-								print(str(testcase))
-								print(repr(testcase))
 							theResult_temp = None
 							del theResult_temp
+					if theResult is not True:
+						print("NEW test")
+						print(str(testcase))
+						print(repr(testcase))
 		except Exception as err:
 			print(str(""))
 			print(str(type(err)))
@@ -371,7 +414,7 @@ class StringsTestSuite(unittest.TestCase):
 			import os
 			if os.__name__ is None:
 				raise ImportError("Failed to import os. Are we alive?")
-			for testrun in range(10000):
+			for testrun in range(1000):
 				randomTest = os.urandom(10)
 				testcase = [str(randomTest), utils.literal_str(randomTest)]
 				if theResult is True:

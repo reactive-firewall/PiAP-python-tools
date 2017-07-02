@@ -174,8 +174,10 @@ class SaltTestSuite(unittest.TestCase):
 			from keyring import saltify as saltify
 			if saltify.__name__ is None:
 				theResult = False
-			import os
-			randomSalt = str(os.urandom(10))
+			from keyring import rand as rand
+			if rand.__name__ is None:
+				theResult = False
+			randomSalt = str(rand.randStr(10))
 			space = str(""" """)
 			randomSalt_shift1 = randomSalt + space
 			randomSalt_shift2 = randomSalt_shift1 + space
@@ -187,32 +189,22 @@ class SaltTestSuite(unittest.TestCase):
 				randomSalt_shift2, randomSalt_shift3,
 				randomSalt_shift4, randomSalt_shift5
 			]
-			for someRandomTest in range(100000):
+			for someRandomTest in range(10000):
 				if theResult is not True:
 					continue
-				this_test = str(os.urandom(10))
-				that_test = str(os.urandom(10))
+				this_test = str(rand.randStr(10))
+				that_test = str(rand.randStr(10))
+				self.assertIsNotNone(that_test)
+				self.assertIsNotNone(this_test)
+				self.assertNotEqual(this_test, that_test)
 				for test_salt in salt_list:
 					a = saltify.saltify(str(this_test), str(randomSalt))
 					b = saltify.saltify(str(that_test), str(test_salt))
-					if (a is not None) and (b is not None) and (a is not b):
-						temp = True
-					else:
-						temp = False
-					theResult = ((theResult is True) and (temp is True))
-					if (temp is False):
-						print(str("COLLISION - NEW TEST FOUND:"))
-						try:
-							print(str("salt( {}, {} ) != salt( {}, {} )").format(
-								this_test,
-								randomSalt,
-								that_test,
-								test_salt
-							))
-						except Exception:
-							print("unprintable test")
+					self.assertIsNotNone(a)
+					self.assertIsNotNone(b)
+					self.assertNotEqual(a, b)
 		except Exception as testErr:
-			print(str("fuzzing"))
+			print(str("Entropy - Fuzzing Crash Found new test"))
 			print(str(""))
 			print(str(type(testErr)))
 			print(str(testErr))

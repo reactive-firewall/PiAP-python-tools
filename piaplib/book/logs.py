@@ -101,12 +101,12 @@ class ANSIColors:
 	FAIL = RED
 
 
-class logs:
+class logs(object):
 	"""Class for Pocket PKU logs"""
 	logging.basicConfig(
 		level=logging.INFO,
 		format=str("%(asctime)s [piaplib] %(message)s"),
-		datefmt=str("%m/%d/%Y %I:%M:%S %p")
+		datefmt=str("%a %b %d %H:%M:%S %Z %Y")
 	)
 
 	logging_level = {
@@ -120,10 +120,14 @@ class logs:
 		'debug': ANSIColors.BLUE, 'info': ANSIColors.GREEN,
 		'warn': ANSIColors.AMBER, 'warning': ANSIColors.AMBER,
 		'error': ANSIColors.FAIL, 'crit': str(ANSIColors.FAIL + ANSIColors.BLINK),
-		'critical': str(ANSIColors.FAIL + ANSIColors.BLINK)
+		'critical': str(str(ANSIColors.FAIL) + str(ANSIColors.BLINK))
 	}
 	"""Mappings from different log levels to colors."""
 
+	def __call__(self, *args, **kwargs):
+		return logs.log(args, kwargs)
+
+	@staticmethod
 	def log(msg=str("Checked in"), loglevel="info"):
 		"""Logs a message."""
 		logger = logging.getLogger(__name__)
@@ -152,9 +156,9 @@ class logs:
 
 
 def main(argv=None):
-	"""The Main Event makes no sense to utils."""
+	"""The Main Event makes no sense to logs yet."""
 	try:
-		raise NotImplementedError("CRITICAL - PKU logs main() not implemented. yet?")
+		raise NotImplementedError("CRITICAL - Pocket Book logs main() not implemented.")
 		exit(3)
 	except Exception as err:
 		logs.log(str(type(err)), "Critical")
@@ -165,8 +169,9 @@ def main(argv=None):
 if __name__ in u'__main__':
 	try:
 		import sys
-		main(sys.argv[1:])
+		exitcode = main(sys.argv[1:])
 	except Exception:
-		exit(3)
+		exitcode = 3
+	exit(exitcode)
 
 

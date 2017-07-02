@@ -62,13 +62,14 @@ __prog__ = str("""clients_check_status.py""")
 
 
 def memoize(func):
+	"""memoize wrapper"""
 	cache = func.cache = {}
 	import functools
 
 	@functools.wraps(func)
 	def memoized_func(*args, **kwargs):
 		key = str(args) + str(kwargs)
-		if key not in cache:
+		if key not in cache.keys():
 			cache[key] = func(*args, **kwargs)
 		return cache[key]
 
@@ -285,6 +286,7 @@ def get_client_arp_status_raw(client_ip=None, lan_interface=interfaces.INTERFACE
 
 def get_client_lease_status_raw(client_row=None):
 	"""list the raw status of client leases."""
+	theRawLeaseStatus = u'UNKNOWN'
 	try:
 		# should probably move to config file
 		theRawLeaseStatus = utils.readFile("/var/lib/misc/dnsmasq.leases")
@@ -343,6 +345,8 @@ def get_client_list(lan_interface=None):
 	theResult = None
 	try:
 		theRawClientState = get_client_arp_status_raw(None, lan_interface)
+		if theRawClientState is None:
+			theRawClientState = [None]
 		theResult = utils.compactList(
 			[x for x in utils.extractIPv4(theRawClientState) if u'10.0.40.' in x]
 		)
@@ -355,6 +359,7 @@ def get_client_list(lan_interface=None):
 	return theResult
 
 
+@remediation.error_handling
 def get_client_status(client=None, use_html=False, lan_interface=None):
 	"""Generate the status"""
 	theResult = None
@@ -366,31 +371,29 @@ def get_client_status(client=None, use_html=False, lan_interface=None):
 		if client_mac is not None:
 			status_txt = None
 			status_txt = get_client_sta_status(client_mac)
-		if use_html is not True:
-			if status_txt is not None:
-				if (str("disassociated") in status_txt):
-					theResult = u'disassociated'
-				elif (str("associated") in status_txt):
-					theResult = u'associated'
-				else:
-					theResult = u'UNKNOWN'
-		else:
-			if status_txt is not None:
-				if (str("disassociated") in status_txt):
-					theResult = html_generator.gen_html_td(
-						html_generator.gen_html_label(u'disassociated', u'danger'),
-						str(u'client_status_value_{}').format(client)
-					)
-				elif (str("associated") in status_txt):
-					theResult = html_generator.gen_html_td(
-						html_generator.gen_html_label(u'associated', u'success'),
-						str(u'client_status_value_{}').format(client)
-					)
-				else:
-					theResult = html_generator.gen_html_td(
-						html_generator.gen_html_label(u'UNKNOWN', u'default'),
-						str(u'client_status_value_{}').format(client)
-					)
+		if use_html is not True and status_txt is not None:
+			if (str("disassociated") in status_txt):
+				theResult = u'disassociated'
+			elif (str("associated") in status_txt):
+				theResult = u'associated'
+			else:
+				theResult = u'UNKNOWN'
+		elif status_txt is not None:
+			if (str("disassociated") in status_txt):
+				theResult = html_generator.gen_html_td(
+					html_generator.gen_html_label(u'disassociated', u'danger'),
+					str(u'client_status_value_{}').format(client)
+				)
+			elif (str("associated") in status_txt):
+				theResult = html_generator.gen_html_td(
+					html_generator.gen_html_label(u'associated', u'success'),
+					str(u'client_status_value_{}').format(client)
+				)
+			else:
+				theResult = html_generator.gen_html_td(
+					html_generator.gen_html_label(u'UNKNOWN', u'default'),
+					str(u'client_status_value_{}').format(client)
+				)
 	except Exception as errcrit:
 		print(str(errcrit))
 		print(str(errcrit.args))
@@ -398,6 +401,7 @@ def get_client_status(client=None, use_html=False, lan_interface=None):
 	return theResult
 
 
+@remediation.error_handling
 def get_client_mac(client=None, use_html=False, lan_interface=None):
 	"""Generate output of the client mac."""
 	if client is None and use_html is not True:
@@ -430,6 +434,7 @@ def get_client_mac(client=None, use_html=False, lan_interface=None):
 	return theResult
 
 
+@remediation.error_handling
 def get_client_ip(client=None, use_html=False, lan_interface=None):
 	"""Generate output of the client IP."""
 	theResult = None
@@ -460,6 +465,7 @@ def get_client_ip(client=None, use_html=False, lan_interface=None):
 	return theResult
 
 
+@remediation.bug_handling
 def main(argv=None):
 	"""The main function."""
 	args = parseargs(argv)
@@ -478,13 +484,19 @@ def main(argv=None):
 					u'<table class=\"table table-striped\">' +
 					u'<thead><th>Client</th><th>MAC</th><th>IP</th><th>Status</th></thead><tbody>'
 				))
-			for client_name in get_client_list(client_interface):
+			client_list = get_client_list(client_interface)
+			if client_list is None:
+				client_list = []
+			for client_name in client_list:
 				print(show_client(str(client_name), verbose, output_html, client_interface))
 			if output_html:
 				print("</tbody></table>")
 		else:
 			if args.list is True:
-				for client_name in get_client_list(client_interface):
+				client_list = get_client_list(client_interface)
+				if client_list is None:
+					client_list = []
+				for client_name in client_list:
 					print(str(client_name))
 			else:
 				ip = args.ip

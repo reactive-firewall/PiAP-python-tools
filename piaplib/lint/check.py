@@ -42,6 +42,22 @@ try:
 except Exception:
 	import users_check_status as users_check_status
 
+try:
+	from piaplib.pku import remediation as remediation
+except Exception:
+	try:
+		import piaplib.pku.remediation as remediation
+	except Exception:
+		raise ImportError("Error Importing remediation")
+
+try:
+	from piaplib.book.logs import logs as logs
+except Exception:
+	try:
+		from piaplib.book.logs import logs as logs
+	except Exception:
+		raise ImportError("Error Importing logs")
+
 
 __prog__ = """piaplib.lint.check"""
 """The name of this PiAPLib tool is check"""
@@ -60,12 +76,13 @@ CHECK_UNITS = {
 	"""
 
 
+@remediation.error_handling
 def parseArgs(arguments=None):
 	"""Parses the CLI arguments."""
 	parser = argparse.ArgumentParser(
 		prog=__prog__,
-		description='Handles PiAP pocket lint',
-		epilog="PiAP Lint Controller for extra tools."
+		description='Handles PiAP pocket checks',
+		epilog="PiAP Pocket Check Controller for health checks."
 	)
 	parser.add_argument(
 		'check_unit',
@@ -78,40 +95,28 @@ def parseArgs(arguments=None):
 	return parser.parse_known_args(arguments)
 
 
-def getTimeStamp():
-	"""Returns the time stamp."""
-	theDate = None
-	try:
-		import time
-		theDate = time.strftime("%a %b %d %H:%M:%S %Z %Y", time.localtime())
-	except Exception:
-		theDate = str("")
-	return str(theDate)
-
-
+@remediation.error_handling
 def useCheckTool(tool, arguments=[None]):
 	"""Handler for launching pocket-tools."""
 	if tool is None:
 		return None
 	if tool in CHECK_UNITS.keys():
+		theResult = None
 		try:
-			try:
-				# print(str("check launching: "+tool))
-				theResult = CHECK_UNITS[tool].main(arguments)
-			except Exception:
-				timestamp = getTimeStamp()
-				theResult = str(
-					timestamp +
-					" - WARNING - An error occured while handling the keyring tool. " +
-					"Cascading failure."
-				)
+			logs.log(str("check launching: " + str(tool)), "DEBUG")
+			theResult = CHECK_UNITS[tool].main(arguments)
 		except Exception:
-			theResult = str("CRITICAL - An error occured while handling the cascading failure.")
+			logs.log(
+				str("An error occured while handling the health check tool. Cascading failure."),
+				"WARNING"
+			)
+			theResult = None
 		return theResult
 	else:
 		return None
 
 
+@remediation.bug_handling
 def main(argv=None):
 	"""The main event"""
 	try:
@@ -120,18 +125,37 @@ def main(argv=None):
 			lint_cmd = args.check_unit
 			useCheckTool(lint_cmd, extra)
 		except Exception as cerr:
-			print(str(cerr))
-			print(str(cerr.args))
-			print(str(" UNKNOWN - An error occured while handling the arguments. Command failure."))
-			exit(3)
+			logs.log(
+				str(
+					"An error occured while handling the arguments. Command failure."
+				),
+				"ERROR"
+			)
+			logs.log(str(type(cerr)), "ERROR")
+			logs.log(str(cerr), "ERROR")
+			logs.log(str((cerr.args)), "ERROR")
+			cerr = None
+			del(cerr)
+			return 3
 	except Exception:
-		print(str(" UNKNOWN - An error occured while handling the failure. Cascading failure."))
-		exit(3)
-	exit(0)
+		logs.log(
+			str(
+				"An error occured while handling the failure. Cascading failure."
+			),
+			"ERROR"
+		)
+		return 3
+	return 0
 
 
 if __name__ in u'__main__':
-	import sys
-	main(sys.argv[1:])
-
+	try:
+		import sys
+		if (sys.argv is not None and (sys.argv is not []) and (len(sys.argv) > 1)):
+			exit(main(sys.argv[1:]))
+		else:
+			exit(main(["--help"]))
+	except Exception:
+		raise ImportError("Error running main")
+	exit(0)
 

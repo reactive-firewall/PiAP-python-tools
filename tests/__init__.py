@@ -58,6 +58,118 @@ try:
 		del impErr
 		raise ImportError(str("Test module failed completely."))
 		exit(1)
+	try:
+		from tests import test_utils
+		if test_utils.__name__ is None:
+			raise ImportError(str("Test module failed to import even the utils tests."))
+	except Exception as impErr:
+		print(str(''))
+		print(str(type(impErr)))
+		print(str(impErr))
+		print(str((impErr.args)))
+		print(str(''))
+		impErr = None
+		del impErr
+		raise ImportError(str("Test module failed completely."))
+		exit(1)
+	try:
+		from tests import test_pocket
+		if test_pocket.__name__ is None:
+			raise ImportError(str("Test module failed to import even the pocket tests."))
+	except Exception as impErr:
+		print(str(''))
+		print(str(type(impErr)))
+		print(str(impErr))
+		print(str((impErr.args)))
+		print(str(''))
+		impErr = None
+		del impErr
+		raise ImportError(str("Test module failed completely."))
+		exit(1)
+	try:
+		from tests import test_config
+		if test_config.__name__ is None:
+			raise ImportError(str("Test module failed to import even the configs tests."))
+	except Exception as impErr:
+		print(str(''))
+		print(str(type(impErr)))
+		print(str(impErr))
+		print(str((impErr.args)))
+		print(str(''))
+		impErr = None
+		del impErr
+		raise ImportError(str("Test module failed completely."))
+		exit(1)
+	try:
+		from tests import test_rand
+		if test_rand.__name__ is None:
+			raise ImportError(str("Test module failed to import even the random tests."))
+	except Exception as impErr:
+		print(str(''))
+		print(str(type(impErr)))
+		print(str(impErr))
+		print(str((impErr.args)))
+		print(str(''))
+		impErr = None
+		del impErr
+		raise ImportError(str("Test module failed completely."))
+		exit(1)
+	try:
+		from tests import test_salt
+		if test_salt.__name__ is None:
+			raise ImportError(str("Test module failed to import even the salt tests."))
+	except Exception as impErr:
+		print(str(''))
+		print(str(type(impErr)))
+		print(str(impErr))
+		print(str((impErr.args)))
+		print(str(''))
+		impErr = None
+		del impErr
+		raise ImportError(str("Test module failed completely."))
+		exit(1)
+	try:
+		from tests import test_lint
+		if test_lint.__name__ is None:
+			raise ImportError(str("Test module failed to import even the lint special tests."))
+	except Exception as impErr:
+		print(str(''))
+		print(str(type(impErr)))
+		print(str(impErr))
+		print(str((impErr.args)))
+		print(str(''))
+		impErr = None
+		del impErr
+		raise ImportError(str("Test module failed completely."))
+		exit(1)
+	try:
+		from tests import test_book
+		if test_book.__name__ is None:
+			raise ImportError(str("Test module failed to import even the book special tests."))
+	except Exception as impErr:
+		print(str(''))
+		print(str(type(impErr)))
+		print(str(impErr))
+		print(str((impErr.args)))
+		print(str(''))
+		impErr = None
+		del impErr
+		raise ImportError(str("Test module failed completely."))
+		exit(1)
+	try:
+		from tests import test_interface
+		if test_interface.__name__ is None:
+			raise ImportError(str("Test module failed to import even the iface special tests."))
+	except Exception as impErr:
+		print(str(''))
+		print(str(type(impErr)))
+		print(str(impErr))
+		print(str((impErr.args)))
+		print(str(''))
+		impErr = None
+		del impErr
+		raise ImportError(str("Test module failed completely."))
+		exit(1)
 except Exception as badErr:
 	print(str(''))
 	print(str(type(badErr)))

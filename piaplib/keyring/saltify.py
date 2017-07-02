@@ -38,6 +38,7 @@ def parseArgs(arguments=None):
 			'--msg',
 			dest='msg',
 			required=True,
+			type=str,
 			help='The Message. An unsalted message.'
 		)
 		parser.add_argument(
@@ -45,6 +46,7 @@ def parseArgs(arguments=None):
 			'--salt',
 			dest='salt',
 			required=True,
+			type=str,
 			help='The Salt. A unique secret.'
 		)
 		theArgs = parser.parse_args(arguments)
@@ -64,10 +66,13 @@ def memoize(func):
 
 	@functools.wraps(func)
 	def memoized_func(*args, **kwargs):
-		key = str(args) + str(kwargs)
-		if key not in cache:
-			cache[key] = func(*args, **kwargs)
-		return cache[key]
+		try:
+			key = str(args) + str(kwargs)
+			if key not in cache:
+				cache[key] = func(*args, **kwargs)
+			return cache[key]
+		except Exception:
+			return func(*args, **kwargs)
 
 	return memoized_func
 
@@ -79,16 +84,13 @@ def saltify(raw_msg, raw_salt):
 		str(raw_msg).encode("utf8"),
 		hashlib.sha512).hexdigest()
 	)
-	if (the_salted_msg is not None):
-		return the_salted_msg
-	else:
-		return None
+	return the_salted_msg
 
 
 def main(argv=None):
 	args = parseArgs(argv)
 	if args.msg is None or args.salt is None:
-		exit(2)
+		return 2
 	else:
 		print(saltify(str(args.msg), str(args.salt)))
 

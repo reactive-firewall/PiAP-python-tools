@@ -19,19 +19,17 @@
 try:
 	import sys
 	import os
-	if str("pku") in __file__:
+	if str("book") in __file__:
 		sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 except Exception:
-	raise ImportError("Pocket Knife Unit PKU failed to import.")
+	raise ImportError("Pocket Book failed to import.")
 
 
 try:
-	from . import pku as pku
-	if pku.__name__ is False:
-		raise ImportError("pku Failed to import.")
-except Exception as impErr:
-	impErr = None
-	del impErr
-	import pku as pku
+	from . import book as book
+	if book.__name__ is False:
+		raise ImportError("Pocket Book Failed to import.")
+except Exception:
+	import book as book
 
 

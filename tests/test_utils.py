@@ -404,6 +404,9 @@ and this will test reads.""")
 			from pku import utils as utils
 			if utils.__name__ is None:
 				raise ImportError("Failed to import utils")
+			from keyring import rand as rand
+			if rand.__name__ is None:
+				raise ImportError("Failed to import rand")
 			theBlob = str("""This is just a test for failure.""")
 			somefile = str(os.path.join(
 				os.path.join(
@@ -411,7 +414,13 @@ and this will test reads.""")
 					str('some_long')
 				),
 				os.path.join(
-					os.path.join(str('very'), str('long')),
+					os.path.join(
+						os.path.join(str('very'), str('long')),
+						os.path.join(
+							os.path.join(str(rand.randInt(1)), str('blahblah')),
+							str(rand.randInt(1))
+						)
+					),
 					str('filename.tmp')
 				)
 			))
@@ -431,8 +440,10 @@ and this will test reads.""")
 						print(str(""))
 				else:
 					theResult = False
+					print(str("append worked"))
 			else:
 				theResult = False
+				print(str("write worked"))
 		except Exception as err:
 			print(str(""))
 			print(str(type(err)))
@@ -475,5 +486,5 @@ and this will test reads.""")
 		assert theResult
 
 
-if __name__ == '__main__':
+if __name__ == u'__main__':
 	unittest.main()

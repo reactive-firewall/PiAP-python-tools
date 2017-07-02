@@ -41,16 +41,32 @@ except Exception as err:
 
 
 try:
-	from piaplib.pku.logs import logs as logs
+	from piaplib.book.logs import logs as logs
 except Exception:
 	try:
-		from .logs import logs as logs
+		from book.logs import logs as logs
 	except Exception as err:
 		print(str(type(err)))
 		print(str(err))
 		print(str(err.args))
 		print("")
 		raise ImportError("Error Importing logs")
+
+
+class PiAPError(RuntimeError):
+	"""An Error class for PiAP errors"""
+	cause = None
+	msg = None
+
+	def __init__(self, cause=None, msg=None):
+		if cause is not None and isinstance(cause, Exception):
+			self.cause = cause
+			self.msg = str(cause)
+		elif cause is not None and isinstance(cause, str):
+			self.msg = str(cause)
+			self.cause = None
+		if msg is not None and isinstance(msg, str):
+			self.msg = str(msg)
 
 
 def getTimeStamp():
@@ -75,16 +91,15 @@ def error_passing(func):
 		try:
 			theOutput = func(*args, **kwargs)
 		except Exception as err:
-			tb = sys.exc_info()[2]
 			timestamp = getTimeStamp()
 			logs.log(str("An error occured at {}").format(timestamp), "Error")
-			logs.log(str(func), "Error")
-			baton = RuntimeError("Passing error up").with_traceback(tb)
+			logs.log(str(func), "Debug")
+			baton = PiAPError(err, str("An error occured."))
 			# sys.exc_clear()
 			err = None
 			del err
-			raise baton
 			theOutput = None
+			raise baton
 		return theOutput
 
 	return helper_func
@@ -103,10 +118,14 @@ def error_handling(func):
 		except Exception as err:
 			timestamp = getTimeStamp()
 			logs.log(str("An error occured at {}").format(timestamp), "Error")
-			logs.log(str(func), "Error")
+			logs.log(str(func), "Debug")
 			logs.log(str(type(err)), "Error")
 			logs.log(str(err), "Error")
-			logs.log(str(err.args), "Error")
+			logs.log(str((err.args)), "Error")
+			if isinstance(err, PiAPError):
+				logs.log(str((err.cause)), "Error")
+				logs.log(str(type(err.cause)), "Error")
+				logs.log(str(type(err.args)), "Error")
 			logs.log(str(""), "Error")
 			# sys.exc_clear()
 			err = None
@@ -130,15 +149,15 @@ def bug_handling(func):
 		except Exception as err:
 			timestamp = getTimeStamp()
 			logs.log(str("An error occured at {}").format(timestamp), "CRITICAL")
-			logs.log(str(func), "CRITICAL")
+			logs.log(str(func), "Debug")
 			logs.log(str(type(err)), "CRITICAL")
 			logs.log(str(err), "CRITICAL")
-			logs.log(str(err.args), "CRITICAL")
+			logs.log(str((err.args)), "CRITICAL")
 			logs.log(str(""), "CRITICAL")
 			logs.log(str("Action will not be compleated! ABORT!"), "CRITICAL")
 			logs.log(str("You found a bug. Please report this to my creator."), "CRITICAL")
 			logs.log(str(""), "CRITICAL")
-			sys.exc_clear()
+			# sys.exc_clear()
 			err = None
 			del err
 			theOutput = 3
@@ -164,12 +183,12 @@ def warning_handling(func):
 		except Exception as err:
 			timestamp = getTimeStamp()
 			logs.log(str("An error occured at {}").format(timestamp), "Warning")
-			logs.log(str(func), "Warning")
+			logs.log(str(func), "Debug")
 			logs.log(str(type(err)), "Warning")
 			logs.log(str(err), "Warning")
-			logs.log(str(err.args), "Warning")
+			logs.log(str((err.args)), "Warning")
 			logs.log(str(""), "Warning")
-			sys.exc_clear()
+			# sys.exc_clear()
 			err = None
 			del err
 			theOutput = None
@@ -180,9 +199,8 @@ def warning_handling(func):
 
 @bug_handling
 def main(argv=None):
-	"""The Main Event makes no sense to utils."""
+	"""The Main Event makes no sense to remediation."""
 	raise NotImplementedError("CRITICAL - PKU remediation main() not implemented. yet?")
-	return 3
 
 
 if __name__ in u'__main__':

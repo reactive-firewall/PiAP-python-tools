@@ -18,6 +18,69 @@
 # limitations under the License.
 
 import unittest
+import subprocess
+
+
+def getPythonCommand():
+	"""function for backend python command"""
+	thepython = "exit 1 ; #"
+	try:
+		import sys
+		if sys.__name__ is None:
+			raise ImportError("Failed to import system. WTF?!!")
+		thepython = checkPythonCommand(["which", "coverage"])
+		if (str("/coverage") in str(thepython)) and (sys.version_info >= (3, 3)):
+			thepython = str("coverage run -p")
+		else:
+			thepython = checkPythonCommand(["which", "python3"])
+			if (str("/python3") not in str(thepython)) or (sys.version_info <= (3, 2)):
+				thepython = "python3"
+	except Exception:
+		thepython = "exit 1 ; #"
+		try:
+			thepython = checkPythonCommand(["which", "python"])
+			if (str("/python") in str(thepython)):
+				thepython = "python"
+		except Exception:
+			thepython = "exit 1 ; #"
+	return str(thepython)
+
+
+def checkPythonCommand(args=[None], stderr=None):
+	"""function for backend subprocess check_output command"""
+	theOutput = None
+	try:
+		if args is None or args is [None]:
+			theOutput = subprocess.check_output(["exit 1 ; #"])
+		else:
+			if str("coverage ") in args[0]:
+				args[0] = str("coverage")
+				args.insert(1, "run")
+				args.insert(2, "-p")
+				args.insert(2, "--source=piaplib,piaplib/lint,piaplib/keyring,piaplib/pku,piaplib/book")
+			theOutput = subprocess.check_output(args, stderr=stderr)
+	except Exception:
+		theOutput = None
+	return theOutput
+
+
+def checkPythonFuzzing(args=[None], stderr=None):
+	"""function for backend subprocess check_output command"""
+	theOutput = None
+	try:
+		if args is None or args is [None]:
+			theOutput = subprocess.check_output(["exit 1 ; #"])
+		else:
+			if str("coverage ") in args[0]:
+				args[0] = str("coverage")
+				args.insert(1, "run")
+				args.insert(2, "-p")
+				args.insert(2, "--source=piaplib,piaplib/lint,piaplib/keyring,piaplib/pku,piaplib/book")
+			theOutput = subprocess.check_output(args, stderr=stderr)
+	except Exception as err:
+		theOutput = None
+		raise RuntimeError(err)
+	return theOutput
 
 
 class BasicUsageTestSuite(unittest.TestCase):
@@ -57,7 +120,6 @@ class BasicUsageTestSuite(unittest.TestCase):
 			import argparse
 			if argparse.__name__ is None:
 				theResult = False
-			import subprocess
 			if subprocess.__name__ is None:
 				theResult = False
 			import time
@@ -85,8 +147,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 		"""Test case for backend which."""
 		theResult = False
 		try:
-			import subprocess
-			theOutputtext = subprocess.check_output(["which", "which"])
+			theOutputtext = checkPythonCommand(["which", "which"])
 			try:
 				if (str("/which") in str(theOutputtext)):
 					theResult = True
@@ -117,14 +178,17 @@ class BasicUsageTestSuite(unittest.TestCase):
 			import sys
 			if sys.__name__ is None:
 				raise ImportError("Failed to import system. WTF?!!")
-			import subprocess
-			thepython = subprocess.check_output(["which", "python3"])
+			thepython = getPythonCommand()
 			if (str("/python3") in str(thepython)) or (sys.version_info <= (3, 2)):
+				theResult = True
+			elif (str("coverage") in str(thepython)) or (sys.version_info <= (3, 2)):
+				theResult = True
+			elif (str("python") in str(thepython)) or (sys.version_info >= (3, 2)):
 				theResult = True
 		except Exception:
 			theResult = False
 			try:
-				theOutputtext = subprocess.check_output(["which", "python"])
+				theOutputtext = checkPythonCommand(["which", "python"])
 				if (str("/python") in str(theOutputtext)):
 					theResult = True
 			except Exception:
@@ -138,15 +202,10 @@ class BasicUsageTestSuite(unittest.TestCase):
 			import sys
 			if sys.__name__ is None:
 				raise ImportError("Failed to import system. WTF?!!")
-			import subprocess
-			thepython = subprocess.check_output(["which", "python3"])
-			if (str("/python3") in str(thepython)) and (sys.version_info >= (3, 3)):
-				thepython = "python3"
-			else:
-				thepython = "python"
+			thepython = getPythonCommand()
 			if (thepython is not None):
 				try:
-					theOutputtext = subprocess.check_output([
+					theOutputtext = checkPythonCommand([
 						str(thepython),
 						str("-m"),
 						str("piaplib.pocket"),
@@ -190,16 +249,11 @@ class BasicUsageTestSuite(unittest.TestCase):
 			import sys
 			if sys.__name__ is None:
 				raise ImportError("Failed to import system. WTF?!!")
-			import subprocess
-			thepython = subprocess.check_output(["which", "python3"])
-			if (str("/python3") in str(thepython)) and (sys.version_info >= (3, 3)):
-				thepython = "python3"
-			else:
-				thepython = "python"
+			thepython = getPythonCommand()
 			if (thepython is not None):
 				try:
-					for unit in ["lint.lint", "pku.pku", "keyring.keyring"]:
-						theOutputtext = subprocess.check_output([
+					for unit in ["lint.lint", "pku.pku", "book.book", "keyring.keyring"]:
+						theOutputtext = checkPythonCommand([
 							str(thepython),
 							str("-m"),
 							str("piaplib.{}").format(str(unit)),
@@ -243,18 +297,13 @@ class BasicUsageTestSuite(unittest.TestCase):
 			import sys
 			if sys.__name__ is None:
 				raise ImportError("Failed to import system. WTF?!!")
-			import subprocess
-			thepython = subprocess.check_output(["which", "python3"])
-			if (str("/python3") in str(thepython)) and (sys.version_info >= (3, 3)):
-				thepython = "python3"
-			else:
-				thepython = "python"
+			thepython = getPythonCommand()
 			from .context import piaplib as piaplib
 			if piaplib.__version__ is not None:
 				theResult = False
 			if (thepython is not None):
 				for unit in ["pocket"]:
-					theOutputtext = subprocess.check_output([
+					theOutputtext = checkPythonCommand([
 						str(thepython),
 						str("-m"),
 						str("piaplib.{}").format(str(unit)),
@@ -282,16 +331,11 @@ class BasicUsageTestSuite(unittest.TestCase):
 			import sys
 			if sys.__name__ is None:
 				raise ImportError("Failed to import system. WTF?!!")
-			import subprocess
-			thepython = subprocess.check_output(["which", "python3"])
-			if (str("/python3") in str(thepython)) and (sys.version_info >= (3, 3)):
-				thepython = "python3"
-			else:
-				thepython = "python"
+			thepython = getPythonCommand()
 			if (thepython is not None):
 				try:
 					for unit in ["pku.interfaces", "pku.compile_interface", "pku.upgrade"]:
-						theOutputtext = subprocess.check_output([
+						theOutputtext = checkPythonCommand([
 							str(thepython),
 							str("-m"),
 							str("piaplib.{}").format(str(unit)),
@@ -335,18 +379,13 @@ class BasicUsageTestSuite(unittest.TestCase):
 			import sys
 			if sys.__name__ is None:
 				raise ImportError("Failed to import system. WTF?!!")
-			import subprocess
-			thepython = subprocess.check_output(["which", "python3"])
-			if (str("/python3") in str(thepython)) and (sys.version_info >= (3, 3)):
-				thepython = "python3"
-			else:
-				thepython = "python"
+			thepython = getPythonCommand()
 			from .context import piaplib as piaplib
 			if piaplib.__version__ is not None:
 				theResult = False
 			if (thepython is not None):
 				for unit in ["pku.interfaces", "pku.compile_interface", "pku.upgrade"]:
-					theOutputtext = subprocess.check_output([
+					theOutputtext = checkPythonCommand([
 						str(thepython),
 						str("-m"),
 						str("piaplib.{}").format(str(unit)),
@@ -382,16 +421,15 @@ class BasicUsageTestSuite(unittest.TestCase):
 			import sys
 			if sys.__name__ is None:
 				raise ImportError("Failed to import system. WTF?!!")
-			import subprocess
-			thepython = subprocess.check_output(["which", "python3"])
-			if (str("/python3") in str(thepython)) and (sys.version_info >= (3, 3)):
-				thepython = "python3"
-			else:
-				thepython = "python"
+			thepython = getPythonCommand()
 			if (thepython is not None):
 				try:
-					for unit in ["lint.lint", "lint.check", "lint.do_execve"]:
-						theOutputtext = subprocess.check_output([
+					mod_tests = [
+						"lint.lint", "lint.check", "lint.clients_check_status",
+						"lint.iface_check_status", "lint.users_check_status", "lint.do_execve"
+					]
+					for unit in mod_tests:
+						theOutputtext = checkPythonCommand([
 							str(thepython),
 							str("-m"),
 							str("piaplib.{}").format(str(unit)),
@@ -435,18 +473,13 @@ class BasicUsageTestSuite(unittest.TestCase):
 			import sys
 			if sys.__name__ is None:
 				raise ImportError("Failed to import system. WTF?!!")
-			import subprocess
-			thepython = subprocess.check_output(["which", "python3"])
-			if (str("/python3") in str(thepython)) and (sys.version_info >= (3, 3)):
-				thepython = "python3"
-			else:
-				thepython = "python"
+			thepython = getPythonCommand()
 			from .context import piaplib as piaplib
 			if piaplib.__version__ is not None:
 				theResult = False
 			if (thepython is not None):
 				for unit in ["lint.lint", "lint.check", "lint.do_execve"]:
-					theOutputtext = subprocess.check_output([
+					theOutputtext = checkPythonCommand([
 						str(thepython),
 						str("-m"),
 						str("piaplib.{}").format(str(unit)),
@@ -482,18 +515,13 @@ class BasicUsageTestSuite(unittest.TestCase):
 			import sys
 			if sys.__name__ is None:
 				raise ImportError("Failed to import system. WTF?!!")
-			import subprocess
-			thepython = subprocess.check_output(["which", "python3"])
-			if (str("/python3") in str(thepython)) and (sys.version_info >= (3, 3)):
-				thepython = "python3"
-			else:
-				thepython = "python"
+			thepython = getPythonCommand()
 			from .context import piaplib as piaplib
 			if piaplib.__version__ is not None:
 				theResult = False
 			if (thepython is not None):
 				for unit in ["iface", "clients", "users"]:
-					theOutputtext = subprocess.check_output([
+					theOutputtext = checkPythonCommand([
 						str(thepython),
 						str("-m"),
 						str("piaplib.lint.check"),
@@ -530,16 +558,11 @@ class BasicUsageTestSuite(unittest.TestCase):
 			import sys
 			if sys.__name__ is None:
 				raise ImportError("Failed to import system. WTF?!!")
-			import subprocess
-			thepython = subprocess.check_output(["which", "python3"])
-			if (str("/python3") in str(thepython)) and (sys.version_info >= (3, 3)):
-				thepython = "python3"
-			else:
-				thepython = "python"
+			thepython = getPythonCommand()
 			if (thepython is not None):
 				try:
 					for unit in ["keyring.keyring", "keyring.saltify", "keyring.rand"]:
-						theOutputtext = subprocess.check_output([
+						theOutputtext = checkPythonCommand([
 							str(thepython),
 							str("-m"),
 							str("piaplib.{}").format(str(unit)),
@@ -583,16 +606,11 @@ class BasicUsageTestSuite(unittest.TestCase):
 			import sys
 			if sys.__name__ is None:
 				raise ImportError("Failed to import system. WTF?!!")
-			import subprocess
-			thepython = subprocess.check_output(["which", "python3"])
-			if (str("/python3") in str(thepython)) and (sys.version_info >= (3, 3)):
-				thepython = "python3"
-			else:
-				thepython = "python"
+			thepython = getPythonCommand()
 			if (thepython is not None):
 				try:
 					for unit in ["rand"]:
-						theOutputtext = subprocess.check_output([
+						theOutputtext = checkPythonCommand([
 							str(thepython),
 							str("-m"),
 							str("piaplib.pocket"),
@@ -639,16 +657,11 @@ class BasicUsageTestSuite(unittest.TestCase):
 			import sys
 			if sys.__name__ is None:
 				raise ImportError("Failed to import system. WTF?!!")
-			import subprocess
-			thepython = subprocess.check_output(["which", "python3"])
-			if (str("/python3") in str(thepython)) and (sys.version_info >= (3, 3)):
-				thepython = "python3"
-			else:
-				thepython = "python"
+			thepython = getPythonCommand()
 			if (thepython is not None):
 				try:
-					for unit in ["iface", "users"]:
-						theOutputtext = subprocess.check_output([
+					for unit in ["iface", "clients", "users"]:
+						theOutputtext = checkPythonCommand([
 							str(thepython),
 							str("-m"),
 							str("piaplib.lint.check"),
@@ -686,15 +699,10 @@ class BasicUsageTestSuite(unittest.TestCase):
 			import sys
 			if sys.__name__ is None:
 				raise ImportError("Failed to import system. WTF?!!")
-			import subprocess
-			thepython = subprocess.check_output(["which", "python3"])
-			if (str("/python3") in str(thepython)) and (sys.version_info >= (3, 3)):
-				thepython = "python3"
-			else:
-				thepython = "python"
+			thepython = getPythonCommand()
 			if (thepython is not None):
 				try:
-					theOutputtext = subprocess.check_output([
+					theOutputtext = checkPythonCommand([
 						str(thepython),
 						str("-m"),
 						str("piaplib.pocket"),
@@ -736,6 +744,59 @@ class BasicUsageTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
+	def test_g_python_command_build_iface(self):
+		"""Test case for piaplib.pocket.lint check users."""
+		theResult = False
+		try:
+			import sys
+			if sys.__name__ is None:
+				raise ImportError("Failed to import system. WTF?!!")
+			thepython = getPythonCommand()
+			if (thepython is not None):
+				try:
+					theOutputtext = checkPythonCommand([
+						str(thepython),
+						str("-m"),
+						str("piaplib.pku.compile_interface"),
+						str("-d"),
+						str("-t"),
+						str("wlan"),
+						str("-z"),
+						str("WAN")
+					], stderr=subprocess.STDOUT)
+					if (str("inet static") in str(theOutputtext)):
+						theResult = True
+					elif (str("inet dhcp") in str(theOutputtext)):
+						theResult = True
+					else:
+						theResult = False
+						print(str(""))
+						print(str("python cmd is {}").format(str(thepython)))
+						print(str(""))
+						print(str("actual output was..."))
+						print(str(""))
+						print(str("{}").format(str(theOutputtext)))
+						print(str(""))
+				except Exception as othererr:
+					print(str(""))
+					print(str(type(othererr)))
+					print(str(othererr))
+					print(str((othererr.args)))
+					print(str(""))
+					othererr = None
+					del othererr
+					theResult = False
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			othererr = None
+			del othererr
+			theResult = False
+		assert theResult
+
 	def test_d_python_command_check_users_html(self):
 		"""Test case for piaplib.pocket.lint check users."""
 		theResult = False
@@ -743,15 +804,10 @@ class BasicUsageTestSuite(unittest.TestCase):
 			import sys
 			if sys.__name__ is None:
 				raise ImportError("Failed to import system. WTF?!!")
-			import subprocess
-			thepython = subprocess.check_output(["which", "python3"])
-			if (str("/python3") in str(thepython)) and (sys.version_info >= (3, 3)):
-				thepython = "python3"
-			else:
-				thepython = "python"
+			thepython = getPythonCommand()
 			if (thepython is not None):
 				try:
-					theOutputtext = subprocess.check_output([
+					theOutputtext = checkPythonCommand([
 						str(thepython),
 						str("-m"),
 						str("piaplib.pocket"),
@@ -795,6 +851,61 @@ class BasicUsageTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
+	def test_d_python_command_check_clientss_html(self):
+		"""Test case for piaplib.pocket.lint check users."""
+		theResult = False
+		try:
+			import sys
+			if sys.__name__ is None:
+				raise ImportError("Failed to import system. WTF?!!")
+			thepython = getPythonCommand()
+			if (thepython is not None):
+				try:
+					theOutputtext = checkPythonCommand([
+						str(thepython),
+						str("-m"),
+						str("piaplib.pocket"),
+						str("lint"),
+						str("check"),
+						str("clients"),
+						str("--all"),
+						str("--html")
+					], stderr=subprocess.STDOUT)
+					if (str("</tbody></table>") in str(theOutputtext)):
+						if str("<table") in str(theOutputtext):
+							theResult = True
+						else:
+							theResult = False
+					else:
+						theResult = False
+						print(str(""))
+						print(str("TEST: check clients's html"))
+						print(str("python cmd is {}").format(str(thepython)))
+						print(str(""))
+						print(str("actual output was..."))
+						print(str(""))
+						print(str("{}").format(str(theOutputtext)))
+						print(str(""))
+				except Exception as othererr:
+					print(str(""))
+					print(str(type(othererr)))
+					print(str(othererr))
+					print(str((othererr.args)))
+					print(str(""))
+					othererr = None
+					del othererr
+					theResult = False
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			othererr = None
+			del othererr
+			theResult = False
+		assert theResult
+
 	def test_d_python_command_check_users_single(self):
 		"""Test case for piaplib.pocket.lint check users."""
 		theResult = False
@@ -802,15 +913,10 @@ class BasicUsageTestSuite(unittest.TestCase):
 			import sys
 			if sys.__name__ is None:
 				raise ImportError("Failed to import system. WTF?!!")
-			import subprocess
-			thepython = subprocess.check_output(["which", "python3"])
-			if (str("/python3") in str(thepython)) and (sys.version_info >= (3, 3)):
-				thepython = "python3"
-			else:
-				thepython = "python"
+			thepython = getPythonCommand()
 			if (thepython is not None):
 				try:
-					theOutputtext = subprocess.check_output([
+					theOutputtext = checkPythonCommand([
 						str(thepython),
 						str("-m"),
 						str("piaplib.pocket"),
@@ -851,6 +957,106 @@ class BasicUsageTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
+	def test_f_python_command_check_users_all(self):
+		"""Test case for piaplib.pocket.lint check users."""
+		theResult = False
+		try:
+			import sys
+			if sys.__name__ is None:
+				raise ImportError("Failed to import system. WTF?!!")
+			thepython = getPythonCommand()
+			if (thepython is not None):
+				try:
+					theOutputtext = checkPythonCommand([
+						str(thepython),
+						str("-m"),
+						str("piaplib.pocket"),
+						str("lint"),
+						str("check"),
+						str("users"),
+						str("--all")
+					], stderr=subprocess.STDOUT)
+					if (str("root") in str(theOutputtext)):
+						theResult = True
+					else:
+						theResult = False
+						print(str(""))
+						print(str("python cmd is {}").format(str(thepython)))
+						print(str(""))
+						print(str("actual output was..."))
+						print(str(""))
+						print(str("{}").format(str(theOutputtext)))
+						print(str(""))
+				except Exception as othererr:
+					print(str(""))
+					print(str(type(othererr)))
+					print(str(othererr))
+					print(str((othererr.args)))
+					print(str(""))
+					othererr = None
+					del othererr
+					theResult = False
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			othererr = None
+			del othererr
+			theResult = False
+		assert theResult
+
+	def test_f_python_command_check_users_list(self):
+		"""Test case for piaplib.pocket.lint check users."""
+		theResult = False
+		try:
+			import sys
+			if sys.__name__ is None:
+				raise ImportError("Failed to import system. WTF?!!")
+			thepython = getPythonCommand()
+			if (thepython is not None):
+				try:
+					theOutputtext = checkPythonCommand([
+						str(thepython),
+						str("-m"),
+						str("piaplib.pocket"),
+						str("lint"),
+						str("check"),
+						str("users"),
+						str("--list")
+					], stderr=subprocess.STDOUT)
+					if (str("root") in str(theOutputtext)):
+						theResult = True
+					else:
+						theResult = False
+						print(str(""))
+						print(str("python cmd is {}").format(str(thepython)))
+						print(str(""))
+						print(str("actual output was..."))
+						print(str(""))
+						print(str("{}").format(str(theOutputtext)))
+						print(str(""))
+				except Exception as othererr:
+					print(str(""))
+					print(str(type(othererr)))
+					print(str(othererr))
+					print(str((othererr.args)))
+					print(str(""))
+					othererr = None
+					del othererr
+					theResult = False
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			othererr = None
+			del othererr
+			theResult = False
+		assert theResult
+
 	def test_d_python_command_check_iface(self):
 		"""Test case for piaplib.pocket.lint check iface."""
 		theResult = False
@@ -858,15 +1064,10 @@ class BasicUsageTestSuite(unittest.TestCase):
 			import sys
 			if sys.__name__ is None:
 				raise ImportError("Failed to import system. WTF?!!")
-			import subprocess
-			thepython = subprocess.check_output(["which", "python3"])
-			if (str("/python3") in str(thepython)) and (sys.version_info >= (3, 3)):
-				thepython = "python3"
-			else:
-				thepython = "python"
+			thepython = getPythonCommand()
 			if (thepython is not None):
 				try:
-					theOutputtext = subprocess.check_output([
+					theOutputtext = checkPythonCommand([
 						str(thepython),
 						str("-m"),
 						str("piaplib.pocket"),
@@ -919,12 +1120,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 			import sys
 			if sys.__name__ is None:
 				raise ImportError("Failed to import system. WTF?!!")
-			import subprocess
-			thepython = subprocess.check_output(["which", "python3"])
-			if (str("/python3") in str(thepython)) and (sys.version_info >= (3, 3)):
-				thepython = "python3"
-			else:
-				thepython = "python"
+			thepython = getPythonCommand()
 			if (thepython is not None):
 				test_salt_one = str(
 					"7a9356011e7f6bc42105deee6d49983e0cfa7650c7fce5d5d3b19aacca91605199ee" +
@@ -932,7 +1128,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 					"\n"
 				)
 				try:
-					theOutputtext = subprocess.check_output([
+					theOutputtext = checkPythonCommand([
 						str(thepython),
 						str("-m"),
 						str("piaplib.pocket"),
@@ -980,6 +1176,155 @@ class BasicUsageTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
+	def test_d_python_command_bad_saltify(self):
+		"""Test case for piaplib.pocket.lint check users."""
+		theResult = True
+		try:
+			from piaplib import pku as pku
+			if pku.__name__ is None:
+				raise ImportError("Failed to import pku")
+			from pku import utils as utils
+			if utils.__name__ is None:
+				raise ImportError("Failed to import utils")
+			import sys
+			if sys.__name__ is None:
+				raise ImportError("Failed to import system. WTF?!!")
+			thepython = getPythonCommand()
+			if (thepython is not None):
+				theOutputtext = None
+				with self.assertRaises(Exception):
+					theOutputtext = checkPythonFuzzing([
+						str(thepython),
+						str("-m"),
+						str("piaplib.pocket"),
+						str("keyring"),
+						str("saltify"),
+						str("""--salt={}""").format(str("testSalt"))
+					], stderr=subprocess.STDOUT)
+				self.assertIsNone(theOutputtext)
+				with self.assertRaises(Exception):
+					theOutputtext = checkPythonFuzzing([
+						str(thepython),
+						str("-m"),
+						str("piaplib.pocket"),
+						str("keyring"),
+						str("saltify"),
+						str("""--msg={}""").format(str("Test Message"))
+					], stderr=subprocess.STDOUT)
+				self.assertIsNone(theOutputtext)
+				with self.assertRaises(Exception):
+					theOutputtext = checkPythonFuzzing([
+						str(thepython),
+						str("-m"),
+						str("piaplib.pocket"),
+						str("keyring"),
+						str("saltify")
+					], stderr=subprocess.STDOUT)
+				self.assertIsNone(theOutputtext)
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			othererr = None
+			del othererr
+			theResult = False
+		assert theResult
+
+	def test_d_python_command_bad_interface(self):  # noqa
+		"""Test case for piaplib.pocket.lint check users."""
+		theResult = True
+		try:
+			from piaplib import pku as pku
+			if pku.__name__ is None:
+				raise ImportError("Failed to import pku")
+			from pku import utils as utils
+			if utils.__name__ is None:
+				raise ImportError("Failed to import utils")
+			import sys
+			if sys.__name__ is None:
+				raise ImportError("Failed to import system. WTF?!!")
+			thepython = getPythonCommand()
+			if (thepython is not None):
+				theOutputtext = None
+				try:
+					theOutputtext = checkPythonFuzzing([
+						str(thepython),
+						str("-m"),
+						str("piaplib.pocket"),
+						str("pku"),
+						str("interfaces"),
+						str("""-i={}""").format(str("eth0"))
+					], stderr=subprocess.STDOUT)
+				except Exception as junkErr:  # noqa
+					del(junkErr)
+				self.assertIsNotNone(theOutputtext)
+				try:
+					theOutputtext = checkPythonFuzzing([
+						str(thepython),
+						str("-m"),
+						str("piaplib.pocket"),
+						str("pku"),
+						str("interfaces"),
+						str("""-i={}""").format(str("eth0")),
+						str("""-r""")
+					], stderr=subprocess.STDOUT)
+				except Exception as junkErr:  # noqa
+					del(junkErr)
+				# self.assertIsNone(theOutputtext)
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			othererr = None
+			del othererr
+			theResult = False
+		assert theResult
+
+	def test_o_exec_command_run(self):
+		"""Test case for piaplib.pocket.lint do_execve calls."""
+		theResult = False
+		try:
+			import sys
+			if sys.__name__ is None:
+				raise ImportError("Failed to import system. WTF?!!")
+			thepython = getPythonCommand()
+			if (thepython is not None):
+				try:
+					self.assertIsNotNone(checkPythonCommand([
+						str(thepython),
+						str("-m"),
+						str("piaplib.pocket"),
+						str("lint"),
+						str("execve"),
+						str("""--cmd={}""").format(str("echo")),
+						str("""--args={}""").format(str("test"))
+					], stderr=subprocess.STDOUT))
+					theResult = True
+				except Exception as othererr:
+					print(str(""))
+					print(str(type(othererr)))
+					print(str(othererr))
+					print(str((othererr.args)))
+					print(str(""))
+					othererr = None
+					del othererr
+					theResult = False
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			othererr = None
+			del othererr
+			theResult = False
+		assert theResult
+
 
 if __name__ == '__main__':
 	unittest.main()
+

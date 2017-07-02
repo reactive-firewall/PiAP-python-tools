@@ -19,6 +19,7 @@
 
 import unittest
 
+
 try:
 	try:
 		import sys
@@ -178,6 +179,58 @@ class RandTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
+	def test_keyring_rand_bad_min_test(self):
+		"""Test generate random output test-case."""
+		theResult = True
+		try:
+			from .context import piaplib
+			if piaplib.__name__ is None:
+				theResult = False
+			from piaplib import keyring as keyring
+			if keyring.__name__ is None:
+				theResult = False
+			from keyring import rand as rand
+			if rand.__name__ is None:
+				theResult = False
+			self.assertIsNotNone(rand.randInt(32, None, 512))
+			self.assertIsNotNone(rand.randInt(32, -256, 512))
+			self.assertIsNotNone(rand.randInt(32, 0, 512))
+			self.assertIsNotNone(rand.randInt(32, 256, 512))
+		except Exception as impErr:
+			print(str(""))
+			print(str(type(impErr)))
+			print(str(impErr))
+			print(str((impErr.args)))
+			print(str(""))
+			theResult = False
+		assert theResult
+
+	def test_keyring_rand_bad_max_test(self):
+		"""Test generate random output test-case."""
+		theResult = True
+		try:
+			from .context import piaplib
+			if piaplib.__name__ is None:
+				theResult = False
+			from piaplib import keyring as keyring
+			if keyring.__name__ is None:
+				theResult = False
+			from keyring import rand as rand
+			if rand.__name__ is None:
+				theResult = False
+			self.assertIsNotNone(rand.randInt(32, 0, None))
+			self.assertIsNotNone(rand.randInt(32, 50, 12))
+			self.assertIsNotNone(rand.randInt(32, 0, -256))
+			self.assertIsNotNone(rand.randInt(32, 1, 512))
+		except Exception as impErr:
+			print(str(""))
+			print(str(type(impErr)))
+			print(str(impErr))
+			print(str((impErr.args)))
+			print(str(""))
+			theResult = False
+		assert theResult
+
 	def test_keyring_rand_bool_test(self):
 		"""Test generate random output test-case."""
 		theResult = True
@@ -259,6 +312,39 @@ class RandTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
+	def test_keyring_rand_bad_count_test(self):
+		"""Test generate random output test-case."""
+		theResult = True
+		try:
+			from .context import piaplib
+			if piaplib.__name__ is None:
+				theResult = False
+			from piaplib import keyring as keyring
+			if keyring.__name__ is None:
+				theResult = False
+			from keyring import rand as rand
+			if rand.__name__ is None:
+				theResult = False
+			self.assertIsNotNone(rand.randInt(None))
+			self.assertIsNotNone(rand.randInt())
+			self.assertIsNotNone(rand.rand(None))
+			self.assertIsNotNone(rand.rand())
+			self.assertIsNotNone(rand.randBool(None))
+			self.assertIsNotNone(rand.randBool())
+			self.assertIsNotNone(rand.randStr(None))
+			self.assertIsNotNone(rand.randStr())
+			self.assertIsNotNone(rand.randChar(None))
+			self.assertIsNotNone(rand.randChar())
+		except Exception as impErr:
+			print(str("Bad count"))
+			print(str(""))
+			print(str(type(impErr)))
+			print(str(impErr))
+			print(str((impErr.args)))
+			print(str(""))
+			theResult = False
+		assert theResult
+
 	def test_keyring_rand_test_bias(self):
 		"""Test generate random output of multiple domains in 1000 tries test-case."""
 		theResult = True
@@ -276,15 +362,16 @@ class RandTestSuite(unittest.TestCase):
 			from keyring import rand as rand
 			if rand.__name__ is None:
 				theResult = False
-				temp = rand.rand(1)
-				for rand_roll in range(1000):
-					seen_alpha = ((seen_alpha is True) or str(temp).isalpha())
-					seen_digit = ((seen_digit is True) or str(temp).isdigit())
-					seen_special = ((seen_special is True) or (str(temp).isalnum() is False))
-					temp = rand.rand(1)
+			temp = str(rand.rand(1))
+			for rand_roll in range(10000):
+				seen_alpha = ((seen_alpha is True) or str(temp).isalpha())
+				seen_digit = ((seen_digit is True) or str(temp).isdigit())
+				seen_special = ((seen_special is True) or (str(temp).isalnum() is False))
+				temp = str(rand.rand(1))
 			if (seen_alpha is True) and (seen_digit is True) and (seen_special is True):
 				theResult = (theResult is True)
-			del temp
+			temp = None
+			del(temp)
 		except Exception as impErr:
 			print(str(""))
 			print(str(type(impErr)))

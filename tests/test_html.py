@@ -69,11 +69,11 @@ class BasicHTMLTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
-	def test_c_html_special_chars(self): # noqa
-		"""Test case for piaplib.* --help."""
+	def test_c_html_special_chars(self):  # noqa
+		"""Test case for piaplib.lint.html_generator.has_special_html_chars."""
 		theResult = False
 		try:
-			from .. import html_generator as html_generator
+			from lint import html_generator as html_generator
 		except Exception:
 			import lint.html_generator as html_generator
 		if html_generator.__name__ is None:
@@ -106,7 +106,7 @@ class BasicHTMLTestSuite(unittest.TestCase):
 		"""Test case for gen TR."""
 		theResult = False
 		try:
-			from .. import html_generator as html_generator
+			from lint import html_generator as html_generator
 		except Exception:
 			import lint.html_generator as html_generator
 		if html_generator.__name__ is None:
@@ -137,7 +137,7 @@ class BasicHTMLTestSuite(unittest.TestCase):
 		"""Test case for gen TD"""
 		theResult = False
 		try:
-			from .. import html_generator as html_generator
+			from lint import html_generator as html_generator
 		except Exception:
 			import lint.html_generator as html_generator
 		if html_generator.__name__ is None:
@@ -168,7 +168,7 @@ class BasicHTMLTestSuite(unittest.TestCase):
 		"""Test case for gen UL"""
 		theResult = False
 		try:
-			from .. import html_generator as html_generator
+			from lint import html_generator as html_generator
 		except Exception:
 			import lint.html_generator as html_generator
 		if html_generator.__name__ is None:
@@ -199,7 +199,7 @@ class BasicHTMLTestSuite(unittest.TestCase):
 		"""Test case for gen TD"""
 		theResult = False
 		try:
-			from .. import html_generator as html_generator
+			from lint import html_generator as html_generator
 		except Exception:
 			import lint.html_generator as html_generator
 		if html_generator.__name__ is None:

@@ -81,10 +81,10 @@ class ConfigTestSuite(unittest.TestCase):
 			somefile = str("the_test_file.json")
 			if (config.writeJsonFile(somefile, theBlob) is True):
 				readback = config.readJsonFile(somefile)
-				a = (theBlob[u'test'][u'write_test'] in readback[u'test'][u'write_test'])
-				b = (readback[u'test'][u'write_test'] in theBlob[u'test'][u'write_test'])
-				c = (theBlob[u'test'][u'read_test'] in readback[u'test'][u'read_test'])
-				d = (readback[u'test'][u'read_test'] in theBlob[u'test'][u'read_test'])
+				a = (str(theBlob[u'test'][u'write_test']) in str(readback[u'test'][u'write_test']))
+				b = (str(readback[u'test'][u'write_test']) in str(theBlob[u'test'][u'write_test']))
+				c = (str(theBlob[u'test'][u'read_test']) in str(readback[u'test'][u'read_test']))
+				d = (str(readback[u'test'][u'read_test']) in str(theBlob[u'test'][u'read_test']))
 				theResult = (a and b and c and d)
 				if theResult:
 					theResult = True
@@ -155,8 +155,8 @@ class ConfigTestSuite(unittest.TestCase):
 					print(str(theBlob))
 					print(str(""))
 			else:
-				print(str("SKIPPED: no yaml support"))
 				theResult = True
+				print(str("SKIPPED: no yaml support"))
 		except Exception as err:
 			print(str(""))
 			print(str("Error in test of yaml write-read"))
