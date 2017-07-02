@@ -1232,7 +1232,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
-	def test_d_python_command_bad_interface(self):
+	def test_d_python_command_bad_interface(self):  # noqa
 		"""Test case for piaplib.pocket.lint check users."""
 		theResult = True
 		try:

@@ -371,31 +371,29 @@ def get_client_status(client=None, use_html=False, lan_interface=None):
 		if client_mac is not None:
 			status_txt = None
 			status_txt = get_client_sta_status(client_mac)
-		if use_html is not True:
-			if status_txt is not None:
-				if (str("disassociated") in status_txt):
-					theResult = u'disassociated'
-				elif (str("associated") in status_txt):
-					theResult = u'associated'
-				else:
-					theResult = u'UNKNOWN'
-		else:
-			if status_txt is not None:
-				if (str("disassociated") in status_txt):
-					theResult = html_generator.gen_html_td(
-						html_generator.gen_html_label(u'disassociated', u'danger'),
-						str(u'client_status_value_{}').format(client)
-					)
-				elif (str("associated") in status_txt):
-					theResult = html_generator.gen_html_td(
-						html_generator.gen_html_label(u'associated', u'success'),
-						str(u'client_status_value_{}').format(client)
-					)
-				else:
-					theResult = html_generator.gen_html_td(
-						html_generator.gen_html_label(u'UNKNOWN', u'default'),
-						str(u'client_status_value_{}').format(client)
-					)
+		if use_html is not True and status_txt is not None:
+			if (str("disassociated") in status_txt):
+				theResult = u'disassociated'
+			elif (str("associated") in status_txt):
+				theResult = u'associated'
+			else:
+				theResult = u'UNKNOWN'
+		elif status_txt is not None:
+			if (str("disassociated") in status_txt):
+				theResult = html_generator.gen_html_td(
+					html_generator.gen_html_label(u'disassociated', u'danger'),
+					str(u'client_status_value_{}').format(client)
+				)
+			elif (str("associated") in status_txt):
+				theResult = html_generator.gen_html_td(
+					html_generator.gen_html_label(u'associated', u'success'),
+					str(u'client_status_value_{}').format(client)
+				)
+			else:
+				theResult = html_generator.gen_html_td(
+					html_generator.gen_html_label(u'UNKNOWN', u'default'),
+					str(u'client_status_value_{}').format(client)
+				)
 	except Exception as errcrit:
 		print(str(errcrit))
 		print(str(errcrit.args))

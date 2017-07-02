@@ -23,6 +23,16 @@ try:
 	import sys
 	import argparse
 	sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+except Exception as importErr:
+	print(str(importErr))
+	print(str(importErr.args))
+	importErr = None
+	del importErr
+	raise ImportError("Failed to import " + str(__file__))
+	exit(255)
+
+
+try:
 	try:
 		import piaplib as piaplib
 	except Exception:
