@@ -51,40 +51,60 @@ __prog__ = """piaplib.keyring.clearify"""
 """The name of this PiAPLib tool is clearify"""
 
 
+KEY_BLOCK_SIZE = len(base64.standard_b64encode(bytes(os.urandom(32))))
+
+
 @remediation.bug_handling
 def packForRest(message=None, key='static key CHANGEME', seed='This is a static IV SEED'):
-	from Crypto.Cipher import AES
-	obj = AES.new(
-		str(key.join("0123456789abcdefg")).encode('utf8')[:16],
-		AES.MODE_CBC,
-		str(seed.join("0123456789ABCDEFG")).encode('utf8')[:16]
-	)
-	pad_text = str(bytes(b'\0' * (16 - (len(message) % 16))).decode('utf8'))
-	pad_message = str("{}{}").format(message, pad_text).encode('utf8')
-	ciphertext = obj.encrypt(pad_message)
-	del(obj)
-	return str(base64.standard_b64encode(ciphertext).decode('utf8'))
+	import six
+	if six.PY2:
+		from Crypto.Cipher import AES
+		obj = AES.new(
+			str(key.join("0123456789abcdef")).encode('utf8')[:16],
+			AES.MODE_CBC,
+			str(seed.join("0123456789ABCDEFG")).encode('utf8')[:16]
+		)
+		pad_text = str(bytes(b'\0' * (16 - (len(message) % 16))).decode('utf8'))
+		pad_message = str("{}{}").format(message, pad_text).encode('utf8')
+		ciphertext = obj.encrypt(pad_message)
+		del(obj)
+		return str(base64.standard_b64encode(ciphertext).decode('utf8'))
+	else:
+		from cryptography.fernet import Fernet
+		f = Fernet(base64.urlsafe_b64encode(
+			bytes(key.join(str("0123456789abcdefg")).encode('utf8'))[:32]
+		)[:KEY_BLOCK_SIZE])
+		ciphertext = f.encrypt(message.encode('utf8'))
+		return str(ciphertext.decode('utf8'))
 
 
 @remediation.bug_handling
 def unpackFormRest(ciphertext=None, key='static key CHANGEME', seed='This is a static IV SEED'):
-	from Crypto.Cipher import AES
-	obj = AES.new(
-		str(key.join("0123456789abcdefg")).encode('utf8')[:16],
-		AES.MODE_CBC,
-		str(seed.join("0123456789ABCDEFG")).encode('utf8')[:16]
-	)
-	cleartext = obj.decrypt(base64.standard_b64decode(ciphertext.encode('utf8')))
-	for pad_len in range(16, 0, -1):
-		pad_text = str(bytes(b'\0' * (16 - pad_len)).decode('utf8'))
-		cleartext_unpad = cleartext.decode('utf8').rstrip(pad_text)
-		if (len(cleartext_unpad.encode('utf8')) is len(cleartext)):
-			continue
-		else:
-			cleartext = cleartext_unpad.encode('utf8')
-	del(obj)
-	return cleartext.decode('utf8')
-
+	import six
+	if six.PY2:
+		from Crypto.Cipher import AES
+		obj = AES.new(
+			str(key.join("0123456789abcdef")).encode('utf8')[:16],
+			AES.MODE_CBC,
+			str(seed.join("0123456789ABCDEFG")).encode('utf8')[:16]
+		)
+		cleartext = obj.decrypt(base64.standard_b64decode(ciphertext.encode('utf8')))
+		for pad_len in range(16, 0, -1):
+			pad_text = str(bytes(b'\0' * (16 - pad_len)).decode('utf8'))
+			cleartext_unpad = cleartext.decode('utf8').rstrip(pad_text)
+			if (len(cleartext_unpad.encode('utf8')) is len(cleartext)):
+				continue
+			else:
+				cleartext = cleartext_unpad.encode('utf8')
+		del(obj)
+		return cleartext.decode('utf8')
+	else:
+		from cryptography.fernet import Fernet
+		f = Fernet(base64.urlsafe_b64encode(
+			bytes(key.join(str("0123456789abcdefg")).encode('utf8'))[:32]
+		)[:KEY_BLOCK_SIZE])
+		cleartext = f.decrypt(ciphertext.encode('utf8'))
+		return str(cleartext.decode('utf8'))
 
 WEAK_ACTIONS = {u'pack': packForRest, u'unpack': unpackFormRest}
 """ The Pocket bag Unit actions.

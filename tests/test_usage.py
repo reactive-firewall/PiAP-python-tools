@@ -750,6 +750,10 @@ class BasicUsageTestSuite(unittest.TestCase):
 							theResult = True
 						elif (str("dSdMQMFlL5ASBCgaM0DOhnMMn21lHePO0sl4x2IF9Y4=") in str(theOutputtext)):
 							theResult = True
+						elif (str("gAAAAABZXLM0i-DXqCdg5UstqVZGLuVqGlu7Q1" +
+							"umhUjS4H2Pd7CIo_1C7KI-h5uaTCKVzktllCN-URmhJOMH1l" + 
+							"Fd90xty0JkZ3M9YFwGckq7oZcXrlel5rY=") in str(theOutputtext)):
+							theResult = True
 						else:
 							theResult = False
 							print(str(""))
