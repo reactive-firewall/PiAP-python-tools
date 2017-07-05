@@ -104,7 +104,7 @@ before_install:
   - travis_retry python3 -m pip install tox || python3 -m pip install tox || true ;
   - travis_retry python3 -m pip install coverage || python3 -m pip install coverage || true ;
   - travis_retry python3 -m pip install codecov || python3 -m pip install codecov || true ;
-  - travis_retry python3 -m pip install pycrypto || python3 -m pip install pycrypto || true ;
+  - travis_retry python3 -m pip install -r requirements.txt || python3 -m pip install -r requirements.txt || true ;
 
 script:
   - make clean ;
