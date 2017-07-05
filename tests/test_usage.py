@@ -55,12 +55,14 @@ def checkPythonCommand(args=[None], stderr=None):
 		else:
 			if str("coverage ") in args[0]:
 				args[0] = str("coverage")
-				args.insert(1, "run")
-				args.insert(2, "-p")
-				args.insert(2, "--source=piaplib,piaplib/lint,piaplib/keyring,piaplib/pku,piaplib/book")
+				args.insert(1, str("run"))
+				args.insert(2, str("-p"))
+				args.insert(2, str("--source=piaplib,piaplib/lint,piaplib/keyring,piaplib/pku,piaplib/book"))
 			theOutput = subprocess.check_output(args, stderr=stderr)
 	except Exception:
 		theOutput = None
+	if isinstance(theOutput, bytes):
+		theOutput = theOutput.decode('utf8')
 	return theOutput
 
 
@@ -77,10 +79,30 @@ def checkPythonFuzzing(args=[None], stderr=None):
 				args.insert(2, "-p")
 				args.insert(2, "--source=piaplib,piaplib/lint,piaplib/keyring,piaplib/pku,piaplib/book")
 			theOutput = subprocess.check_output(args, stderr=stderr)
+		if isinstance(theOutput, bytes):
+			theOutput = theOutput.decode('utf8')
 	except Exception as err:
 		theOutput = None
 		raise RuntimeError(err)
 	return theOutput
+
+
+def debugBlob(blob=None):
+	try:
+		print(str(""))
+		print(str("String:"))
+		print(str("""\""""))
+		print(str(blob))
+		print(str("""\""""))
+		print(str(""))
+		print(str("CODE:"))
+		print(str("""\""""))
+		print(repr(blob))
+		print(str("""\""""))
+		print(str(""))
+	except Exception:
+		return False
+	return True
 
 
 class BasicUsageTestSuite(unittest.TestCase):
@@ -620,6 +642,113 @@ class BasicUsageTestSuite(unittest.TestCase):
 							str("5")
 						], stderr=subprocess.STDOUT)
 						if (theOutputtext is not None and len(str(theOutputtext)) > 0):
+							theResult = True
+						else:
+							theResult = False
+							print(str(""))
+							print(str("python cmd is {}").format(str(thepython)))
+							print(str(""))
+							print(str("actual output was..."))
+							print(str(""))
+							print(str("{}").format(str(theOutputtext)))
+							print(str(""))
+				except Exception as othererr:
+					print(str(""))
+					print(str(type(othererr)))
+					print(str(othererr))
+					print(str((othererr.args)))
+					print(str(""))
+					othererr = None
+					del othererr
+					theResult = False
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			othererr = None
+			del othererr
+			theResult = False
+		assert theResult
+
+	def test_keyring_rand_gen_units(self):
+		"""Test case for piaplib.keyring.rand -g *."""
+		theResult = False
+		try:
+			import sys
+			if sys.__name__ is None:
+				raise ImportError("Failed to import system. WTF?!!")
+			thepython = getPythonCommand()
+			if (thepython is not None):
+				try:
+					for unit in ["raw", "str", "passphrase", "int", "bool", "IP", "SSID"]:
+						theOutputtext = checkPythonCommand([
+							str(thepython),
+							str("-m"),
+							str("piaplib.keyring.rand"),
+							str("--count"),
+							str("5"),
+							str("--generate"),
+							str("{}").format(str(unit))
+						], stderr=subprocess.STDOUT)
+						if (str(theOutputtext) is not None):
+							theResult = True
+						else:
+							theResult = False
+							print(str(""))
+							print(str("python cmd is {}").format(str(thepython)))
+							print(str(""))
+							print(str("actual output was..."))
+							print(str(""))
+							print(str("{}").format(str(theOutputtext)))
+							print(str(""))
+				except Exception as othererr:
+					print(str(""))
+					print(str(type(othererr)))
+					print(str(othererr))
+					print(str((othererr.args)))
+					print(str(""))
+					othererr = None
+					del othererr
+					theResult = False
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			othererr = None
+			del othererr
+			theResult = False
+		assert theResult
+
+	def test_keyring_clear_io(self):
+		"""Test case for piaplib.keyring.clearify."""
+		theResult = False
+		try:
+			import sys
+			if sys.__name__ is None:
+				raise ImportError("Failed to import system. WTF?!!")
+			thepython = getPythonCommand()
+			if (thepython is not None):
+				try:
+					test_message = str(u'This is a test Message')
+					theOutputtext = test_message
+					for unit in ["--pack", "--unpack"]:
+						theOutputtext = checkPythonCommand([
+							str(thepython),
+							str("-m"),
+							str("piaplib.keyring.clearify"),
+							str("{}").format(str(unit)),
+							str("-S=testSeedNeedstobelong"),
+							str("--msg=\"{}\"").format(theOutputtext),
+							str("-K=testkeyneedstobelong")
+						], stderr=subprocess.STDOUT)
+						theOutputtext = str(theOutputtext).replace(str("\\n"), str(""))
+						if (test_message in str(theOutputtext)):
+							theResult = True
+						elif (str("dSdMQMFlL5ASBCgaM0DOhnMMn21lHePO0sl4x2IF9Y4=") in str(theOutputtext)):
 							theResult = True
 						else:
 							theResult = False

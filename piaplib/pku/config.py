@@ -124,7 +124,7 @@ def readYamlFile(somefile):
 		return None
 	read_data = None
 	try:
-		with utils.open_func(somefile, 'r', encoding='utf-8') as ymalfile:
+		with utils.open_func(somefile, mode='r', encoding='utf-8') as ymalfile:
 			read_data = yaml.load(ymalfile)
 	except Exception as yamlerr:
 		print("")
@@ -147,10 +147,11 @@ def writeYamlFile(somefile, data):
 		did_write = utils.writeFile(someFilePath, yaml.dump(data))
 	except Exception as yamlerr:
 		print("")
-		print("Error: Failed to load YAML file.")
+		print("Error: Failed to save YAML file.")
 		print(str(type(yamlerr)))
 		print(str(yamlerr))
 		print(str((yamlerr.args)))
+		print(str(somefile))
 		print("")
 		did_write = None
 	return did_write

@@ -105,7 +105,7 @@ def randPW(count=None):
 	else:
 		x_count = count
 	try:
-		return str(randStr(x_count))
+		return str(randStr((x_count + 4))).replace(str("""\\x"""), str(""))[2:-1]
 	except Exception as err:
 		print(str(u'FAILED DURRING RAND-PW. ABORT.'))
 		print(str(type(err)))

@@ -169,6 +169,7 @@ def restart_iface(iface_name="lo"):
 @remediation.bug_handling
 def main(argv=None):
 	try:
+		args = None
 		if (argv is not None and (argv is not []) and (len(argv) >= 1)):
 			(args, extras) = parseargs(argv)
 		if args is None:
