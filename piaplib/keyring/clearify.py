@@ -41,6 +41,7 @@ try:
 except Exception:
 	import rand as rand
 
+
 try:
 	from ..pku import remediation as remediation
 except Exception:
@@ -105,6 +106,7 @@ def unpackFormRest(ciphertext=None, key='static key CHANGEME', seed='This is a s
 		)[:KEY_BLOCK_SIZE])
 		cleartext = f.decrypt(ciphertext.encode('utf8'))
 		return str(cleartext.decode('utf8'))
+
 
 WEAK_ACTIONS = {u'pack': packForRest, u'unpack': unpackFormRest}
 """ The Pocket bag Unit actions.
@@ -192,4 +194,5 @@ if __name__ in u'__main__':
 		exit(255)
 	finally:
 		exit(exitcode)
+
 

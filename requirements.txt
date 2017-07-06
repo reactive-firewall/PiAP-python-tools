@@ -17,8 +17,10 @@ tox>=2.7.0
 #py>=1.4.33
 pip>=8.2
 requests>=2.14.2
-# pycryptodome - Public Domain
-cryptography==1.2.3
+# cffi>=1.10
+# pycparser>=2.18
+# cryptography - Apache 2
+# cryptography>=1.2.3
 # pycrypto - MIT
 #pycrypto>=2.6.1
 urllib3>=1.13.1

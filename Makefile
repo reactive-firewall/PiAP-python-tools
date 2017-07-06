@@ -64,9 +64,11 @@ build:
 	$(QUIET)$(ECHO) "No need to build. Try make -f Makefile install"
 
 init:
+	$(QUIET)if [ $TRAVIS_OS_NAME == osx ] || [ "$(uname)" == "Darwin" ] ; then env CRYPTOGRAPHY_SUPPRESS_LINK_FLAGS=1 LDFLAGS="$(brew --prefix openssl@1.1)/lib/libssl.a $(brew --prefix openssl@1.1)/lib/libcrypto.a" CFLAGS="-I$(brew --prefix openssl@1.1)/include" python3 -m pip install cryptography || true ; fi
+	$(QUIET)if [ "$(uname)" == "Linux" ] ; then if [[ ( $(dpkg --list | grep -E "^ii\s" | tr -s '\s' ' ' | cut -d \  -f 2 | fgrep -c "${THEDEPENDS}" ) -le 0 ) ]] ; then sudo apt-get install -y python3-cryptography 2>/dev/null || true ; fi ; fi
 	$(QUIET)$(ECHO) "$@: Done."
 
-install: must_be_root
+install: must_be_root init
 	$(QUIET)python3 -m pip install "git+https://github.com/reactive-firewall/PiAP-python-tools.git#egg=piaplib"
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."

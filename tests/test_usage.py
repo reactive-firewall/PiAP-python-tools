@@ -734,6 +734,12 @@ class BasicUsageTestSuite(unittest.TestCase):
 			if (thepython is not None):
 				try:
 					test_message = str(u'This is a test Message')
+					enc_string_py2 = str("dSdMQMFlL5ASBCgaM0DOhnMMn21lHePO0sl4x2IF9Y4=")
+					enc_string_py3 = str(
+						"gAAAAABZXLM0i-DXqCdg5UstqVZGLuVqGlu7Q1" +
+						"umhUjS4H2Pd7CIo_1C7KI-h5uaTCKVzktllCN-URmhJOMH1l" +
+						"Fd90xty0JkZ3M9YFwGckq7oZcXrlel5rY="
+					)
 					theOutputtext = test_message
 					for unit in ["--pack", "--unpack"]:
 						theOutputtext = checkPythonCommand([
@@ -748,11 +754,9 @@ class BasicUsageTestSuite(unittest.TestCase):
 						theOutputtext = str(theOutputtext).replace(str("\\n"), str(""))
 						if (test_message in str(theOutputtext)):
 							theResult = True
-						elif (str("dSdMQMFlL5ASBCgaM0DOhnMMn21lHePO0sl4x2IF9Y4=") in str(theOutputtext)):
+						elif (enc_string_py2 in str(theOutputtext)):
 							theResult = True
-						elif (str("gAAAAABZXLM0i-DXqCdg5UstqVZGLuVqGlu7Q1" +
-							"umhUjS4H2Pd7CIo_1C7KI-h5uaTCKVzktllCN-URmhJOMH1l" + 
-							"Fd90xty0JkZ3M9YFwGckq7oZcXrlel5rY=") in str(theOutputtext)):
+						elif (enc_string_py3 in str(theOutputtext)):
 							theResult = True
 						else:
 							theResult = False
