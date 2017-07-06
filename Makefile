@@ -120,6 +120,7 @@ cleanup:
 	$(QUIET)rm -f ./the_test_file*.txt 2>/dev/null || true
 	$(QUIET)rm -f ./the_test_file*.json 2>/dev/null || true
 	$(QUIET)rm -f ./the_test_file*.yml 2>/dev/null || true
+	$(QUIET)rm -f /tmp/.beta_PiAP_weak_key 2>/dev/null || true
 
 clean: cleanup
 	$(QUIET)$(MAKE) -s -C ./docs/ -f Makefile clean 2>/dev/null || true
