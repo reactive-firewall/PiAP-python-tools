@@ -639,7 +639,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 							str("keyring"),
 							str("{}").format(str(unit)),
 							str("--count"),
-							str("5")
+							str("2")
 						], stderr=subprocess.STDOUT)
 						if (theOutputtext is not None and len(str(theOutputtext)) > 0):
 							theResult = True
@@ -688,7 +688,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 							str("-m"),
 							str("piaplib.keyring.rand"),
 							str("--count"),
-							str("5"),
+							str("2"),
 							str("--generate"),
 							str("{}").format(str(unit))
 						], stderr=subprocess.STDOUT)
@@ -733,28 +733,23 @@ class BasicUsageTestSuite(unittest.TestCase):
 			thepython = getPythonCommand()
 			if (thepython is not None):
 				try:
-					test_message = str(u'This is a test Message')
-					enc_string_py2 = str("dSdMQMFlL5ASBCgaM0DOhnMMn21lHePO0sl4x2IF9Y4=")
-					enc_string_py3 = str(
-						"gAAAAABZXLM0i-DXqCdg5UstqVZGLuVqGlu7Q1" +
-						"umhUjS4H2Pd7CIo_1C7KI-h5uaTCKVzktllCN-URmhJOMH1l" +
-						"Fd90xty0JkZ3M9YFwGckq7oZcXrlel5rY="
-					)
+					test_message = str("This is a test Message")
+					enc_string_py3 = str("jO2fjYejUczBE9ol2lsFWO0JjLRCaQ==")
 					theOutputtext = test_message
 					for unit in ["--pack", "--unpack"]:
+						input_text = str(theOutputtext)
 						theOutputtext = checkPythonCommand([
 							str(thepython),
 							str("-m"),
 							str("piaplib.keyring.clearify"),
 							str("{}").format(str(unit)),
+							str("--msg={}").format(theOutputtext),
 							str("-S=testSeedNeedstobelong"),
-							str("--msg=\"{}\"").format(theOutputtext),
-							str("-K=testkeyneedstobelong")
+							str("-K=testkeyneedstobelong"),
+							str("-k=/tmp/.beta_PiAP_weak_key")
 						], stderr=subprocess.STDOUT)
 						theOutputtext = str(theOutputtext).replace(str("\\n"), str(""))
 						if (test_message in str(theOutputtext)):
-							theResult = True
-						elif (enc_string_py2 in str(theOutputtext)):
 							theResult = True
 						elif (enc_string_py3 in str(theOutputtext)):
 							theResult = True
@@ -763,6 +758,8 @@ class BasicUsageTestSuite(unittest.TestCase):
 							print(str(""))
 							print(str("python cmd is {}").format(str(thepython)))
 							print(str(""))
+							print(str("action is {}").format(str(unit)))
+							print(str("input was {}").format(str(input_text)))
 							print(str("actual output was..."))
 							print(str(""))
 							print(str("{}").format(str(theOutputtext)))
