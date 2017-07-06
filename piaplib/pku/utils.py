@@ -327,7 +327,7 @@ def readFile(somefile):
 	"""Reads the raw contents of a file."""
 	read_data = None
 	theReadPath = str(somefile)
-	with open_func(theReadPath, u'r', encoding='utf-8') as f:
+	with open_func(theReadPath, u'r', encoding=u'utf-8') as f:
 		read_data = f.read()
 	f.close()
 	try:
@@ -381,7 +381,7 @@ def appendFile(somefile, somedata):
 	f = None
 	theResult = False
 	try:
-		with open_func(theWritePath, u'a', encoding='utf-8') as f:
+		with open_func(theWritePath, mode=u'a', encoding=u'utf-8') as f:
 			write_func(f, somedata)
 			write_func(f, os.linesep)
 		theResult = True

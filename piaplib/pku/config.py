@@ -65,7 +65,7 @@ def readJsonFile(somefile):
 	read_data = None
 	try:
 		someFilePath = addExtension(somefile, str('json'))
-		with utils.open_func(someFilePath, mode='r', encoding='utf-8') as json_data_file:
+		with utils.open_func(someFilePath, mode=u'r', encoding=u'utf-8') as json_data_file:
 			read_data = json.load(fp=json_data_file)
 	except Exception as jsonerr:
 		print("")
@@ -83,7 +83,7 @@ def writeJsonFile(somefile, data):
 	did_write = False
 	try:
 		someFilePath = addExtension(somefile, str('json'))
-		with utils.open_func(someFilePath, mode='w+', encoding='utf-8') as outfile:
+		with utils.open_func(someFilePath, mode=u'w+', encoding=u'utf-8') as outfile:
 			json.dump(data, fp=outfile, ensure_ascii=True, indent=1, separators=(',', ': '))
 			did_write = True
 	except Exception as jsonerr:
@@ -124,7 +124,7 @@ def readYamlFile(somefile):
 		return None
 	read_data = None
 	try:
-		with utils.open_func(somefile, mode='r', encoding='utf-8') as ymalfile:
+		with utils.open_func(file=somefile, mode=u'r', encoding=u'utf-8') as ymalfile:
 			read_data = yaml.load(ymalfile)
 	except Exception as yamlerr:
 		print("")

@@ -78,7 +78,7 @@ class ConfigTestSuite(unittest.TestCase):
 					u'read_test': u'and this will test reads.'
 				}
 			})
-			somefile = str("the_test_file.json")
+			somefile = u'the_test_file.json'
 			if (config.writeJsonFile(somefile, theBlob) is True):
 				readback = config.readJsonFile(somefile)
 				a = (str(theBlob[u'test'][u'write_test']) in str(readback[u'test'][u'write_test']))
