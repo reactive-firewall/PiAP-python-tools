@@ -73,9 +73,9 @@ __prog__ = """piaplib.keyring.clearify"""
 KEY_BLOCK_SIZE = len(base64.standard_b64encode(bytes(os.urandom(32))))
 
 
-
 EOFNEWLINE = str("""
 """)
+
 
 # Note:
 # OpenSSL is NOT part of PiAP in anyway:
@@ -174,7 +174,7 @@ def packForRest(message=None, keyStore=None):
 		]
 		p1 = subprocess.Popen(
 			args,
-			shell=False, 
+			shell=False,
 			universal_newlines=True,
 			stdin=subprocess.PIPE,
 			stdout=subprocess.PIPE,
@@ -222,12 +222,12 @@ def unpackFromRest(ciphertext=None, keyStore=None):
 	else:
 		raise NotImplementedError("BUG")
 		UFsx2Kb_WrkG3LR = utils.readFile(keyStore)
-		seed = saltify.saltify(message, UFsx2Kb_WrkG3LR)
-		return unpackFromRest_junk(message, UFsx2Kb_WrkG3LR, seed)
+		seed = saltify.saltify(ciphertext, UFsx2Kb_WrkG3LR)
+		return unpackFromRest_junk(ciphertext, UFsx2Kb_WrkG3LR, seed)
 
 
 @remediation.bug_handling
-def packForRest_junk(message=None, key='static key CHANGEME', seed='This is a static IV SEED'):
+def packForRest_junk(message=None, key='static key CHANGEME', seed='a static IV SEED'):
 	import six
 	if six.PY2:
 		from Crypto.Cipher import AES
@@ -251,7 +251,7 @@ def packForRest_junk(message=None, key='static key CHANGEME', seed='This is a st
 
 
 @remediation.bug_handling
-def unpackFromRest_junk(ciphertext=None, key='static key CHANGEME', seed='This is a static IV SEED'):
+def unpackFromRest_junk(ciphertext=None, key='static key CHANGEME', seed='a static IV SEED'):
 	import six
 	if six.PY2:
 		from Crypto.Cipher import AES
@@ -309,7 +309,9 @@ def parseArgs(arguments=None):
 			dest='salt',
 			required=False,
 			type=str,
-			help=str('The cryptographic Salt String. A unique salt. Like {}').format(str(rand.randPW(16)))
+			help=str(
+				'The cryptographic Salt String. A unique salt. Like {}'
+			).format(str(rand.randPW(16)))
 		)
 		parser.add_argument(
 			'-K',
@@ -317,7 +319,9 @@ def parseArgs(arguments=None):
 			dest='key',
 			required=False,
 			type=str,
-			help=str('The cryptographic Key String. A unique secret. Like {}').format(str(rand.randPW(16)))
+			help=str(
+				'The cryptographic Key String. A unique secret. Like {}'
+			).format(str(rand.randPW(16)))
 		)
 		parser.add_argument(
 			'-k',
