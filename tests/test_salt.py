@@ -64,7 +64,7 @@ class SaltTestSuite(unittest.TestCase):
 	"""Basic test cases."""
 
 	def test_absolute_truth_and_meaning(self):
-		"""Insanitty Test."""
+		"""Insanity Test."""
 		assert True
 
 	def test_syntax(self):
@@ -134,6 +134,7 @@ class SaltTestSuite(unittest.TestCase):
 		assert theResult
 
 	def test_keyring_salt_test_salt(self):
+		"""test that hash is correct for known value"""
 		theResult = True
 		try:
 			from .context import piaplib
@@ -163,6 +164,7 @@ class SaltTestSuite(unittest.TestCase):
 		assert theResult
 
 	def test_keyring_salt_test_entropy(self):
+		"""Test deversity of saltify hashes."""
 		theResult = True
 		try:
 			from .context import piaplib
@@ -189,9 +191,9 @@ class SaltTestSuite(unittest.TestCase):
 				randomSalt_shift2, randomSalt_shift3,
 				randomSalt_shift4, randomSalt_shift5
 			]
+			if theResult is not True:
+				self.assertTrue(theResult)
 			for someRandomTest in range(10000):
-				if theResult is not True:
-					continue
 				this_test = str(rand.randStr(10))
 				that_test = str(rand.randStr(10))
 				self.assertIsNotNone(that_test)

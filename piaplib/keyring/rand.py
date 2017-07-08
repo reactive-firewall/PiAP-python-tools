@@ -67,7 +67,10 @@ def rand(count=None):
 	else:
 		x_count = count
 	try:
-		return os.urandom(x_count)
+		theEntropy = os.urandom(x_count)
+		if isinstance(theEntropy, str):
+			theEntropy = bytes(theEntropy)
+		return theEntropy
 	except Exception as err:
 		print(str(u'FAILED DURRING RAND. ABORT.'))
 		print(str(type(err)))
@@ -86,7 +89,8 @@ def randStr(count=None):
 	else:
 		x_count = count
 	try:
-		return str(rand(x_count))
+		import string
+		return str("").join([string.printable[randInt(1, 1, 99)] for _ in range(x_count)])
 	except Exception as err:
 		print(str(u'FAILED DURRING RAND-STR. ABORT.'))
 		print(str(type(err)))
@@ -187,16 +191,15 @@ def randIP(count=None, min=0, max=256):
 
 
 @remediation.error_handling
-def randInt(count=None, min=0, max=512):
+def fastrandInt(count=None, max=512):
 	"""
 	Wrapper for random.randint(min, max)
 	WARNING: this is not intended for cryptographic randomness, in that case use os.urandom().
 	count - int the number of integers to return. Defaults to 1.
-	min - int the smallest value of integers to return. Defaults to 0.
+	min - fast as 0.
 	max - int the largest value of integers to return. Defaults to 512.
 	"""
-	if min is None or (isinstance(min, int) is False) or min <= 0:
-		min = 0
+	min = 0
 	if max is None or (isinstance(max, int) is False) or max <= 0 or max <= min:
 		max = 512
 	if count is None or (isinstance(count, int) is False) or count <= 1:
@@ -205,15 +208,16 @@ def randInt(count=None, min=0, max=512):
 		x_count = int(count)
 	try:
 		if x_count <= 1:
-			import random
-			entropy = random.Random()
-			entropy.seed(a=rand(128))
-			return entropy.randint(min, max)
+			try:
+				import six
+				if six.PY2:
+					return int(int(bytearray(os.urandom(16))[8]) % max)
+				else:
+					return int(os.urandom(max), max)
+			except Exception:
+				return int(int(bytearray(os.urandom(16))[8]) % max)
 		else:
-			theResult = []
-			for someInt in range(x_count):
-				theResult.append(randInt(1, min, max))
-			return theResult
+			return [fastrandInt(1, min, max) for someInt in range(x_count)]
 	except Exception as err:
 		print(str(u'FAILED DURRING RAND-INT. ABORT.'))
 		print(str(type(err)))
@@ -222,6 +226,43 @@ def randInt(count=None, min=0, max=512):
 		err = None
 		del err
 	raise AssertionError("IMPOSIBLE STATE REACHED IN RAND-INT. ABORT.")
+
+
+@remediation.error_handling
+def randInt(count=None, min=0, max=512):
+	"""
+	Wrapper for random.randint(min, max)
+	WARNING: this is not intended for cryptographic randomness, in that case use os.urandom().
+	count - int the number of integers to return. Defaults to 1.
+	min - int the smallest absolute value of integers to return. Defaults to 0.
+	max - int the largest absolute value of integers to return. Defaults to 512.
+	"""
+	if min is None or (isinstance(min, int) is False) or min <= 0:
+		return int(fastrandInt(1, max))
+	if max is None or (isinstance(max, int) is False) or max <= 0 or max <= min:
+		max = 512
+	if count is None or (isinstance(count, int) is False) or count <= 1:
+		x_count = 1
+	else:
+		x_count = int(count)
+	try:
+		if x_count <= 1:
+			entropy_seed = int(fastrandInt(1, max))
+			if min <= entropy_seed:
+				return entropy_seed
+			else:
+				return int(min)
+		else:
+			return [randInt(1, min, max) for someInt in range(x_count)]
+	except Exception as err:
+		print(str(u'FAILED DURRING RAND-INT. ABORT.'))
+		print(str(type(err)))
+		print(str(err))
+		print(str(err.args))
+		err = None
+		del err
+	raise AssertionError("IMPOSIBLE STATE REACHED IN RAND-INT. ABORT.")
+
 
 
 @remediation.error_handling

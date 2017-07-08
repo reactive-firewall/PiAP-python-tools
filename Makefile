@@ -58,6 +58,10 @@ ifeq "$(LOG)" "no"
 	QUIET=@
 endif
 
+ifeq "$(DO_FAIL)" ""
+	DO_FAIL=$(ECHO) "ok"
+endif
+
 PHONY: must_be_root cleanup
 
 build:
@@ -81,17 +85,24 @@ purge: clean uninstall
 	$(QUIET)$(ECHO) "$@: Done."
 
 test: cleanup
+	$(QUIET)coverage run -p --source=piaplib,piaplib/lint,piaplib/keyring,piaplib/pku,piaplib/book -m unittest discover --verbose -s ./tests -t ./ || python3 -m unittest discover --verbose -s ./tests -t ./ || python -m unittest discover --verbose -s ./tests -t ./ || DO_FAIL=exit 2 ;
+	$(QUIET)coverage combine 2>/dev/null || true
+	$(QUIET)coverage report --include=piaplib* 2>/dev/null || true
+	$(QUIET)$(DO_FAIL);
+	$(QUIET)$(ECHO) "$@: Done."
+
+test-mats: cleanup
 	$(QUIET)coverage run -p --source=piaplib,piaplib/lint,piaplib/keyring,piaplib/pku,piaplib/book -m unittest tests.test_basic tests.test_html tests.test_strings tests.test_salt tests.test_rand tests.test_utils tests.test_lint tests.test_book tests.test_interface tests.test_config tests.test_usage tests.test_pocket || python3 -m unittest tests.test_basic tests.test_html tests.test_strings tests.test_salt tests.test_rand tests.test_utils tests.test_lint tests.test_book tests.test_interface tests.test_config tests.test_usage tests.test_pocket || python -m unittest tests.test_basic tests.test_html tests.test_strings tests.test_salt tests.test_rand tests.test_utils tests.test_lint tests.test_interface tests.test_book tests.test_config tests.test_usage tests.test_pocket
 	$(QUIET)coverage combine 2>/dev/null || true
 	$(QUIET)coverage report --include=piaplib* 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-tox: cleanup
-	$(QUIET)tox --
+	$(QUIET)tox -v --
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-style: cleanup
-	$(QUIET)flake8 --ignore=W191,W391 --max-line-length=100 --count
+	$(QUIET)flake8 --ignore=W191,W391 --max-line-length=100 --verbose --count
 	$(QUIET)$(ECHO) "$@: Done."
 
 cleanup:

@@ -63,7 +63,7 @@ class ConfigTestSuite(unittest.TestCase):
 		assert theResult
 
 	def test_case_json_read_write_file(self):
-		"""Tests the read and write functions"""
+		"""Tests the JSON read and write functions"""
 		theResult = False
 		try:
 			from piaplib import pku as pku
@@ -78,14 +78,19 @@ class ConfigTestSuite(unittest.TestCase):
 					u'read_test': u'and this will test reads.'
 				}
 			})
-			somefile = u'the_test_file.json'
+			somefile = str("the_test_file.json")
 			if (config.writeJsonFile(somefile, theBlob) is True):
 				readback = config.readJsonFile(somefile)
-				a = (str(theBlob[u'test'][u'write_test']) in str(readback[u'test'][u'write_test']))
-				b = (str(readback[u'test'][u'write_test']) in str(theBlob[u'test'][u'write_test']))
-				c = (str(theBlob[u'test'][u'read_test']) in str(readback[u'test'][u'read_test']))
-				d = (str(readback[u'test'][u'read_test']) in str(theBlob[u'test'][u'read_test']))
-				theResult = (a and b and c and d)
+				if (readback is None):
+					theResult = False
+				else:
+					input_data = str(theBlob[u'test'][u'write_test'])
+					output_data = str(readback[u'test'][u'write_test'])
+					a = (output_data in input_data)
+					b = (input_data in output_data)
+					c = (output_data in input_data)
+					d = (input_data in output_data)
+					theResult = (a and b and c and d)
 				if theResult:
 					theResult = True
 				else:
@@ -99,7 +104,6 @@ class ConfigTestSuite(unittest.TestCase):
 					print(str(""))
 			else:
 				theResult = False
-			if (theResult is False):
 				print(str("write failed"))
 				print(str(theBlob))
 				print(str(""))
@@ -116,7 +120,7 @@ class ConfigTestSuite(unittest.TestCase):
 		assert theResult
 
 	def test_case_yaml_read_write_file(self):
-		"""Tests the read and write functions"""
+		"""Tests the YAML read and write functions"""
 		theResult = False
 		try:
 			from piaplib import pku as pku
@@ -134,20 +138,43 @@ class ConfigTestSuite(unittest.TestCase):
 				})
 				somefile = str("the_test_file.yml")
 				if (config.writeYamlFile(somefile, theBlob) is True):
-					readback = config.writeYamlFile(somefile)
-					a = (theBlob[u'test'] in readback[u'test'])
-					b = (readback[u'test'] in theBlob[u'test'])
-					if a and b:
-						theResult = True
-					else:
-						theResult = False
-					if (theResult is False):
-						print(str("wrote"))
-						print(str(theBlob))
+					try:
+						readback = config.readYamlFile(somefile)
+						a = (theBlob[u'test'] in readback[u'test'])
+						b = (readback[u'test'] in theBlob[u'test'])
+						if a and b:
+							theResult = True
+						else:
+							theResult = False
+						if (theResult is False):
+							print(str("wrote"))
+							print(str(theBlob))
+							print(str(""))
+							print(str("read"))
+							print(str(readback))
+							print(str(""))
+							print(str("case a"))
+							print(str(a))
+							print(str(""))
+							print(str("case b"))
+							print(str(b))
+							print(str(""))
+					except Exception as err:
+						print(str(""))
+						print(str("Error in test of yaml write-read"))
+						print(str(type(err)))
+						print(str(err))
+						print(str((err.args)))
+						print(str(""))
+						print(str("wrote to file"))
+						print(str(somefile))
 						print(str(""))
 						print(str("read"))
 						print(str(readback))
 						print(str(""))
+						err = None
+						del err
+						theResult = False
 				else:
 					theResult = False
 				if (theResult is False):

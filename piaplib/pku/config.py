@@ -26,6 +26,7 @@ except Exception:
 	except Exception:
 		raise ImportError("Error Importing json utils for config")
 
+
 try:
 	from . import utils as utils
 except Exception:
@@ -33,6 +34,15 @@ except Exception:
 		import utils as utils
 	except Exception:
 		raise ImportError("Error Importing config")
+
+
+try:
+	from . import remediation as remediation
+except Exception:
+	try:
+		import remediation as remediation
+	except Exception:
+		raise ImportError("Error Importing remediation")
 
 
 def addExtension(somefile, extension):
@@ -43,7 +53,7 @@ def addExtension(somefile, extension):
 		return somefile
 	if (len(str(somefile)) > len(extension)):
 		offset = (-1 * len(extension))
-		if (extension in str(somefile)[offset:-1]) and (str(".") in str(somefile)):
+		if (extension in str(somefile)[offset:]) and (str(".") in str(somefile)):
 			return somefile
 		else:
 			return str("{}.{}").format(somefile, extension)
@@ -60,13 +70,14 @@ def hasJsonSupport():
 	return support_json
 
 
+@remediation.error_passing
 def readJsonFile(somefile):
 	"""Reads the raw json file."""
 	read_data = None
 	try:
 		someFilePath = addExtension(somefile, str('json'))
 		with utils.open_func(someFilePath, mode=u'r', encoding=u'utf-8') as json_data_file:
-			read_data = json.load(fp=json_data_file)
+			read_data = json.load(fp=json_data_file, encoding=u'utf-8')
 	except Exception as jsonerr:
 		print("")
 		print("Error: Failed to load JSON file.")
@@ -78,14 +89,23 @@ def readJsonFile(somefile):
 	return read_data
 
 
+@remediation.error_passing
 def writeJsonFile(somefile, data):
-	"""Reads the raw json file."""
+	"""Writes the raw json file."""
+	if data is None:
+		return False
 	did_write = False
 	try:
 		someFilePath = addExtension(somefile, str('json'))
 		with utils.open_func(someFilePath, mode=u'w+', encoding=u'utf-8') as outfile:
-			json.dump(data, fp=outfile, ensure_ascii=True, indent=1, separators=(',', ': '))
-			did_write = True
+			jsonData = json.dumps(
+				obj=dict(data),
+				ensure_ascii=True,
+				indent=1,
+				separators=(',', ': ')
+			)
+			utils.write_func(outfile, jsonData)
+		did_write = True
 	except Exception as jsonerr:
 		print("")
 		print("Error: Failed to write JSON file.")
@@ -113,7 +133,7 @@ def hasYamlSupport():
 	support_yaml = False
 	try:
 		support_yaml = (yaml.__name__ is not None)
-	except:
+	except Exception:
 		support_yaml = False
 	return support_yaml
 
@@ -124,8 +144,13 @@ def readYamlFile(somefile):
 		return None
 	read_data = None
 	try:
-		with utils.open_func(file=somefile, mode=u'r', encoding=u'utf-8') as ymalfile:
-			read_data = yaml.load(ymalfile)
+		someFilePath = addExtension(somefile, str('yaml'))
+		with utils.open_func(file=someFilePath, mode=u'r', encoding=u'utf-8') as ymalfile:
+			if yaml.version_info < (0, 15):
+				read_data = yaml.safe_load(ymalfile)
+			else:
+				yml = yaml.YAML(typ='safe', pure=True)  # 'safe' load and dump
+				read_data = yml.load(ymalfile)
 	except Exception as yamlerr:
 		print("")
 		print("Error: Failed to load YAML file.")
