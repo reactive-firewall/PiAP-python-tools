@@ -38,12 +38,34 @@ except Exception:
 	raise ImportError("Failed to import test context")
 
 
+def dict_compare(d1, d2):
+	d1_keys = set(d1.keys())
+	d2_keys = set(d2.keys())
+	intersect_keys = d1_keys.intersection(d2_keys)
+	same = set(o for o in intersect_keys if d1[o] == d2[o])
+	return (len(same) is len(d1) and len(d1) is len(d2))
+
+
 class ConfigTestSuite(unittest.TestCase):
 	"""Basic config test cases."""
 
 	def test_absolute_truth_and_meaning(self):
 		"""Insanitty Test."""
 		assert True
+
+	def test_dic_compare(self):
+		"""Meta dict-Test."""
+		test_control = dict({"test": "this", "for": "match"})
+		test_control_b = dict({"test": "this", "for": "match"})
+		test_match = dict(test_control)
+		test_diff = dict({"test": "this", "for": "bad match"})
+		self.assertTrue(dict_compare(test_control, test_control_b))
+		self.assertTrue(dict_compare(test_control, test_match))
+		self.assertTrue(dict_compare(test_match, test_control_b))
+		self.assertTrue(dict_compare(test_match, test_control))
+		self.assertFalse(dict_compare(test_control, test_diff))
+		self.assertFalse(dict_compare(test_control_b, test_diff))
+		self.assertFalse(dict_compare(test_match, test_diff))
 
 	def test_syntax(self):
 		"""Test case importing code."""
@@ -140,8 +162,10 @@ class ConfigTestSuite(unittest.TestCase):
 				if (config.writeYamlFile(somefile, theBlob) is True):
 					try:
 						readback = config.readYamlFile(somefile)
-						a = (theBlob[u'test'] in readback[u'test'])
-						b = (readback[u'test'] in theBlob[u'test'])
+						a = dict_compare(theBlob[u'test'], readback[u'test'])
+						b = dict_compare(readback, theBlob)
+						# c = (theBlob[u'test'].values() in readback[u'test'].values())
+						# d = (readback[u'test'].values() theBlob[u'test'].values())
 						if a and b:
 							theResult = True
 						else:
@@ -172,6 +196,7 @@ class ConfigTestSuite(unittest.TestCase):
 						print(str("read"))
 						print(str(readback))
 						print(str(""))
+						print(str(type(readback)))
 						err = None
 						del err
 						theResult = False
@@ -180,6 +205,7 @@ class ConfigTestSuite(unittest.TestCase):
 				if (theResult is False):
 					print(str("write failed"))
 					print(str(theBlob))
+					print(str(type(theBlob)))
 					print(str(""))
 			else:
 				theResult = True

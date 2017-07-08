@@ -108,8 +108,8 @@ before_install:
 
 script:
   - make clean ;
-  - if [ $TRAVIS_OS_NAME == osx ] ; then echo "SKIP" ; else make test || exit $? ; fi ;
-  - codecov || true
+  - if [ $TRAVIS_OS_NAME == osx ] ; then echo "SKIP make test" ; else make test || exit $? ; fi ;
+  - if [ $TRAVIS_OS_NAME == osx ] ; then echo "SKIP codecov" ; else codecov || exit $? ; fi ;
   - make clean || exit $? ; 
   - travis_wait make test-tox || exit $? ;
   - make clean ;
@@ -118,4 +118,5 @@ script:
 after_success:
   - codecov || true
   - if [ $TRAVIS_OS_NAME == osx ] ; then true ; wait ; else coverage run -p -m piaplib.pocket pku upgrade --upgrade-all || true ; wait ; codecov || true ; fi ; wait ;
-  - codecov || true
+  - if [ $TRAVIS_OS_NAME == osx ] ; then echo "SKIP codecov" ; else codecov || exit $? ; fi ;
+

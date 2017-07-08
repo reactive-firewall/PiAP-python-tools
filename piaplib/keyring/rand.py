@@ -264,7 +264,6 @@ def randInt(count=None, min=0, max=512):
 	raise AssertionError("IMPOSIBLE STATE REACHED IN RAND-INT. ABORT.")
 
 
-
 @remediation.error_handling
 def randBool(count=None):
 	"""wrapper for str(os.urandom())"""
