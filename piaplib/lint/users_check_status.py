@@ -367,7 +367,7 @@ def get_user_status(user_name=None, use_html=False):
 		if (user_tty is not None) and (str(user_tty) not in str("console")):
 			status_txt = get_user_work_status_raw(user_name)
 			if status_txt is None:
-				status_txt = ["UNKNOWN"]
+				status_list = ["UNKNOWN"]
 			else:
 				status_list = utils.compactList(
 					[str(

@@ -878,7 +878,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 					], stderr=subprocess.STDOUT)
 					if (str("root console ") in str(theOutputtext)):
 						theResult = True
-					elif (str("travis UNKNOWN UNKNOWN None") in str(theOutputtext)):
+					elif (str("travis UNKNOWN UNKNOWN") in str(theOutputtext)):
 						theResult = True
 					else:
 						theResult = False
