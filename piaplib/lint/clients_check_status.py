@@ -61,21 +61,6 @@ __prog__ = str("""clients_check_status.py""")
 """The Program's name"""
 
 
-def memoize(func):
-	"""memoize wrapper"""
-	cache = func.cache = {}
-	import functools
-
-	@functools.wraps(func)
-	def memoized_func(*args, **kwargs):
-		key = str(args) + str(kwargs)
-		if key not in cache.keys():
-			cache[key] = func(*args, **kwargs)
-		return cache[key]
-
-	return memoized_func
-
-
 @remediation.error_handling
 def parseargs(arguments=None):
 	"""Parse the arguments"""
@@ -174,7 +159,7 @@ def get_client_name(client_ip=None, use_html=False, lan_interface=None):
 		return html_generator.gen_html_td(client, str(u'client_status_{}').format(client))
 
 
-@memoize
+@utils.memoize
 def get_client_sta_status_raw():
 	"""list the raw status of client sta."""
 	theRawClientState = None
@@ -224,7 +209,7 @@ def get_client_sta_status_raw():
 	return theRawClientState
 
 
-@memoize
+@utils.memoize
 def isLineForSTA(someLine=None, staname=None):
 	"""determins if a raw output line is for a STA"""
 	doesMatch = False
@@ -245,7 +230,7 @@ def isLineForSTA(someLine=None, staname=None):
 	return doesMatch
 
 
-@memoize
+@utils.memoize
 def get_client_arp_status_raw(client_ip=None, lan_interface=interfaces.INTERFACE_CHOICES[1]):
 	"""list the raw status of client sta."""
 	if lan_interface not in interfaces.INTERFACE_CHOICES:
@@ -301,7 +286,7 @@ def get_client_lease_status_raw(client_row=None):
 	return theRawLeaseStatus
 
 
-@memoize
+@utils.memoize
 def get_client_sta_status(client_mac=None):
 	"""list the raw status of client sta."""
 	theClientState = str("disassociated")
@@ -320,7 +305,7 @@ def get_client_sta_status(client_mac=None):
 	return theClientState
 
 
-@memoize
+@utils.memoize
 def get_client_lease_status(client_mac=None):
 	"""list the raw status of client lease."""
 	theClientState = str("No Lease")
@@ -339,7 +324,7 @@ def get_client_lease_status(client_mac=None):
 	return theClientState
 
 
-@memoize
+@utils.memoize
 def get_client_list(lan_interface=None):
 	"""list the availabel clients."""
 	theResult = None

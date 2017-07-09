@@ -117,7 +117,32 @@ def literal_str(raw_input=None):
 	return None
 
 
+def memoize(func):
+	"""memoize wrapper"""
+	cache = func.cache = {}
+	import functools
+
+	@functools.wraps(func)
+	def memoized_func(*args, **kwargs):
+		try:
+			key = str(str(args) + str(kwargs))
+			if key not in cache.keys():
+				cache[key] = func(*args, **kwargs)
+			return cache[key]
+		except Exception as memoErr:
+			logs.log(
+				str("[CWE-233] Possible malformed argument attack occured. Skipping cache."),
+				"Warning"
+			)
+			memoErr = None
+			del(memoErr)
+			return func(*args, **kwargs)
+
+	return memoized_func
+
+
 @remediation.error_handling
+@memoize
 def extractRegexPattern(theInput_Str, theInputPattern):
 	"""
 	Extracts the given regex patern.
@@ -132,6 +157,7 @@ def extractRegexPattern(theInput_Str, theInputPattern):
 
 
 @remediation.error_handling
+@memoize
 def compactSpace(theInput_Str):
 	"""Try to remove the spaces from the input string."""
 	import re
@@ -244,6 +270,7 @@ def extractIPAddr(theInputStr):
 
 
 @remediation.error_handling
+@memoize
 def isLineForMatch(someLine=None, toMatch=None):
 	"""Determins if a raw output line is for a matching string"""
 	if ((toMatch is None) or (literal_str(
@@ -257,6 +284,7 @@ def isLineForMatch(someLine=None, toMatch=None):
 
 
 @remediation.warning_handling
+@memoize
 def compactList(list, intern_func=None):
 	"""
 	Compacts Lists

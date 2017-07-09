@@ -185,7 +185,7 @@ def get_system_work_status_raw(user_name=None):
 		try:
 			# hard-coded white-list cmds
 			p1 = subprocess.Popen(
-				[str("ps"), str("-elf")],
+				[str("ps"), str("-eo"), str("user,command")],
 				shell=False,
 				stdout=subprocess.PIPE,
 				stderr=None
@@ -203,41 +203,29 @@ def get_system_work_status_raw(user_name=None):
 			)
 			p3 = subprocess.Popen(
 				[
-					str("cut"),
-					utils.literal_str("""-d"""),
-					utils.literal_str(""" """),
-					str("-f"),
-					str("3,15")
-				],
-				shell=False,
-				stdin=p2.stdout,
-				stdout=subprocess.PIPE
-			)
-			p4 = subprocess.Popen(
-				[
 					str("sed"),
 					str("-E"),
 					str("-e"),
 					str(utils.literal_str("""s/[\[\(]{1}[^]]+[]\)]{1}/SYSTEM/g"""))
 				],
 				shell=False,
+				stdin=p2.stdout,
+				stdout=subprocess.PIPE
+			)
+			p4 = subprocess.Popen(
+				[utils.literal_str("""sort""")],
+				shell=False,
 				stdin=p3.stdout,
 				stdout=subprocess.PIPE
 			)
 			p5 = subprocess.Popen(
-				[utils.literal_str("""sort""")],
+				[utils.literal_str("""uniq""")],
 				shell=False,
 				stdin=p4.stdout,
 				stdout=subprocess.PIPE
 			)
-			p6 = subprocess.Popen(
-				[utils.literal_str("""uniq""")],
-				shell=False,
-				stdin=p5.stdout,
-				stdout=subprocess.PIPE
-			)
-			p5.stdout.close()  # Allow p1 to receive a SIGPIPE if p5 exits.
-			(output, stderrors) = p6.communicate()
+			p4.stdout.close()  # Allow p4 to receive a SIGPIPE if p5 exits.
+			(output, stderrors) = p5.communicate()
 			if (isinstance(output, bytes)):
 				output = output.decode('utf8')
 			if (output is not None) and (len(output) > 0):
@@ -272,7 +260,7 @@ def get_w_cmd_args():
 	"""Either -his or -wnh depending on system."""
 	try:
 		import sys
-		if str(sys.platform()).lower().startswith(str("""darwin""")):
+		if (str(sys.platform).lower().startswith(str("""darwin""")) is True):
 			return str("""-whn""")
 		else:
 			return str("""-his""")
@@ -289,10 +277,11 @@ def get_user_work_status_raw(user_name=None):
 	theRawOutput = None
 	try:
 		import subprocess
+		output = None
 		try:
 			# hard-coded white-list cmds
 			p1 = subprocess.Popen(
-				[str("w"), get_w_cmd_args()],
+				[str("w"), str(get_w_cmd_args())],
 				shell=False,
 				stdout=subprocess.PIPE,
 				stderr=None
@@ -310,27 +299,27 @@ def get_user_work_status_raw(user_name=None):
 			)
 			p1.stdout.close()  # Allow p1 to receive a SIGPIPE if p2 exits.
 			(output, stderrors) = p2.communicate()
-			if (isinstance(output, bytes)):
-				output = output.decode('utf8')
-			if output is not None and len(output) > 0:
-				lines = [
-					utils.literal_str(x) for x in output.splitlines() if isLineForUser(x, user_name)
-				]
-				theRawOutput = str("")
-				for line in lines:
-					if (line is not None) and (len(line) > 0):
-						theRawOutput = str("{}{}\n").format(str(theRawOutput), str(line))
-				del lines
-			else:
-				theRawOutput = None
 		except subprocess.CalledProcessError as subErr:
 			subErr = None
-			del subErr
+			del(subErr)
 			theRawOutput = None
 		except Exception as cmdErr:
 			logs.log(str(type(cmdErr)), "Error")
 			logs.log(str(cmdErr), "Error")
 			logs.log(str((cmdErr.args)), "Error")
+			theRawOutput = None
+		if (isinstance(output, bytes)):
+			output = output.decode('utf8')
+		if output is not None and len(output) > 0:
+			lines = [
+				utils.literal_str(x) for x in output.splitlines() if isLineForUser(x, user_name)
+			]
+			theRawOutput = str("")
+			for line in lines:
+				if (line is not None) and (len(line) > 0):
+					theRawOutput = str("{}{}\n").format(str(theRawOutput), str(line))
+			del(lines)
+		else:
 			theRawOutput = None
 	except Exception as importErr:
 		logs.log(str(type(importErr)), "Warning")

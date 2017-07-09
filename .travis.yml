@@ -110,12 +110,12 @@ script:
   - if [ $TRAVIS_OS_NAME == osx ] ; then echo "SKIP make test" ; else make test || exit $? ; fi ;
   - if [ $TRAVIS_OS_NAME == osx ] ; then echo "SKIP codecov" ; else codecov || exit $? ; fi ;
   - make clean || exit $? ; 
-  - travis_wait make test-tox || exit $? ;
+  - make test-tox || exit $? ;
   - make clean ;
   - if [ $TRAVIS_OS_NAME == osx ] ; then true ; wait ; else pip install --upgrade -e git+https://github.com/reactive-firewall/PiAP-python-tools.git@${TRAVIS_PULL_REQUEST_SHA:-${TRAVIS_COMMIT}}#egg=piaplib ; fi ; wait ;
 
 after_success:
   - codecov || true
-  - if [ $TRAVIS_OS_NAME == osx ] ; then true ; wait ; else coverage run -p -m piaplib.pocket pku upgrade --upgrade-all || true ; wait ; codecov || true ; fi ; wait ;
+  - if [ $TRAVIS_OS_NAME == osx ] ; then true ; wait ; else coverage run -p -m piaplib.pocket pku upgrade --upgrade-all || true ; fi ;
   - if [ $TRAVIS_OS_NAME == osx ] ; then echo "SKIP codecov" ; else codecov || exit $? ; fi ;
 

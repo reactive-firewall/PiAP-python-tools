@@ -325,7 +325,19 @@ class RandTestSuite(unittest.TestCase):
 			from keyring import rand as rand
 			if rand.__name__ is None:
 				theResult = False
-			for theTest in [rand.randInt, rand.rand, rand.randBool, rand.randStr, rand.randChar]:
+			the_list = [
+				rand.fastrandInt,
+				rand.randInt,
+				rand.rand,
+				rand.randBool,
+				rand.randStr,
+				rand.randChar,
+				rand.randPW,
+				rand.randSSID,
+				rand.randIP,
+				rand.randPW
+			]
+			for theTest in the_list:
 				self.assertIsNotNone(theTest(None))
 				self.assertIsNotNone(theTest())
 		except Exception as impErr:

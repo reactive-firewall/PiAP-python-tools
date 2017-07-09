@@ -70,6 +70,10 @@ __prog__ = """piaplib.keyring.clearify"""
 """The name of this PiAPLib tool is clearify"""
 
 
+DEFAULT_BETA_FILE_PATH = str("""/var/opt/PiAP/.beta_h5RlRMVO6RzA""")
+"""THIS IS A PLACEHOLDER. WILL move this to a config file."""
+
+
 KEY_BLOCK_SIZE = len(base64.standard_b64encode(bytes(os.urandom(32))))
 
 
@@ -82,6 +86,7 @@ EOFNEWLINE = str("""
 # See the terms of the OpenSSL license: http://www.openssl.org/source/license.html
 
 
+@utils.memoize
 def getBackendCommand():
 	"""Function for backend openssl command if available.
 	PLEASE NOTE THIS RETURNS NONE IF YOU HAVE NOT INSTALLED OPENSSL"""
@@ -104,6 +109,7 @@ def getBackendCommand():
 
 
 @remediation.error_handling
+@utils.memoize
 def hasBackendCommand():
 	"""True if the backend command is available."""
 	try:
@@ -119,7 +125,7 @@ def getKeyFilePath():
 	"""THIS IS A PLACEHOLDER. WILL move this to a config file."""
 	import os.path
 	U2FsdGVkX1_KOouklCprVMv6P6TFdZhCFg = os.path.normpath(
-		str("""/var/opt/PiAP/.beta_h5RlRMVO6RzA""")
+		DEFAULT_BETA_FILE_PATH
 	)
 	if (os.path.isfile(U2FsdGVkX1_KOouklCprVMv6P6TFdZhCFg) is False):
 		try:
@@ -141,7 +147,7 @@ def makeKeystoreFile(theKey=str(rand.randPW(16)), somePath=None):
 	import os.path
 	if somePath is None:
 		U2FsdGVkX1_KOouklCprVMv6P6TFdZhCFg = os.path.normpath(
-			str("""/var/opt/PiAP/.beta_h5RlRMVO6RzA""")
+			DEFAULT_BETA_FILE_PATH
 		)
 	else:
 		U2FsdGVkX1_KOouklCprVMv6P6TFdZhCFg = os.path.normpath(

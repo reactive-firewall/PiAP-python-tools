@@ -38,23 +38,23 @@ except Exception:
 	raise ImportError("Failed to import test context")
 
 
-class iFaceTestSuite(unittest.TestCase):
-	"""Special pku.interface test cases."""
+class BookTestSuite(unittest.TestCase):
+	"""Special Pocket keyring crypto test cases."""
 
 	def test_absolute_truth_and_meaning(self):
-		"""Insanitty Test."""
+		"""Insanity Test."""
 		assert True
 		self.assertIsNone(None)
 
-	def test_syntax(self):
-		"""Test case importing code."""
+	def test_keyring_import_syntax(self):
+		"""Test case importing keyring code."""
 		theResult = False
 		try:
 			from .context import piaplib
 			if piaplib.__name__ is None:
 				theResult = False
-			from piaplib import pocket
-			if pocket.__name__ is None:
+			from piaplib import keyring
+			if keyring.__name__ is None:
 				theResult = False
 			theResult = True
 		except Exception as impErr:
@@ -63,18 +63,16 @@ class iFaceTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
-	def test_case_iface_insane_none(self):
-		"""Tests the imposible state for pku.interface given bad input"""
+	def test_y_case_clearify_hasbackend(self):
+		"""Tests the helper function hasBackendCommand of keyring.clearify"""
 		theResult = True
 		try:
-			from piaplib import pku as pku
-			if pku.__name__ is None:
-				theResult = False
-			from pku import interfaces as interfaces
-			if interfaces.__name__ is None:
-				raise ImportError("Failed to import iface")
-			self.assertIsNone(pku.interfaces.taint_name("NoSuchName"))
-			self.assertIsNone(pku.interfaces.taint_name(None))
+			from piaplib.keyring import clearify as clearify
+			if clearify.__name__ is None:
+				raise ImportError("Failed to import clearify")
+			theTest = (clearify.hasBackendCommand() is True)
+			theTest = (theTest is True or clearify.hasBackendCommand() is False)
+			self.assertTrue(theTest)
 		except Exception as err:
 			print(str(""))
 			print(str(type(err)))
@@ -86,23 +84,14 @@ class iFaceTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
-	@unittest.skipUnless(sys.platform.startswith("linux"), "Requires linux ifup/ifdown tools")
-	def test_case_iface_check_nonroot_down(self):
-		"""Tests the imposible state for pku.interface given bad tools"""
-		theResult = False
+	def test_z_case_clearify_getKeyFile(self):
+		"""Tests the helper function getKeyFilePath of keyring.clearify"""
+		theResult = True
 		try:
-			import subprocess
-			from piaplib import pku as pku
-			if pku.__name__ is None:
-				theResult = False
-			from pku import interfaces as interfaces
-			if interfaces.__name__ is None:
-				raise ImportError("Failed to import iface")
-			try:
-				pku.interfaces.disable_iface("eth1", False)
-				theResult = True
-			except subprocess.CalledProcessError as junkErr:
-				del(junkErr)
+			from piaplib.keyring import clearify as clearify
+			if clearify.__name__ is None:
+				raise ImportError("Failed to import clearify")
+			self.assertIsNotNone(clearify.getKeyFilePath())
 		except Exception as err:
 			print(str(""))
 			print(str(type(err)))
@@ -114,23 +103,17 @@ class iFaceTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
-	@unittest.skipUnless(sys.platform.startswith("linux"), "Requires linux ifup/ifdown tools")
-	def test_case_iface_check_nonroot_up(self):
-		"""Tests the imposible state for pku.interface given bad values"""
+	def test_z_case_clearify_setKeyFile(self):
+		"""Tests the helper function makeKeystoreFile of keyring.clearify"""
 		theResult = True
 		try:
-			import subprocess
-			from piaplib import pku as pku
-			if pku.__name__ is None:
-				theResult = False
-			from pku import interfaces as interfaces
-			if interfaces.__name__ is None:
-				raise ImportError("Failed to import iface")
-			try:
-				pku.interfaces.enable_iface("eth1")
-				theResult = True
-			except subprocess.CalledProcessError as junkErr:
-				del(junkErr)
+			from piaplib.keyring import clearify as clearify
+			if clearify.__name__ is None:
+				raise ImportError("Failed to import clearify")
+			self.assertIsNotNone(clearify.makeKeystoreFile(
+				str("This is not a real key"),
+				str("../test.secret")
+			))
 		except Exception as err:
 			print(str(""))
 			print(str(type(err)))
