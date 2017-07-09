@@ -299,9 +299,15 @@ class BasicUsageTestSuite(unittest.TestCase):
 			if sys.__name__ is None:
 				raise ImportError("Failed to import system. WTF?!!")
 			thepython = getPythonCommand()
+			test_units = [
+				"lint.lint",
+				"pku.pku",
+				"book.book",
+				"keyring.keyring"
+			]
 			if (thepython is not None):
 				try:
-					for unit in ["lint.lint", "pku.pku", "book.book", "keyring.keyring"]:
+					for unit in test_units:
 						theOutputtext = checkPythonCommand([
 							str(thepython),
 							str("-m"),
@@ -608,9 +614,15 @@ class BasicUsageTestSuite(unittest.TestCase):
 			if sys.__name__ is None:
 				raise ImportError("Failed to import system. WTF?!!")
 			thepython = getPythonCommand()
+			test_units = [
+				"keyring.saltify",
+				"keyring.rand",
+				"keyring.clearify",
+				"keyring.keyring"
+			]
 			if (thepython is not None):
 				try:
-					for unit in ["keyring.keyring", "keyring.saltify", "keyring.rand"]:
+					for unit in test_units:
 						theOutputtext = checkPythonCommand([
 							str(thepython),
 							str("-m"),

@@ -45,26 +45,20 @@ except Exception as importErr:
 	exit(255)
 
 
+try:
+	from piaplib.book.logs import logs as logs
+except Exception:
+	try:
+		from book.logs import logs as logs
+	except Exception:
+		try:
+			from piaplib.book.logs import logs as logs
+		except Exception:
+			raise ImportError("Error Importing logs")
+
+
 __prog__ = """users_check_status"""
 """The Program's name"""
-
-
-def error_handling(func):
-	"""Runs a function in try-except"""
-	def helper(**kwargs):
-		"""Wraps a function in try-except"""
-		theOutput = None
-		try:
-			theOutput = func(kwargs)
-		except Exception as err:
-			print(str(err))
-			print(str((err.args)))
-			print(str(
-				"{}: REALLY BAD ERROR: ACTION will not be completed! ABORT!"
-			).format(__prog__))
-			theOutput = None
-		return theOutput
-	return helper
 
 
 def parseargs(arguments=None):
@@ -143,8 +137,9 @@ def show_user(user_name=None, is_verbose=False, use_html=False):
 			)
 			theResult = utils.literal_str(the_temp_Result)
 	except Exception as cmdErr:
-		print(str(cmdErr))
-		print(str(cmdErr.args))
+		logs.log(str(type(cmdErr)), "Error")
+		logs.log(str(cmdErr), "Error")
+		logs.log(str((cmdErr.args)), "Error")
 		theResult = "UNKNOWN"
 	return theResult
 
@@ -173,9 +168,9 @@ def isLineForUser(someLine=None, username=None):
 	try:
 		doesMatch = utils.isLineForMatch(someLine, username)
 	except Exception as matchErr:
-		print(str(type(matchErr)))
-		print(str(matchErr))
-		print(str(matchErr.args))
+		logs.log(str(type(matchErr)), "Error")
+		logs.log(str(matchErr), "Error")
+		logs.log(str((matchErr.args)), "Error")
 		matchErr = None
 		del matchErr
 		doesMatch = False
@@ -261,15 +256,31 @@ def get_system_work_status_raw(user_name=None):
 			del subErr
 			theuserState = None
 		except Exception as cmdErr:
-			print(str(type(cmdErr)))
-			print(str(cmdErr))
-			print(str(cmdErr.args))
+			logs.log(str(type(cmdErr)), "Error")
+			logs.log(str(cmdErr), "Error")
+			logs.log(str((cmdErr.args)), "Error")
 			theuserState = None
 	except Exception as importErr:
-		print(str(importErr))
-		print(str(importErr.args))
+		logs.log(str(importErr), "Warning")
+		logs.log(str((importErr.args)), "Warning")
 		theuserState = None
 	return theuserState
+
+
+# TODO: memoize this function
+def get_w_cmd_args():
+	"""Either -his or -wnh depending on system."""
+	try:
+		import sys
+		if str(sys.platform()).lower().startswith(str("""darwin""")):
+			return str("""-whn""")
+		else:
+			return str("""-his""")
+	except Exception as someErr:
+		logs.log(str(type(someErr)), "Error")
+		logs.log(str(someErr), "Error")
+		logs.log(str((someErr.args)), "Error")
+	return str("""-h""")
 
 
 # TODO: memoize this function
@@ -281,7 +292,7 @@ def get_user_work_status_raw(user_name=None):
 		try:
 			# hard-coded white-list cmds
 			p1 = subprocess.Popen(
-				[str("w"), str("-his")],
+				[str("w"), get_w_cmd_args()],
 				shell=False,
 				stdout=subprocess.PIPE,
 				stderr=None
@@ -317,12 +328,14 @@ def get_user_work_status_raw(user_name=None):
 			del subErr
 			theRawOutput = None
 		except Exception as cmdErr:
-			print(str(cmdErr))
-			print(str(cmdErr.args))
+			logs.log(str(type(cmdErr)), "Error")
+			logs.log(str(cmdErr), "Error")
+			logs.log(str((cmdErr.args)), "Error")
 			theRawOutput = None
 	except Exception as importErr:
-		print(str(importErr))
-		print(str(importErr.args))
+		logs.log(str(type(importErr)), "Warning")
+		logs.log(str(importErr), "Warning")
+		logs.log(str((importErr.args)), "Warning")
 		theRawOutput = None
 	return theRawOutput
 
@@ -341,16 +354,21 @@ def get_user_list():
 				[str(str(x).split(u' ', 1)[0]) for x in theRawuserState.split(u'\n') if (u' ' in x)]
 			)
 		except Exception as cmdErr:
-			print(str(cmdErr))
-			print(str(cmdErr.args))
+			logs.log(str(type(cmdErr)), "Error")
+			logs.log(str(cmdErr), "Error")
+			logs.log(str((cmdErr.args)), "Error")
 			theResult = []
 		# while one line is probably faster here, two is more readable
 		for reserved_lines in ["UID", "message+"]:
 			theResult = [x for x in theResult if utils.xstr(reserved_lines) not in utils.xstr(x)]
 	except Exception as parseErr:
-		print(str("user_check_status.get_user_list: ERROR: ACTION will not be compleated! ABORT!"))
-		print(str(parseErr))
-		print(str(parseErr.args))
+		logs.log(
+			str("user_check_status.get_user_list: ERROR: ACTION will not be compleated! ABORT!"),
+			"Error"
+		)
+		logs.log(str(type(parseErr)), "Error")
+		logs.log(str(parseErr), "Error")
+		logs.log(str((parseErr.args)), "Error")
 		theResult = []
 	return theResult
 
@@ -454,10 +472,13 @@ def get_user_status(user_name=None, use_html=False):
 		user_tty = None
 		del user_tty
 	except Exception as errcrit:
-		print(str("get_user_status: ERROR: ACTION will not be compleated! ABORT!"))
-		print(str(type(errcrit)))
-		print(str(errcrit))
-		print(str(errcrit.args))
+		logs.log(
+			str("user_check_status.get_user_status: ERROR: ACTION will not be compleated! ABORT!"),
+			"Error"
+		)
+		logs.log(str(type(errcrit)), "Error")
+		logs.log(str(errcrit), "Error")
+		logs.log(str((errcrit.args)), "Error")
 		theResult = None
 	return theResult
 
@@ -486,9 +507,13 @@ def get_user_ttys(user=None, use_html=False):
 				str(u'user_status_tty_{}').format(user)
 			)
 	except Exception as errcrit:
-		print(str("user_check_status.get_user_ttys: ERROR: ACTION will not be compleated! ABORT!"))
-		print(str(errcrit))
-		print(str(errcrit.args))
+		logs.log(
+			str("user_check_status.get_user_ttys: ERROR: ACTION will not be compleated! ABORT!"),
+			"Error"
+		)
+		logs.log(str(type(errcrit)), "Error")
+		logs.log(str(errcrit), "Error")
+		logs.log(str((errcrit.args)), "Error")
 		theResult = None
 	return theResult
 
@@ -527,9 +552,13 @@ def get_user_ip(user=None, use_html=False):
 			else:
 				theResult = "UNKNOWN"
 	except Exception as errcrit:
-		print(str("user_check_status.get_user_ip: ERROR: ACTION will not be compleated! ABORT!"))
-		print(str(errcrit))
-		print(str(errcrit.args))
+		logs.log(
+			str("user_check_status.get_user_ip: ERROR: ACTION will not be compleated! ABORT!"),
+			"Error"
+		)
+		logs.log(str(type(errcrit)), "Error")
+		logs.log(str(errcrit), "Error")
+		logs.log(str((errcrit.args)), "Error")
 		theResult = "UNKNOWN"
 	return theResult
 
@@ -558,9 +587,9 @@ def main(argv=None):
 					content_err = None
 					del(content_err)
 				else:
-					print(str(type(content_err)))
-					print(str(content_err))
-					print(str(content_err.args))
+					logs.log(str(type(content_err)), "Error")
+					logs.log(str(content_err), "Error")
+					logs.log(str((content_err.args)), "Error")
 					content_err = None
 					del(content_err)
 			if output_html:
@@ -575,9 +604,11 @@ def main(argv=None):
 				return 0
 			return 0
 	except Exception as main_err:
-		print(str("user_check_status: REALLY BAD ERROR: ACTION will not be compleated! ABORT!"))
-		print(str(main_err))
-		print(str(main_err.args))
+		logs.log(str(
+			"{}: REALLY BAD ERROR: ACTION will not be completed! ABORT!"
+		).format(__prog__), "Error")
+		logs.log(str(main_err), "Error")
+		logs.log(str((main_err.args)), "Error")
 	return 1
 
 
@@ -587,8 +618,10 @@ if __name__ == '__main__':
 		exitcode = main(sys.argv[1:])
 		exit(exitcode)
 	except Exception as main_err:
-		print(str("user_check_status: REALLY BAD ERROR: ACTION will not be compleated! ABORT!"))
-		print(str(main_err))
-		print(str(main_err.args))
+		logs.log(str(
+			"{}: REALLY BAD ERROR: ACTION will not be completed! ABORT!"
+		).format(__prog__), "Error")
+		logs.log(str(main_err), "Error")
+		logs.log(str((main_err.args)), "Error")
 	exit(1)
 
