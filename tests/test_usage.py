@@ -78,7 +78,7 @@ def checkPythonCommand(args=[None], stderr=None):
 		if isinstance(theOutput, bytes):
 			theOutput = theOutput.decode('utf8')
 	except UnicodeDecodeError:
-		theOutput = bytes()
+		theOutput = bytes(theOutput)
 	return theOutput
 
 
@@ -649,7 +649,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 		assert theResult
 
 	def test_c_python_command_keyring_rand(self):
-		"""Test case for piaplib.keyring.rand --count=5."""
+		"""Test case for piaplib.keyring.rand --count=15."""
 		theResult = False
 		try:
 			import sys
@@ -668,18 +668,17 @@ class BasicUsageTestSuite(unittest.TestCase):
 							str("--count"),
 							str("5")
 						], stderr=subprocess.STDOUT)
-						print("reached")
 						if (theOutputtext is not None and len(theOutputtext) > 0):
 							theResult = True
 						else:
 							theResult = False
 							print(str(""))
 							print(str("python cmd is {}").format(str(thepython)))
-							print(str("python exe is {}").format(str(sys.executable)))
 							print(str(""))
 							print(str("actual output was..."))
 							print(str(""))
 							print(str("{}").format(str(theOutputtext)))
+							print(str("{}").format(repr(theOutputtext)))
 							print(str("{}").format(str(type(theOutputtext))))
 							print(str("{}").format(str(len(theOutputtext))))
 							print(str(""))
@@ -1463,15 +1462,6 @@ class BasicUsageTestSuite(unittest.TestCase):
 		"""Test case for piaplib.pocket pku interfaces -i=junk."""
 		theResult = True
 		try:
-			from piaplib import pku as pku
-			if pku.__name__ is None:
-				raise ImportError("Failed to import pku")
-			from pku import utils as utils
-			if utils.__name__ is None:
-				raise ImportError("Failed to import utils")
-			import sys
-			if sys.__name__ is None:
-				raise ImportError("Failed to import system. WTF?!!")
 			thepython = getPythonCommand()
 			if (thepython is not None):
 				theOutputtext = None

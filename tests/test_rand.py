@@ -325,16 +325,9 @@ class RandTestSuite(unittest.TestCase):
 			from keyring import rand as rand
 			if rand.__name__ is None:
 				theResult = False
-			self.assertIsNotNone(rand.randInt(None))
-			self.assertIsNotNone(rand.randInt())
-			self.assertIsNotNone(rand.rand(None))
-			self.assertIsNotNone(rand.rand())
-			self.assertIsNotNone(rand.randBool(None))
-			self.assertIsNotNone(rand.randBool())
-			self.assertIsNotNone(rand.randStr(None))
-			self.assertIsNotNone(rand.randStr())
-			self.assertIsNotNone(rand.randChar(None))
-			self.assertIsNotNone(rand.randChar())
+			for theTest in [rand.randInt, rand.rand, rand.randBool, rand.randStr, rand.randChar]:
+				self.assertIsNotNone(theTest(None))
+				self.assertIsNotNone(theTest())
 		except Exception as impErr:
 			print(str("Bad count"))
 			print(str(""))
@@ -368,6 +361,7 @@ class RandTestSuite(unittest.TestCase):
 				seen_digit = ((seen_digit is True) or str(temp).isdigit())
 				seen_special = ((seen_special is True) or (str(temp).isalnum() is False))
 				temp = str(rand.rand(1))
+				self.assertIsNotNone(temp)
 			if (seen_alpha is True) and (seen_digit is True) and (seen_special is True):
 				theResult = (theResult is True)
 			temp = None
