@@ -53,7 +53,7 @@ class ConfigTestSuite(unittest.TestCase):
 		"""Insanitty Test."""
 		assert True
 
-	def test_dic_compare(self):
+	def test_dict_compare(self):
 		"""Meta dict-Test."""
 		test_control = dict({"test": "this", "for": "match"})
 		test_control_b = dict({"test": "this", "for": "match"})
@@ -106,10 +106,10 @@ class ConfigTestSuite(unittest.TestCase):
 				if (readback is None):
 					theResult = False
 				else:
+					a = dict_compare(theBlob[u'test'], readback[u'test'])
+					b = dict_compare(readback, theBlob)
 					input_data = str(theBlob[u'test'][u'write_test'])
 					output_data = str(readback[u'test'][u'write_test'])
-					a = (output_data in input_data)
-					b = (input_data in output_data)
 					c = (output_data in input_data)
 					d = (input_data in output_data)
 					theResult = (a and b and c and d)
@@ -164,8 +164,7 @@ class ConfigTestSuite(unittest.TestCase):
 						readback = config.readYamlFile(somefile)
 						a = dict_compare(theBlob[u'test'], readback[u'test'])
 						b = dict_compare(readback, theBlob)
-						# c = (theBlob[u'test'].values() in readback[u'test'].values())
-						# d = (readback[u'test'].values() theBlob[u'test'].values())
+						# c = dict_compare(theBlob[u'test'].values(), readback[u'test'].values())
 						if a and b:
 							theResult = True
 						else:

@@ -188,15 +188,63 @@ def get_system_work_status_raw(user_name=None):
 	try:
 		import subprocess
 		try:
-			# hard-coded white-list cmd
-			output = subprocess.check_output(
-				[utils.literal_str(
-					"""ulimit -t 2 ; ps -elf 2>/dev/null | tr -s ' ' ' ' | cut -d\  -f 3,15 """ +
-					"""| sed -E -e 's/[\[\(]{1}[^]]+[]\)]{1}/SYSTEM/g' | sort | uniq ;"""
-				)],
-				shell=True,
-				stderr=subprocess.STDOUT
+			# hard-coded white-list cmds
+			p1 = subprocess.Popen(
+				[str("ps"), str("-elf")],
+				shell=False,
+				stdout=subprocess.PIPE,
+				stderr=None
 			)
+			p2 = subprocess.Popen(
+				[
+					str("tr"),
+					str("-s"),
+					utils.literal_str("""' '"""),
+					utils.literal_str("""' '""")
+				],
+				shell=False,
+				stdin=p1.stdout,
+				stdout=subprocess.PIPE
+			)
+			p3 = subprocess.Popen(
+				[
+					str("cut"),
+					utils.literal_str("""-d"""),
+					utils.literal_str(""" """),
+					str("-f"),
+					str("3,15")
+				],
+				shell=False,
+				stdin=p2.stdout,
+				stdout=subprocess.PIPE
+			)
+			p4 = subprocess.Popen(
+				[
+					str("sed"),
+					str("-E"),
+					str("-e"),
+					str(utils.literal_str("""s/[\[\(]{1}[^]]+[]\)]{1}/SYSTEM/g"""))
+				],
+				shell=False,
+				stdin=p3.stdout,
+				stdout=subprocess.PIPE
+			)
+			p5 = subprocess.Popen(
+				[utils.literal_str("""sort""")],
+				shell=False,
+				stdin=p4.stdout,
+				stdout=subprocess.PIPE
+			)
+			p6 = subprocess.Popen(
+				[utils.literal_str("""uniq""")],
+				shell=False,
+				stdin=p5.stdout,
+				stdout=subprocess.PIPE
+			)
+			p5.stdout.close()  # Allow p1 to receive a SIGPIPE if p5 exits.
+			(output, stderrors) = p6.communicate()
+			if (isinstance(output, bytes)):
+				output = output.decode('utf8')
 			if (output is not None) and (len(output) > 0):
 				lines = [
 					utils.literal_str(x) for x in output.splitlines() if isLineForUser(x, user_name)
@@ -231,11 +279,28 @@ def get_user_work_status_raw(user_name=None):
 	try:
 		import subprocess
 		try:
-			output = subprocess.check_output(
-				[str("""ulimit -t 2 ; w -his 2>/dev/null | tr -s ' ' ' '""")],
-				shell=True,
-				stderr=subprocess.STDOUT
+			# hard-coded white-list cmds
+			p1 = subprocess.Popen(
+				[str("w"), str("-his")],
+				shell=False,
+				stdout=subprocess.PIPE,
+				stderr=None
 			)
+			p2 = subprocess.Popen(
+				[
+					str("tr"),
+					str("-s"),
+					utils.literal_str("""' '"""),
+					utils.literal_str("""' '""")
+				],
+				shell=False,
+				stdin=p1.stdout,
+				stdout=subprocess.PIPE
+			)
+			p1.stdout.close()  # Allow p1 to receive a SIGPIPE if p2 exits.
+			(output, stderrors) = p2.communicate()
+			if (isinstance(output, bytes)):
+				output = output.decode('utf8')
 			if output is not None and len(output) > 0:
 				lines = [
 					utils.literal_str(x) for x in output.splitlines() if isLineForUser(x, user_name)
@@ -301,11 +366,14 @@ def get_user_status(user_name=None, use_html=False):
 		status_txt = get_system_work_status_raw(user_name)
 		if (user_tty is not None) and (str(user_tty) not in str("console")):
 			status_txt = get_user_work_status_raw(user_name)
-			status_list = utils.compactList(
-				[str(
-					str(x).split(u' ', 4)[-1]
-				) for x in status_txt.split(u'\n') if (x is not None) and (len(x) > 0)]
-			)
+			if status_txt is None:
+				status_txt = ["UNKNOWN"]
+			else:
+				status_list = utils.compactList(
+					[str(
+						str(x).split(u' ', 4)[-1]
+					) for x in status_txt.split(u'\n') if (x is not None) and (len(x) > 0)]
+				)
 		elif status_txt is not None:
 			if (str("root SYSTEM\n") not in status_txt):
 				theWorks = utils.compactList(
