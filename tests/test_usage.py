@@ -823,6 +823,8 @@ class BasicUsageTestSuite(unittest.TestCase):
 							print(str("{}").format(str(theOutputtext)))
 							print(str(""))
 							raise unittest.SkipTest("BETA. Experemental feature not ready yet.")
+				except unittest.SkipTest as skiperr:
+					raise unittest.SkipTest("BETA. Experemental feature not ready yet.")
 				except Exception as othererr:
 					print(str(""))
 					print(str(type(othererr)))
@@ -832,6 +834,8 @@ class BasicUsageTestSuite(unittest.TestCase):
 					othererr = None
 					del othererr
 					theResult = False
+		except unittest.SkipTest as skiperr:
+			raise unittest.SkipTest("BETA. Experemental feature not ready yet.")
 		except Exception as err:
 			print(str(""))
 			print(str(type(err)))
