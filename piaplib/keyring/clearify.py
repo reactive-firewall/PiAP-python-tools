@@ -174,7 +174,8 @@ def packForRest(message=None, keyStore=None):
 			str("-e"),
 			str("-aes-256-ctr"),
 			str("-a"),
-			str("-nosalt"),
+			str("-A"),
+			str("-salt"),
 			str("-kfile"),
 			str("{}").format(str(keyStore))
 		]
@@ -208,7 +209,8 @@ def unpackFromRest(ciphertext=None, keyStore=None):
 			str("-d"),
 			str("-aes-256-ctr"),
 			str("-a"),
-			str("-nosalt"),
+			str("-A"),
+			str("-salt"),
 			str("-kfile"),
 			str("{}").format(str(keyStore))
 		]
@@ -347,7 +349,7 @@ def parseArgs(arguments=None):
 			)
 		theArgs = parser.parse_args(arguments)
 	except Exception as err:
-		print(str(u'FAILED DURRING CLEARIFY. ABORT.'))
+		print(str("FAILED DURRING CLEARIFY. ABORT."))
 		print(str(type(err)))
 		print(str(err))
 		print(str(err.args))
@@ -376,7 +378,7 @@ def main(argv=None):
 			output = str(WEAK_ACTIONS[args.clear_action](str(args.msg), theFile))
 			print(output)
 		except Exception as err:
-			print(str(u'FAILED DURRING CLEARIFY. ABORT.'))
+			print(str("FAILED DURRING CLEARIFY. ABORT."))
 			print(str(type(err)))
 			print(str(err))
 			print(str(err.args))
@@ -392,7 +394,7 @@ if __name__ in u'__main__':
 		import sys
 		exitcode = main(sys.argv[1:])
 	except Exception as err:
-		print(str(u'MAIN FAILED DURRING CLEARIFY. ABORT.'))
+		print(str("MAIN FAILED DURRING CLEARIFY. ABORT."))
 		print(str(type(err)))
 		print(str(err))
 		print(str(err.args))

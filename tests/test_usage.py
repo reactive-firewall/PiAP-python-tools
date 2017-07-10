@@ -766,6 +766,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
+	@unittest.skipUnless(sys.platform.startswith("linux"), "Only working on linux")
 	def test_keyring_clear_io(self):
 		"""Test case for piaplib.keyring.clearify."""
 		theResult = False
@@ -777,11 +778,12 @@ class BasicUsageTestSuite(unittest.TestCase):
 			if (thepython is not None):
 				try:
 					test_message = str("This is a test Message")
+					enc_string_salted = str("U2FsdGVk")
 					enc_string_py3 = str("jO2fjYejUczBE9ol2lsFWO0JjLRCaQ==")
 					theOutputtext = test_message
 					for unit in ["--pack", "--unpack"]:
 						input_text = str(theOutputtext)
-						theOutputtext = checkPythonCommand([
+						arguments = [
 							str(thepython),
 							str("-m"),
 							str("piaplib.keyring.clearify"),
@@ -790,20 +792,24 @@ class BasicUsageTestSuite(unittest.TestCase):
 							str("-S=testSeedNeedstobelong"),
 							str("-K=testkeyneedstobelong"),
 							str("-k=/tmp/.beta_PiAP_weak_key")
-						], stderr=subprocess.STDOUT)
+						]
+						theOutputtext = checkPythonCommand(arguments, stderr=subprocess.STDOUT)
 						theOutputtext = str(theOutputtext).replace(str("\\n"), str(""))
 						if (test_message in str(theOutputtext)):
 							theResult = True
 						elif (enc_string_py3 in str(theOutputtext)):
 							theResult = True
+						elif (enc_string_salted in str(theOutputtext)):
+							theResult = True
 						else:
 							theResult = False
 							print(str(""))
 							print(str("python cmd is {}").format(str(thepython)))
+							print(str("arguments are {}").format(str(arguments)))
 							print(str(""))
 							print(str("action is {}").format(str(unit)))
-							print(str("input was {}").format(str(input_text)))
-							print(str("actual output was..."))
+							print(str("input given {}").format(str(input_text)))
+							print(str("but actual output was..."))
 							print(str(""))
 							print(str("{}").format(str(theOutputtext)))
 							print(str(""))
