@@ -125,6 +125,113 @@ class BookTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
+	def test_z_case_clearify_setKeyFile_no_path(self):
+		"""Tests the helper function makeKeystoreFile(x, None) of keyring.clearify"""
+		theResult = True
+		try:
+			from piaplib.keyring import clearify as clearify
+			if clearify.__name__ is None:
+				raise ImportError("Failed to import clearify")
+			self.assertIsNotNone(clearify.makeKeystoreFile(
+				str("This is not a real key"),
+				None
+			))
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			err = None
+			del err
+			theResult = False
+		assert theResult
+
+	def test_z_case_clearify_setKeyFile_no_key(self):
+		"""Tests the helper function makeKeystoreFile(None, x) of keyring.clearify"""
+		theResult = True
+		try:
+			from piaplib.keyring import clearify as clearify
+			if clearify.__name__ is None:
+				raise ImportError("Failed to import clearify")
+			self.assertIsNotNone(clearify.makeKeystoreFile(
+				None,
+				str("../test.secret")
+			))
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			err = None
+			del err
+			theResult = False
+		assert theResult
+
+	def test_z_case_clearify_setKeyFile_none(self):
+		"""Tests the helper function makeKeystoreFile(None) of keyring.clearify"""
+		theResult = True
+		try:
+			from piaplib.keyring import clearify as clearify
+			if clearify.__name__ is None:
+				raise ImportError("Failed to import clearify")
+			self.assertIsNotNone(clearify.makeKeystoreFile(None))
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			err = None
+			del err
+			theResult = False
+		assert theResult
+
+	def test_z_case_clearify_main_bad(self):
+		"""Tests the helper function main(bad stuff) of keyring.clearify"""
+		theResult = True
+		try:
+			from piaplib.keyring import clearify as clearify
+			if clearify.__name__ is None:
+				raise ImportError("Failed to import clearify")
+			self.assertIsNotNone(clearify.main([
+				str("--pack"),
+				str("-msg=None")
+			]), 2)
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			err = None
+			del err
+			theResult = False
+		assert theResult
+
+	def test_z_case_clearify_main_lazy(self):
+		"""Tests the helper function main(lazy stuff) of keyring.clearify"""
+		theResult = True
+		try:
+			from piaplib.keyring import clearify as clearify
+			if clearify.__name__ is None:
+				raise ImportError("Failed to import clearify")
+			self.assertIsNotNone(clearify.main([
+				str("--pack"),
+				str("--msg=testing")
+			]))
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			err = None
+			del err
+			theResult = False
+		assert theResult
+
 
 if __name__ == u'__main__':
 	unittest.main()
