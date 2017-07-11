@@ -86,6 +86,7 @@ class iFaceTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
+	@unittest.skipUnless(sys.platform.startswith("linux"), "Requires linux ifup/ifdown tools")
 	def test_case_iface_check_nonroot_down(self):
 		"""Tests the imposible state for pku.interface given bad tools"""
 		theResult = False
@@ -113,6 +114,7 @@ class iFaceTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
+	@unittest.skipUnless(sys.platform.startswith("linux"), "Requires linux ifup/ifdown tools")
 	def test_case_iface_check_nonroot_up(self):
 		"""Tests the imposible state for pku.interface given bad values"""
 		theResult = True

@@ -15,10 +15,16 @@ six>=1.0.0
 #pgpy>=0.4.1
 tox>=2.7.0
 #py>=1.4.33
-pip>=8.0
+pip>=8.2
 requests>=2.14.2
+# cryptography - Apache 2
+#cryptography>=1.2.3
+# pycrypto - MIT
+#pycrypto>=2.6.1
 urllib3>=1.13.1
 # ruamel.yaml - MIT
 #ruamel.yaml>=0.14.12
+# pyyaml - MIT
+#pyyaml>=3.12
 #-e git+https://github.com/reactive-firewall/PiAP-python-tools.git#egg=piaplib
 

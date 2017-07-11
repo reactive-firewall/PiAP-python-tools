@@ -5,7 +5,15 @@ Standards checklist:
 	 - RFC 2104 HMAC class.
 	 - Also complies with RFC 4231.
 	 - see HMAC API in PEP 247.
+	setup.cfg 
+	 - PEP 345 -- Metadata for Python Software Packages 1.2
 
 	Other Misc (just for navigation):
 	PEP324 - subproccess
 	RFC 4880 - pgpy (bsd compatable python pgp)
+	
+	encryption:
+	aes-256-ctr
+	- ??
+	aes-256-cbc
+	- ??

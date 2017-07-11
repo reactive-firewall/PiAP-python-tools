@@ -38,12 +38,34 @@ except Exception:
 	raise ImportError("Failed to import test context")
 
 
+def dict_compare(d1, d2):
+	d1_keys = set(d1.keys())
+	d2_keys = set(d2.keys())
+	intersect_keys = d1_keys.intersection(d2_keys)
+	same = set(o for o in intersect_keys if d1[o] == d2[o])
+	return (len(same) is len(d1) and len(d1) is len(d2))
+
+
 class ConfigTestSuite(unittest.TestCase):
 	"""Basic config test cases."""
 
 	def test_absolute_truth_and_meaning(self):
 		"""Insanitty Test."""
 		assert True
+
+	def test_dict_compare(self):
+		"""Meta dict-Test."""
+		test_control = dict({"test": "this", "for": "match"})
+		test_control_b = dict({"test": "this", "for": "match"})
+		test_match = dict(test_control)
+		test_diff = dict({"test": "this", "for": "bad match"})
+		self.assertTrue(dict_compare(test_control, test_control_b))
+		self.assertTrue(dict_compare(test_control, test_match))
+		self.assertTrue(dict_compare(test_match, test_control_b))
+		self.assertTrue(dict_compare(test_match, test_control))
+		self.assertFalse(dict_compare(test_control, test_diff))
+		self.assertFalse(dict_compare(test_control_b, test_diff))
+		self.assertFalse(dict_compare(test_match, test_diff))
 
 	def test_syntax(self):
 		"""Test case importing code."""
@@ -63,7 +85,7 @@ class ConfigTestSuite(unittest.TestCase):
 		assert theResult
 
 	def test_case_json_read_write_file(self):
-		"""Tests the read and write functions"""
+		"""Tests the JSON read and write functions"""
 		theResult = False
 		try:
 			from piaplib import pku as pku
@@ -81,11 +103,16 @@ class ConfigTestSuite(unittest.TestCase):
 			somefile = str("the_test_file.json")
 			if (config.writeJsonFile(somefile, theBlob) is True):
 				readback = config.readJsonFile(somefile)
-				a = (str(theBlob[u'test'][u'write_test']) in str(readback[u'test'][u'write_test']))
-				b = (str(readback[u'test'][u'write_test']) in str(theBlob[u'test'][u'write_test']))
-				c = (str(theBlob[u'test'][u'read_test']) in str(readback[u'test'][u'read_test']))
-				d = (str(readback[u'test'][u'read_test']) in str(theBlob[u'test'][u'read_test']))
-				theResult = (a and b and c and d)
+				if (readback is None):
+					theResult = False
+				else:
+					a = dict_compare(theBlob[u'test'], readback[u'test'])
+					b = dict_compare(readback, theBlob)
+					input_data = str(theBlob[u'test'][u'write_test'])
+					output_data = str(readback[u'test'][u'write_test'])
+					c = (output_data in input_data)
+					d = (input_data in output_data)
+					theResult = (a and b and c and d)
 				if theResult:
 					theResult = True
 				else:
@@ -99,7 +126,6 @@ class ConfigTestSuite(unittest.TestCase):
 					print(str(""))
 			else:
 				theResult = False
-			if (theResult is False):
 				print(str("write failed"))
 				print(str(theBlob))
 				print(str(""))
@@ -116,7 +142,7 @@ class ConfigTestSuite(unittest.TestCase):
 		assert theResult
 
 	def test_case_yaml_read_write_file(self):
-		"""Tests the read and write functions"""
+		"""Tests the YAML read and write functions"""
 		theResult = False
 		try:
 			from piaplib import pku as pku
@@ -134,25 +160,51 @@ class ConfigTestSuite(unittest.TestCase):
 				})
 				somefile = str("the_test_file.yml")
 				if (config.writeYamlFile(somefile, theBlob) is True):
-					readback = config.writeYamlFile(somefile)
-					a = (theBlob[u'test'] in readback[u'test'])
-					b = (readback[u'test'] in theBlob[u'test'])
-					if a and b:
-						theResult = True
-					else:
-						theResult = False
-					if (theResult is False):
-						print(str("wrote"))
-						print(str(theBlob))
+					try:
+						readback = config.readYamlFile(somefile)
+						a = dict_compare(theBlob[u'test'], readback[u'test'])
+						b = dict_compare(readback, theBlob)
+						# c = dict_compare(theBlob[u'test'].values(), readback[u'test'].values())
+						if a and b:
+							theResult = True
+						else:
+							theResult = False
+						if (theResult is False):
+							print(str("wrote"))
+							print(str(theBlob))
+							print(str(""))
+							print(str("read"))
+							print(str(readback))
+							print(str(""))
+							print(str("case a"))
+							print(str(a))
+							print(str(""))
+							print(str("case b"))
+							print(str(b))
+							print(str(""))
+					except Exception as err:
+						print(str(""))
+						print(str("Error in test of yaml write-read"))
+						print(str(type(err)))
+						print(str(err))
+						print(str((err.args)))
+						print(str(""))
+						print(str("wrote to file"))
+						print(str(somefile))
 						print(str(""))
 						print(str("read"))
 						print(str(readback))
 						print(str(""))
+						print(str(type(readback)))
+						err = None
+						del err
+						theResult = False
 				else:
 					theResult = False
 				if (theResult is False):
 					print(str("write failed"))
 					print(str(theBlob))
+					print(str(type(theBlob)))
 					print(str(""))
 			else:
 				theResult = True

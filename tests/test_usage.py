@@ -19,28 +19,31 @@
 
 import unittest
 import subprocess
+import sys
 
 
 def getPythonCommand():
 	"""function for backend python command"""
 	thepython = "exit 1 ; #"
 	try:
-		import sys
-		if sys.__name__ is None:
-			raise ImportError("Failed to import system. WTF?!!")
 		thepython = checkPythonCommand(["which", "coverage"])
 		if (str("/coverage") in str(thepython)) and (sys.version_info >= (3, 3)):
 			thepython = str("coverage run -p")
+		elif (str("/coverage") in str(thepython)) and (sys.version_info <= (3, 2)):
+			try:
+				import coverage
+				if coverage.__name__ is not None:
+					thepython = str("{} -m coverage run -p").format(str(sys.executable))
+				else:
+					thepython = str(sys.executable)
+			except Exception:
+				thepython = str(sys.executable)
 		else:
-			thepython = checkPythonCommand(["which", "python3"])
-			if (str("/python3") not in str(thepython)) or (sys.version_info <= (3, 2)):
-				thepython = "python3"
+			thepython = str(sys.executable)
 	except Exception:
 		thepython = "exit 1 ; #"
 		try:
-			thepython = checkPythonCommand(["which", "python"])
-			if (str("/python") in str(thepython)):
-				thepython = "python"
+			thepython = str(sys.executable)
 		except Exception:
 			thepython = "exit 1 ; #"
 	return str(thepython)
@@ -54,13 +57,28 @@ def checkPythonCommand(args=[None], stderr=None):
 			theOutput = subprocess.check_output(["exit 1 ; #"])
 		else:
 			if str("coverage ") in args[0]:
-				args[0] = str("coverage")
-				args.insert(1, "run")
-				args.insert(2, "-p")
-				args.insert(2, "--source=piaplib,piaplib/lint,piaplib/keyring,piaplib/pku,piaplib/book")
+				if sys.__name__ is None:
+					raise ImportError("Failed to import system. WTF?!!")
+				if str("{} -m coverage ").format(str(sys.executable)) in str(args[0]):
+					args[0] = str(sys.executable)
+					args.insert(1, str("-m"))
+					args.insert(2, str("coverage"))
+					args.insert(3, str("run"))
+					args.insert(4, str("-p"))
+					args.insert(4, str("--source=piaplib,piaplib/lint,piaplib/keyring,piaplib/pku,piaplib/book"))
+				else:
+					args[0] = str("coverage")
+					args.insert(1, str("run"))
+					args.insert(2, str("-p"))
+					args.insert(2, str("--source=piaplib,piaplib/lint,piaplib/keyring,piaplib/pku,piaplib/book"))
 			theOutput = subprocess.check_output(args, stderr=stderr)
-	except Exception:
+	except Exception as cmderror:
 		theOutput = None
+	try:
+		if isinstance(theOutput, bytes):
+			theOutput = theOutput.decode('utf8')
+	except UnicodeDecodeError:
+		theOutput = bytes(theOutput)
 	return theOutput
 
 
@@ -72,15 +90,46 @@ def checkPythonFuzzing(args=[None], stderr=None):
 			theOutput = subprocess.check_output(["exit 1 ; #"])
 		else:
 			if str("coverage ") in args[0]:
-				args[0] = str("coverage")
-				args.insert(1, "run")
-				args.insert(2, "-p")
-				args.insert(2, "--source=piaplib,piaplib/lint,piaplib/keyring,piaplib/pku,piaplib/book")
+				import sys
+				if sys.__name__ is None:
+					raise ImportError("Failed to import system. WTF?!!")
+				if str("{} -m coverage ").format(str(sys.executable)) in str(args[0]):
+					args[0] = str(sys.executable)
+					args.insert(1, str("-m"))
+					args.insert(2, str("coverage"))
+					args.insert(3, str("run"))
+					args.insert(4, str("-p"))
+					args.insert(4, str("--source=piaplib,piaplib/lint,piaplib/keyring,piaplib/pku,piaplib/book"))
+				else:
+					args[0] = str("coverage")
+					args.insert(1, str("run"))
+					args.insert(2, str("-p"))
+					args.insert(2, str("--source=piaplib,piaplib/lint,piaplib/keyring,piaplib/pku,piaplib/book"))
 			theOutput = subprocess.check_output(args, stderr=stderr)
+		if isinstance(theOutput, bytes):
+			theOutput = theOutput.decode('utf8')
 	except Exception as err:
 		theOutput = None
 		raise RuntimeError(err)
 	return theOutput
+
+
+def debugBlob(blob=None):
+	try:
+		print(str(""))
+		print(str("String:"))
+		print(str("""\""""))
+		print(str(blob))
+		print(str("""\""""))
+		print(str(""))
+		print(str("CODE:"))
+		print(str("""\""""))
+		print(repr(blob))
+		print(str("""\""""))
+		print(str(""))
+	except Exception:
+		return False
+	return True
 
 
 class BasicUsageTestSuite(unittest.TestCase):
@@ -250,9 +299,15 @@ class BasicUsageTestSuite(unittest.TestCase):
 			if sys.__name__ is None:
 				raise ImportError("Failed to import system. WTF?!!")
 			thepython = getPythonCommand()
+			test_units = [
+				"lint.lint",
+				"pku.pku",
+				"book.book",
+				"keyring.keyring"
+			]
 			if (thepython is not None):
 				try:
-					for unit in ["lint.lint", "pku.pku", "book.book", "keyring.keyring"]:
+					for unit in test_units:
 						theOutputtext = checkPythonCommand([
 							str(thepython),
 							str("-m"),
@@ -559,9 +614,15 @@ class BasicUsageTestSuite(unittest.TestCase):
 			if sys.__name__ is None:
 				raise ImportError("Failed to import system. WTF?!!")
 			thepython = getPythonCommand()
+			test_units = [
+				"keyring.saltify",
+				"keyring.rand",
+				"keyring.clearify",
+				"keyring.keyring"
+			]
 			if (thepython is not None):
 				try:
-					for unit in ["keyring.keyring", "keyring.saltify", "keyring.rand"]:
+					for unit in test_units:
 						theOutputtext = checkPythonCommand([
 							str(thepython),
 							str("-m"),
@@ -600,7 +661,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 		assert theResult
 
 	def test_c_python_command_keyring_rand(self):
-		"""Test case for piaplib.keyring.* --help."""
+		"""Test case for piaplib.keyring.rand --count=15."""
 		theResult = False
 		try:
 			import sys
@@ -619,12 +680,67 @@ class BasicUsageTestSuite(unittest.TestCase):
 							str("--count"),
 							str("5")
 						], stderr=subprocess.STDOUT)
-						if (theOutputtext is not None and len(str(theOutputtext)) > 0):
+						if (theOutputtext is not None and len(theOutputtext) > 0):
 							theResult = True
 						else:
 							theResult = False
 							print(str(""))
 							print(str("python cmd is {}").format(str(thepython)))
+							print(str(""))
+							print(str("actual output was..."))
+							print(str(""))
+							print(str("{}").format(str(theOutputtext)))
+							print(str("{}").format(repr(theOutputtext)))
+							print(str("{}").format(str(type(theOutputtext))))
+							print(str("{}").format(str(len(theOutputtext))))
+							print(str(""))
+				except Exception as othererr:
+					print(str(""))
+					print(str(type(othererr)))
+					print(str(othererr))
+					print(str((othererr.args)))
+					print(str(""))
+					othererr = None
+					del othererr
+					theResult = False
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			othererr = None
+			del othererr
+			theResult = False
+		assert theResult
+
+	def test_keyring_rand_gen_units(self):
+		"""Test case for piaplib.keyring.rand -g *."""
+		theResult = False
+		try:
+			import sys
+			if sys.__name__ is None:
+				raise ImportError("Failed to import system. WTF?!!")
+			thepython = getPythonCommand()
+			if (thepython is not None):
+				try:
+					for unit in ["raw", "str", "passphrase", "int", "bool", "IP", "SSID"]:
+						theOutputtext = checkPythonCommand([
+							str(thepython),
+							str("-m"),
+							str("piaplib.keyring.rand"),
+							str("--count"),
+							str("2"),
+							str("--generate"),
+							str("{}").format(str(unit))
+						], stderr=subprocess.STDOUT)
+						if (str(theOutputtext) is not None):
+							theResult = True
+						else:
+							theResult = False
+							print(str(""))
+							print(str("python cmd is {}").format(str(thepython)))
+							print(str("python exe is {}").format(str(sys.executable)))
 							print(str(""))
 							print(str("actual output was..."))
 							print(str(""))
@@ -639,6 +755,87 @@ class BasicUsageTestSuite(unittest.TestCase):
 					othererr = None
 					del othererr
 					theResult = False
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			othererr = None
+			del othererr
+			theResult = False
+		assert theResult
+
+	def test_keyring_clear_io(self):
+		"""Test case for piaplib.keyring.clearify."""
+		theResult = False
+		try:
+			import sys
+			if sys.__name__ is None:
+				raise ImportError("Failed to import system. WTF?!!")
+			import piaplib.keyring.rand as rand
+			if rand.__name__ is None:
+				raise ImportError("Failed to import rand.")
+			thepython = getPythonCommand()
+			if (thepython is not None):
+				try:
+					test_message = str("This is a test Message")
+					enc_string_salted = str("U2FsdGVk")
+					enc_string_py3 = str("jO2fjYejUczBE9ol2lsFWO0JjLRCaQ==")
+					enc_string_test_key = str("{}junk{}junk{}key{}").format(
+						str(rand.randInt(1, 11, 99)),
+						str(rand.randInt(1, 1001, 9999)),
+						str(rand.randInt(1, 0, 99)),
+						str(rand.randInt(1, 1000, 9999))
+					)
+					theOutputtext = test_message
+					for unit in ["--pack", "--unpack"]:
+						input_text = str(theOutputtext)
+						arguments = [
+							str(thepython),
+							str("-m"),
+							str("piaplib.keyring.clearify"),
+							str("{}").format(str(unit)),
+							str("--msg={}").format(theOutputtext),
+							str("-S=testSeedNeedstobelong"),
+							str("-K={}").format(str(enc_string_test_key)),
+							str("-k=/tmp/.beta_PiAP_weak_key")
+						]
+						theOutputtext = checkPythonCommand(arguments, stderr=subprocess.STDOUT)
+						theOutputtext = str(theOutputtext).replace(str("\\n"), str(""))
+						if (test_message in str(theOutputtext)):
+							theResult = True
+						elif (enc_string_py3 in str(theOutputtext)):
+							theResult = True
+						elif (enc_string_salted in str(theOutputtext)):
+							theResult = True
+						else:
+							print(str(""))
+							print(str("Not working yet"))
+							print(str(""))
+							print(str("python cmd is {}").format(str(thepython)))
+							print(str("arguments are {}").format(str(arguments)))
+							print(str(""))
+							print(str("action is {}").format(str(unit)))
+							print(str("input given {}").format(str(input_text)))
+							print(str("but actual output was..."))
+							print(str(""))
+							print(str("{}").format(str(theOutputtext)))
+							print(str(""))
+							raise unittest.SkipTest("BETA. Experemental feature not ready yet.")
+				except unittest.SkipTest as skiperr:
+					raise unittest.SkipTest("BETA. Experemental feature not ready yet.")
+				except Exception as othererr:
+					print(str(""))
+					print(str(type(othererr)))
+					print(str(othererr))
+					print(str((othererr.args)))
+					print(str(""))
+					othererr = None
+					del othererr
+					theResult = False
+		except unittest.SkipTest as skiperr:
+			raise unittest.SkipTest("BETA. Experemental feature not ready yet.")
 		except Exception as err:
 			print(str(""))
 			print(str(type(err)))
@@ -713,7 +910,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 					], stderr=subprocess.STDOUT)
 					if (str("root console ") in str(theOutputtext)):
 						theResult = True
-					elif (str("travis UNKNOWN UNKNOWN None") in str(theOutputtext)):
+					elif (str("travis UNKNOWN UNKNOWN") in str(theOutputtext)):
 						theResult = True
 					else:
 						theResult = False
@@ -745,7 +942,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 		assert theResult
 
 	def test_g_python_command_build_iface(self):
-		"""Test case for piaplib.pocket.lint check users."""
+		"""Test case for piaplib.pku.compile_interface dhcp iface."""
 		theResult = False
 		try:
 			import sys
@@ -768,6 +965,65 @@ class BasicUsageTestSuite(unittest.TestCase):
 						theResult = True
 					elif (str("inet dhcp") in str(theOutputtext)):
 						theResult = True
+					else:
+						theResult = False
+						print(str(""))
+						print(str("python cmd is {}").format(str(thepython)))
+						print(str(""))
+						print(str("actual output was..."))
+						print(str(""))
+						print(str("{}").format(str(theOutputtext)))
+						print(str(""))
+				except Exception as othererr:
+					print(str(""))
+					print(str(type(othererr)))
+					print(str(othererr))
+					print(str((othererr.args)))
+					print(str(""))
+					othererr = None
+					del othererr
+					theResult = False
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			othererr = None
+			del othererr
+			theResult = False
+		assert theResult
+
+	def test_h_python_command_build_iface(self):
+		"""Test case for piaplib.pku.compile_interface static iface."""
+		theResult = False
+		try:
+			import sys
+			if sys.__name__ is None:
+				raise ImportError("Failed to import system. WTF?!!")
+			thepython = getPythonCommand()
+			if (thepython is not None):
+				try:
+					theOutputtext = checkPythonCommand([
+						str(thepython),
+						str("-m"),
+						str("piaplib.pku.compile_interface"),
+						str("-S"),
+						str("-t"),
+						str("wlan"),
+						str("-z"),
+						str("WAN"),
+						str("-g"),
+						str("10.0.1.1"),
+						str("-n"),
+						str("255.255.255.255"),
+						str("-i"),
+						str("10.0.1.40")
+					], stderr=subprocess.STDOUT)
+					if (str("inet static") in str(theOutputtext)):
+						theResult = True
+					elif (str("inet dhcp") in str(theOutputtext)):
+						theResult = False
 					else:
 						theResult = False
 						print(str(""))
@@ -1057,6 +1313,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
+	@unittest.skipUnless(sys.platform.startswith("linux"), "Requires linux")
 	def test_d_python_command_check_iface(self):
 		"""Test case for piaplib.pocket.lint check iface."""
 		theResult = False
@@ -1232,19 +1489,11 @@ class BasicUsageTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
+	@unittest.skipUnless(sys.platform.startswith("linux"), "Requires linux ifup/ifdown tools")
 	def test_d_python_command_bad_interface(self):  # noqa
-		"""Test case for piaplib.pocket.lint check users."""
+		"""Test case for piaplib.pocket pku interfaces -i=junk."""
 		theResult = True
 		try:
-			from piaplib import pku as pku
-			if pku.__name__ is None:
-				raise ImportError("Failed to import pku")
-			from pku import utils as utils
-			if utils.__name__ is None:
-				raise ImportError("Failed to import utils")
-			import sys
-			if sys.__name__ is None:
-				raise ImportError("Failed to import system. WTF?!!")
 			thepython = getPythonCommand()
 			if (thepython is not None):
 				theOutputtext = None
