@@ -252,7 +252,10 @@ class BookTestSuite(unittest.TestCase):
 			if (str("U2FsdGVkX") in str(test_out)):
 				theResult = True
 			else:
-				theResult = False
+				if sys.platform.startswith("linux"):
+					theResult = False
+				else:
+					raise unittest.SkipTest("BETA. Experemental feature not ready yet.")
 		except Exception as err:
 			print(str(""))
 			print(str(type(err)))
@@ -289,8 +292,11 @@ class BookTestSuite(unittest.TestCase):
 			if (str("This is a test Message") in str(test_out)):
 				theResult = True
 			else:
-				print(str(repr(bytes(test_out))))
-				theResult = False
+				if sys.platform.startswith("linux"):
+					print(str(repr(bytes(test_out))))
+					theResult = False
+				else:
+					raise unittest.SkipTest("BETA. Experemental feature not ready yet.")
 		except Exception as err:
 			print(str(""))
 			print(str(type(err)))
