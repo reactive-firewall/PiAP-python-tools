@@ -661,7 +661,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 		assert theResult
 
 	def test_c_python_command_keyring_rand(self):
-		"""Test case for piaplib.keyring.rand --count=15."""
+		"""Test case for piaplib.keyring.rand --count=5."""
 		theResult = False
 		try:
 			import sys
@@ -718,9 +718,6 @@ class BasicUsageTestSuite(unittest.TestCase):
 		"""Test case for piaplib.keyring.rand -g *."""
 		theResult = False
 		try:
-			import sys
-			if sys.__name__ is None:
-				raise ImportError("Failed to import system. WTF?!!")
 			thepython = getPythonCommand()
 			if (thepython is not None):
 				try:
@@ -734,6 +731,11 @@ class BasicUsageTestSuite(unittest.TestCase):
 							str("--generate"),
 							str("{}").format(str(unit))
 						], stderr=subprocess.STDOUT)
+						try:
+							if isinstance(theOutputtext, bytes):
+								theOutputtext = theOutputtext.decode('utf8')
+						except UnicodeDecodeError:
+							theOutputtext = str(repr(bytes(theOutputtext)))
 						if (str(theOutputtext) is not None):
 							theResult = True
 						else:
