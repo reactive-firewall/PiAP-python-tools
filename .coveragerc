@@ -2,7 +2,7 @@
 parallel = True
 
 [report]
-include = piaplib*
+include = piaplib*,tests*
 # Regexes for lines to exclude from consideration
 exclude_lines =
     # Have to re-enable the standard pragma

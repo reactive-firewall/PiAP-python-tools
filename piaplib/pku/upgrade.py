@@ -37,10 +37,6 @@ try:
 			import remediation as remediation
 		except Exception:
 			raise ImportError("Error Importing remediation")
-except PendingDeprecationWarning as junkErr:
-	"""mute junk errors"""
-	junkErr = None
-	del(junkErr)
 except Exception:
 	try:
 		try:
@@ -168,12 +164,7 @@ def upgradepip():
 def upgradePiAPlib():
 	"""Upgrade piaplib via pip."""
 	upsream_repo = str("git+https://github.com/reactive-firewall/PiAP-python-tools.git")
-	try:
-		pip.main(args=["install", "--upgrade", upsream_repo])
-	except PendingDeprecationWarning as junkErr:
-		"""mute junk errors"""
-		junkErr = None
-		del(junkErr)
+	pip.main(args=["install", "--upgrade", upsream_repo])
 	return None
 
 
@@ -185,16 +176,11 @@ def upgradePiAPlib_depends():
 		"/PiAP-python-tools/master/requirements.txt"
 	)
 	utils.getFileResource(upsream_repo_depends, "temp_req.txt")
-	try:
-		pip.main(args=[
-			"install", "--upgrade-strategy",
-			"only-if-needed", "--upgrade",
-			"-r", "temp_req.txt"
-		])
-	except PendingDeprecationWarning as junkErr:
-		"""mute junk errors"""
-		junkErr = None
-		del(junkErr)
+	pip.main(args=[
+		"install", "--upgrade-strategy",
+		"only-if-needed", "--upgrade",
+		"-r", "temp_req.txt"
+	])
 	utils.cleanFileResource("temp_req.txt")
 	return None
 

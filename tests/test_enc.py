@@ -229,7 +229,86 @@ class BookTestSuite(unittest.TestCase):
 			print(str(""))
 			err = None
 			del err
-			theResult = False
+		assert theResult
+
+	def test_case_clearify_main_a(self):
+		"""Tests the helper function main pack of keyring.clearify"""
+		theResult = True
+		try:
+			from piaplib.keyring import clearify as clearify
+			if clearify.__name__ is None:
+				raise ImportError("Failed to import clearify")
+			test_out = clearify.main([
+				str("--pack"),
+				str("--msg=\"This is a test Message\""),
+				str("-K=testkeyneedstobelong")
+			])
+			self.assertIsNotNone(test_out)
+			try:
+				if isinstance(test_out, bytes):
+					test_out = test_out.decode('utf8')
+			except UnicodeDecodeError:
+				test_out = str(repr(bytes(test_out)))
+			if (str("U2FsdGVkX") in str(test_out)):
+				theResult = True
+			else:
+				if sys.platform.startswith("linux"):
+					theResult = False
+				else:
+					raise unittest.SkipTest("BETA. Experemental feature not ready yet.")
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			err = None
+			del err
+			if sys.platform.startswith("linux"):
+				theResult = False
+			else:
+				raise unittest.SkipTest("BETA. Experemental feature not ready yet.")
+		assert theResult
+
+	def test_case_clearify_main_b(self):
+		"""Tests the helper function main unpack of keyring.clearify"""
+		theResult = True
+		try:
+			temp_msg = str("""U2FsdGVkX1+dD6bFlND+Xa0bzNttrZfB5zYCp0mSEYfhMTpaM7U=""")
+			from piaplib.keyring import clearify as clearify
+			if clearify.__name__ is None:
+				raise ImportError("Failed to import clearify")
+			test_out = clearify.main([
+				str("--unpack"),
+				str("--msg={}").format(temp_msg),
+				str("-K=testkeyneedstobelong")
+			])
+			try:
+				if isinstance(test_out, bytes):
+					test_out = test_out.decode('utf8')
+			except UnicodeDecodeError:
+				test_out = str(repr(bytes(test_out)))
+			self.assertIsNotNone(test_out)
+			if (str("This is a test Message") in str(test_out)):
+				theResult = True
+			else:
+				if sys.platform.startswith("linux"):
+					print(str(repr(bytes(test_out))))
+					theResult = False
+				else:
+					raise unittest.SkipTest("BETA. Experemental feature not ready yet.")
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			err = None
+			del err
+			if sys.platform.startswith("linux"):
+				theResult = False
+			else:
+				raise unittest.SkipTest("BETA. Experemental feature not ready yet.")
 		assert theResult
 
 

@@ -71,6 +71,10 @@ except Exception:
 	raise ImportError("Error Importing utils")
 
 
+__prog__ = str("""piaplib.pku.utils""")
+"""The name of this program is piaplib.pku.utils"""
+
+
 @remediation.error_handling
 def literal_code(raw_input=None):
 	"""A simple attempt at validating raw python unicode. Always expect CWE-20.
@@ -162,7 +166,7 @@ def compactSpace(theInput_Str):
 	"""Try to remove the spaces from the input string."""
 	import re
 	sourceStr = literal_str(theInput_Str)
-	theList = re.sub(r' +', u' ', sourceStr)
+	theList = re.sub(r' +', str(""" """), sourceStr)
 	return theList
 
 

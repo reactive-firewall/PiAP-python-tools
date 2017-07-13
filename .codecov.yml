@@ -5,18 +5,36 @@ coverage:
       piaplib:
         target: 45%
         flags: piaplib
+        base: auto
+        paths:
+          - piaplib/
+          - piaplib/lint
+          - piaplib/pku
+          - piaplib/keyring
+          - piaplib/book
       piaplib.book:
         target: 70%
         flags: book
+        paths:
+          - piaplib/book
       piaplib.pku:
         target: 50%
         flags: pku
-      piaplib.pku:
+          - piaplib/pku
+      piaplib.lint:
+        target: 50%
+        flags: lint
+          - piaplib/lint
+      piaplib.keyring:
         target: 75%
         flags: keyring
+        paths:
+          - piaplib/keyring
       tests:
         target: 50%
         flags: tests
+        paths:
+          - tests
 
 flags:
   piaplib:
@@ -40,4 +58,5 @@ flags:
       - piaplib/lint
   tests:
     paths:
-      - tests/
+      - tests
+    joined: false

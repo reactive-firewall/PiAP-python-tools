@@ -43,12 +43,6 @@ except Exception:
 
 
 try:
-	from . import saltify as saltify
-except Exception:
-	import saltify as saltify
-
-
-try:
 	from . import rand as rand
 except Exception:
 	import rand as rand
@@ -165,6 +159,10 @@ def makeKeystoreFile(theKey=str(rand.randPW(16)), somePath=None):
 
 @remediation.error_handling
 def packForRest(message=None, keyStore=None):
+	"""Serializes the given cleartext.
+		param ciphertext - str the encrypted data.
+		param keyStore - str the path to this file with the key.
+	"""
 	if keyStore is None:
 		keyStore = getKeyFilePath()
 	if hasBackendCommand():
@@ -193,13 +191,15 @@ def packForRest(message=None, keyStore=None):
 		# ciphertext = str(ciphertext).replace(str("\\n"), str(""))
 		return ciphertext
 	else:
-		UFsx2Kb_WrkG3LR = utils.readFile(keyStore)
-		seed = saltify.saltify(message, UFsx2Kb_WrkG3LR)
-		return packForRest_junk(message, UFsx2Kb_WrkG3LR, seed)
+		raise NotImplementedError("No Implemented Backend - BUG")
 
 
 @remediation.error_handling
 def unpackFromRest(ciphertext=None, keyStore=None):
+	"""Deserializes the given ciphertext.
+		param ciphertext - str the encrypted data.
+		param keyStore - str the path to this file with the key.
+	"""
 	if keyStore is None:
 		keyStore = getKeyFilePath()
 	if hasBackendCommand():
@@ -228,63 +228,7 @@ def unpackFromRest(ciphertext=None, keyStore=None):
 		# cleartext = str(cleartext).replace(str("\\n"), str(""))
 		return str(cleartext)
 	else:
-		raise NotImplementedError("BUG")
-		UFsx2Kb_WrkG3LR = utils.readFile(keyStore)
-		seed = saltify.saltify(ciphertext, UFsx2Kb_WrkG3LR)
-		return unpackFromRest_junk(ciphertext, UFsx2Kb_WrkG3LR, seed)
-
-
-@remediation.bug_handling
-def packForRest_junk(message=None, key='static key CHANGEME', seed='a static IV SEED'):
-	import six
-	if six.PY2:
-		from Crypto.Cipher import AES
-		obj = AES.new(
-			str(key.join("0123456789abcdef")).encode('utf8')[:16],
-			AES.MODE_CBC,
-			str(seed.join("0123456789ABCDEFG")).encode('utf8')[:16]
-		)
-		pad_text = str(bytes(b'\0' * (16 - (len(message) % 16))).decode('utf8'))
-		pad_message = str("{}{}").format(message, pad_text).encode('utf8')
-		ciphertext = obj.encrypt(pad_message)
-		del(obj)
-		return str(base64.standard_b64encode(ciphertext).decode('utf8'))
-	else:
-		from cryptography.fernet import Fernet
-		f = Fernet(base64.urlsafe_b64encode(
-			bytes(key.join(str("0123456789abcdefg")).encode('utf8'))[:32]
-		)[:KEY_BLOCK_SIZE])
-		ciphertext = f.encrypt(message.encode('utf8'))
-		return str(ciphertext.decode('utf8'))
-
-
-@remediation.bug_handling
-def unpackFromRest_junk(ciphertext=None, key='static key CHANGEME', seed='a static IV SEED'):
-	import six
-	if six.PY2:
-		from Crypto.Cipher import AES
-		obj = AES.new(
-			str(key.join("0123456789abcdef")).encode('utf8')[:16],
-			AES.MODE_CBC,
-			str(seed.join("0123456789ABCDEFG")).encode('utf8')[:16]
-		)
-		cleartext = obj.decrypt(base64.standard_b64decode(ciphertext.encode('utf8')))
-		for pad_len in range(16, 0, -1):
-			pad_text = str(bytes(b'\0' * (16 - pad_len)).decode('utf8'))
-			cleartext_unpad = cleartext.decode('utf8').rstrip(pad_text)
-			if (len(cleartext_unpad.encode('utf8')) is len(cleartext)):
-				continue
-			else:
-				cleartext = cleartext_unpad.encode('utf8')
-		del(obj)
-		return cleartext.decode('utf8')
-	else:
-		from cryptography.fernet import Fernet
-		f = Fernet(base64.urlsafe_b64encode(
-			bytes(key.join(str("0123456789abcdefg")).encode('utf8'))[:32]
-		)[:KEY_BLOCK_SIZE])
-		cleartext = f.decrypt(ciphertext.encode('utf8'))
-		return str(cleartext.decode('utf8'))
+		raise NotImplementedError("No Implemented Backend - BUG")
 
 
 WEAK_ACTIONS = {u'pack': packForRest, u'unpack': unpackFromRest}
@@ -296,7 +240,7 @@ WEAK_ACTIONS = {u'pack': packForRest, u'unpack': unpackFromRest}
 
 @remediation.error_handling
 def parseArgs(arguments=None):
-	theArgs = None
+	theArgs = argparse.Namespace()
 	try:
 		parser = argparse.ArgumentParser(
 			prog=__prog__,
@@ -355,7 +299,7 @@ def parseArgs(arguments=None):
 		print(str(err.args))
 		err = None
 		del err
-		theArgs = None
+		theArgs = argparse.Namespace()
 	return theArgs
 
 
@@ -363,28 +307,29 @@ def parseArgs(arguments=None):
 def main(argv=None):
 	"""The main event"""
 	args = parseArgs(argv)
-	if args.msg is None:
-		return 2
+	theFile = None
+	output = None
+	if args.keystore is not None:
+		theFile = args.keystore
 	else:
-		theFile = None
-		output = None
-		if args.keystore is not None:
-			theFile = args.keystore
-		else:
-			theFile = str("""/tmp/.beta_PiAP_weak_key""")
-		if args.key is not None:
-			theFile = makeKeystoreFile(str(args.key), theFile)
-		try:
-			output = str(WEAK_ACTIONS[args.clear_action](str(args.msg), theFile))
+		theFile = str("""/tmp/.beta_PiAP_weak_key""")
+	if args.key is not None:
+		theFile = makeKeystoreFile(str(args.key), theFile)
+	try:
+		output = str(WEAK_ACTIONS[args.clear_action](str(args.msg), theFile))
+		if __name__ in u'__main__':
 			print(output)
-		except Exception as err:
-			print(str("FAILED DURRING CLEARIFY. ABORT."))
-			print(str(type(err)))
-			print(str(err))
-			print(str(err.args))
-			err = None
-			del err
-			output = None
+		else:
+			return output
+	except Exception as err:
+		print(str("FAILED DURRING CLEARIFY. ABORT."))
+		print(str(type(err)))
+		print(str(err))
+		print(str(err.args))
+		err = None
+		del err
+		output = None
+		del output
 	return 0
 
 
