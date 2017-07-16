@@ -721,7 +721,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 			thepython = getPythonCommand()
 			if (thepython is not None):
 				try:
-					for unit in ["raw", "str", "passphrase", "int", "bool", "IP", "SSID"]:
+					for unit in ["str", "passphrase", "int", "bool", "IP", "SSID"]:
 						theOutputtext = checkPythonCommand([
 							str(thepython),
 							str("-m"),

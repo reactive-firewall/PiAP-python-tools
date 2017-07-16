@@ -7,12 +7,12 @@
 ### master:
 [![status](https://travis-ci.org/reactive-firewall/PiAP-python-tools.svg?branch=master)](https://travis-ci.org/reactive-firewall/PiAP-python-tools)
 [![Dependency Status](https://www.versioneye.com/user/projects/59141686eb858e002d45d36e/badge.svg?style=flat-round)](https://www.versioneye.com/user/projects/59141686eb858e002d45d36e)
-[![code coverage](https://codecov.io/gh/reactive-firewall/PiAP-python-tools/branch/master/graph/badge.svg)](https://codecov.io/gh/reactive-firewall/PiAP-python-tools)
+[![code coverage](https://codecov.io/gh/reactive-firewall/PiAP-python-tools/branch/master/graph/badge.svg)](https://codecov.io/gh/reactive-firewall/PiAP-python-tools/branch/master/)
 
 ### Stable:
 [![status](https://travis-ci.org/reactive-firewall/PiAP-python-tools.svg?branch=stable)](https://travis-ci.org/reactive-firewall/PiAP-python-tools)
-[![Dependency Status](https://www.versioneye.com/user/projects/59141688eb858e0050aa7d7b/badge.svg?style=flat-round)](https://www.versioneye.com/user/projects/59141688eb858e0050aa7d7b)
-[![code coverage](https://codecov.io/gh/reactive-firewall/PiAP-python-tools/branch/stable/graph/badge.svg)](https://codecov.io/gh/reactive-firewall/PiAP-python-tools)
+[![Dependency Status](https://www.versioneye.com/user/projects/5961fc36368b08002a056e48/badge.svg?style=flat-round)](https://www.versioneye.com/user/projects/5961fc36368b08002a056e48)
+[![code coverage](https://codecov.io/gh/reactive-firewall/PiAP-python-tools/branch/stable/graph/badge.svg)](https://codecov.io/gh/reactive-firewall/PiAP-python-tools/branch/stable/)
 
 ## License - MIT
 

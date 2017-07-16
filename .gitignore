@@ -43,6 +43,7 @@ htmlcov/
 .cache
 nosetests.xml
 coverage.xml
+codecov_env
 *,cover
 .hypothesis/
 testcases/*
