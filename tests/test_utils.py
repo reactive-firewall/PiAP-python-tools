@@ -455,6 +455,41 @@ and this will test reads.""")
 			theResult = False
 		assert theResult
 
+	def test_case_utils_read_url_file(self):
+		"""Tests the fetch url and clean functions"""
+		theResult = False
+		try:
+			from piaplib import pku as pku
+			if pku.__name__ is None:
+				raise ImportError("Failed to import pku")
+			from pku import utils as utils
+			if utils.__name__ is None:
+				raise ImportError("Failed to import utils")
+			someURL = str(
+				"https://raw.githubusercontent.com/reactive-firewall" +
+				"/PiAP-python-tools/master/requirements.txt"
+			)
+			somefile = str("the_test_url_file.txt")
+			if (utils.getFileResource(someURL, somefile) is True):
+				utils.cleanFileResource(somefile)
+				theResult = True
+			else:
+				theResult = False
+			if (theResult is False):
+				print(str("fetch failed"))
+				print(str(theBlob))
+				print(str(""))
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			err = None
+			del err
+			theResult = False
+		assert theResult
+
 	def test_case_utils_remediation_error_pass(self):
 		"""Tests the tty name regex logic on user output"""
 		theResult = True
@@ -474,6 +509,144 @@ and this will test reads.""")
 			with self.assertRaises(RuntimeError):
 				force_error()
 			theResult = True
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			err = None
+			del err
+			theResult = False
+		assert theResult
+
+	def test_case_utils_str_lit(self):
+		"""Tests the literal string with a string as input"""
+		theResult = True
+		try:
+			from piaplib import pku as pku
+			if pku.__name__ is None:
+				raise ImportError("Failed to import pku")
+			from pku import utils as utils
+			if utils.__name__ is None:
+				raise ImportError("Failed to import utils")
+			validMAC = str("00:FF:00:FF:00:FF")
+			self.assertEqual(utils.literal_str(validMAC), validMAC)
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			err = None
+			del err
+			theResult = False
+		assert theResult
+
+	def test_case_utils_none_lit(self):
+		"""Tests the literal string with a None as input"""
+		theResult = True
+		try:
+			from piaplib import pku as pku
+			if pku.__name__ is None:
+				raise ImportError("Failed to import pku")
+			from pku import utils as utils
+			if utils.__name__ is None:
+				raise ImportError("Failed to import utils")
+			self.assertIsNone(utils.literal_str(None))
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			err = None
+			del err
+			theResult = False
+		assert theResult
+
+	def test_case_utils_str_lit_code(self):
+		"""Tests the literal code with a string as input"""
+		theResult = True
+		try:
+			from piaplib import pku as pku
+			if pku.__name__ is None:
+				raise ImportError("Failed to import pku")
+			from pku import utils as utils
+			if utils.__name__ is None:
+				raise ImportError("Failed to import utils")
+			validMAC = str("00:FF:00:FF:00:FF")
+			self.assertEqual(utils.literal_code(validMAC), validMAC)
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			err = None
+			del err
+			theResult = False
+		assert theResult
+
+	def test_case_utils_none_lit_code(self):
+		"""Tests the literal code with a None as input"""
+		theResult = True
+		try:
+			from piaplib import pku as pku
+			if pku.__name__ is None:
+				raise ImportError("Failed to import pku")
+			from pku import utils as utils
+			if utils.__name__ is None:
+				raise ImportError("Failed to import utils")
+			self.assertIsNone(utils.literal_code(None))
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			err = None
+			del err
+			theResult = False
+		assert theResult
+
+	def test_case_utils_compact_space(self):
+		"""Tests the compactSpace with a multispace value as input"""
+		theResult = True
+		try:
+			from piaplib import pku as pku
+			if pku.__name__ is None:
+				raise ImportError("Failed to import pku")
+			from pku import utils as utils
+			if utils.__name__ is None:
+				raise ImportError("Failed to import utils")
+			self.assertEqual(len(utils.compactSpace(str("""   """))), int(1))
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			err = None
+			del err
+			theResult = False
+		assert theResult
+
+	def test_case_utils_extractInt(self):
+		"""Tests the extractInt with an int value as input"""
+		theResult = True
+		try:
+			from piaplib import pku as pku
+			if pku.__name__ is None:
+				raise ImportError("Failed to import pku")
+			from pku import utils as utils
+			if utils.__name__ is None:
+				raise ImportError("Failed to import utils")
+			for i in range(100):
+				self.assertEqual(
+					int(utils.extractInt(str("The number is {}").format(str(i)))),
+					int(i)
+				)
 		except Exception as err:
 			print(str(""))
 			print(str(type(err)))
