@@ -477,7 +477,6 @@ and this will test reads.""")
 				theResult = False
 			if (theResult is False):
 				print(str("fetch failed"))
-				print(str(theBlob))
 				print(str(""))
 		except Exception as err:
 			print(str(""))
