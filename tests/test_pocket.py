@@ -19,28 +19,31 @@
 
 import unittest
 import subprocess
+import sys
 
 
 def getPythonCommand():
 	"""function for backend python command"""
 	thepython = "exit 1 ; #"
 	try:
-		import sys
-		if sys.__name__ is None:
-			raise ImportError("Failed to import system. WTF?!!")
 		thepython = checkPythonCommand(["which", "coverage"])
 		if (str("/coverage") in str(thepython)) and (sys.version_info >= (3, 3)):
 			thepython = str("coverage run -p")
+		elif (str("/coverage") in str(thepython)) and (sys.version_info <= (3, 2)):
+			try:
+				import coverage
+				if coverage.__name__ is not None:
+					thepython = str("{} -m coverage run -p").format(str(sys.executable))
+				else:
+					thepython = str(sys.executable)
+			except Exception:
+				thepython = str(sys.executable)
 		else:
-			thepython = checkPythonCommand(["which", "python3"])
-			if (str("/python3") not in str(thepython)) or (sys.version_info <= (3, 2)):
-				thepython = "python3"
+			thepython = str(sys.executable)
 	except Exception:
 		thepython = "exit 1 ; #"
 		try:
-			thepython = checkPythonCommand(["which", "python"])
-			if (str("/python") in str(thepython)):
-				thepython = "python"
+			thepython = str(sys.executable)
 		except Exception:
 			thepython = "exit 1 ; #"
 	return str(thepython)
@@ -54,13 +57,28 @@ def checkPythonCommand(args=[None], stderr=None):
 			theOutput = subprocess.check_output(["exit 1 ; #"])
 		else:
 			if str("coverage ") in args[0]:
-				args[0] = str("coverage")
-				args.insert(1, "run")
-				args.insert(2, "-p")
-				args.insert(2, "--source=piaplib,piaplib/lint,piaplib/keyring,piaplib/pku,piaplib/book")
+				if sys.__name__ is None:
+					raise ImportError("Failed to import system. WTF?!!")
+				if str("{} -m coverage ").format(str(sys.executable)) in str(args[0]):
+					args[0] = str(sys.executable)
+					args.insert(1, str("-m"))
+					args.insert(2, str("coverage"))
+					args.insert(3, str("run"))
+					args.insert(4, str("-p"))
+					args.insert(4, str("--source=piaplib,piaplib/lint,piaplib/keyring,piaplib/pku,piaplib/book"))
+				else:
+					args[0] = str("coverage")
+					args.insert(1, str("run"))
+					args.insert(2, str("-p"))
+					args.insert(2, str("--source=piaplib,piaplib/lint,piaplib/keyring,piaplib/pku,piaplib/book"))
 			theOutput = subprocess.check_output(args, stderr=stderr)
-	except Exception:
+	except Exception as cmderror:
 		theOutput = None
+	try:
+		if isinstance(theOutput, bytes):
+			theOutput = theOutput.decode('utf8')
+	except UnicodeDecodeError:
+		theOutput = bytes(theOutput)
 	return theOutput
 
 
@@ -72,11 +90,24 @@ def checkPythonFuzzing(args=[None], stderr=None):
 			theOutput = subprocess.check_output(["exit 1 ; #"])
 		else:
 			if str("coverage ") in args[0]:
-				args[0] = str("coverage")
-				args.insert(1, "run")
-				args.insert(2, "--source=piaplib,piaplib/lint,piaplib/keyring,piaplib/pku,piaplib/book")
-				args.insert(2, "-p")
+				import sys
+				if sys.__name__ is None:
+					raise ImportError("Failed to import system. WTF?!!")
+				if str("{} -m coverage ").format(str(sys.executable)) in str(args[0]):
+					args[0] = str(sys.executable)
+					args.insert(1, str("-m"))
+					args.insert(2, str("coverage"))
+					args.insert(3, str("run"))
+					args.insert(4, str("-p"))
+					args.insert(4, str("--source=piaplib,piaplib/lint,piaplib/keyring,piaplib/pku,piaplib/book"))
+				else:
+					args[0] = str("coverage")
+					args.insert(1, str("run"))
+					args.insert(2, str("-p"))
+					args.insert(2, str("--source=piaplib,piaplib/lint,piaplib/keyring,piaplib/pku,piaplib/book"))
 			theOutput = subprocess.check_output(args, stderr=stderr)
+		if isinstance(theOutput, bytes):
+			theOutput = theOutput.decode('utf8')
 	except Exception as err:
 		theOutput = None
 		raise RuntimeError(err)
@@ -127,6 +158,32 @@ class PocketUsageTestSuite(unittest.TestCase):
 					theResult = True
 			except Exception:
 				theResult = False
+		assert theResult
+
+	def test_case_pocket_insane_none(self):
+		"""Tests the imposible state for pocket given bad tools"""
+		theResult = True
+		try:
+			from .context import piaplib
+			if piaplib.__name__ is None:
+				theResult = False
+			from piaplib import pocket
+			if pocket.__name__ is None:
+				theResult = False
+			from piaplib import pocket as pocket
+			if pocket.__name__ is None:
+				raise ImportError("Failed to import pocket")
+			self.assertIsNone(pocket.useTool("NoSuchTool"))
+			self.assertIsNone(pocket.useTool(None))
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			err = None
+			del err
+			theResult = False
 		assert theResult
 
 	def test_c_python_command_pocket(self):

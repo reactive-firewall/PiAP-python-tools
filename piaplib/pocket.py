@@ -118,23 +118,6 @@ def getTimeStamp():
 	return str(theDate)
 
 
-def doRunHandle(theInputStr):
-	"""Handler for running sub commands state."""
-	try:
-		import subprocess
-		try:
-			theResult = subprocess.check_output(str(theInputStr).split(u' '))
-		except Exception:
-			timestamp = getTimeStamp()
-			theResult = str(
-				timestamp +
-				" - WARNING - An error occured while handling the pocket tool. Cascading failure."
-			)
-	except Exception:
-		theResult = str("CRITICAL - An error occured while handling the cascading failure.")
-		return theResult
-
-
 def useTool(tool, arguments=[None]):
 	"""Handler for launching pocket-tools."""
 	if tool is None:
