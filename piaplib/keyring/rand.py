@@ -46,7 +46,7 @@ RAND_CHARS = [
 	str("""s"""), str("""t"""), str("""u"""), str("""v"""), str("""w"""), str("""x"""),
 	str("""y"""), str("""z"""), str("""1"""), str("""2"""), str("""3"""), str("""4"""),
 	str("""5"""), str("""6"""), str("""7"""), str("""8"""), str("""9"""), str("""0"""),
-	str("""!"""), str("""@"""), str("""#"""), str("""$"""), str("""%"""), str("""^"""),
+	str("""!"""), str("""@"""), str("""#"""), str("""$"""), str("""%%"""), str("""^"""),
 	str("""&"""), str("""*"""), str("""("""), str(""")"""), str("""_"""), str("""-"""),
 	str("""+"""), str("""="""), str("""<"""), str(""">"""), str(""","""), str("""."""),
 	str("""?"""), str("""/"""), str("""'"""), str(""";"""), str("""["""), str("""]"""),
@@ -90,7 +90,8 @@ def randStr(count=None):
 		x_count = count
 	try:
 		import string
-		return str("").join([string.printable[randInt(1, 1, 99)] for _ in range(x_count)])
+		choices = [randInt(1, 1, 99) for x in range(x_count)]
+		return str("").join([string.printable[m] for m in choices if m is not int(69)])
 	except Exception as err:
 		print(str(u'FAILED DURRING RAND-STR. ABORT.'))
 		print(str(type(err)))
@@ -110,7 +111,8 @@ def randPW(count=None):
 		x_count = count
 	try:
 		import string
-		return str("").join([string.printable[randInt(1, 1, 95)] for _ in range(x_count)])
+		choices = [randInt(1, 1, 95) for x in range(x_count)]
+		return str(str("").join([string.printable[m] for m in choices if m is not int(69)]))
 	except Exception as err:
 		print(str(u'FAILED DURRING RAND-PW. ABORT.'))
 		print(str(type(err)))
@@ -172,7 +174,7 @@ def randIP(count=None, min=0, max=256):
 		x_count = int(count)
 	try:
 		if x_count <= 1:
-			return str(str("{}.{}.{}.{}").format(
+			return str(str("{0}.{1}.{2}.{3}").format(
 				randInt(1, min, max), randInt(1, min, max),
 				randInt(1, min, max), randInt(1, min, max)
 			))
@@ -305,7 +307,7 @@ def randChar(count=None):
 				char_rand_seed = str(RAND_CHARS[randInt(1, 0, 65)])
 			if (randBool(1)):
 				char_rand_seed = str(char_rand_seed).upper()
-			theRandomResult = str("{}{}").format(theRandomResult, str(char_rand_seed))
+			theRandomResult = str("{0}{1}").format(theRandomResult, str(char_rand_seed))
 		return theRandomResult
 	except Exception as err:
 		print(str(u'FAILED DURRING RAND-CHAR. ABORT.'))

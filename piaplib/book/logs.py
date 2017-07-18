@@ -145,10 +145,10 @@ class logs(object):
 			raise ValueError(str("Invalid log level"))
 		logger.log(
 			logs.logging_level[loglevel.lower()],
-			str("{} -- {}{}{}").format(
-				str(myName),
-				logs.logging_color[loglevel.lower()],
-				msg, ANSIColors.ENDC
+			str("{name} -- {prefix}{message}{suffix}").format(
+				name=str(myName),
+				prefix=logs.logging_color[loglevel.lower()],
+				message=msg, suffix=ANSIColors.ENDC
 			)
 		)
 
@@ -159,11 +159,12 @@ def main(argv=None):
 	"""The Main Event makes no sense to logs yet."""
 	try:
 		raise NotImplementedError("CRITICAL - Pocket Book logs main() not implemented.")
-		exit(3)
+		return 3
 	except Exception as err:
 		logs.log(str(type(err)), "Critical")
 		logs.log(str(err), "Critical")
 		logs.log(str(err.args), "Critical")
+	return 3
 
 
 if __name__ in u'__main__':

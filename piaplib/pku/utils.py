@@ -412,21 +412,24 @@ def appendFile(somefile, somedata):
 @remediation.error_handling
 def getFileResource(someURL, outFile):
 	"""Downloads a file from the given URL."""
-	import urllib
-	try:
-		tempfile = urllib.FancyURLopener()
-	except Exception:
-		import urllib.request
-		tempfile = urllib.request.FancyURLopener()
-	try:
-		tempfile.retrieve(someURL, outFile)
-	except Exception:
-		return False
-	try:
-		logs.log(str("fetched file {}").format(someURL), "Debug")
-	except Exception:
-		pass
-	return True
+	import warnings
+	with warnings.catch_warnings():
+		warnings.filterwarnings("ignore", category=DeprecationWarning)
+		import urllib
+		try:
+			tempfile = urllib.FancyURLopener()
+		except Exception:
+			import urllib.request
+			tempfile = urllib.request.FancyURLopener()
+		try:
+			tempfile.retrieve(someURL, outFile)
+		except Exception:
+			return False
+		try:
+			logs.log(str("fetched file {}").format(someURL), "Debug")
+		except Exception:
+			pass
+		return True
 
 
 @remediation.error_handling

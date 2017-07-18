@@ -23,6 +23,10 @@ try:
 	import sys
 	sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 	try:
+		import piaplib as piaplib
+	except Exception:
+		from .. import piaplib as piaplib
+	try:
 		from .. import utils as utils
 	except Exception:
 		import pku.utils as utils
@@ -103,7 +107,9 @@ def parseargs(arguments=None):
 			dest='verbose_mode', default=False,
 			action='store_false', help='Disable the given interface.'
 		)
-		parser.add_argument('-V', '--version', action='version', version='%(prog)s 0.2.4')
+		parser.add_argument('-V', '--version', action='version', version=str(
+			"%(prog)s {}"
+		).format(str(piaplib.__version__)))
 		(theResult, junk) = parser.parse_known_args(arguments)
 	except Exception as parseErr:
 		parser.error(str("ERROR: parseargs"))
