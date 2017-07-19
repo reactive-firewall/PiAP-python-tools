@@ -102,6 +102,29 @@ class BasicHTMLTestSuite(unittest.TestCase):
 				theResult = False
 		assert theResult
 
+	def test_c_html_special_chars_none(self):  # noqa
+		"""Test case for piaplib.lint.html_generator.has_special_html_chars(None)."""
+		theResult = True
+		try:
+			from lint import html_generator as html_generator
+		except Exception:
+			import lint.html_generator as html_generator
+		if html_generator.__name__ is None:
+			theResult = False
+		else:
+			try:
+				self.assertTrue(html_generator.has_special_html_chars(None))
+			except Exception as err:
+				print(str(""))
+				print(str(type(err)))
+				print(str(err))
+				print(str((err.args)))
+				print(str(""))
+				err = None
+				del err
+				theResult = False
+		assert theResult
+
 	def test_d_html_gen_tr(self):
 		"""Test case for gen TR."""
 		theResult = False
@@ -117,6 +140,66 @@ class BasicHTMLTestSuite(unittest.TestCase):
 					content="this is a test",
 					id="test_id",
 					name="test_tr"
+				)
+				if (str("<tr") in output_gen and str("</tr>") in output_gen):
+						theResult = True
+				else:
+					theResult = False
+			except Exception as err:
+				print(str(""))
+				print(str(type(err)))
+				print(str(err))
+				print(str((err.args)))
+				print(str(""))
+				err = None
+				del err
+				theResult = False
+		assert theResult
+
+	def test_d_html_gen_tr_no_id(self):
+		"""Test case for gen TR."""
+		theResult = False
+		try:
+			from lint import html_generator as html_generator
+		except Exception:
+			import lint.html_generator as html_generator
+		if html_generator.__name__ is None:
+			theResult = False
+		else:
+			try:
+				output_gen = html_generator.gen_html_tr(
+					content="this is a test",
+					id=None,
+					name="test_tr"
+				)
+				if (str("<tr") in output_gen and str("</tr>") in output_gen):
+						theResult = True
+				else:
+					theResult = False
+			except Exception as err:
+				print(str(""))
+				print(str(type(err)))
+				print(str(err))
+				print(str((err.args)))
+				print(str(""))
+				err = None
+				del err
+				theResult = False
+		assert theResult
+
+	def test_d_html_gen_tr_no_name(self):
+		"""Test case for gen TR."""
+		theResult = False
+		try:
+			from lint import html_generator as html_generator
+		except Exception:
+			import lint.html_generator as html_generator
+		if html_generator.__name__ is None:
+			theResult = False
+		else:
+			try:
+				output_gen = html_generator.gen_html_tr(
+					content="this is a test"
 				)
 				if (str("<tr") in output_gen and str("</tr>") in output_gen):
 						theResult = True
@@ -164,6 +247,66 @@ class BasicHTMLTestSuite(unittest.TestCase):
 				theResult = False
 		assert theResult
 
+	def test_d_html_gen_td_no_id(self):
+		"""Test case for gen TD with no id."""
+		theResult = False
+		try:
+			from lint import html_generator as html_generator
+		except Exception:
+			import lint.html_generator as html_generator
+		if html_generator.__name__ is None:
+			theResult = False
+		else:
+			try:
+				output_gen = html_generator.gen_html_td(
+					content="this is a test",
+					id=None,
+					name="test_td"
+				)
+				if (str("<td") in output_gen and str("</td>") in output_gen):
+						theResult = True
+				else:
+					theResult = False
+			except Exception as err:
+				print(str(""))
+				print(str(type(err)))
+				print(str(err))
+				print(str((err.args)))
+				print(str(""))
+				err = None
+				del err
+				theResult = False
+		assert theResult
+
+	def test_d_html_gen_td_no_name(self):
+		"""Test case for gen TD with no name or ID."""
+		theResult = False
+		try:
+			from lint import html_generator as html_generator
+		except Exception:
+			import lint.html_generator as html_generator
+		if html_generator.__name__ is None:
+			theResult = False
+		else:
+			try:
+				output_gen = html_generator.gen_html_td(
+					content="this is a test"
+				)
+				if (str("<td") in output_gen and str("</td>") in output_gen):
+						theResult = True
+				else:
+					theResult = False
+			except Exception as err:
+				print(str(""))
+				print(str(type(err)))
+				print(str(err))
+				print(str((err.args)))
+				print(str(""))
+				err = None
+				del err
+				theResult = False
+		assert theResult
+
 	def test_d_html_gen_ul(self):
 		"""Test case for gen UL"""
 		theResult = False
@@ -177,7 +320,38 @@ class BasicHTMLTestSuite(unittest.TestCase):
 			try:
 				output_gen = html_generator.gen_html_ul(
 					["this is a test"],
-					"test_id",
+					id="test_id",
+					name="test_ul"
+				)
+				if (str("<ul") in output_gen and str("</ul>") in output_gen):
+					theResult = True
+				else:
+					theResult = False
+			except Exception as err:
+				print(str(""))
+				print(str(type(err)))
+				print(str(err))
+				print(str((err.args)))
+				print(str(""))
+				err = None
+				del err
+				theResult = False
+		assert theResult
+
+	def test_d_html_gen_ul_no_id(self):
+		"""Test case for gen UL without ID."""
+		theResult = False
+		try:
+			from lint import html_generator as html_generator
+		except Exception:
+			import lint.html_generator as html_generator
+		if html_generator.__name__ is None:
+			theResult = False
+		else:
+			try:
+				output_gen = html_generator.gen_html_ul(
+					["this is a test"],
+					None,
 					"test_ul"
 				)
 				if (str("<ul") in output_gen and str("</ul>") in output_gen):
@@ -195,8 +369,66 @@ class BasicHTMLTestSuite(unittest.TestCase):
 				theResult = False
 		assert theResult
 
-	def test_d_html_gen_li(self):
-		"""Test case for gen TD"""
+	def test_d_html_gen_ul_no_name(self):
+		"""Test case for gen UL without name"""
+		theResult = False
+		try:
+			from lint import html_generator as html_generator
+		except Exception:
+			import lint.html_generator as html_generator
+		if html_generator.__name__ is None:
+			theResult = False
+		else:
+			try:
+				output_gen = html_generator.gen_html_ul(
+					["this is a test"]
+				)
+				if (str("<ul") in output_gen and str("</ul>") in output_gen):
+					theResult = True
+				else:
+					theResult = False
+			except Exception as err:
+				print(str(""))
+				print(str(type(err)))
+				print(str(err))
+				print(str((err.args)))
+				print(str(""))
+				err = None
+				del err
+				theResult = False
+		assert theResult
+
+	def test_d_html_gen_ul_no_value(self):
+		"""Test case for gen UL without name"""
+		theResult = True
+		try:
+			from lint import html_generator as html_generator
+		except Exception:
+			import lint.html_generator as html_generator
+		if html_generator.__name__ is None:
+			theResult = False
+		else:
+			try:
+				output_gen = html_generator.gen_html_ul(
+					[None]
+				)
+				if (str("<ul") in output_gen and str("</ul>") in output_gen):
+					theResult = True
+				else:
+					theResult = False
+			except Exception as err:
+				print(str(""))
+				print(str(type(err)))
+				print(str(err))
+				print(str((err.args)))
+				print(str(""))
+				err = None
+				del err
+				theResult = False
+		assert theResult
+
+	def test_d_html_gen_lable(self):
+		"""Test case for gen lable"""
 		theResult = False
 		try:
 			from lint import html_generator as html_generator
@@ -211,7 +443,7 @@ class BasicHTMLTestSuite(unittest.TestCase):
 						"this is a test",
 						html_generator.HTML_LABEL_ROLES[role_label],
 						"test_id",
-						"test_li"
+						"test_lable"
 					)
 					if (str("<span") in output_gen and str("</span>") in output_gen):
 						if (str(html_generator.HTML_LABEL_ROLES[role_label]) in output_gen):
@@ -220,6 +452,68 @@ class BasicHTMLTestSuite(unittest.TestCase):
 							theResult = False
 					else:
 						theResult = False
+			except Exception as err:
+				print(str(""))
+				print(str(type(err)))
+				print(str(err))
+				print(str((err.args)))
+				print(str(""))
+				err = None
+				del err
+				theResult = False
+		assert theResult
+
+	def test_e_html_gen_li(self):
+		"""Test case for gen Li."""
+		theResult = False
+		try:
+			from lint import html_generator as html_generator
+		except Exception:
+			import lint.html_generator as html_generator
+		if html_generator.__name__ is None:
+			theResult = False
+		else:
+			try:
+				output_gen = html_generator.gen_html_li(
+					["this is a test"],
+					"test_id",
+					"test_li"
+				)
+				if (str("<li") in output_gen and str("</li>") in output_gen):
+					theResult = True
+				else:
+					theResult = False
+			except Exception as err:
+				print(str(""))
+				print(str(type(err)))
+				print(str(err))
+				print(str((err.args)))
+				print(str(""))
+				err = None
+				del err
+				theResult = False
+		assert theResult
+
+	def test_e_html_gen_li_no_id(self):
+		"""Test case for gen Li without ID."""
+		theResult = False
+		try:
+			from lint import html_generator as html_generator
+		except Exception:
+			import lint.html_generator as html_generator
+		if html_generator.__name__ is None:
+			theResult = False
+		else:
+			try:
+				output_gen = html_generator.gen_html_li(
+					["this is a test"],
+					None,
+					"test_li"
+				)
+				if (str("<li") in output_gen and str("</li>") in output_gen):
+					theResult = True
+				else:
+					theResult = False
 			except Exception as err:
 				print(str(""))
 				print(str(type(err)))

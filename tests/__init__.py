@@ -31,6 +31,20 @@ try:
 		del ImportErr
 		raise ImportError(str("Test module failed completely."))
 	try:
+		from tests import profiling as profiling
+		if profiling.__name__ is None:
+			raise ImportError(str("Test module failed to import even the profiling framework."))
+	except Exception as impErr:
+		print(str(''))
+		print(str(type(impErr)))
+		print(str(impErr))
+		print(str((impErr.args)))
+		print(str(''))
+		impErr = None
+		del impErr
+		raise ImportError(str("Test module failed completely."))
+		exit(1)
+	try:
 		from tests import test_basic
 		if test_basic.__name__ is None:
 			raise ImportError(str("Test module failed to import even the basic tests."))

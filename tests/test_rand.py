@@ -24,7 +24,6 @@ try:
 	try:
 		import sys
 		import os
-		import functools
 		sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), str('..'))))
 		sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), str('.'))))
 	except Exception as ImportErr:
@@ -38,27 +37,6 @@ try:
 		raise ImportError(str("Test module failed completely."))
 except Exception:
 	raise ImportError("Failed to import test context")
-
-
-def _test_try_or_fail(func):
-	""" decorator for try-except wrapping tests """
-	@functools.wraps(func)
-	def helper_func(*args, **kwargs):
-		theResult = False
-		try:
-			func(*args, **kwargs)
-			theResult = True
-		except Exception as failErr:
-			print(str(""))
-			print(str(type(failErr)))
-			print(str(failErr))
-			print(str((failErr.args)))
-			print(str(""))
-			failErr = None
-			del failErr
-			theResult = False
-		return theResult
-	return helper_func
 
 
 class RandTestSuite(unittest.TestCase):
@@ -351,7 +329,7 @@ class RandTestSuite(unittest.TestCase):
 		assert theResult
 
 	def test_keyring_rand_test_bias(self):
-		"""Test generate random output of multiple domains in 1000 tries test-case."""
+		"""Test generate random output of multiple domains in 10000 tries test-case."""
 		theResult = True
 		seen_alpha = False
 		seen_digit = False

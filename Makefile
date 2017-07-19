@@ -125,6 +125,7 @@ cleanup:
 	$(QUIET)rm -f ./*~ 2>/dev/null || true
 	$(QUIET)coverage erase 2>/dev/null || true
 	$(QUIET)rm -f ./.coverage 2>/dev/null || true
+	$(QUIET)rm -f ./coverage*.xml 2>/dev/null || true
 	$(QUIET)rm -f ./sitecustomize.py 2>/dev/null || true
 	$(QUIET)rm -f ./.*~ 2>/dev/null || true
 	$(QUIET)rm -Rf ./.tox/ 2>/dev/null || true
