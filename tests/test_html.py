@@ -416,6 +416,7 @@ class BasicHTMLTestSuite(unittest.TestCase):
 					theResult = True
 				else:
 					theResult = False
+				self.assertIsNone(html_generator.gen_html_ul(None))
 			except Exception as err:
 				print(str(""))
 				print(str(type(err)))
