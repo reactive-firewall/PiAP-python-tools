@@ -187,7 +187,7 @@ class PocketUsageTestSuite(unittest.TestCase):
 		assert theResult
 
 	def test_c_python_command_pocket(self):
-		"""Test case for piaplib.pocket help."""
+		"""Test case for piaplib.pocket --help."""
 		theResult = False
 		try:
 			import sys
@@ -233,8 +233,51 @@ class PocketUsageTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
+	def test_h_python_command_pocket_version(self):
+		"""Test case for piaplib.pocket --version."""
+		theResult = False
+		try:
+			import sys
+			if sys.__name__ is None:
+				raise ImportError("Failed to import system. WTF?!!")
+			from .context import piaplib as piaplib
+			if piaplib.__version__ is not None:
+				theResult = False
+			thepython = getPythonCommand()
+			if (thepython is not None):
+				try:
+					theOutputtext = checkPythonCommand([
+						str(thepython),
+						str("-m"),
+						str("piaplib.pocket"),
+						str("--version")
+					], stderr=subprocess.STDOUT)
+					if (str(piaplib.__version__) in str(theOutputtext)):
+						theResult = True
+					else:
+						theResult = False
+				except Exception as othererr:
+					print(str(""))
+					print(str(type(othererr)))
+					print(str(othererr))
+					print(str((othererr.args)))
+					print(str(""))
+					othererr = None
+					del othererr
+					theResult = False
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			othererr = None
+			del othererr
+			theResult = False
+		assert theResult
+
 	def test_c_python_command_pocket_units(self):
-		"""Test case for piaplib.* --help."""
+		"""Test case for piaplib.pocket *"""
 		theResult = False
 		try:
 			import sys
@@ -380,7 +423,7 @@ class PocketUsageTestSuite(unittest.TestCase):
 						str("piaplib.pocket"),
 						str("lint"),
 						str("execve"),
-						str("""--cmd={}""").format(str(thepython)),
+						str("""--cmd={}""").format(str(sys.executable)),
 						str("""--args={}""").format(str("piaplib.pocket"))
 					], stderr=subprocess.STDOUT))
 					theResult = True

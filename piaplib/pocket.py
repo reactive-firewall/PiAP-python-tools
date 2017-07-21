@@ -33,6 +33,18 @@ except Exception:
 	import book as book
 
 try:
+	from book.logs import logs as logs
+except Exception:
+	try:
+		from piaplib.book.logs import logs as logs
+	except Exception as err:
+		print(str(type(err)))
+		print(str(err))
+		print(str(err.args))
+		print("")
+		raise ImportError("Error Importing logs")
+
+try:
 	from . import pku as pku
 except Exception:
 	import pku as pku
@@ -104,20 +116,6 @@ def parseArgs(arguments=None):
 	return parser.parse_known_args(arguments)
 
 
-# define the function blocks
-
-
-def getTimeStamp():
-	"""Returns the time stamp."""
-	theDate = None
-	try:
-		import time
-		theDate = time.strftime("%a %b %d %H:%M:%S %Z %Y", time.localtime())
-	except Exception:
-		theDate = str("")
-	return str(theDate)
-
-
 def useTool(tool, arguments=[None]):
 	"""Handler for launching pocket-tools."""
 	if tool is None:
@@ -128,14 +126,14 @@ def useTool(tool, arguments=[None]):
 				# print(str("PiAP launching: "+tool))
 				POCKET_UNITS[tool].main(arguments)
 			except Exception:
-				timestamp = getTimeStamp()
-				theResult = str(
-					timestamp +
+				logs.log(str(
 					" - WARNING - An error occured while handling the shell. Cascading failure."
-				)
+				), "Warning")
 		except Exception:
-			theResult = str("CRITICAL - An error occured while handling the cascading failure.")
-			return theResult
+			logs.log(
+				str("CRITICAL - An error occured while handling the cascading failure."),
+				"error"
+			)
 	else:
 		return None
 
@@ -156,16 +154,17 @@ def main(argv=None):
 			service_cmd = args.pocket_unit
 			useTool(service_cmd, extra)
 		except Exception as cerr:
-			print(str(cerr))
-			print(str(cerr.args))
-			timestamp = getTimeStamp()
-			print(str(
-				timestamp +
+			logs.log(str(cerr), "Warning")
+			logs.log(str(cerr.args), "Warning")
+			logs.log(str(
 				" - UNKNOWN - An error occured while handling the arguments. Cascading failure."
-			))
+			), "Warning")
 			exit(3)
 	except Exception:
-		print(str(" UNKNOWN - An error occured while handling the failure. Cascading failure."))
+		logs.log(
+			str(" UNKNOWN - An error occured while handling the failure. Cascading failure."),
+			"warning"
+		)
 		exit(3)
 	exit(0)
 
