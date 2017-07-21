@@ -20,6 +20,7 @@
 import unittest
 import subprocess
 import sys
+import profiling as profiling
 
 
 def getPythonCommand():
@@ -80,6 +81,12 @@ def checkPythonCommand(args=[None], stderr=None):
 	except UnicodeDecodeError:
 		theOutput = bytes(theOutput)
 	return theOutput
+
+
+@profiling.do_cprofile
+def timePythonCommand(args=[None], stderr=None):
+	"""function for backend subprocess check_output command"""
+	return checkPythonCommand(args, stderr)
 
 
 def checkPythonFuzzing(args=[None], stderr=None):
@@ -671,7 +678,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 			if (thepython is not None):
 				try:
 					for unit in ["rand"]:
-						theOutputtext = checkPythonCommand([
+						theOutputtext = timePythonCommand([
 							str(thepython),
 							str("-m"),
 							str("piaplib.pocket"),
@@ -721,8 +728,8 @@ class BasicUsageTestSuite(unittest.TestCase):
 			thepython = getPythonCommand()
 			if (thepython is not None):
 				try:
-					for unit in ["raw", "str", "passphrase", "int", "bool", "IP", "SSID"]:
-						theOutputtext = checkPythonCommand([
+					for unit in ["str", "passphrase", "int", "bool", "IP", "SSID"]:
+						theOutputtext = timePythonCommand([
 							str(thepython),
 							str("-m"),
 							str("piaplib.keyring.rand"),

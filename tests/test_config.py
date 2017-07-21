@@ -69,7 +69,7 @@ class ConfigTestSuite(unittest.TestCase):
 
 	def test_syntax(self):
 		"""Test case importing code."""
-		theResult = False
+		theResult = True
 		try:
 			from .context import piaplib
 			if piaplib.__name__ is None:
@@ -77,10 +77,168 @@ class ConfigTestSuite(unittest.TestCase):
 			from piaplib import pocket
 			if pocket.__name__ is None:
 				theResult = False
-			theResult = True
 		except Exception as impErr:
 			print(str(type(impErr)))
 			print(str(impErr))
+			theResult = False
+		assert theResult
+
+	def test_case_config_none_ext(self):
+		"""Tests the addExtension when input is None"""
+		theResult = True
+		try:
+			from .context import piaplib as piaplib
+			if piaplib.__name__ is None:
+				raise ImportError("Failed to import pku")
+			from piaplib import pocket as pocket
+			if pocket.__name__ is None:
+				raise ImportError("Failed to import utils")
+			from piaplib import pku as pku
+			if pku.__name__ is None:
+				raise ImportError("Failed to import pku")
+			from pku import config as config
+			if config.__name__ is None:
+				raise ImportError("Failed to import config")
+			self.assertIsNone(config.addExtension(None, None))
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			err = None
+			del err
+			theResult = False
+		assert theResult
+
+	def test_case_config_file_with_none_ext(self):
+		"""Tests the addExtension when input is (test, None)"""
+		theResult = True
+		try:
+			from .context import piaplib as piaplib
+			if piaplib.__name__ is None:
+				raise ImportError("Failed to import pku")
+			from piaplib import pocket as pocket
+			if pocket.__name__ is None:
+				raise ImportError("Failed to import utils")
+			from piaplib import pku as pku
+			if pku.__name__ is None:
+				raise ImportError("Failed to import pku")
+			from pku import config as config
+			if config.__name__ is None:
+				raise ImportError("Failed to import config")
+			test = None
+			test_name = str("test_no_dot")
+			self.assertIsNone(test)
+			test = config.addExtension(test_name, None)
+			self.assertIsNotNone(test)
+			self.assertEqual(test, test_name)
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			err = None
+			del err
+			theResult = False
+		assert theResult
+
+	def test_case_config_file_with_short_ext(self):
+		"""Tests the addExtension when input is (test, txt)"""
+		theResult = True
+		try:
+			from .context import piaplib as piaplib
+			if piaplib.__name__ is None:
+				raise ImportError("Failed to import pku")
+			from piaplib import pocket as pocket
+			if pocket.__name__ is None:
+				raise ImportError("Failed to import utils")
+			from piaplib import pku as pku
+			if pku.__name__ is None:
+				raise ImportError("Failed to import pku")
+			from pku import config as config
+			if config.__name__ is None:
+				raise ImportError("Failed to import config")
+			test = None
+			test_name = str("test_no_dot")
+			test_ext = str("txt")
+			self.assertIsNone(test)
+			test = config.addExtension(test_name, test_ext)
+			self.assertIsNotNone(test)
+			self.assertNotEqual(test, test_name)
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			err = None
+			del err
+			theResult = False
+		assert theResult
+
+	def test_case_config_file_with_long_ext(self):
+		"""Tests the addExtension when input is (test, much_longer_extension)"""
+		theResult = True
+		try:
+			from .context import piaplib as piaplib
+			if piaplib.__name__ is None:
+				raise ImportError("Failed to import pku")
+			from piaplib import pocket as pocket
+			if pocket.__name__ is None:
+				raise ImportError("Failed to import utils")
+			from piaplib import pku as pku
+			if pku.__name__ is None:
+				raise ImportError("Failed to import pku")
+			from pku import config as config
+			if config.__name__ is None:
+				raise ImportError("Failed to import config")
+			test = None
+			test_name = str("test")
+			test_ext = str("much_longer_extension")
+			self.assertIsNone(test)
+			test = config.addExtension(test_name, test_ext)
+			self.assertIsNotNone(test)
+			self.assertNotEqual(test, test_name)
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			err = None
+			del err
+			theResult = False
+		assert theResult
+
+	def test_case_config_supports_json(self):
+		"""Tests the config.hasJsonSupport() function"""
+		theResult = True
+		try:
+			from .context import piaplib as piaplib
+			if piaplib.__name__ is None:
+				raise ImportError("Failed to import pku")
+			from piaplib import pocket as pocket
+			if pocket.__name__ is None:
+				raise ImportError("Failed to import utils")
+			from piaplib import pku as pku
+			if pku.__name__ is None:
+				raise ImportError("Failed to import pku")
+			from pku import config as config
+			if config.__name__ is None:
+				raise ImportError("Failed to import config")
+			theResult = False
+			theResult = (config.hasJsonSupport() is True)
+			theResult = (theResult or (config.hasJsonSupport() is False))
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			err = None
+			del err
 			theResult = False
 		assert theResult
 

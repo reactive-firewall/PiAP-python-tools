@@ -174,25 +174,18 @@ def compactSpace(theInput_Str):
 def extractMACAddr(theInputStr):
 	"""Extract the MAC addresses from a string."""
 	theResult = []
-	try:
-		theResult = extractRegexPattern(
-			theInputStr,
-			"""(?:(?:[[:print:]]*){0,1}(?P<Mac>(?:(?:[0-9a-fA-F]{1,2}[\:]{1}){5}""" +
-			"""(?:[0-9a-fA-F]{1,2}){1}){1})+(?:[[:print:]]*){0,1})+"""
-		)
-	except DeprecationWarning:
-		theResult = extractRegexPattern(
-			theInputStr,
-			"""(?:(?:[[:print:]]*){0,1}(?P<Mac>(?:(?:[0-9a-fA-F]{1,2}[\\:]{1}){5}""" +
-			"""(?:[0-9a-fA-F]{1,2}){1}){1})+(?:[[:print:]]*){0,1})+"""
-		)
+	theResult = extractRegexPattern(
+		theInputStr,
+		"""(?:(?:[[:print:]]*){0,1}(?P<Mac>(?:(?:[0-9a-fA-F]{1,2}[\:]{1}){5}""" +
+		"""(?:[0-9a-fA-F]{1,2}){1}){1})+(?:[[:print:]]*){0,1})+"""
+	)
 	return theResult
 
 
 @remediation.error_handling
 def extractInts(theInputStr):
 	"""Extract the ints from a string."""
-	theResult = extractRegexPattern(theInputStr, """([1234567890]{1})+""")
+	theResult = extractRegexPattern(theInputStr, """([1234567890]+)+""")
 	return theResult
 
 
@@ -216,18 +209,11 @@ def extractIfaceNames(theInputStr):
 def extractTTYs(theInputStr):
 	"""Extract the TTYs from a string."""
 	theResult = []
-	try:
-		theResult = extractRegexPattern(
-			theInputStr,
-			"""(?:(?:[[:print:]]*){0,1}(?P<TTYs>(?:(?:pts|tty|console|ptty)""" +
-			"""{1}[\/]?[0-9]+){1})+(?:[[:print:]]*){0,1})+"""
-		)
-	except DeprecationWarning:
-		theResult = extractRegexPattern(
-			theInputStr,
-			"""(?:(?:[[:print:]]*){0,1}(?P<TTYs>(?:(?:pts|tty|console|ptty)""" +
-			"""{1}[\\/]?[0-9]+){1})+(?:[[:print:]]*){0,1})+"""
-		)
+	theResult = extractRegexPattern(
+		theInputStr,
+		"""(?:(?:[[:print:]]*){0,1}(?P<TTYs>(?:(?:pts|tty|console|ptty)""" +
+		"""{1}[\/]?[0-9]+){1})+(?:[[:print:]]*){0,1})+"""
+	)
 	return theResult
 
 
@@ -235,20 +221,12 @@ def extractTTYs(theInputStr):
 def extractIPv4(theInputStr):
 	"""Extract the Ipv4 addresses from a string. Simple x.x.x.x matching, no checks."""
 	theResult = []
-	try:
-		theResult = extractRegexPattern(
-			theInputStr,
-			"""(?:(?:(?:^|[^0-9]{1}){1}(?P<IP>(?:(?:[12]{1}[0-9]{1}[0-9]{1}|[1-9]{1}[0-9]{1}|""" +
-			"""[0-9]{1}){1}[\.]{1}){3}(?:[12]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[0-9]{1}){1}){1}""" +
-			"""(?:[^0-9\.]?|$){1}){1})"""
-		)
-	except DeprecationWarning:
-		theResult = extractRegexPattern(
-			theInputStr,
-			"""(?:(?:(?:^|[^0-9]{1}){1}(?P<IP>(?:(?:[12]{1}[0-9]{1}[0-9]{1}|[1-9]{1}[0-9]{1}|""" +
-			"""[0-9]{1}){1}[\\.]{1}){3}(?:[12]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[0-9]{1}){1}){1}""" +
-			"""(?:[^0-9\\.]?|$){1}){1})"""
-		)
+	theResult = extractRegexPattern(
+		theInputStr,
+		"""(?:(?:(?:^|[^0-9]{1}){1}(?P<IP>(?:(?:[12]{1}[0-9]{1}[0-9]{1}|[1-9]{1}[0-9]{1}|""" +
+		"""[0-9]{1}){1}[\.]{1}){3}(?:[12]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[0-9]{1}){1}){1}""" +
+		"""(?:[^0-9\.]?|$){1}){1})"""
+	)
 	return theResult
 
 
@@ -256,20 +234,12 @@ def extractIPv4(theInputStr):
 def extractIPAddr(theInputStr):
 	"""Extract the Ipv4 addresses from a string. Simple x.x.x.x matching, no checks."""
 	theResult = []
-	try:
-		theResult = extractRegexPattern(
-			theInputStr,
-			"""(?:(?:(?:^|[^0-9]{1}){1}(?P<IP>(?:(?:[12]{1}[0-9]{1}[0-9]{1}|[1-9]{1}[0-9]{1}|""" +
-			"""[0-9]{1}){1}[\.]{1}){3}(?:[12]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[0-9]{1}){1}){1}""" +
-			"""(?:[/]{1}){1}(?:[^0-9\.]?|$){1}){1})"""
-		)
-	except DeprecationWarning:
-		theResult = extractRegexPattern(
-			theInputStr,
-			"""(?:(?:(?:^|[^0-9]{1}){1}(?P<IP>(?:(?:[12]{1}[0-9]{1}[0-9]{1}|[1-9]{1}[0-9]{1}|""" +
-			"""[0-9]{1}){1}[\\.]{1}){3}(?:[12]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[0-9]{1}){1}){1}""" +
-			"""(?:[\\/]{1}){1}(?:[^0-9\\.]?|$){1}){1})"""
-		)
+	theResult = extractRegexPattern(
+		theInputStr,
+		"""(?:(?:(?:^|[^0-9]{1}){1}(?P<IP>(?:(?:[12]{1}[0-9]{1}[0-9]{1}|[1-9]{1}[0-9]{1}|""" +
+		"""[0-9]{1}){1}[\.]{1}){3}(?:[12]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[0-9]{1}){1}){1}""" +
+		"""(?:[/]{1}){1}(?:[^0-9\.]?|$){1}){1})"""
+	)
 	return theResult
 
 
@@ -442,21 +412,24 @@ def appendFile(somefile, somedata):
 @remediation.error_handling
 def getFileResource(someURL, outFile):
 	"""Downloads a file from the given URL."""
-	import urllib
-	try:
-		tempfile = urllib.FancyURLopener()
-	except Exception:
-		import urllib.request
-		tempfile = urllib.request.FancyURLopener()
-	try:
-		tempfile.retrieve(someURL, outFile)
-	except Exception:
-		return False
-	try:
-		logs.log(str("fetched file {}").format(someURL), "Debug")
-	except Exception:
-		pass
-	return True
+	import warnings
+	with warnings.catch_warnings():
+		warnings.filterwarnings("ignore", category=DeprecationWarning)
+		import urllib
+		try:
+			tempfile = urllib.FancyURLopener()
+		except Exception:
+			import urllib.request
+			tempfile = urllib.request.FancyURLopener()
+		try:
+			tempfile.retrieve(someURL, outFile)
+		except Exception:
+			return False
+		try:
+			logs.log(str("fetched file {}").format(someURL), "Debug")
+		except Exception:
+			pass
+		return True
 
 
 @remediation.error_handling

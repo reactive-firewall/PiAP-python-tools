@@ -22,6 +22,10 @@ try:
 	import sys
 	sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 	try:
+		import piaplib as piaplib
+	except Exception:
+		from . import piaplib as piaplib
+	try:
 		from piaplib.book.logs import logs as logs
 	except Exception:
 		try:
@@ -113,8 +117,9 @@ def parseargs(arguments=None):
 		)
 		parser.add_argument(
 			'-V', '--version',
-			action='version', version='%(prog)s 0.2.4'
-		)
+			action='version', version=str(
+				"%(prog)s {}"
+			).format(str(piaplib.__version__)))
 		theResult = parser.parse_args(arguments)
 	except Exception as parseErr:
 		parser.error(str(parseErr))
