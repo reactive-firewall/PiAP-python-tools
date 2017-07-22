@@ -98,7 +98,6 @@ before_install:
   - travis_retry pip install tox || pip install tox || true ;
   - travis_retry pip install coverage || true ;
   - travis_retry pip install codecov || true ;
-  - travis_retry pip install python-coveralls || true
   - travis_retry python -m pip install coverage || python -m pip install coverage || true ;
   - travis_retry python -m pip install codecov || python -m pip install codecov || true ;
   - travis_retry python3 -m pip install tox || python3 -m pip install tox || true ;
@@ -117,7 +116,8 @@ script:
 
 after_success:
   - codecov || true
-  - coveralls || true
+  - travis_retry python -m pip install python-coveralls || true
+  - python -m coveralls || true
   - if [ $TRAVIS_OS_NAME == osx ] ; then true ; wait ; else coverage run -p -m piaplib.pocket pku upgrade --upgrade-all || true ; fi ;
   - if [ $TRAVIS_OS_NAME == osx ] ; then echo "SKIP codecov" ; else codecov || exit $? ; fi ;
 

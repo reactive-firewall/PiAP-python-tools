@@ -8,6 +8,7 @@
 [![status](https://travis-ci.org/reactive-firewall/PiAP-python-tools.svg?branch=master)](https://travis-ci.org/reactive-firewall/PiAP-python-tools)
 [![Dependency Status](https://www.versioneye.com/user/projects/59141686eb858e002d45d36e/badge.svg?style=flat-round)](https://www.versioneye.com/user/projects/59141686eb858e002d45d36e)
 [![code coverage](https://codecov.io/gh/reactive-firewall/PiAP-python-tools/branch/master/graph/badge.svg)](https://codecov.io/gh/reactive-firewall/PiAP-python-tools/branch/master/)
+[![Coverage Status](https://coveralls.io/repos/github/reactive-firewall/PiAP-python-tools/badge.svg?branch=master)](https://coveralls.io/github/reactive-firewall/PiAP-python-tools?branch=master)
 
 ### Stable:
 [![status](https://travis-ci.org/reactive-firewall/PiAP-python-tools.svg?branch=stable)](https://travis-ci.org/reactive-firewall/PiAP-python-tools)
