@@ -45,27 +45,11 @@ except Exception:
 		raise ImportError("Error Importing remediation")
 
 
-def addExtension(somefile, extension):
-	"""Ensures the given extension is used."""
-	if (somefile is None):
-		return None
-	if (extension is None):
-		return somefile
-	if (len(str(somefile)) > len(extension)):
-		offset = (-1 * len(extension))
-		if (extension in str(somefile)[offset:]) and (str(".") in str(somefile)):
-			return somefile
-		else:
-			return str("{}.{}").format(somefile, extension)
-	else:
-		return str("{}.{}").format(somefile, extension)
-
-
 def hasJsonSupport():
 	support_json = False
 	try:
 		support_json = (json.__name__ is not None)
-	except:
+	except BaseException:
 		support_json = False
 	return support_json
 
@@ -75,7 +59,7 @@ def readJsonFile(somefile):
 	"""Reads the raw json file."""
 	read_data = None
 	try:
-		someFilePath = addExtension(somefile, str('json'))
+		someFilePath = utils.addExtension(somefile, str('json'))
 		with utils.open_func(someFilePath, mode=u'r', encoding=u'utf-8') as json_data_file:
 			read_data = json.load(fp=json_data_file, encoding=u'utf-8')
 	except Exception as jsonerr:
@@ -96,7 +80,7 @@ def writeJsonFile(somefile, data):
 		return False
 	did_write = False
 	try:
-		someFilePath = addExtension(somefile, str('json'))
+		someFilePath = utils.addExtension(somefile, str('json'))
 		with utils.open_func(someFilePath, mode=u'w+', encoding=u'utf-8') as outfile:
 			jsonData = json.dumps(
 				obj=dict(data),
@@ -133,7 +117,7 @@ def hasYamlSupport():
 	support_yaml = False
 	try:
 		support_yaml = (yaml.__name__ is not None)
-	except Exception:
+	except BaseException:
 		support_yaml = False
 	return support_yaml
 
@@ -144,7 +128,7 @@ def readYamlFile(somefile):
 		return None
 	read_data = None
 	try:
-		someFilePath = addExtension(somefile, str('yaml'))
+		someFilePath = utils.addExtension(somefile, str('yaml'))
 		with utils.open_func(file=someFilePath, mode=u'r', encoding=u'utf-8') as ymalfile:
 			if yaml.version_info < (0, 15):
 				read_data = yaml.safe_load(ymalfile)
@@ -168,7 +152,7 @@ def writeYamlFile(somefile, data):
 		return False
 	did_write = False
 	try:
-		someFilePath = addExtension(somefile, str('yaml'))
+		someFilePath = utils.addExtension(somefile, str('yaml'))
 		did_write = utils.writeFile(someFilePath, yaml.dump(data))
 	except Exception as yamlerr:
 		print("")

@@ -9,11 +9,12 @@ exclude_lines =
     pragma: no cover
 
     except Exception
+    except BaseException:
     # Don't complain if tests don't hit defensive assertion code:
     raise AssertionError
     raise NotImplementedError
     raise ImportError
-    except unittest.SkipTest as skiperr
+    except unittest.SkipTest
     except IOError
     except OSError
 
