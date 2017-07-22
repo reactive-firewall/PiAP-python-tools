@@ -38,6 +38,7 @@ matrix:
     python:  "3.7-dev"
   - os: linux
     python: "pypy"  # PyPy2 2.5.0
+    dist: precise
   - os: linux
     python:  "pypy-5.3.1"
   - os: linux
@@ -64,6 +65,7 @@ matrix:
     python:  "3.2"
   - os: linux
     python: "pypy"
+    dist: precise
   - os: linux
     python:  "pypy3"
   - os: linux
