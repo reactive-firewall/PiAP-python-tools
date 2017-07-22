@@ -269,7 +269,7 @@ def get_w_cmd_args():
 	try:
 		import sys
 		if (str(sys.platform).lower().startswith(str("""darwin""")) is True):
-			return str("""-whn""")
+			return str("""-hi""")
 		else:
 			return str("""-his""")
 	except Exception as someErr:

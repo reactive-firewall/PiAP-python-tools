@@ -114,6 +114,17 @@ def hasBackendCommand():
 	return False
 
 
+@remediation.error_passing
+@utils.memoize
+def getAlgoForOS():
+	"""returns cbc for darwin and ctr for linux"""
+	import sys
+	if sys.platform.startswith("linux"):
+		return str("-aes-256-ctr")
+	else:
+		return str("-aes-256-cbc")
+
+
 @remediation.error_handling
 def getKeyFilePath():
 	"""THIS IS A PLACEHOLDER. WILL move this to a config file."""
@@ -170,7 +181,7 @@ def packForRest(message=None, keyStore=None):
 			getBackendCommand(),
 			str("enc"),
 			str("-e"),
-			str("-aes-256-ctr"),
+			getAlgoForOS(),
 			str("-a"),
 			str("-A"),
 			str("-salt"),
@@ -207,7 +218,7 @@ def unpackFromRest(ciphertext=None, keyStore=None):
 			getBackendCommand(),
 			str("enc"),
 			str("-d"),
-			str("-aes-256-ctr"),
+			getAlgoForOS(),
 			str("-a"),
 			str("-A"),
 			str("-salt"),

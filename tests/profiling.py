@@ -154,7 +154,7 @@ def do_cprofile(func):
 	return profiled_func
 
 
-try:
+try:  # noqa
 	from line_profiler import LineProfiler
 
 	def do_profile(follow=[]):

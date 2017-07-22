@@ -73,7 +73,7 @@ def checkPythonCommand(args=[None], stderr=None):
 					args.insert(2, str("-p"))
 					args.insert(2, str("--source=piaplib,piaplib/lint,piaplib/keyring,piaplib/pku,piaplib/book"))
 			theOutput = subprocess.check_output(args, stderr=stderr)
-	except Exception as cmderror:
+	except Exception:
 		theOutput = None
 	try:
 		if isinstance(theOutput, bytes):
@@ -832,7 +832,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 							print(str("{}").format(str(theOutputtext)))
 							print(str(""))
 							raise unittest.SkipTest("BETA. Experemental feature not ready yet.")
-				except unittest.SkipTest as skiperr:
+				except unittest.SkipTest:
 					raise unittest.SkipTest("BETA. Experemental feature not ready yet.")
 				except Exception as othererr:
 					print(str(""))
@@ -843,7 +843,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 					othererr = None
 					del othererr
 					theResult = False
-		except unittest.SkipTest as skiperr:
+		except unittest.SkipTest:
 			raise unittest.SkipTest("BETA. Experemental feature not ready yet.")
 		except Exception as err:
 			print(str(""))
