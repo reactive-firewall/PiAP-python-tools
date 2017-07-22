@@ -109,12 +109,17 @@ script:
   - make clean ;
   - if [ $TRAVIS_OS_NAME == osx ] ; then echo "SKIP make test" ; else make test || exit $? ; fi ;
   - if [ $TRAVIS_OS_NAME == osx ] ; then echo "SKIP codecov" ; else codecov || exit $? ; fi ;
+  - cp -f .coverage ".coverage.Lasting.$PPID.$RANDOM" 2>/dev/null || true
+  - cp -f .coverage ".coverall.Lasting.$PPID.$RANDOM" 2>/dev/null || true
   - make clean || exit $? ; 
   - make test-tox || exit $? ;
+  - cp -vf .coverage ".coverall.Lasting.$PPID.$RANDOM" 2>/dev/null || true
   - make clean ;
   - if [ $TRAVIS_OS_NAME == osx ] ; then true ; wait ; else pip install --upgrade -e git+https://github.com/reactive-firewall/PiAP-python-tools.git@${TRAVIS_PULL_REQUEST_SHA:-${TRAVIS_COMMIT}}#egg=piaplib ; fi ; wait ;
 
 after_success:
+  - mv -vf .coverall.Lasting.* .coverage.Lasting || true
+  - coverage combine || true
   - codecov || true
   - travis_retry python -m pip install python-coveralls || true
   - python -m coveralls || true
