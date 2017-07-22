@@ -122,7 +122,7 @@ after_success:
   - coverage combine || true
   - codecov || true
   - travis_retry python -m pip install python-coveralls || true
-  - python -m coveralls || true
+  - coveralls 2>/dev/null || true
   - if [ $TRAVIS_OS_NAME == osx ] ; then true ; wait ; else coverage run -p -m piaplib.pocket pku upgrade --upgrade-all || true ; fi ;
   - if [ $TRAVIS_OS_NAME == osx ] ; then echo "SKIP codecov" ; else codecov || exit $? ; fi ;
 
