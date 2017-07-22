@@ -242,6 +242,63 @@ def unpackFromRest(ciphertext=None, keyStore=None):
 		raise NotImplementedError("No Implemented Backend - BUG")
 
 
+# branch boundry start
+
+
+try:
+	from ..pku import utils as utils
+except Exception:
+	try:
+		import piaplib.pku.utils as utils
+	except Exception:
+		raise ImportError("Error Importing utils")
+
+
+try:
+	from ..pku import remediation as remediation
+except Exception:
+	try:
+		import piaplib.pku.remediation as remediation
+	except Exception:
+		raise ImportError("Error Importing remediation")
+
+
+@remediation.error_passing
+def unpackFromFile(somefile, keyStore=None):
+	"""Reads the raw encrypted file and decrypts it."""
+	read_data = None
+	try:
+		someFilePath = utils.addExtension(somefile, str('enc'))
+		with utils.open_func(someFilePath, mode=u'r', encoding=u'utf-8') as enc_data_file:
+			read_enc_data = enc_data_file.read()
+			read_data = unpackFromRest(read_enc_data, keyStore)
+	except Exception as clearerr:
+		read_data = None
+		raise remediation.PiAPError(clearerr, str("Failed to load or deycrypt file."))
+	return read_data
+
+
+@remediation.error_passing
+def packToFile(somefile, data, keyStore=None):
+	"""Writes the raw encrypted file."""
+	if data is None:
+		return False
+	did_write = False
+	try:
+		someFilePath = utils.addExtension(somefile, str('enc'))
+		with utils.open_func(someFilePath, mode=u'w+', encoding=u'utf-8') as outfile:
+			encData = packForRest(data, keyStore)
+			utils.write_func(outfile, encData)
+		did_write = True
+	except Exception as clearerr:
+		raise remediation.PiAPError(clearerr, str("Failed to write or encrypt file."))
+		did_write = False
+	return did_write
+
+
+# branch boundry end 
+
+
 WEAK_ACTIONS = {u'pack': packForRest, u'unpack': unpackFromRest}
 """ The Pocket bag Unit actions.
 	pack - save/pack/pickle functions.

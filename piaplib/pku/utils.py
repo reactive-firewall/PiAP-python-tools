@@ -296,6 +296,23 @@ def xstr(some_str=None):
 
 
 @remediation.error_passing
+def addExtension(somefile, extension):
+	"""Ensures the given extension is used."""
+	if (somefile is None):
+		return None
+	if (extension is None):
+		return somefile
+	if (len(str(somefile)) > len(extension)):
+		offset = (-1 * len(extension))
+		if (extension in str(somefile)[offset:]) and (str(".") in str(somefile)):
+			return somefile
+		else:
+			return str("{}.{}").format(somefile, extension)
+	else:
+		return str("{}.{}").format(somefile, extension)
+
+
+@remediation.error_passing
 def open_func(file, mode='r', buffering=-1, encoding=None):
 	""" cross-python open function """
 	try:
