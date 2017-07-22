@@ -43,6 +43,7 @@ htmlcov/
 .cache
 nosetests.xml
 coverage.xml
+.coveralls.yml
 codecov_env
 *,cover
 .hypothesis/
