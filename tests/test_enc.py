@@ -252,10 +252,7 @@ class BookTestSuite(unittest.TestCase):
 			if (str("U2FsdGVkX") in str(test_out)):
 				theResult = True
 			else:
-				if sys.platform.startswith("linux"):
-					theResult = False
-				else:
-					raise unittest.SkipTest("BETA. Experemental feature not ready yet.")
+				theResult = False
 		except Exception as err:
 			print(str(""))
 			print(str(type(err)))
@@ -274,15 +271,26 @@ class BookTestSuite(unittest.TestCase):
 		"""Tests the helper function main unpack of keyring.clearify"""
 		theResult = True
 		try:
-			temp_msg = str("""U2FsdGVkX1+dD6bFlND+Xa0bzNttrZfB5zYCp0mSEYfhMTpaM7U=""")
+			temp_msg = None
+			args = None
+			if sys.platform.startswith("linux"):
+				temp_msg = str("""U2FsdGVkX1+dD6bFlND+Xa0bzNttrZfB5zYCp0mSEYfhMTpaM7U=""")
+				args = [
+					str("--unpack"),
+					str("--msg={}").format(temp_msg),
+					str("-K=testkeyneedstobelong")
+				]
+			else:
+				temp_msg = str("U2FsdGVkX18cNPUnfix9LYLebBgwP6BdT7ReAJvL1+ZHJWN96sNB5IvV/u+fRL6D")
+				args = [
+					str("--unpack"),
+					str("--msg=\"{}\"").format(temp_msg),
+					str("-K=testkeyneedstobelong")
+				]
 			from piaplib.keyring import clearify as clearify
 			if clearify.__name__ is None:
 				raise ImportError("Failed to import clearify")
-			test_out = clearify.main([
-				str("--unpack"),
-				str("--msg={}").format(temp_msg),
-				str("-K=testkeyneedstobelong")
-			])
+			test_out = clearify.main(args)
 			try:
 				if isinstance(test_out, bytes):
 					test_out = test_out.decode('utf8')

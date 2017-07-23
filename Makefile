@@ -125,6 +125,7 @@ cleanup:
 	$(QUIET)rm -f ./*~ 2>/dev/null || true
 	$(QUIET)coverage erase 2>/dev/null || true
 	$(QUIET)rm -f ./.coverage 2>/dev/null || true
+	$(QUIET)rm -f ./coverage*.xml 2>/dev/null || true
 	$(QUIET)rm -f ./sitecustomize.py 2>/dev/null || true
 	$(QUIET)rm -f ./.*~ 2>/dev/null || true
 	$(QUIET)rm -Rf ./.tox/ 2>/dev/null || true
@@ -132,6 +133,7 @@ cleanup:
 	$(QUIET)rm -f ./the_test_file*.json 2>/dev/null || true
 	$(QUIET)rm -f ./the_test_file*.yml 2>/dev/null || true
 	$(QUIET)rm -f ./the_test_file*.yaml 2>/dev/null || true
+	$(QUIET)rm -f ./the_test_url_file*.txt 2>/dev/null || true
 	$(QUIET)rm -f /tmp/.beta_PiAP_weak_key 2>/dev/null || true
 
 clean: cleanup

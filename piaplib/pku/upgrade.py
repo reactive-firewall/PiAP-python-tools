@@ -186,6 +186,19 @@ def upgradePiAPlib_depends():
 
 
 @remediation.error_passing
+def upgradePiAPlib_webui():
+	"""Upgrade PiAP version via update script."""
+	upsream_repo_depends = str(
+		"https://raw.githubusercontent.com/reactive-firewall" +
+		"/Pocket-PiAP/master/upgrade.sh"
+	)
+	utils.getFileResource(upsream_repo_depends, "upgrade.sh")
+	# run script here
+	utils.cleanFileResource("upgrade.sh")
+	return None
+
+
+@remediation.error_passing
 def upgradeAll():
 	"""Upgrade piaplib and requirements via pip."""
 	upgradepip()

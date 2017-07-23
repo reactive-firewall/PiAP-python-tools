@@ -26,7 +26,6 @@ try:
 	import os
 	import sys
 	import argparse
-	import base64
 	import subprocess
 	sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 except Exception:
@@ -68,11 +67,12 @@ DEFAULT_BETA_FILE_PATH = str("""/var/opt/PiAP/.beta_h5RlRMVO6RzA""")
 """THIS IS A PLACEHOLDER. WILL move this to a config file."""
 
 
-KEY_BLOCK_SIZE = len(base64.standard_b64encode(bytes(os.urandom(32))))
+KEY_BLOCK_SIZE = 44
+"""KEY_BLOCK_SIZE = len(base64.standard_b64encode(bytes(os.urandom(32)))) = 44"""
 
 
-EOFNEWLINE = str("""
-""")
+EOFNEWLINE = str(os.linesep)
+"""newline to use"""
 
 
 # Note:
@@ -114,6 +114,17 @@ def hasBackendCommand():
 	return False
 
 
+@remediation.error_passing
+@utils.memoize
+def getAlgoForOS():
+	"""returns cbc for darwin and ctr for linux"""
+	import sys
+	if sys.platform.startswith("linux"):
+		return str("-aes-256-ctr")
+	else:
+		return str("-aes-256-cbc")
+
+
 @remediation.error_handling
 def getKeyFilePath():
 	"""THIS IS A PLACEHOLDER. WILL move this to a config file."""
@@ -136,7 +147,7 @@ def getKeyFilePath():
 
 
 @remediation.error_handling
-def makeKeystoreFile(theKey=str(rand.randPW(16)), somePath=None):
+def makeKeystoreFile(theKey=str(str(rand.randPW(16)).replace("%", "%%")), somePath=None):
 	"""THIS IS A PLACEHOLDER. WILL move this to a config file."""
 	import os.path
 	if somePath is None:
@@ -170,7 +181,7 @@ def packForRest(message=None, keyStore=None):
 			getBackendCommand(),
 			str("enc"),
 			str("-e"),
-			str("-aes-256-ctr"),
+			getAlgoForOS(),
 			str("-a"),
 			str("-A"),
 			str("-salt"),
@@ -207,7 +218,7 @@ def unpackFromRest(ciphertext=None, keyStore=None):
 			getBackendCommand(),
 			str("enc"),
 			str("-d"),
-			str("-aes-256-ctr"),
+			getAlgoForOS(),
 			str("-a"),
 			str("-A"),
 			str("-salt"),
@@ -241,6 +252,8 @@ WEAK_ACTIONS = {u'pack': packForRest, u'unpack': unpackFromRest}
 @remediation.error_handling
 def parseArgs(arguments=None):
 	theArgs = argparse.Namespace()
+	salt_rand = str(rand.randPW(16)).replace("%", "%%")
+	key_rand = str(rand.randPW(16)).replace("%", "%%")
 	try:
 		parser = argparse.ArgumentParser(
 			prog=__prog__,
@@ -262,8 +275,10 @@ def parseArgs(arguments=None):
 			required=False,
 			type=str,
 			help=str(
-				'The cryptographic Salt String. A unique salt. Like {}'
-			).format(str(rand.randPW(16)))
+				str(
+					"The cryptographic Salt String. A unique salt. Like {thevalue}"
+				).format(thevalue=salt_rand)
+			)
 		)
 		parser.add_argument(
 			'-K',
@@ -272,8 +287,10 @@ def parseArgs(arguments=None):
 			required=False,
 			type=str,
 			help=str(
-				'The cryptographic Key String. A unique secret. Like {}'
-			).format(str(rand.randPW(16)))
+				str(
+					"The cryptographic Key String. A unique secret. Like {thevalue}"
+				).format(thevalue=key_rand)
+			)
 		)
 		parser.add_argument(
 			'-k',
@@ -293,10 +310,12 @@ def parseArgs(arguments=None):
 			)
 		theArgs = parser.parse_args(arguments)
 	except Exception as err:
-		print(str("FAILED DURRING CLEARIFY. ABORT."))
+		print(str("FAILED DURRING CLEARIFY.. ABORT."))
 		print(str(type(err)))
 		print(str(err))
 		print(str(err.args))
+		print(str(key_rand))
+		print(str(salt_rand))
 		err = None
 		del err
 		theArgs = argparse.Namespace()

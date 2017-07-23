@@ -23,7 +23,6 @@ try:
 	try:
 		import sys
 		import os
-		import functools
 		sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), str('..'))))
 		sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), str('.'))))
 	except Exception as ImportErr:
@@ -37,27 +36,6 @@ try:
 		raise ImportError(str("Test module failed completely."))
 except Exception:
 	raise ImportError("Failed to import test context")
-
-
-def _test_try_or_fail(func):
-	""" decorator for try-except wrapping tests """
-	@functools.wraps(func)
-	def helper_func(*args, **kwargs):
-		theResult = False
-		try:
-			func(*args, **kwargs)
-			theResult = True
-		except Exception as failErr:
-			print(str(""))
-			print(str(type(failErr)))
-			print(str(failErr))
-			print(str((failErr.args)))
-			print(str(""))
-			failErr = None
-			del failErr
-			theResult = False
-		return theResult
-	return helper_func
 
 
 class SaltTestSuite(unittest.TestCase):
@@ -196,15 +174,27 @@ class SaltTestSuite(unittest.TestCase):
 			for someRandomTest in range(10000):
 				this_test = str(rand.randStr(10))
 				that_test = str(rand.randStr(10))
-				self.assertIsNotNone(that_test)
-				self.assertIsNotNone(this_test)
-				self.assertNotEqual(this_test, that_test)
-				for test_salt in salt_list:
-					a = saltify.saltify(str(this_test), str(randomSalt))
-					b = saltify.saltify(str(that_test), str(test_salt))
-					self.assertIsNotNone(a)
-					self.assertIsNotNone(b)
-					self.assertNotEqual(a, b)
+				try:
+					with self.subTest(i=someRandomTest, this_test=that_test, that_test=that_test):
+						self.assertIsNotNone(that_test)
+						self.assertIsNotNone(this_test)
+						self.assertNotEqual(this_test, that_test)
+						for test_salt in salt_list:
+							a = saltify.saltify(str(this_test), str(randomSalt))
+							b = saltify.saltify(str(that_test), str(test_salt))
+							self.assertIsNotNone(a)
+							self.assertIsNotNone(b)
+							self.assertNotEqual(a, b)
+				except Exception:
+					self.assertIsNotNone(that_test)
+					self.assertIsNotNone(this_test)
+					self.assertNotEqual(this_test, that_test)
+					for test_salt in salt_list:
+						a = saltify.saltify(str(this_test), str(randomSalt))
+						b = saltify.saltify(str(that_test), str(test_salt))
+						self.assertIsNotNone(a)
+						self.assertIsNotNone(b)
+						self.assertNotEqual(a, b)
 		except Exception as testErr:
 			print(str("Entropy - Fuzzing Crash Found new test"))
 			print(str(""))

@@ -21,7 +21,12 @@
 try:
 	import os
 	import sys
+	import argparse
 	sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+	try:
+		import piaplib as piaplib
+	except Exception:
+		from . import piaplib as piaplib
 	try:
 		from .. import utils as utils
 	except Exception:
@@ -63,7 +68,6 @@ __prog__ = """users_check_status"""
 
 def parseargs(arguments=None):
 	"""Parse the arguments"""
-	import argparse
 	try:
 		parser = argparse.ArgumentParser(
 			prog=__prog__,
@@ -100,7 +104,11 @@ def parseargs(arguments=None):
 			dest='verbose_mode', default=False,
 			action='store_false', help='Disable the given interface.'
 		)
-		parser.add_argument('-V', '--version', action='version', version='%(prog)s 0.2.4')
+		parser.add_argument(
+			'-V', '--version',
+			action='version', version=str(
+				"%(prog)s {}"
+			).format(str(piaplib.__version__)))
 		theResult = parser.parse_args(arguments)
 	except Exception as parseErr:
 		parser.error(str(parseErr))
@@ -261,7 +269,7 @@ def get_w_cmd_args():
 	try:
 		import sys
 		if (str(sys.platform).lower().startswith(str("""darwin""")) is True):
-			return str("""-whn""")
+			return str("""-hi""")
 		else:
 			return str("""-his""")
 	except Exception as someErr:
