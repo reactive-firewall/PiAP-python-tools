@@ -38,7 +38,7 @@ except Exception:
 	raise ImportError("Failed to import test context")
 
 
-class BookTestSuite(unittest.TestCase):
+class CryptoTestSuite(unittest.TestCase):
 	"""Special Pocket keyring crypto test cases."""
 
 	def test_absolute_truth_and_meaning(self):
@@ -112,7 +112,7 @@ class BookTestSuite(unittest.TestCase):
 				raise ImportError("Failed to import clearify")
 			self.assertIsNotNone(clearify.makeKeystoreFile(
 				str("This is not a real key"),
-				str("../test.secret")
+				str("./test.secret")
 			))
 		except Exception as err:
 			print(str(""))
@@ -156,7 +156,7 @@ class BookTestSuite(unittest.TestCase):
 				raise ImportError("Failed to import clearify")
 			self.assertIsNotNone(clearify.makeKeystoreFile(
 				None,
-				str("../test.secret")
+				str("./test.secret")
 			))
 		except Exception as err:
 			print(str(""))
@@ -305,6 +305,64 @@ class BookTestSuite(unittest.TestCase):
 					theResult = False
 				else:
 					raise unittest.SkipTest("BETA. Experemental feature not ready yet.")
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			err = None
+			del err
+			if sys.platform.startswith("linux"):
+				theResult = False
+			else:
+				raise unittest.SkipTest("BETA. Experemental feature not ready yet.")
+		assert theResult
+
+	def test_case_clearify_read_write(self):
+		"""Tests the helper function pack to file of keyring.clearify and then unpack"""
+		theResult = False
+		try:
+			from piaplib.keyring import clearify as clearify
+			if clearify.__name__ is None:
+				raise ImportError("Failed to import clearify")
+			from piaplib.keyring import rand as rand
+			if rand.__name__ is None:
+				raise ImportError("Failed to import rand")
+			sometestfile = str("./the_test_file.enc")
+			theteststore = clearify.makeKeystoreFile(
+				str("testkeyneedstobelong"),
+				str("./.weak_test_key_{}").format(rand.randInt(1, 10, 99))
+			)
+			self.assertIsNotNone(theteststore)
+			if (theteststore is not None):
+				print(" ... Wrote key file ... ")
+			test_write = clearify.packToFile(
+				sometestfile,
+				str("This is a test Message"),
+				theteststore
+			)
+			if (test_write is True):
+				print(" ... Wrote enc file ... ")
+			self.assertTrue(test_write)
+			if (test_write is True):
+				test_read = clearify.unpackFromFile(sometestfile, theteststore)
+				try:
+					if isinstance(test_read, bytes):
+						test_read = test_read.decode('utf8')
+				except UnicodeDecodeError:
+					test_read = str(repr(bytes(test_read)))
+				self.assertIsNotNone(test_read)
+				if (str("This is a test Message") in str(test_read)):
+					theResult = True
+				else:
+					if sys.platform.startswith("linux"):
+						print(str(repr(bytes(test_read))))
+						theResult = False
+					else:
+						raise unittest.SkipTest("BETA. Experemental feature not ready yet.")
+			else:
+				theResult = False
 		except Exception as err:
 			print(str(""))
 			print(str(type(err)))

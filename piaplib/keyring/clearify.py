@@ -52,6 +52,13 @@ try:
 except Exception:
 	import pku.remediation as remediation
 
+try:
+	from remediation import PiAPError as PiAPError
+except Exception:
+	try:
+		from piaplib.pku.remediation import PiAPError as PiAPError
+	except Exception:
+		raise ImportError("Error Importing PiAPError")
 
 try:
 	from ..pku import utils as utils
@@ -240,6 +247,46 @@ def unpackFromRest(ciphertext=None, keyStore=None):
 		return str(cleartext)
 	else:
 		raise NotImplementedError("No Implemented Backend - BUG")
+
+
+@remediation.error_handling
+def unpackFromFile(somefile, keyStore=None):
+	"""Reads the raw encrypted file and decrypts it."""
+	read_data = None
+	try:
+		someFilePath = utils.addExtension(somefile, str('enc'))
+		with utils.open_func(someFilePath, mode=u'r', encoding=u'utf-8') as enc_data_file:
+			read_enc_data = enc_data_file.read()
+			read_data = unpackFromRest(read_enc_data, keyStore)
+	except Exception as clearerr:
+		read_data = None
+		baton = PiAPError(clearerr, str("Failed to load or deycrypt file."))
+		clearerr = None
+		del clearerr
+		raise baton
+	return read_data
+
+
+@remediation.error_handling
+def packToFile(somefile, data, keyStore=None):
+	"""Writes the raw encrypted file."""
+	if data is None:
+		return False
+	if somefile is None:
+		return False
+	did_write = False
+	try:
+		someFilePath = utils.literal_code(utils.addExtension(str(somefile), str("enc")))
+		if someFilePath is not None:
+			encData = packForRest(data, keyStore)
+			with utils.open_func(file=someFilePath, mode=u'wb+') as enc_data_file:
+				utils.write_func(enc_data_file, utils.literal_str(encData).encode("utf-8"))
+			del(encData)
+		did_write = True
+	except Exception as clearerr:
+		raise remediation.PiAPError(clearerr, str("Failed to write or encrypt file."))
+		did_write = False
+	return did_write
 
 
 WEAK_ACTIONS = {u'pack': packForRest, u'unpack': unpackFromRest}
