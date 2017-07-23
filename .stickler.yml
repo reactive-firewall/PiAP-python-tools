@@ -11,4 +11,3 @@ linters:
         exclude: ['.git', '__pycache__', 'docs', '.tox', 'build']
 files:
     ignore: ['*/*.pyc', '*.pyc', '*~', '__pycache__', '.git']
----
