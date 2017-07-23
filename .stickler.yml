@@ -10,4 +10,4 @@ linters:
         ignore: ['W191', 'W391']
         exclude: ['.git', '__pycache__', 'docs', '.tox', 'build']
 files:
-    ignore: ['*/*.pyc', '*.pyc', '*~', '__pycache__', '.git']
+    ignore: ['*/*.pyc', '*.pyc', '*~']
