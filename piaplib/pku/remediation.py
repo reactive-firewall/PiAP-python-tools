@@ -105,6 +105,21 @@ def error_passing(func):
 	return helper_func
 
 
+def error_breakpoint(error, context=None):
+	"""Just logs the error and returns None"""
+	timestamp = getTimeStamp()
+	logs.log(str("An error occured at {}").format(timestamp), "Error")
+	logs.log(str(context), "Debug")
+	logs.log(str(type(error)), "Error")
+	logs.log(str(error), "Error")
+	logs.log(str((error.args)), "Error")
+	if isinstance(error, PiAPError):
+		logs.log(str(error.cause), "Error")
+		logs.log(str(type(error.cause)), "Error")
+		logs.log(str((error.args)), "Error")
+	return None
+
+
 def error_handling(func):
 	"""Runs a function in try-except"""
 	import functools
@@ -116,21 +131,10 @@ def error_handling(func):
 		try:
 			theOutput = func(*args, **kwargs)
 		except Exception as err:
-			timestamp = getTimeStamp()
-			logs.log(str("An error occured at {}").format(timestamp), "Error")
-			logs.log(str(func), "Debug")
-			logs.log(str(type(err)), "Error")
-			logs.log(str(err), "Error")
-			logs.log(str((err.args)), "Error")
-			if isinstance(err, PiAPError):
-				logs.log(str((err.cause)), "Error")
-				logs.log(str(type(err.cause)), "Error")
-				logs.log(str(type(err.args)), "Error")
-			logs.log(str(""), "Error")
+			theOutput = error_breakpoint(error=err, context=func)
 			# sys.exc_clear()
 			err = None
 			del err
-			theOutput = None
 		return theOutput
 
 	return safety_func
