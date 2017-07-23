@@ -330,7 +330,7 @@ def open_func(file, mode='r', buffering=-1, encoding=None):
 
 @remediation.error_passing
 def write_func(someFile, the_data=None):
-	""" cross-python open function """
+	""" cross-python write function """
 	try:
 		import six
 		if six.PY2:

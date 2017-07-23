@@ -112,7 +112,7 @@ class CryptoTestSuite(unittest.TestCase):
 				raise ImportError("Failed to import clearify")
 			self.assertIsNotNone(clearify.makeKeystoreFile(
 				str("This is not a real key"),
-				str("../test.secret")
+				str("./test.secret")
 			))
 		except Exception as err:
 			print(str(""))
@@ -156,7 +156,7 @@ class CryptoTestSuite(unittest.TestCase):
 				raise ImportError("Failed to import clearify")
 			self.assertIsNotNone(clearify.makeKeystoreFile(
 				None,
-				str("../test.secret")
+				str("./test.secret")
 			))
 		except Exception as err:
 			print(str(""))
@@ -321,7 +321,7 @@ class CryptoTestSuite(unittest.TestCase):
 
 	def test_case_clearify_read_write(self):
 		"""Tests the helper function pack to file of keyring.clearify and then unpack"""
-		theResult = True
+		theResult = False
 		try:
 			from piaplib.keyring import clearify as clearify
 			if clearify.__name__ is None:
@@ -329,15 +329,24 @@ class CryptoTestSuite(unittest.TestCase):
 			from piaplib.keyring import rand as rand
 			if rand.__name__ is None:
 				raise ImportError("Failed to import rand")
-			somefile = str("the_test_file.enc")
+			sometestfile = str("./the_test_file.enc")
 			theteststore = clearify.makeKeystoreFile(
 				str("testkeyneedstobelong"),
-				str(".weak_test_key_{}").format(rand.randInt(1, 10, 99))
+				str("./.weak_test_key_{}").format(rand.randInt(1, 10, 99))
 			)
-			test_write = clearify.packToFile(somefile, str("This is a test Message"), theteststore)
+			self.assertIsNotNone(theteststore)
+			if (theteststore is not None):
+				print(" ... Wrote key file ... ")
+			test_write = clearify.packToFile(
+				sometestfile,
+				str("This is a test Message"),
+				theteststore
+			)
+			if (test_write is True):
+				print(" ... Wrote enc file ... ")
 			self.assertTrue(test_write)
 			if (test_write is True):
-				test_read = clearify.unpackFromFile(somefile, theteststore)
+				test_read = clearify.unpackFromFile(sometestfile, theteststore)
 				try:
 					if isinstance(test_read, bytes):
 						test_read = test_read.decode('utf8')
