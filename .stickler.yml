@@ -1,12 +1,12 @@
 linters:
-    yamllint:
-        config: .yamllint
     shellcheck:
         shell: bash
     flake8:
         max-line-length: 100
         max-complexity: 10
-        ignore: ['W191', 'W391']
+        ignore: 'W191,W391'
         exclude: ['.git', '__pycache__', 'docs', '.tox', 'build']
+    yamllint:
+        config: .yamllint
 files:
     ignore: ['*/*.pyc', '*.pyc', '*~']
