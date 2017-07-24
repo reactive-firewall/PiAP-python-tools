@@ -1,4 +1,3 @@
----
 linters:
     yamllint:
         config: .yamllint
