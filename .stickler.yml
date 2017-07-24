@@ -6,6 +6,5 @@ linters:
         max-complexity: 10
         ignore: 'W191,W391'
         exclude: ['.git', '__pycache__', 'docs', '.tox', 'build']
-    yamllint:
 files:
-    ignore: ['*/*.pyc', '*.pyc', '*~']
+    ignore: ['*/*.pyc', '*.pyc', '*~', '.git', '__pycache__']
