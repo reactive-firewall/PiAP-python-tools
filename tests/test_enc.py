@@ -335,15 +335,11 @@ class CryptoTestSuite(unittest.TestCase):
 				str("./.weak_test_key_{}").format(rand.randInt(1, 10, 99))
 			)
 			self.assertIsNotNone(theteststore)
-			if (theteststore is not None):
-				print(" ... Wrote key file ... ")
 			test_write = clearify.packToFile(
 				sometestfile,
 				str("This is a test Message"),
 				theteststore
 			)
-			if (test_write is True):
-				print(" ... Wrote enc file ... ")
 			self.assertTrue(test_write)
 			if (test_write is True):
 				test_read = clearify.unpackFromFile(sometestfile, theteststore)
@@ -361,8 +357,6 @@ class CryptoTestSuite(unittest.TestCase):
 						theResult = False
 					else:
 						raise unittest.SkipTest("BETA. Experemental feature not ready yet.")
-			else:
-				theResult = False
 		except Exception as err:
 			print(str(""))
 			print(str(type(err)))
