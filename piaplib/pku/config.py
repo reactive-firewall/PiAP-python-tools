@@ -33,7 +33,7 @@ except Exception:
 	try:
 		import utils as utils
 	except Exception:
-		raise ImportError("Error Importing config")
+		raise ImportError("Error Importing utils for config")
 
 
 try:
@@ -164,6 +164,139 @@ def writeYamlFile(somefile, data):
 		print("")
 		did_write = None
 	return did_write
+
+
+# branch mark start
+
+
+try:
+	import configparser as configparser
+except Exception:
+	try:
+		import ConfigParser as configparser
+	except Exception:
+		raise ImportError("Error Importing ConfigParser utils for config")
+
+
+@remediation.error_handling
+def getDefaultMainConfigFile():
+	import os
+	default_config = dict({
+		'PiAP-logging': dict({
+			'mode': str("stdout"),
+			'dir': str("/var/log"),
+			'keyfile': repr(None),
+			'encryptlogs': repr(False)
+		}),
+		'PiAP-logging-outputs': dict({
+			'splunk': repr(False),
+			'syslog': repr(False),
+			'file': repr(False),
+			'stdout': repr(True)
+		}),
+		'PiAP-rand': dict({
+			'keyfile': repr(None),
+			'entropy_function': repr(os.urandom),
+			'char_upper': repr(99),
+			'char_lower': repr(1),
+			'char_range': repr(tuple(('${PiAP-rand:char_lower}', '${PiAP-rand:char_upper}'))),
+			'passphrase_length': repr(16),
+			'passphrase_encoding': str("utf-8"),
+			'SSID_length': repr(20)
+		}),
+		'PiAP-network-lan': dict({
+			'keyfile': repr(None),
+			'network_ipv4_on': repr(True),
+			'network_ipv4': repr(tuple(("10.0.40", 0))),
+			'ipv4_dhcp_reserved': repr({}),
+			'network_ipv6_on': repr(False),
+			'network_ipv6': repr(None),
+			'ipv6_dhcp_reserved': repr(None)
+		})
+	})
+	return default_config
+
+
+@remediation.error_handling
+def writeDefaultMainConfigFile(confFile='/var/opt/PiAP/PiAP.conf'):
+	try:
+		config = configparser.ConfigParser()
+		default_config = getDefaultMainConfigFile()
+		# config.add_section('PiAP-logging')
+		# config['PIAP-logging'] = {}
+		# logging['timefmt'] = str("""%a %b %d %H:%M:%S %Z %Y""")
+		for someSection in default_config.keys():
+			config.add_section(someSection)
+			for someOption in default_config[someSection].keys():
+				config[someSection][someOption] = dict(default_config[someSection])[someOption]
+		with utils.open_func(confFile, 'w') as configfile:
+			config.write(configfile)
+	except Exception as err:
+		print(str(err))
+		print(str(type(err)))
+		print(str((err.args)))
+		return False
+	return True
+
+
+@remediation.error_handling
+def writeMainConfigFile(confFile='/var/opt/PiAP/PiAP.conf', config_data=None):
+	try:
+		config = configparser.ConfigParser()
+		default_config = loadMainConfigFile(confFile)
+		# config.add_section('PiAP-logging')
+		# config['PIAP-logging'] = {}
+		# logging['timefmt'] = str("""%a %b %d %H:%M:%S %Z %Y""")
+		for someSection in config_data.keys():
+			config.add_section(someSection)
+			for someOption in config_data[someSection].keys():
+				config[someSection][someOption] = dict(config_data[someSection])[someOption]
+		for someSection in default_config.keys():
+			if not config.has_section(someSection):
+				config.add_section(someSection)
+			for someOption in default_config[someSection].keys():
+				if not config.has_option(someSection, someOption):
+					config[someSection][someOption] = dict(default_config[someSection])[someOption]
+		with utils.open_func(confFile, 'w') as configfile:
+			config.write(configfile)
+	except Exception as err:
+		print(str(err))
+		print(str(type(err)))
+		print(str((err.args)))
+		return False
+	return True
+
+
+@remediation.error_handling
+def loadMainConfigFile(confFile='/var/opt/PiAP/PiAP.conf'):
+	try:
+		config = configparser.ConfigParser()
+		# config.add_section('PiAP-logging')
+		# config['PIAP-logging'] = {}
+		# logging['timefmt'] = str("""%a %b %d %H:%M:%S %Z %Y""")
+		result_config = getDefaultMainConfigFile()
+		with utils.open_func(confFile, 'r') as configfile:
+			config.read(configfile)
+		for someSection in config.sections():
+			if str(someSection) in result_config.keys():
+				for someOption in config.options(someSection):
+					if str(someOption) in result_config[someSection].keys():
+						continue
+					else:
+						result_config[someSection][someOption] = config[someSection][someOption]
+			else:
+				result_config[someSection] = dict({})
+				for someOption in config.options(someSection):
+					result_config[someSection][someOption] = config[someSection][someOption]
+	except Exception as err:
+		print(str(err))
+		print(str(type(err)))
+		print(str((err.args)))
+		return getDefaultMainConfigFile()
+	return result_config
+
+
+# branch mark end
 
 
 if __name__ in u'__main__':
