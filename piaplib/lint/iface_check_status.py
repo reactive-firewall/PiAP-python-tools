@@ -86,7 +86,7 @@ def parseargs(arguments=None):
 		)
 		parser.add_argument(
 			'-i', '--interface',
-			default=interfaces.INTERFACE_CHOICES[1], choices=interfaces.INTERFACE_CHOICES,
+			default=interfaces.INTERFACE_CHOICES[0], choices=interfaces.INTERFACE_CHOICES,
 			help='The interface to show.'
 		)
 		parser.add_argument(
@@ -213,7 +213,7 @@ def get_iface_list():
 		if x in interfaces.INTERFACE_CHOICES:
 			theResult.append(x)
 	theResult = utils.compactList([x for x in theResult])
-	"""while '[aehltw]{3}[n]?[0-9]+' would probably work well here, best to whitelist. """
+	"""while regex would probably work well here, best to whitelist. """
 	return theResult
 
 

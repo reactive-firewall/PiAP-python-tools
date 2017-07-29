@@ -12,6 +12,9 @@ Standards checklist:
 	PEP324 - subproccess
 	RFC 4880 - pgpy (bsd compatable python pgp)
 	
+	RFC3530 - NFSv4
+	
+	
 	encryption:
 	aes-256-ctr
 	- ??

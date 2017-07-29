@@ -170,6 +170,55 @@ class ConfigTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
+	def test_case_default_config(self):
+		"""Tests the default configuration functions"""
+		theResult = False
+		try:
+			from piaplib import pku as pku
+			if pku.__name__ is None:
+				raise ImportError("Failed to import pku")
+			from pku import config as config
+			if config.__name__ is None:
+				raise ImportError("Failed to import config")
+			self.assertIsNotNone(config.getDefaultMainConfigFile())
+			theResult = True
+		except Exception as err:
+			print(str(""))
+			print(str("Error in test of default config"))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			err = None
+			del err
+			theResult = False
+		assert theResult
+
+	def test_case_write_default_config(self):
+		"""Tests the write default configuration functions"""
+		theResult = False
+		try:
+			from piaplib import pku as pku
+			if pku.__name__ is None:
+				raise ImportError("Failed to import pku")
+			from pku import config as config
+			if config.__name__ is None:
+				raise ImportError("Failed to import config")
+			self.assertTrue(config.writeMainConfigFile('/tmp/test_config.cnf'))
+			self.assertIsNotNone(config.loadMainConfigFile('/tmp/test_config.cnf'))
+			theResult = True
+		except Exception as err:
+			print(str(""))
+			print(str("Error in test of default config"))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			err = None
+			del err
+			theResult = False
+		assert theResult
+
 	def test_case_yaml_read_write_file(self):
 		"""Tests the YAML read and write functions"""
 		theResult = False
