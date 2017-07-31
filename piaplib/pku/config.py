@@ -167,12 +167,15 @@ def writeYamlFile(somefile, data):
 
 
 try:
-	import configparser as configparser
-except Exception:
 	try:
-		import ConfigParser as configparser
+		import configparser as configparser
 	except Exception:
-		raise ImportError("Error Importing ConfigParser utils for config")
+		try:
+			import ConfigParser as configparser
+		except Exception:
+			raise ImportError("Error Importing ConfigParser utils for config")
+except Exception:
+	pass
 
 
 @remediation.error_handling
@@ -216,7 +219,7 @@ def getDefaultMainConfigFile():
 
 
 @remediation.error_handling
-def writeDefaultMainConfigFile(confFile='/var/opt/PiAP/PiAP.conf'):
+def writeDefaultMainConfigFile(confFile=str('/var/opt/PiAP/PiAP.conf')):
 	theResult = False
 	if writeMainConfigFile(confFile, getDefaultMainConfigFile()):
 		theResult = True
@@ -224,23 +227,27 @@ def writeDefaultMainConfigFile(confFile='/var/opt/PiAP/PiAP.conf'):
 
 
 @remediation.error_handling
-def writeMainConfigFile(confFile='/var/opt/PiAP/PiAP.conf', config_data=None):
+def writeMainConfigFile(confFile=str('/var/opt/PiAP/PiAP.conf'), config_data=None):
 	try:
-		config = configparser.ConfigParser()
+		theConfig = configparser.ConfigParser(allow_no_value=True)
 		default_config = loadMainConfigFile(confFile)
 		if config_data is not None:
 			for someSection in config_data.keys():
-				config.add_section(someSection)
+				theConfig.add_section(someSection)
 				for someOption in config_data[someSection].keys():
-					config.set(someSection, someOption, config_data[someSection][someOption])
+					theConfig.set(someSection, someOption, config_data[someSection][someOption])
 		for someSection in default_config.keys():
-			if not config.has_section(someSection):
-				config.add_section(someSection)
+			if not theConfig.has_section(someSection):
+				theConfig.add_section(someSection)
 			for someOption in default_config[someSection].keys():
-				if not config.has_option(someSection, someOption):
-					config.set(someSection, someOption, default_config[someSection][someOption])
-		with utils.open_func(confFile, 'w+') as configfile:
-			config.write(configfile)
+				if not theConfig.has_option(someSection, someOption):
+					theConfig.set(someSection, someOption, default_config[someSection][someOption])
+		try:
+			with utils.open_func(file=confFile, mode='w+') as configfile:
+				theConfig.write(configfile)
+		except Exception:
+			with open(confFile, 'wb') as configfile:
+				theConfig.write(configfile)
 	except Exception as err:
 		print(str(err))
 		print(str(type(err)))
@@ -252,14 +259,10 @@ def writeMainConfigFile(confFile='/var/opt/PiAP/PiAP.conf', config_data=None):
 @remediation.error_handling
 def loadMainConfigFile(confFile='/var/opt/PiAP/PiAP.conf'):
 	try:
-		config = configparser.ConfigParser()
+		config = configparser.ConfigParser(allow_no_value=True)
 		result_config = getDefaultMainConfigFile()
-		try:
-			with utils.open_func(confFile, 'r') as configfile:
-				config.read(configfile)
-		finally:
-			if configfile:
-				configfile.close()
+		with utils.open_func(file=confFile, mode=u'r', encoding=u'utf-8') as configfile:
+			config.read(configfile)
 		for someSection in config.sections():
 			if str(someSection) in result_config.keys():
 				for someOption in config.options(someSection):

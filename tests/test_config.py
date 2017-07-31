@@ -204,8 +204,9 @@ class ConfigTestSuite(unittest.TestCase):
 			from pku import config as config
 			if config.__name__ is None:
 				raise ImportError("Failed to import config")
-			self.assertTrue(config.writeMainConfigFile('/tmp/test_config.cnf'))
-			self.assertIsNotNone(config.loadMainConfigFile('/tmp/test_config.cnf'))
+			test_path = str("/tmp/test_config.cnf")
+			self.assertTrue(config.writeMainConfigFile(test_path))
+			self.assertIsNotNone(config.loadMainConfigFile(test_path))
 			theResult = True
 		except Exception as err:
 			print(str(""))
