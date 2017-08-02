@@ -312,9 +312,25 @@ def addExtension(somefile, extension):
 		return str("{}.{}").format(somefile, extension)
 
 
+@remediation.error_handling
+def xisfile(somefile):
+	"""Ensures the given file is available for reading."""
+	if (somefile is None):
+		return False
+	import os.path
+	if os.path.isabs(somefile) and os.path.isfile(somefile):
+		return True
+	else:
+		return os.path.isfile(os.path.abspath(somefile))
+
+
 @remediation.error_passing
 def open_func(file, mode='r', buffering=-1, encoding=None):
 	""" cross-python open function """
+	if xstr("r") in xstr(mode):
+		if not xisfile(file):
+			logs.log(str("[CWE-73] File expected, but not found. Redacted filename."), "Info")
+			file = None
 	try:
 		import six
 		if six.PY2:
