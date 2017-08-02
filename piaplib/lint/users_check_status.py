@@ -370,7 +370,7 @@ def get_user_list():
 	return theResult
 
 
-def get_user_status(user_name=None, use_html=False):
+def get_user_status(user_name=None, use_html=False):  # noqa C901
 	"""Generate the status"""
 	theResult = None
 	try:
@@ -560,7 +560,7 @@ def get_user_ip(user=None, use_html=False):
 	return theResult
 
 
-def main(argv=None):
+def main(argv=None):  # noqa C901
 	"""The main function."""
 	args = parseargs(argv)
 	try:

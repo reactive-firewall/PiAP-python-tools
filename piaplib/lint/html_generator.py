@@ -153,16 +153,16 @@ def gen_html_ul(somelist=None, id=None, name=None):
 	items = [gen_html_li(x) for x in somelist]
 	theresult = None
 	if id is not None and has_special_html_chars(id) is not True:
-		if name is not None and has_special_html_chars(name) is not True:
-			theresult = str(u'<ul name=\"{}\" id=\"{}\">').format(str(name), str(id))
-			for item in items:
-				theresult = str(theresult + item)
-		else:
-			theresult = str(u'<ul id=\"{}\">').format(str(id))
-			for item in items:
-				theresult = str(theresult + item)
+		if name is None or has_special_html_chars(name) is True:
+			name = utils.literal_str(id)
+		theresult = str(u'<ul name=\"{}\" id=\"{}\">').format(
+			utils.literal_str(name),
+			utils.literal_str(id)
+		)
+		for item in items:
+			theresult = str(theresult + item)
 	elif name is not None and has_special_html_chars(name) is not True:
-		theresult = str(u'<ul name=\"{}\">').format(str(name))
+		theresult = str(u'<ul name=\"{}\">').format(utils.literal_str(name))
 		for item in items:
 			theresult = str(theresult + item)
 	else:
@@ -184,13 +184,17 @@ def gen_html_li(item=None, id=None, name=None):
 	"""
 	if id is not None and has_special_html_chars(id) is not True:
 		if name is not None and has_special_html_chars(name) is not True:
-			return str(u'<li name=\"{}\" id=\"{}\">{}</li>').format(str(name), str(id), str(item))
+			return str(u'<li name=\"{}\" id=\"{}\">{}</li>').format(
+				utils.literal_str(name),
+				utils.literal_str(id),
+				utils.literal_str(item)
+			)
 		else:
-			return str(u'<li id=\"{}\">{}</li>').format(id, str(item))
+			return str(u'<li id=\"{}\">{}</li>').format(id, utils.literal_str(item))
 	elif name is not None and has_special_html_chars(name) is not True:
-			return str(u'<li name=\"{}\">{}</li>').format(id, str(item))
+			return str(u'<li name=\"{}\">{}</li>').format(id, utils.literal_str(item))
 	else:
-		return str(u'<li>{}</li>').format(str(item))
+		return str(u'<li>{}</li>').format(utils.literal_str(item))
 
 
 def gen_html_label(content=None, role=HTML_LABEL_ROLES[0], id=None, name=None):

@@ -146,17 +146,12 @@ class SaltTestSuite(unittest.TestCase):
 		theResult = True
 		try:
 			from .context import piaplib
-			if piaplib.__name__ is None:
-				theResult = False
 			from piaplib import keyring as keyring
-			if keyring.__name__ is None:
-				theResult = False
 			from keyring import saltify as saltify
-			if saltify.__name__ is None:
-				theResult = False
 			from keyring import rand as rand
-			if rand.__name__ is None:
-				theResult = False
+			for depends in [piaplib, keyring, saltify, rand]:
+				if depends.__name__ is None:
+					theResult = False
 			randomSalt = str(rand.randStr(10))
 			space = str(""" """)
 			randomSalt_shift1 = randomSalt + space

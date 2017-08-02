@@ -350,8 +350,8 @@ def get_client_list(lan_interface=None):
 	return theResult
 
 
-@remediation.error_handling
-def get_client_status(client=None, use_html=False, lan_interface=None):
+@remediation.error_handling  # noqa C901
+def get_client_status(client=None, use_html=False, lan_interface=None):  # noqa C901
 	"""Generate the status"""
 	theResult = None
 	try:
@@ -456,6 +456,23 @@ def get_client_ip(client=None, use_html=False, lan_interface=None):
 	return theResult
 
 
+@remediation.error_handling
+def showAllClients(verbose_mode, output_html, client_interface):
+	"""Used by main to show all. Not intended to be called directly"""
+	if output_html:
+		print(
+			"<table class=\"table table-striped\">" +
+			"<thead><th>Client</th><th>MAC</th><th>IP</th><th>Status</th></thead><tbody>"
+		)
+	client_list = get_client_list(client_interface)
+	if client_list is None:
+		client_list = []
+	for client_name in client_list:
+		print(show_client(str(client_name), verbose_mode, output_html, client_interface))
+	if output_html:
+		print("</tbody></table>")
+
+
 @remediation.bug_handling
 def main(argv=None):
 	"""The main function."""
@@ -470,30 +487,17 @@ def main(argv=None):
 		if args.interface is not None:
 			client_interface = args.interface
 		if args.show_all is True:
-			if output_html:
-				print(str(
-					u'<table class=\"table table-striped\">' +
-					u'<thead><th>Client</th><th>MAC</th><th>IP</th><th>Status</th></thead><tbody>'
-				))
+			showAllClients(verbose, output_html, client_interface)
+		elif args.list is True:
 			client_list = get_client_list(client_interface)
 			if client_list is None:
 				client_list = []
 			for client_name in client_list:
-				print(show_client(str(client_name), verbose, output_html, client_interface))
-			if output_html:
-				print("</tbody></table>")
+				print(str(client_name))
 		else:
-			if args.list is True:
-				client_list = get_client_list(client_interface)
-				if client_list is None:
-					client_list = []
-				for client_name in client_list:
-					print(str(client_name))
-			else:
-				ip = args.ip
-				print(show_client(ip, verbose, output_html, client_interface))
-				return 0
-			return 0
+			ip = args.ip
+			print(show_client(ip, verbose, output_html, client_interface))
+		return 0
 	except Exception as main_err:
 		print(str("client_check_status: REALLY BAD ERROR: ACTION will not be compleated! ABORT!"))
 		print(str(main_err))

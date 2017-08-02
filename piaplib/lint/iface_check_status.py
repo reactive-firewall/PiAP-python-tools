@@ -305,34 +305,39 @@ def get_iface_ip_list(iface=u'lo', use_html=False):
 	return theResult
 
 
+@remediation.error_handling
+def showAlliFace(verbose_mode, output_html):
+	"""Used by main to show all. Not intended to be called directly"""
+	if output_html:
+		print(
+			"<table class=\"table table-striped\">" +
+			"<thead><th>Interface</th><th>MAC</th><th>IP</th><th>State</th></thead><tbody>"
+		)
+	for iface_name in get_iface_list():
+		print(show_iface(iface_name, verbose_mode, output_html))
+	if output_html:
+		print("</tbody></table>")
+
+
 def main(argv=None):
 	"""The main function."""
 	args = parseargs(argv)
 	try:
 		verbose = False
+		output_html = False
 		if args.verbose_mode is not None:
 				verbose = args.verbose_mode
 		if args.output_html is not None:
 				output_html = args.output_html
 		if args.show_all is True:
-			if output_html:
-				print(
-					"<table class=\"table table-striped\">" +
-					"<thead><th>Interface</th><th>MAC</th><th>IP</th><th>State</th></thead><tbody>"
-				)
+			showAlliFace(verbose, output_html)
+		elif args.list is True:
 			for iface_name in get_iface_list():
-				print(show_iface(iface_name, verbose, output_html))
-			if output_html:
-				print("</tbody></table>")
+				print(str(iface_name))
 		else:
-			if args.list is True:
-				for iface_name in get_iface_list():
-					print(str(iface_name))
-			else:
-				interface = args.interface
-				print(show_iface(interface, verbose, output_html))
-				return 0
-			return 0
+			interface = args.interface
+			print(show_iface(interface, verbose, output_html))
+		return 0
 	except Exception as main_err:
 		logs.log(
 			str("iface_check_status: REALLY BAD ERROR: ACTION will not be compleated! ABORT!"),

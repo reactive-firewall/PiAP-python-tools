@@ -319,7 +319,7 @@ class CryptoTestSuite(unittest.TestCase):
 				raise unittest.SkipTest("BETA. Experemental feature not ready yet.")
 		assert theResult
 
-	def test_case_clearify_read_write(self):
+	def test_case_clearify_read_write(self):  # noqa C901
 		"""Tests the helper function pack to file of keyring.clearify and then unpack"""
 		theResult = False
 		try:

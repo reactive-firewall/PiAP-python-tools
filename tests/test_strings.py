@@ -238,14 +238,12 @@ class StringsTestSuite(unittest.TestCase):
 			]
 			for testcase in the_test_cases:
 				if theResult is True:
-					if testcase[0] is None:
+					if testcase[0] is None or testcase[1] is None:
 						continue
-					if testcase[1] is not None:
+					else:
 						theResult = (
 							testcase[0] in testcase[1]
 						)
-					else:
-						continue
 					if utils.literal_str(testcase[0]) is None:
 						continue
 					if utils.literal_str(testcase[1]) is not None:
@@ -406,14 +404,11 @@ class StringsTestSuite(unittest.TestCase):
 		theResult = True
 		try:
 			from piaplib import pku as pku
-			if pku.__name__ is None:
-				raise ImportError("Failed to import pku")
 			from pku import utils as utils
-			if utils.__name__ is None:
-				raise ImportError("Failed to import utils")
 			import os
-			if os.__name__ is None:
-				raise ImportError("Failed to import os. Are we alive?")
+			for depends in [os, utils, pku]:
+				if depends.__name__ is None:
+					raise ImportError("Failed to import dependancy")
 			for testrun in range(1000):
 				randomTest = os.urandom(10)
 				testcase = [str(randomTest), utils.literal_str(randomTest)]
