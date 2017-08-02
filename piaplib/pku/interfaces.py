@@ -40,7 +40,7 @@ __prog__ = """piaplib.pku.interfaces"""
 """The name of this PiAPLib tool is Pocket Knife Interfaces Unit"""
 
 
-IFACE_PREFIXES = [str("wlan"), str("eth"), str("usb"), str("br"), str("mon")]
+IFACE_PREFIXES = [str("lan"), str("wlan"), str("eth"), str("usb"), str("br"), str("mon")]
 """whitelist of valid iface prefixes"""
 
 
@@ -63,7 +63,7 @@ def parseargs(arguments=None):
 		parser.add_argument(
 			'-i',
 			'--interface',
-			default=INTERFACE_CHOICES[1],
+			default=INTERFACE_CHOICES[0],
 			choices=INTERFACE_CHOICES,
 			help='The interface to use.'
 		)

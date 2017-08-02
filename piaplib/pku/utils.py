@@ -296,8 +296,41 @@ def xstr(some_str=None):
 
 
 @remediation.error_passing
+def addExtension(somefile, extension):
+	"""Ensures the given extension is used."""
+	if (somefile is None):
+		return None
+	if (extension is None):
+		return somefile
+	if (len(str(somefile)) > len(extension)):
+		offset = (-1 * len(extension))
+		if (extension in str(somefile)[offset:]) and (str(".") in str(somefile)):
+			return somefile
+		else:
+			return str("{}.{}").format(somefile, extension)
+	else:
+		return str("{}.{}").format(somefile, extension)
+
+
+@remediation.error_handling
+def xisfile(somefile):
+	"""Ensures the given file is available for reading."""
+	if (somefile is None):
+		return False
+	import os.path
+	if os.path.isabs(somefile) and os.path.isfile(somefile):
+		return True
+	else:
+		return os.path.isfile(os.path.abspath(somefile))
+
+
+@remediation.error_passing
 def open_func(file, mode='r', buffering=-1, encoding=None):
 	""" cross-python open function """
+	if xstr("r") in xstr(mode):
+		if not xisfile(file):
+			logs.log(str("[CWE-73] File expected, but not found. Redacted filename."), "Info")
+			file = None
 	try:
 		import six
 		if six.PY2:
@@ -313,7 +346,7 @@ def open_func(file, mode='r', buffering=-1, encoding=None):
 
 @remediation.error_passing
 def write_func(someFile, the_data=None):
-	""" cross-python open function """
+	""" cross-python write function """
 	try:
 		import six
 		if six.PY2:

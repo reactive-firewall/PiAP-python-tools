@@ -168,28 +168,16 @@ class BasicUsageTestSuite(unittest.TestCase):
 		theResult = True
 		try:
 			import sys
-			if sys.__name__ is None:
-				theResult = False
 			import os
-			if os.__name__ is None:
-				theResult = False
 			import argparse
-			if argparse.__name__ is None:
-				theResult = False
-			if subprocess.__name__ is None:
-				theResult = False
+			import subprocess
 			import time
-			if time.__name__ is None:
-				theResult = False
 			import re
-			if re.__name__ is None:
-				theResult = False
 			import hashlib
-			if hashlib.__name__ is None:
-				theResult = False
 			import hmac
-			if hmac.__name__ is None:
-				theResult = False
+			for depends in [sys, os, argparse, subprocess, time, re, hashlib, hmac]:
+				if depends.__name__ is None:
+					theResult = False
 		except Exception as impErr:
 			print(str(""))
 			print(str(type(impErr)))

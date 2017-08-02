@@ -1,0 +1,21 @@
+version: 2
+jobs:
+  build:
+    working_directory: ~/PiAP-python-tools
+    docker:
+      - image: circleci/python:3.6.1
+        environment:
+          CI: cicleci
+          POSTGRES_DB: circle_test
+    steps:
+      - checkout
+      - run:
+          command: |
+            make clean
+      - run:
+          command: |
+            make test
+      - run:
+          command: |
+            make clean
+destination: tr1

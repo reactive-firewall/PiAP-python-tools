@@ -83,135 +83,6 @@ class ConfigTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
-	def test_case_config_none_ext(self):
-		"""Tests the addExtension when input is None"""
-		theResult = True
-		try:
-			from .context import piaplib as piaplib
-			if piaplib.__name__ is None:
-				raise ImportError("Failed to import pku")
-			from piaplib import pocket as pocket
-			if pocket.__name__ is None:
-				raise ImportError("Failed to import utils")
-			from piaplib import pku as pku
-			if pku.__name__ is None:
-				raise ImportError("Failed to import pku")
-			from pku import config as config
-			if config.__name__ is None:
-				raise ImportError("Failed to import config")
-			self.assertIsNone(config.addExtension(None, None))
-		except Exception as err:
-			print(str(""))
-			print(str(type(err)))
-			print(str(err))
-			print(str((err.args)))
-			print(str(""))
-			err = None
-			del err
-			theResult = False
-		assert theResult
-
-	def test_case_config_file_with_none_ext(self):
-		"""Tests the addExtension when input is (test, None)"""
-		theResult = True
-		try:
-			from .context import piaplib as piaplib
-			if piaplib.__name__ is None:
-				raise ImportError("Failed to import pku")
-			from piaplib import pocket as pocket
-			if pocket.__name__ is None:
-				raise ImportError("Failed to import utils")
-			from piaplib import pku as pku
-			if pku.__name__ is None:
-				raise ImportError("Failed to import pku")
-			from pku import config as config
-			if config.__name__ is None:
-				raise ImportError("Failed to import config")
-			test = None
-			test_name = str("test_no_dot")
-			self.assertIsNone(test)
-			test = config.addExtension(test_name, None)
-			self.assertIsNotNone(test)
-			self.assertEqual(test, test_name)
-		except Exception as err:
-			print(str(""))
-			print(str(type(err)))
-			print(str(err))
-			print(str((err.args)))
-			print(str(""))
-			err = None
-			del err
-			theResult = False
-		assert theResult
-
-	def test_case_config_file_with_short_ext(self):
-		"""Tests the addExtension when input is (test, txt)"""
-		theResult = True
-		try:
-			from .context import piaplib as piaplib
-			if piaplib.__name__ is None:
-				raise ImportError("Failed to import pku")
-			from piaplib import pocket as pocket
-			if pocket.__name__ is None:
-				raise ImportError("Failed to import utils")
-			from piaplib import pku as pku
-			if pku.__name__ is None:
-				raise ImportError("Failed to import pku")
-			from pku import config as config
-			if config.__name__ is None:
-				raise ImportError("Failed to import config")
-			test = None
-			test_name = str("test_no_dot")
-			test_ext = str("txt")
-			self.assertIsNone(test)
-			test = config.addExtension(test_name, test_ext)
-			self.assertIsNotNone(test)
-			self.assertNotEqual(test, test_name)
-		except Exception as err:
-			print(str(""))
-			print(str(type(err)))
-			print(str(err))
-			print(str((err.args)))
-			print(str(""))
-			err = None
-			del err
-			theResult = False
-		assert theResult
-
-	def test_case_config_file_with_long_ext(self):
-		"""Tests the addExtension when input is (test, much_longer_extension)"""
-		theResult = True
-		try:
-			from .context import piaplib as piaplib
-			if piaplib.__name__ is None:
-				raise ImportError("Failed to import pku")
-			from piaplib import pocket as pocket
-			if pocket.__name__ is None:
-				raise ImportError("Failed to import utils")
-			from piaplib import pku as pku
-			if pku.__name__ is None:
-				raise ImportError("Failed to import pku")
-			from pku import config as config
-			if config.__name__ is None:
-				raise ImportError("Failed to import config")
-			test = None
-			test_name = str("test")
-			test_ext = str("much_longer_extension")
-			self.assertIsNone(test)
-			test = config.addExtension(test_name, test_ext)
-			self.assertIsNotNone(test)
-			self.assertNotEqual(test, test_name)
-		except Exception as err:
-			print(str(""))
-			print(str(type(err)))
-			print(str(err))
-			print(str((err.args)))
-			print(str(""))
-			err = None
-			del err
-			theResult = False
-		assert theResult
-
 	def test_case_config_supports_json(self):
 		"""Tests the config.hasJsonSupport() function"""
 		theResult = True
@@ -290,6 +161,56 @@ class ConfigTestSuite(unittest.TestCase):
 		except Exception as err:
 			print(str(""))
 			print(str("Error in test of json write-read"))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			err = None
+			del err
+			theResult = False
+		assert theResult
+
+	def test_case_default_config(self):
+		"""Tests the default configuration functions"""
+		theResult = False
+		try:
+			from piaplib import pku as pku
+			if pku.__name__ is None:
+				raise ImportError("Failed to import pku")
+			from pku import config as config
+			if config.__name__ is None:
+				raise ImportError("Failed to import config")
+			self.assertIsNotNone(config.getDefaultMainConfigFile())
+			theResult = True
+		except Exception as err:
+			print(str(""))
+			print(str("Error in test of default config"))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			err = None
+			del err
+			theResult = False
+		assert theResult
+
+	def test_case_write_default_config(self):
+		"""Tests the write default configuration functions"""
+		theResult = False
+		try:
+			from piaplib import pku as pku
+			if pku.__name__ is None:
+				raise ImportError("Failed to import pku")
+			from pku import config as config
+			if config.__name__ is None:
+				raise ImportError("Failed to import config")
+			test_path = str("/tmp/test_config.cnf")
+			self.assertTrue(config.writeMainConfigFile(test_path))
+			self.assertIsNotNone(config.loadMainConfigFile(test_path))
+			theResult = True
+		except Exception as err:
+			print(str(""))
+			print(str("Error in test of default config"))
 			print(str(type(err)))
 			print(str(err))
 			print(str((err.args)))
