@@ -226,28 +226,60 @@ def writeDefaultMainConfigFile(confFile=str('/var/opt/PiAP/PiAP.conf')):
 	return theResult
 
 
-@remediation.error_handling
-def writeMainConfigFile(confFile=str('/var/opt/PiAP/PiAP.conf'), config_data=None):
-	try:
+@remediation.error_passing
+def mergeConfigParser(theConfig=None, config_data=None, overwrite=False):
+	"""
+	Merges the Configuration Dictionary into a configparser.
+	param theConfig - configparser.ConfigParser the ConfigParser.
+	param config_data - dict the configuration to merge.
+	param overwrite - boolean determining if the dict is record of truth or if theConfig is.
+	"""
+	if theConfig is None:
 		theConfig = configparser.ConfigParser(allow_no_value=True)
-		default_config = loadMainConfigFile(confFile)
-		if config_data is not None:
-			for someSection in config_data.keys():
-				theConfig.add_section(someSection)
-				for someOption in config_data[someSection].keys():
-					theConfig.set(someSection, someOption, config_data[someSection][someOption])
-		for someSection in default_config.keys():
+	if config_data is not None:
+		for someSection in config_data.keys():
 			if not theConfig.has_section(someSection):
 				theConfig.add_section(someSection)
-			for someOption in default_config[someSection].keys():
-				if not theConfig.has_option(someSection, someOption):
-					theConfig.set(someSection, someOption, default_config[someSection][someOption])
+			for someOption in config_data[someSection].keys():
+				if not theConfig.has_option(someSection, someOption) or (overwrite is True):
+					theConfig.set(someSection, someOption, config_data[someSection][someOption])
+	return theConfig
+
+
+@remediation.error_handling
+def parseConfigParser(config_data=None, theConfig=None, overwrite=True):
+	"""
+	Merges the Configuration Dictionary into a configparser.
+	param config_data - dict the configuration to merge.
+	param theConfig - configparser.ConfigParser the ConfigParser.
+	param overwrite - boolean determining if the dict is record of truth or if theConfig is.
+	"""
+	if config_data is None:
+		config_data = dict({})
+	if theConfig is not None:
+		for someSection in theConfig.sections():
+			if str(someSection) not in config_data.keys():
+				config_data[someSection] = dict({})
+			for someOption in theConfig.options(someSection):
+				if str(someOption) not in config_data[someSection].keys() or (overwrite is True):
+					config_data[someSection][someOption] = theConfig.get(someSection, someOption)
+	return config_data
+
+
+@remediation.error_handling
+def writeMainConfigFile(confFile=str('/var/opt/PiAP/PiAP.conf'), config_data=None):
+	"""Generates the Main Configuration file for PiAPlib"""
+	try:
+		mainConfig = configparser.ConfigParser(allow_no_value=True)
+		default_config = loadMainConfigFile(confFile)
+		mainConfig = mergeConfigParser(mainConfig, config_data, True)
+		mainConfig = mergeConfigParser(mainConfig, default_config, False)
 		try:
 			with utils.open_func(file=confFile, mode='w+') as configfile:
-				theConfig.write(configfile)
+				mainConfig.write(configfile)
 		except Exception:
 			with open(confFile, 'wb') as configfile:
-				theConfig.write(configfile)
+				mainConfig.write(configfile)
 	except Exception as err:
 		print(str(err))
 		print(str(type(err)))
@@ -259,18 +291,11 @@ def writeMainConfigFile(confFile=str('/var/opt/PiAP/PiAP.conf'), config_data=Non
 @remediation.error_handling
 def loadMainConfigFile(confFile='/var/opt/PiAP/PiAP.conf'):
 	try:
-		config = configparser.ConfigParser(allow_no_value=True)
+		mainConfig = configparser.ConfigParser(allow_no_value=True)
 		result_config = getDefaultMainConfigFile()
 		with utils.open_func(file=confFile, mode=u'r', encoding=u'utf-8') as configfile:
-			config.read(configfile)
-		for someSection in config.sections():
-			if str(someSection) in result_config.keys():
-				for someOption in config.options(someSection):
-					result_config[someSection][someOption] = config.get(someSection, someOption)
-			else:
-				result_config[someSection] = dict({})
-				for someOption in config.options(someSection):
-					result_config[someSection][someOption] = config.get(someSection, someOption)
+			mainConfig.read(configfile)
+		result_config = parseConfigParser(result_config, mainConfig, True)
 	except Exception as err:
 		print(str(err))
 		print(str(type(err)))
