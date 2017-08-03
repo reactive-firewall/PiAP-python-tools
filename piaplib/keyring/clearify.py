@@ -70,7 +70,7 @@ __prog__ = """piaplib.keyring.clearify"""
 """The name of this PiAPLib tool is clearify"""
 
 
-DEFAULT_BETA_FILE_PATH = str("""/var/opt/PiAP/.beta_h5RlRMVO6RzA""")
+DEFAULT_BETA_FILE_PATH = str("""/var/opt/PiAP/.beta_W1AsYRUDzyZx""")
 """THIS IS A PLACEHOLDER. WILL move this to a config file."""
 
 

@@ -159,7 +159,11 @@ def get_client_name(client_ip=None, use_html=False, lan_interface=None):
 	if client_ip is None:
 		return None
 	if use_html is not True:
-		return get_client_arp_status_raw(client_ip, lan_interface).split(u' ', 1)[0]
+		temp_name = get_client_arp_status_raw(client_ip, lan_interface).split(u' ', 1)[0]
+		if temp_name is not None and len(temp_name) > 0:
+			return temp_name
+		else:
+			return str("UNKNOWN")
 	else:
 		client = str(get_client_name(client_ip, False))
 		return html_generator.gen_html_td(client, str(u'client_status_{}').format(client))

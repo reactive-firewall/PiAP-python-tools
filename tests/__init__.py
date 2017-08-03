@@ -171,6 +171,34 @@ try:
 		raise ImportError(str("Test module failed completely."))
 		exit(1)
 	try:
+		from tests import test_version
+		if test_version.__name__ is None:
+			raise ImportError(str("Test module failed to import even the version special tests."))
+	except Exception as impErr:
+		print(str(''))
+		print(str(type(impErr)))
+		print(str(impErr))
+		print(str((impErr.args)))
+		print(str(''))
+		impErr = None
+		del impErr
+		raise ImportError(str("Test module failed completely."))
+		exit(1)
+	try:
+		from tests import test_clients_check
+		if test_clients_check.__name__ is None:
+			raise ImportError(str("Test module failed to import even the client special tests."))
+	except Exception as impErr:
+		print(str(''))
+		print(str(type(impErr)))
+		print(str(impErr))
+		print(str((impErr.args)))
+		print(str(''))
+		impErr = None
+		del impErr
+		raise ImportError(str("Test module failed completely."))
+		exit(1)
+	try:
 		from tests import test_interface
 		if test_interface.__name__ is None:
 			raise ImportError(str("Test module failed to import even the iface special tests."))

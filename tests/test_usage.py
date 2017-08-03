@@ -298,6 +298,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 				"lint.lint",
 				"pku.pku",
 				"book.book",
+				"book.version",
 				"keyring.keyring"
 			]
 			if (thepython is not None):
@@ -352,7 +353,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 			if piaplib.__version__ is not None:
 				theResult = False
 			if (thepython is not None):
-				for unit in ["pocket"]:
+				for unit in ["pocket", "book.version"]:
 					theOutputtext = checkPythonCommand([
 						str(thepython),
 						str("-m"),
@@ -1519,6 +1520,48 @@ class BasicUsageTestSuite(unittest.TestCase):
 				except Exception as junkErr:  # noqa
 					del(junkErr)
 				# self.assertIsNone(theOutputtext)
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			othererr = None
+			del othererr
+			theResult = False
+		assert theResult
+
+	def test_d_python_command_version_check(self):  # noqa
+		"""Test case for piaplib.book.version."""
+		theResult = True
+		try:
+			from piaplib import pku as pku
+			if pku.__name__ is None:
+				raise ImportError("Failed to import pku")
+			from pku import utils as utils
+			if utils.__name__ is None:
+				raise ImportError("Failed to import utils")
+			import sys
+			if sys.__name__ is None:
+				raise ImportError("Failed to import system. WTF?!!")
+			thepython = getPythonCommand()
+			if (thepython is not None):
+				theOutputtext = None
+				theOutputtext = checkPythonFuzzing([
+					str(thepython),
+					str("-m"),
+					str("piaplib.book.version"),
+					str("--version")
+				], stderr=subprocess.STDOUT)
+				self.assertIsNotNone(theOutputtext)
+				theOutputtext = checkPythonFuzzing([
+					str(thepython),
+					str("-m"),
+					str("piaplib.book.version"),
+					str("all"),
+					str("--verbose")
+				], stderr=subprocess.STDOUT)
+				self.assertIsNotNone(theOutputtext)
 		except Exception as err:
 			print(str(""))
 			print(str(type(err)))

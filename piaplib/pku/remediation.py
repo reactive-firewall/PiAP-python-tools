@@ -94,7 +94,7 @@ def error_passing(func):
 			timestamp = getTimeStamp()
 			logs.log(str("An error occured at {}").format(timestamp), "Error")
 			logs.log(str(func), "Debug")
-			baton = PiAPError(err, str("An error occured."))
+			baton = PiAPError(err, str("An error occured in {}.").format(str(func)))
 			# sys.exc_clear()
 			err = None
 			del err
@@ -112,10 +112,11 @@ def error_breakpoint(error, context=None):
 	logs.log(str(context), "Debug")
 	logs.log(str(type(error)), "Error")
 	logs.log(str(error), "Error")
-	logs.log(str((error.args)), "Error")
 	if isinstance(error, PiAPError):
 		logs.log(str(error.cause), "Error")
 		logs.log(str(type(error.cause)), "Error")
+		logs.log(str((error.args)), "Error")
+	else:
 		logs.log(str((error.args)), "Error")
 	return None
 

@@ -190,6 +190,8 @@ class SaltTestSuite(unittest.TestCase):
 						self.assertIsNotNone(a)
 						self.assertIsNotNone(b)
 						self.assertNotEqual(a, b)
+				if ((int(someRandomTest) % int(100)) == 0):
+					print(str("Test {} ... ok").format(str(someRandomTest)))
 		except Exception as testErr:
 			print(str("Entropy - Fuzzing Crash Found new test"))
 			print(str(""))
