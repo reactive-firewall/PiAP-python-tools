@@ -262,7 +262,7 @@ def isLineForMatch(someLine=None, toMatch=None):
 def compactList(list, intern_func=None):
 	"""
 	Compacts Lists
-	Adapted from some now forgoten form about flattening arrays, and sorting.
+	Adapted from some now forgoten forum about flattening arrays, and sorting.
 	Cleaned up to be Pep8 compatable.
 	"""
 	if intern_func is None:
@@ -290,6 +290,18 @@ def xstr(some_str=None):
 		return str("_x_" + literal_str(some_str) + "_x_")
 	except Exception:
 		return None
+
+
+@remediation.error_handling
+@memoize
+def isWhiteListed(someString=None, whitelist=[]):
+	"""Determins if a raw input string is an exact string in the whitelist."""
+	for validString in [xstr(x) for x in compactList(whitelist)]:
+		if xstr(someString) in xstr(validString):
+			return True
+		else:
+			continue
+	return False
 
 
 """ I/O and Files """

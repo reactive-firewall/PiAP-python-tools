@@ -38,13 +38,11 @@ try:
 	except Exception:
 		from . import piaplib as piaplib
 	try:
-		from pku import utils as utils
+		from piaplib.pku import baseconfig as baseconfig
 	except Exception:
-		import piaplib.pku.utils as utils
-	try:
-		from pku import remediation as remediation
-	except Exception:
-		import piaplib.pku.remediation as remediation
+		import piaplib.pku.baseconfig as baseconfig
+	if baseconfig.__name__ is None:
+		raise ImportError("Failed to open PKU baseconfig")
 	try:
 		from .logs import logs as logs
 	except Exception as impErr:
@@ -54,8 +52,10 @@ try:
 			import logs.logs as logs
 		except Exception:
 			raise ImportError("Error Importing logs")
-	if utils.__name__ is None:
-		raise ImportError("Failed to open PKU Utils")
+	try:
+		from piaplib.pku import remediation as remediation
+	except Exception:
+		import piaplib.pku.remediation as remediation
 	if remediation.__name__ is None:
 		raise ImportError("Failed to open PKU Remediation")
 	if logs.__name__ is None:

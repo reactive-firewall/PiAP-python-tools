@@ -71,7 +71,7 @@ init:
 	$(QUIET)$(ECHO) "$@: Done."
 
 install: must_be_root
-	$(QUIET)python3 -m pip install "git+https://github.com/reactive-firewall/PiAP-python-tools.git#egg=piaplib"
+	$(QUIET)python3 -m pip install "git+https://github.com/reactive-firewall/PiAP-python-tools.git@stable#egg=piaplib"
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
 

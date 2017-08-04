@@ -263,7 +263,7 @@ def get_system_work_status_raw(user_name=None):
 	return theuserState
 
 
-# TODO: memoize this function
+@utils.memoize
 def get_w_cmd_args():
 	"""Either -his or -wnh depending on system."""
 	try:
@@ -379,7 +379,7 @@ def get_user_status(user_name=None, use_html=False):  # noqa C901
 		if user_name is not None:
 			user_tty = get_user_ttys(user_name, False)
 		status_txt = get_system_work_status_raw(user_name)
-		if (user_tty is not None) and (str(user_tty) not in str("console")):
+		if (user_tty is not None) and (str(user_tty).lower() not in str("console")):
 			status_txt = get_user_work_status_raw(user_name)
 			if status_txt is None:
 				status_list = ["UNKNOWN"]

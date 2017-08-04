@@ -42,7 +42,16 @@ except Exception:
 	try:
 		import remediation as remediation
 	except Exception:
-		raise ImportError("Error Importing remediation")
+		raise ImportError("Error Importing remediation for config")
+
+
+try:
+	from . import baseconfig as baseconfig
+except Exception:
+	try:
+		import baseconfig as baseconfig
+	except Exception:
+		raise ImportError("Error Importing baseconfig for config")
 
 
 def hasJsonSupport():
@@ -183,18 +192,6 @@ def getDefaultMainConfigFile():
 	import os
 	# logging['timefmt'] = str("""%a %b %d %H:%M:%S %Z %Y""")
 	default_config = dict({
-		'PiAP-logging': dict({
-			'mode': str("stdout"),
-			'dir': str("/var/log"),
-			'keyfile': repr(None),
-			'encryptlogs': repr(False)
-		}),
-		'PiAP-logging-outputs': dict({
-			'splunk': repr(False),
-			'syslog': repr(False),
-			'file': repr(False),
-			'stdout': repr(True)
-		}),
 		'PiAP-rand': dict({
 			'keyfile': repr(None),
 			'entropy_function': repr(os.urandom),
@@ -215,7 +212,7 @@ def getDefaultMainConfigFile():
 			'ipv6_dhcp_reserved': repr(None)
 		})
 	})
-	return default_config
+	return baseconfig.mergeDicts(baseconfig.getDefaultMainConfigFile(), default_config)
 
 
 @remediation.error_handling

@@ -89,7 +89,7 @@ def saltify(raw_msg, raw_salt):
 
 def main(argv=None):
 	args = parseArgs(argv)
-	if args.msg is None or args.salt is None:
+	if args is None or args.msg is None or args.salt is None:
 		return 2
 	else:
 		print(saltify(str(args.msg), str(args.salt)))

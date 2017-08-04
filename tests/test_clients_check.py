@@ -58,8 +58,8 @@ class MoreClientChecksTestSuite(unittest.TestCase):
 		from pku import interfaces as interfaces
 		from lint import clients_check_status as clients_check_status
 		for depends in [piaplib, pku, interfaces, lint, clients_check_status]:
-				if depends.__name__ is None:
-					theResult = False
+			if depends.__name__ is None:
+				theResult = False
 		try:
 			temp = clients_check_status.show_client(
 				"1.2.3.4",
@@ -91,8 +91,8 @@ class MoreClientChecksTestSuite(unittest.TestCase):
 		from pku import interfaces as interfaces
 		from lint import clients_check_status as clients_check_status
 		for depends in [piaplib, pku, interfaces, lint, clients_check_status]:
-				if depends.__name__ is None:
-					theResult = False
+			if depends.__name__ is None:
+				theResult = False
 		try:
 			temp = clients_check_status.show_client(
 				"1.2.3.4",
@@ -124,8 +124,8 @@ class MoreClientChecksTestSuite(unittest.TestCase):
 		from pku import interfaces as interfaces
 		from lint import clients_check_status as clients_check_status
 		for depends in [piaplib, pku, interfaces, lint, clients_check_status]:
-				if depends.__name__ is None:
-					theResult = False
+			if depends.__name__ is None:
+				theResult = False
 		try:
 			temp = clients_check_status.show_client(
 				"1.2.3.4",
@@ -157,8 +157,8 @@ class MoreClientChecksTestSuite(unittest.TestCase):
 		from pku import interfaces as interfaces
 		from lint import clients_check_status as clients_check_status
 		for depends in [piaplib, pku, interfaces, lint, clients_check_status]:
-				if depends.__name__ is None:
-					theResult = False
+			if depends.__name__ is None:
+				theResult = False
 		try:
 			temp = clients_check_status.show_client(
 				"1.2.3.4",
@@ -188,8 +188,8 @@ class MoreClientChecksTestSuite(unittest.TestCase):
 		from piaplib import lint as lint
 		from lint import clients_check_status as clients_check_status
 		for depends in [piaplib, lint, clients_check_status]:
-				if depends.__name__ is None:
-					theResult = False
+			if depends.__name__ is None:
+				theResult = False
 		try:
 			self.assertIsNotNone(clients_check_status.show_client("1.2.3.4", False, False, "JUNK"))
 			self.assertIsNotNone(clients_check_status.show_client("1.2.3.4", False, True, "JUNK"))
@@ -218,8 +218,8 @@ class MoreClientChecksTestSuite(unittest.TestCase):
 		from pku import interfaces as interfaces
 		from lint import clients_check_status as clients_check_status
 		for depends in [piaplib, pku, interfaces, lint, clients_check_status]:
-				if depends.__name__ is None:
-					theResult = False
+			if depends.__name__ is None:
+				theResult = False
 		try:
 			temp = clients_check_status.get_client_name(
 				None,
@@ -248,8 +248,8 @@ class MoreClientChecksTestSuite(unittest.TestCase):
 		from pku import interfaces as interfaces
 		from lint import clients_check_status as clients_check_status
 		for depends in [piaplib, pku, interfaces, lint, clients_check_status]:
-				if depends.__name__ is None:
-					theResult = False
+			if depends.__name__ is None:
+				theResult = False
 		try:
 			temp = clients_check_status.get_client_name(
 				"1.2.3.4",

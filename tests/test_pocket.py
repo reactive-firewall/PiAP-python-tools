@@ -370,6 +370,9 @@ class PocketUsageTestSuite(unittest.TestCase):
 			from pku import utils as utils
 			if utils.__name__ is None:
 				raise ImportError("Failed to import utils")
+			from pku import interfaces as interfaces
+			if interfaces.__name__ is None:
+				raise ImportError("Failed to import interfaces")
 			import sys
 			if sys.__name__ is None:
 				raise ImportError("Failed to import system. WTF?!!")
@@ -386,15 +389,14 @@ class PocketUsageTestSuite(unittest.TestCase):
 						str("""-i {}""").format(str("eth0"))
 					], stderr=subprocess.STDOUT)
 				self.assertIsNone(theOutputtext)
-				with self.assertRaises(Exception):
-					theOutputtext = checkPythonFuzzing([
-						str(thepython),
-						str("-m"),
-						str("piaplib.pocket"),
-						str("pku"),
-						str("interfaces"),
-						str("""-i {} -r""").format(str("eth0"))
-					], stderr=subprocess.STDOUT)
+				theOutputtext = checkPythonCommand([
+					str(thepython),
+					str("-m"),
+					str("piaplib.pocket"),
+					str("pku"),
+					str("interfaces"),
+					str("""-i {} -r""").format(interfaces.INTERFACE_CHOICES[1])
+				], stderr=subprocess.STDOUT)
 				self.assertIsNone(theOutputtext)
 		except Exception as err:
 			print(str(""))
