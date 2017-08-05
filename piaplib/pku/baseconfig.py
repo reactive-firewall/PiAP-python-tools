@@ -179,9 +179,13 @@ def loadMainConfigFile(confFile='/var/opt/PiAP/PiAP.conf'):
 			with io.open(file=confFile, mode='r', buffering=-1, encoding='utf-8') as configfile:
 				mainConfig.read(configfile)
 		result_config = parseConfigParser(result_config, mainConfig, True)
-	except FileNotFoundError as ioerr:
-		ioerr = None
-		del(ioerr)
+	except IOError as ioErr:
+		ioErr = None
+		del(ioErr)
+		return getDefaultMainConfigFile()
+	except OSError as nonerr:
+		nonerr = None
+		del(nonerr)
 		return getDefaultMainConfigFile()
 	except Exception as err:
 		print(str(err))
