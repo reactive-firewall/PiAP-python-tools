@@ -2,20 +2,22 @@
 # -*- coding: utf-8 -*-
 
 # Pocket PiAP
-# ..................................
+# ......................................................................
 # Copyright (c) 2017, Kendrick Walls
-# ..................................
-# Licensed under the Apache License, Version 2.0 (the "License");
+# ......................................................................
+# Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# ..........................................
-# http://www.apache.org/licenses/LICENSE-2.0
-# ..........................................
+# ......................................................................
+# http://www.github.com/reactive-firewall/PiAP-python-tools/LICENSE.rst
+# ......................................................................
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+# implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# ......................................................................
 
 # Imports
 try:
@@ -263,7 +265,7 @@ def get_system_work_status_raw(user_name=None):
 	return theuserState
 
 
-# TODO: memoize this function
+@utils.memoize
 def get_w_cmd_args():
 	"""Either -his or -wnh depending on system."""
 	try:
@@ -379,7 +381,7 @@ def get_user_status(user_name=None, use_html=False):  # noqa C901
 		if user_name is not None:
 			user_tty = get_user_ttys(user_name, False)
 		status_txt = get_system_work_status_raw(user_name)
-		if (user_tty is not None) and (str(user_tty) not in str("console")):
+		if (user_tty is not None) and (str(user_tty).lower() not in str("console")):
 			status_txt = get_user_work_status_raw(user_name)
 			if status_txt is None:
 				status_list = ["UNKNOWN"]

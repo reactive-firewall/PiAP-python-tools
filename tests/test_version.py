@@ -21,43 +21,25 @@
 
 import unittest
 
-try:
-	try:
-		import sys
-		import os
-		sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), str('..'))))
-		sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), str('.'))))
-	except Exception as ImportErr:
-		print(str(''))
-		print(str(type(ImportErr)))
-		print(str(ImportErr))
-		print(str((ImportErr.args)))
-		print(str(''))
-		ImportErr = None
-		del ImportErr
-		raise ImportError(str("Test module failed completely."))
-except Exception:
-	raise ImportError("Failed to import test context")
 
-
-class LintTestSuite(unittest.TestCase):
-	"""Special Lint test cases."""
+class VersionTestSuite(unittest.TestCase):
+	"""More Unit test cases for piaplib.lint.check_clients_status."""
 
 	def test_absolute_truth_and_meaning(self):
 		"""Insanitty Test."""
 		assert True
-		self.assertIsNone(None)
 
 	def test_syntax(self):
 		"""Test case importing code."""
 		theResult = False
 		try:
 			from .context import piaplib
-			if piaplib.__name__ is None:
-				theResult = False
 			from piaplib import pocket
-			if pocket.__name__ is None:
-				theResult = False
+			from piaplib import book as book
+			from book import version as version
+			for depends in [piaplib, pocket, book, version]:
+				if depends.__name__ is None:
+					theResult = False
 			theResult = True
 		except Exception as impErr:
 			print(str(type(impErr)))
@@ -65,15 +47,29 @@ class LintTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
-	def test_case_lint_insane_none(self):
-		"""Tests the imposible state for lint given bad tools"""
+	def test_version_loop(self):
+		"""Test case for piaplib.book.version(*)"""
+		from .context import piaplib
+		from piaplib import book as book
+		from book import version as version
 		theResult = True
+		for depends in [piaplib, book, version]:
+				if depends.__name__ is None:
+					theResult = False
 		try:
-			from piaplib import lint as lint
-			if lint.__name__ is None:
-				raise ImportError("Failed to import lint")
-			self.assertIsNone(lint.lint.useLintTool("NoSuchTool"))
-			self.assertIsNone(lint.lint.useLintTool(None))
+			for test_case_input in version.VERSION_UNITS.keys():
+				temp = version.main([
+					str(test_case_input),
+					str("-v")
+				])
+				self.assertIsNotNone(temp)
+				self.assertIsInstance(temp, str, "Version output should be a string")
+				theResult = (theResult and isinstance(temp, str))
+				temp = None
+				temp = version.main([str(test_case_input)])
+				self.assertIsNotNone(temp)
+				self.assertIsInstance(temp, str, "Version output should be a string")
+				theResult = (theResult and isinstance(temp, str))
 		except Exception as err:
 			print(str(""))
 			print(str(type(err)))
@@ -85,15 +81,27 @@ class LintTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
-	def test_case_lint_check_insane_none(self):
-		"""Tests the imposible state for lint given bad tools"""
+	def test_version_bad_loop(self):
+		"""Test case for bad input of piaplib.book.version(JUNK)"""
+		from .context import piaplib
+		from piaplib import book as book
+		from book import version as version
 		theResult = True
+		for depends in [piaplib, book, version]:
+				if depends.__name__ is None:
+					theResult = False
 		try:
-			from piaplib import lint as lint
-			if lint.__name__ is None:
-				raise ImportError("Failed to import lint (and thus lint.check)")
-			self.assertIsNone(lint.check.useCheckTool("NoSuchCheck"))
-			self.assertIsNone(lint.check.useCheckTool(None))
+			with self.assertRaises(BaseException):
+				for test_case_input in [str("JUNK"), None]:
+					temp = version.main([
+						str(test_case_input),
+						str("-v")
+					])
+					self.assertIsNotNone(temp)
+					temp = None
+			temp = version.getRunVersion(None, False)
+			self.assertIsNotNone(temp)
+			theResult = True
 		except Exception as err:
 			print(str(""))
 			print(str(type(err)))
@@ -106,5 +114,5 @@ class LintTestSuite(unittest.TestCase):
 		assert theResult
 
 
-if __name__ == u'__main__':
+if __name__ == '__main__':
 	unittest.main()

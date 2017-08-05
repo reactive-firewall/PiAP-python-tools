@@ -2,20 +2,22 @@
 # -*- coding: utf-8 -*-
 
 # Pocket PiAP
-# ..................................
+# ......................................................................
 # Copyright (c) 2017, Kendrick Walls
-# ..................................
-# Licensed under the Apache License, Version 2.0 (the "License");
+# ......................................................................
+# Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# ..........................................
-# http://www.apache.org/licenses/LICENSE-2.0
-# ..........................................
+# ......................................................................
+# http://www.github.com/reactive-firewall/PiAP-python-tools/LICENSE.rst
+# ......................................................................
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+# implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# ......................................................................
 
 import unittest
 import subprocess
@@ -298,6 +300,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 				"lint.lint",
 				"pku.pku",
 				"book.book",
+				"book.version",
 				"keyring.keyring"
 			]
 			if (thepython is not None):
@@ -352,7 +355,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 			if piaplib.__version__ is not None:
 				theResult = False
 			if (thepython is not None):
-				for unit in ["pocket"]:
+				for unit in ["pocket", "book.version"]:
 					theOutputtext = checkPythonCommand([
 						str(thepython),
 						str("-m"),
@@ -1431,7 +1434,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 		assert theResult
 
 	def test_d_python_command_bad_saltify(self):
-		"""Test case for piaplib.pocket.lint check users."""
+		"""Test case for piaplib.keyring.saltify JUNK."""
 		theResult = True
 		try:
 			from piaplib import pku as pku
@@ -1519,6 +1522,48 @@ class BasicUsageTestSuite(unittest.TestCase):
 				except Exception as junkErr:  # noqa
 					del(junkErr)
 				# self.assertIsNone(theOutputtext)
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			othererr = None
+			del othererr
+			theResult = False
+		assert theResult
+
+	def test_d_python_command_version_check(self):  # noqa
+		"""Test case for piaplib.book.version."""
+		theResult = True
+		try:
+			from piaplib import pku as pku
+			if pku.__name__ is None:
+				raise ImportError("Failed to import pku")
+			from pku import utils as utils
+			if utils.__name__ is None:
+				raise ImportError("Failed to import utils")
+			import sys
+			if sys.__name__ is None:
+				raise ImportError("Failed to import system. WTF?!!")
+			thepython = getPythonCommand()
+			if (thepython is not None):
+				theOutputtext = None
+				theOutputtext = checkPythonFuzzing([
+					str(thepython),
+					str("-m"),
+					str("piaplib.book.version"),
+					str("--version")
+				], stderr=subprocess.STDOUT)
+				self.assertIsNotNone(theOutputtext)
+				theOutputtext = checkPythonFuzzing([
+					str(thepython),
+					str("-m"),
+					str("piaplib.book.version"),
+					str("all"),
+					str("--verbose")
+				], stderr=subprocess.STDOUT)
+				self.assertIsNotNone(theOutputtext)
 		except Exception as err:
 			print(str(""))
 			print(str(type(err)))

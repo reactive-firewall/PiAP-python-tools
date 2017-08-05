@@ -2,20 +2,23 @@
 # -*- coding: utf-8 -*-
 
 # Pocket PiAP
-# ..................................
+# ......................................................................
 # Copyright (c) 2017, Kendrick Walls
-# ..................................
-# Licensed under the Apache License, Version 2.0 (the "License");
+# ......................................................................
+# Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# ..........................................
-# http://www.apache.org/licenses/LICENSE-2.0
-# ..........................................
+# ......................................................................
+# http://www.github.com/reactive-firewall/PiAP-python-tools/LICENSE.rst
+# ......................................................................
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+# implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# ......................................................................
+
 
 # try:
 # 	from . import config as config
@@ -94,7 +97,7 @@ def error_passing(func):
 			timestamp = getTimeStamp()
 			logs.log(str("An error occured at {}").format(timestamp), "Error")
 			logs.log(str(func), "Debug")
-			baton = PiAPError(err, str("An error occured."))
+			baton = PiAPError(err, str("An error occured in {}.").format(str(func)))
 			# sys.exc_clear()
 			err = None
 			del err
@@ -112,10 +115,11 @@ def error_breakpoint(error, context=None):
 	logs.log(str(context), "Debug")
 	logs.log(str(type(error)), "Error")
 	logs.log(str(error), "Error")
-	logs.log(str((error.args)), "Error")
 	if isinstance(error, PiAPError):
 		logs.log(str(error.cause), "Error")
 		logs.log(str(type(error.cause)), "Error")
+		logs.log(str((error.args)), "Error")
+	else:
 		logs.log(str((error.args)), "Error")
 	return None
 

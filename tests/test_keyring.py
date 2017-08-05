@@ -40,13 +40,12 @@ except Exception:
 	raise ImportError("Failed to import test context")
 
 
-class iFaceTestSuite(unittest.TestCase):
-	"""Special pku.interface test cases."""
+class KeyringTestSuite(unittest.TestCase):
+	"""Keyring test cases."""
 
 	def test_absolute_truth_and_meaning(self):
-		"""Insanitty Test."""
+		"""Insanity Test."""
 		assert True
-		self.assertIsNone(None)
 
 	def test_syntax(self):
 		"""Test case importing code."""
@@ -65,18 +64,13 @@ class iFaceTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
-	def test_case_iface_insane_none(self):
-		"""Tests the imposible state for pku.interface given bad input"""
+	def test_before_case_keyring(self):
+		"""Test before test-case keyring."""
 		theResult = True
 		try:
-			from piaplib import pku as pku
-			if pku.__name__ is None:
+			from piaplib import keyring as keyring
+			if keyring.__name__ is None:
 				theResult = False
-			from pku import interfaces as interfaces
-			if interfaces.__name__ is None:
-				raise ImportError("Failed to import iface")
-			self.assertIsNone(pku.interfaces.taint_name("NoSuchName"))
-			self.assertIsNone(pku.interfaces.taint_name(None))
 		except Exception as err:
 			print(str(""))
 			print(str(type(err)))
@@ -88,62 +82,28 @@ class iFaceTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
-	@unittest.skipUnless(sys.platform.startswith("linux"), "Requires linux ifup/ifdown tools")
-	def test_case_iface_check_nonroot_down(self):
-		"""Tests the imposible state for pku.interface given bad tools"""
-		theResult = False
-		try:
-			import subprocess
-			from piaplib import pku as pku
-			if pku.__name__ is None:
-				theResult = False
-			from pku import interfaces as interfaces
-			if interfaces.__name__ is None:
-				raise ImportError("Failed to import iface")
-			try:
-				pku.interfaces.disable_iface("eth1", False)
-				theResult = True
-			except subprocess.CalledProcessError as junkErr:
-				del(junkErr)
-		except Exception as err:
-			print(str(""))
-			print(str(type(err)))
-			print(str(err))
-			print(str((err.args)))
-			print(str(""))
-			err = None
-			del err
-			theResult = False
-		assert theResult
-
-	@unittest.skipUnless(sys.platform.startswith("linux"), "Requires linux ifup/ifdown tools")
-	def test_case_iface_check_nonroot_up(self):
-		"""Tests the imposible state for pku.interface given bad values"""
+	def test_keyring_salt_bad_tools(self):
+		"""test that keyring garbage in garbage out for keyring.useKeyTool"""
 		theResult = True
 		try:
-			import subprocess
-			from piaplib import pku as pku
-			if pku.__name__ is None:
+			from .context import piaplib
+			if piaplib.__name__ is None:
 				theResult = False
-			from pku import interfaces as interfaces
-			if interfaces.__name__ is None:
-				raise ImportError("Failed to import iface")
-			try:
-				pku.interfaces.enable_iface("eth1")
-				theResult = True
-			except subprocess.CalledProcessError as junkErr:
-				del(junkErr)
-		except Exception as err:
+			from piaplib import keyring as keyring
+			if keyring.__name__ is None:
+				theResult = False
+			for junk_input in [str("BADTOOL"), None]:
+				self.assertIsNone(keyring.keyring.useKeyTool(junk_input, [str("--help")]))
+			theResult = True
+		except Exception as impErr:
 			print(str(""))
-			print(str(type(err)))
-			print(str(err))
-			print(str((err.args)))
+			print(str(type(impErr)))
+			print(str(impErr))
+			print(str((impErr.args)))
 			print(str(""))
-			err = None
-			del err
 			theResult = False
 		assert theResult
 
 
-if __name__ == u'__main__':
+if __name__ == '__main__':
 	unittest.main()

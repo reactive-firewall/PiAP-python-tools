@@ -2,20 +2,22 @@
 # -*- coding: utf-8 -*-
 
 # Pocket PiAP
-# ..................................
+# ......................................................................
 # Copyright (c) 2017, Kendrick Walls
-# ..................................
-# Licensed under the Apache License, Version 2.0 (the "License");
+# ......................................................................
+# Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# ..........................................
-# http://www.apache.org/licenses/LICENSE-2.0
-# ..........................................
+# ......................................................................
+# http://www.github.com/reactive-firewall/PiAP-python-tools/LICENSE.rst
+# ......................................................................
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+# implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# ......................................................................
 
 
 try:
@@ -130,7 +132,7 @@ def randSSID(count=None):
 	WARNING: this is a placeholder.
 	count - length to return. Defaults to 20.
 	"""
-	if count is None or (isinstance(count, int) is False) or count <= 1:
+	if count is None or (isinstance(count, int) is False) or count < 1:
 		x_count = 20
 	else:
 		x_count = int(count)
@@ -220,7 +222,7 @@ def fastrandInt(count=None, max=512):
 			except Exception:
 				return int(int(bytearray(os.urandom(16))[8]) % max)
 		else:
-			return [fastrandInt(1, min, max) for someInt in range(x_count)]
+			return [fastrandInt(1, max) for someInt in range(x_count)]
 	except Exception as err:
 		print(str(u'FAILED DURRING RAND-INT. ABORT.'))
 		print(str(type(err)))

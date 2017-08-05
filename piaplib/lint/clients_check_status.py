@@ -2,20 +2,22 @@
 # -*- coding: utf-8 -*-
 
 # Pocket PiAP
-# ..................................
+# ......................................................................
 # Copyright (c) 2017, Kendrick Walls
-# ..................................
-# Licensed under the Apache License, Version 2.0 (the "License");
+# ......................................................................
+# Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# ..........................................
-# http://www.apache.org/licenses/LICENSE-2.0
-# ..........................................
+# ......................................................................
+# http://www.github.com/reactive-firewall/PiAP-python-tools/LICENSE.rst
+# ......................................................................
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+# implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# ......................................................................
 
 # Imports
 try:
@@ -88,7 +90,7 @@ def parseargs(arguments=None):
 		)
 		parser.add_argument(
 			'--interface', dest='interface',
-			default=interfaces.INTERFACE_CHOICES[1], choices=interfaces.INTERFACE_CHOICES,
+			default=interfaces.INTERFACE_CHOICES[0], choices=interfaces.INTERFACE_CHOICES,
 			help='The LAN interface.'
 		)
 		parser.add_argument(
@@ -123,7 +125,7 @@ def show_client(client_ip=None, is_verbose=False, use_html=False, lan_interface=
 	"""show the given client."""
 	try:
 		if lan_interface not in interfaces.INTERFACE_CHOICES:
-			lan_interface = interfaces.INTERFACE_CHOICES[1]
+			lan_interface = interfaces.INTERFACE_CHOICES[0]
 		if use_html:
 			format_pattern = str(u'{}{}{}{}')
 		else:
@@ -155,11 +157,18 @@ def show_client(client_ip=None, is_verbose=False, use_html=False, lan_interface=
 @remediation.error_handling
 def get_client_name(client_ip=None, use_html=False, lan_interface=None):
 	if lan_interface not in interfaces.INTERFACE_CHOICES:
-		lan_interface = interfaces.INTERFACE_CHOICES[1]
+		lan_interface = interfaces.INTERFACE_CHOICES[0]
 	if client_ip is None:
 		return None
 	if use_html is not True:
-		return get_client_arp_status_raw(client_ip, lan_interface).split(u' ', 1)[0]
+		temp_name_raw = get_client_arp_status_raw(client_ip, lan_interface)
+		temp_name = None
+		if temp_name_raw is not None and len(temp_name_raw) > 0:
+			temp_name = temp_name_raw.split(u' ', 1)[0]
+		if temp_name is not None and len(temp_name) > 0:
+			return temp_name
+		else:
+			return str("UNKNOWN")
 	else:
 		client = str(get_client_name(client_ip, False))
 		return html_generator.gen_html_td(client, str(u'client_status_{}').format(client))
@@ -221,7 +230,7 @@ def isLineForSTA(someLine=None, staname=None):
 	doesMatch = False
 	try:
 		doesMatch = utils.isLineForMatch(someLine, staname)
-		if (doesMatch is False):
+		if (doesMatch is False) and (utils.literal_str(someLine) is not None):
 			if str(staname) in utils.extractIPv4(utils.literal_str(someLine)):
 				doesMatch = True
 			else:
@@ -237,11 +246,11 @@ def isLineForSTA(someLine=None, staname=None):
 
 
 @utils.memoize
-def get_client_arp_status_raw(client_ip=None, lan_interface=interfaces.INTERFACE_CHOICES[1]):
+def get_client_arp_status_raw(client_ip=None, lan_interface=interfaces.INTERFACE_CHOICES[0]):
 	"""list the raw status of client sta."""
 	if lan_interface not in interfaces.INTERFACE_CHOICES:
-		lan_interface = interfaces.INTERFACE_CHOICES[1]
-	arguments = [str("arp"), str("-i"), str(lan_interface), str("-a")]
+		lan_interface = interfaces.INTERFACE_CHOICES[0]
+	arguments = [str("/usr/sbin/arp"), str("-i"), str(lan_interface), str("-a")]
 	theRawClientState = None
 	try:
 		import subprocess
@@ -356,7 +365,7 @@ def get_client_status(client=None, use_html=False, lan_interface=None):  # noqa 
 	theResult = None
 	try:
 		if lan_interface not in interfaces.INTERFACE_CHOICES:
-			lan_interface = interfaces.INTERFACE_CHOICES[1]
+			lan_interface = interfaces.INTERFACE_CHOICES[0]
 		client_mac = get_client_mac(client, False, lan_interface)
 		status_txt = get_client_sta_status(client_mac)
 		if client_mac is not None:
@@ -398,7 +407,7 @@ def get_client_mac(client=None, use_html=False, lan_interface=None):
 	if client is None and use_html is not True:
 		return None
 	if lan_interface not in interfaces.INTERFACE_CHOICES:
-		lan_interface = interfaces.INTERFACE_CHOICES[1]
+		lan_interface = interfaces.INTERFACE_CHOICES[0]
 	theResult = None
 	try:
 		mac_list_txt = utils.extractMACAddr(get_client_arp_status_raw(client, lan_interface))
@@ -431,7 +440,7 @@ def get_client_ip(client=None, use_html=False, lan_interface=None):
 	theResult = None
 	try:
 		if lan_interface not in interfaces.INTERFACE_CHOICES:
-			lan_interface = interfaces.INTERFACE_CHOICES[1]
+			lan_interface = interfaces.INTERFACE_CHOICES[0]
 		ip_list_txt = utils.extractIPv4(get_client_arp_status_raw(client, lan_interface))
 		if use_html is not True:
 			if ip_list_txt is not None and len(ip_list_txt) > 0:
@@ -479,7 +488,7 @@ def main(argv=None):
 	args = parseargs(argv)
 	try:
 		verbose = False
-		client_interface = interfaces.INTERFACE_CHOICES[1]
+		client_interface = interfaces.INTERFACE_CHOICES[0]
 		if args.verbose_mode is not None:
 			verbose = args.verbose_mode
 		if args.output_html is not None:

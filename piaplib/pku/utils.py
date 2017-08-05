@@ -2,20 +2,22 @@
 # -*- coding: utf-8 -*-
 
 # Pocket PiAP
-# ..................................
+# ......................................................................
 # Copyright (c) 2017, Kendrick Walls
-# ..................................
-# Licensed under the Apache License, Version 2.0 (the "License");
+# ......................................................................
+# Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# ..........................................
-# http://www.apache.org/licenses/LICENSE-2.0
-# ..........................................
+# ......................................................................
+# http://www.github.com/reactive-firewall/PiAP-python-tools/LICENSE.rst
+# ......................................................................
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+# implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# ......................................................................
 
 # try:
 # 	from . import config as config
@@ -262,7 +264,7 @@ def isLineForMatch(someLine=None, toMatch=None):
 def compactList(list, intern_func=None):
 	"""
 	Compacts Lists
-	Adapted from some now forgoten form about flattening arrays, and sorting.
+	Adapted from some now forgoten forum about flattening arrays, and sorting.
 	Cleaned up to be Pep8 compatable.
 	"""
 	if intern_func is None:
@@ -290,6 +292,18 @@ def xstr(some_str=None):
 		return str("_x_" + literal_str(some_str) + "_x_")
 	except Exception:
 		return None
+
+
+@remediation.error_handling
+@memoize
+def isWhiteListed(someString=None, whitelist=[]):
+	"""Determins if a raw input string is an exact string in the whitelist."""
+	for validString in [xstr(x) for x in compactList(whitelist)]:
+		if xstr(someString) in xstr(validString):
+			return True
+		else:
+			continue
+	return False
 
 
 """ I/O and Files """
@@ -473,7 +487,9 @@ def cleanFileResource(theFile):
 	try:
 		os.remove(str(theFile))
 		theResult = True
-	except FileNotFoundError:
+	except IOError:
+		theResult = False
+	except OSError:
 		theResult = False
 	except Exception:
 		logs.log(str("Error: Failed to remove file"), "Warning")

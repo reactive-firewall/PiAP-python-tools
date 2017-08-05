@@ -2,20 +2,22 @@
 # -*- coding: utf-8 -*-
 
 # Pocket PiAP
-# ..................................
+# ......................................................................
 # Copyright (c) 2017, Kendrick Walls
-# ..................................
-# Licensed under the Apache License, Version 2.0 (the "License");
+# ......................................................................
+# Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# ..........................................
-# http://www.apache.org/licenses/LICENSE-2.0
-# ..........................................
+# ......................................................................
+# http://www.github.com/reactive-firewall/PiAP-python-tools/LICENSE.rst
+# ......................................................................
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+# implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# ......................................................................
 
 # try:
 # 	from . import config as config
@@ -103,11 +105,34 @@ class ANSIColors:
 
 class logs(object):
 	"""Class for Pocket PKU logs"""
-	logging.basicConfig(
-		level=logging.INFO,
-		format=str("%(asctime)s [piaplib] %(message)s"),
-		datefmt=str("%a %b %d %H:%M:%S %Z %Y")
-	)
+
+	try:
+		try:
+			import baseconfig as baseconfig
+		except Exception:
+			try:
+				import piaplib.pku.baseconfig as baseconfig
+			except Exception as err:
+				raise ImportError(err)
+				exit(3)
+		if baseconfig.loadMainConfigFile()['PiAP-logging-outputs']['file']:
+			import os.path
+			prefix_path = baseconfig.loadMainConfigFile()['PiAP-logging']['dir']
+			file_path = os.path.join(prefix_path, str("piaplib.log"))
+		else:
+			file_path = sys.stdout
+		logging.basicConfig(
+			filename=file_path,
+			level=logging.INFO,
+			format=str("%(asctime)s [piaplib] %(message)s"),
+			datefmt=str("%a %b %d %H:%M:%S %Z %Y")
+		)
+	except Exception:
+		logging.basicConfig(
+			level=logging.INFO,
+			format=str("%(asctime)s [piaplib] %(message)s"),
+			datefmt=str("%a %b %d %H:%M:%S %Z %Y")
+		)
 
 	logging_level = {
 		'debug': logging.DEBUG, 'info': logging.INFO, 'warn': logging.WARNING,

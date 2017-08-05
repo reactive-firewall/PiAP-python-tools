@@ -2,20 +2,22 @@
 # -*- coding: utf-8 -*-
 
 # Pocket PiAP
-# ..................................
+# ......................................................................
 # Copyright (c) 2017, Kendrick Walls
-# ..................................
-# Licensed under the Apache License, Version 2.0 (the "License");
+# ......................................................................
+# Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# ..........................................
-# http://www.apache.org/licenses/LICENSE-2.0
-# ..........................................
+# ......................................................................
+# http://www.github.com/reactive-firewall/PiAP-python-tools/LICENSE.rst
+# ......................................................................
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+# implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# ......................................................................
 
 try:
 	import functools
@@ -89,23 +91,21 @@ def saltify(raw_msg, raw_salt):
 
 def main(argv=None):
 	args = parseArgs(argv)
-	if args.msg is None or args.salt is None:
-		return 2
-	else:
-		print(saltify(str(args.msg), str(args.salt)))
+	print(saltify(str(args.msg), str(args.salt)))
+	return 0
 
 
 if __name__ in u'__main__':
+	exitcode = 3
 	try:
 		import sys
-		main(sys.argv[1:])
+		exitcode = main(sys.argv[1:])
 	except Exception as err:
 		print(str(u'MAIN FAILED DURRING SALTIFY. ABORT.'))
 		print(str(type(err)))
 		print(str(err))
 		print(str(err.args))
 		del err
-		exit(255)
-	finally:
-		exit(0)
+		exitcode = 255
+	exit(exitcode)
 

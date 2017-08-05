@@ -2,20 +2,22 @@
 # -*- coding: utf-8 -*-
 
 # Pocket PiAP
-# ..................................
+# ......................................................................
 # Copyright (c) 2017, Kendrick Walls
-# ..................................
-# Licensed under the Apache License, Version 2.0 (the "License");
+# ......................................................................
+# Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# ..........................................
-# http://www.apache.org/licenses/LICENSE-2.0
-# ..........................................
+# ......................................................................
+# http://www.github.com/reactive-firewall/PiAP-python-tools/LICENSE.rst
+# ......................................................................
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+# implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# ......................................................................
 
 """
 	The PiAP equivilant of the execve call.
@@ -95,7 +97,7 @@ def parseargs(tainted_arguments=None):
 		)
 		parser.add_argument(
 			'--chroot', dest='chroot_path',
-			default=None, type=argparse.FileType('w'), required=False,
+			default=None, type=str, required=False,
 			help='the sandbox to play in.'
 		)
 		the_action = parser.add_mutually_exclusive_group(required=False)
@@ -107,7 +109,7 @@ def parseargs(tainted_arguments=None):
 		the_action.add_argument(
 			'-q', '--quiet',
 			dest='verbose_mode', default=False,
-			action='store_false', help='Disable the verbosemode.'
+			action='store_false', help='Disable the verbose mode.'
 		)
 		parser.add_argument(
 			'-c', '--cmd',
@@ -147,8 +149,14 @@ def runUnsafeCommand(arguments, error_fd=None):
 	if os.fork():
 		exit(0)
 	try:
+		WHTLIST = [
+			str("""exit"""),
+			str("""which""")
+		]
 		if arguments is None or isinstance(arguments, list) is not True:
 			arguments = [u'exit', u'0']
+		elif not os.access(arguments[0], os.X_OK) or not utils.isWhiteListed(arguments[0], WHTLIST):
+			arguments = [u'exit', u'1']
 		try:
 			err_fd = subprocess.STDOUT
 			if error_fd is not None:

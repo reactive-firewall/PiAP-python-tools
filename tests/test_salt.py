@@ -2,20 +2,22 @@
 # -*- coding: utf-8 -*-
 
 # Pocket PiAP
-# ..................................
+# ......................................................................
 # Copyright (c) 2017, Kendrick Walls
-# ..................................
-# Licensed under the Apache License, Version 2.0 (the "License");
+# ......................................................................
+# Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# ..........................................
-# http://www.apache.org/licenses/LICENSE-2.0
-# ..........................................
+# ......................................................................
+# http://www.github.com/reactive-firewall/PiAP-python-tools/LICENSE.rst
+# ......................................................................
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+# implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# ......................................................................
 
 import unittest
 
@@ -190,6 +192,8 @@ class SaltTestSuite(unittest.TestCase):
 						self.assertIsNotNone(a)
 						self.assertIsNotNone(b)
 						self.assertNotEqual(a, b)
+				if ((int(someRandomTest) % int(100)) == 0):
+					print(str("Test {} ... ok").format(str(someRandomTest)))
 		except Exception as testErr:
 			print(str("Entropy - Fuzzing Crash Found new test"))
 			print(str(""))
@@ -199,6 +203,37 @@ class SaltTestSuite(unittest.TestCase):
 			print(str(""))
 			testErr = None
 			del(testErr)
+			theResult = False
+		assert theResult
+
+	def test_keyring_salt_bad_main(self):
+		"""test that salt garbage in garbage out for saltify.main"""
+		theResult = True
+		try:
+			from .context import piaplib
+			if piaplib.__name__ is None:
+				theResult = False
+			from piaplib import keyring as keyring
+			if keyring.__name__ is None:
+				theResult = False
+			from keyring import saltify as saltify
+			if saltify.__name__ is None:
+				theResult = False
+			for junk_input in [str("--bad"), str("--junk")]:
+				with self.assertRaises(SystemExit):
+					output = saltify.main([str("--msg=a"), str("--salt=b"), junk_input])
+					self.assertEqual(int(output), int(2))
+			try:
+				output = saltify.main([None])
+			except SystemExit as err:
+				self.assertEqual(int(err.code), int(2))
+			theResult = True
+		except Exception as impErr:
+			print(str(""))
+			print(str(type(impErr)))
+			print(str(impErr))
+			print(str((impErr.args)))
+			print(str(""))
 			theResult = False
 		assert theResult
 

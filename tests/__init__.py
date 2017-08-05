@@ -1,20 +1,22 @@
 # -*- coding: utf-8 -*-
 
 # Pocket PiAP
-# ..................................
+# ......................................................................
 # Copyright (c) 2017, Kendrick Walls
-# ..................................
-# Licensed under the Apache License, Version 2.0 (the "License");
+# ......................................................................
+# Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# ..........................................
-# http://www.apache.org/licenses/LICENSE-2.0
-# ..........................................
+# ......................................................................
+# http://www.github.com/reactive-firewall/PiAP-python-tools/LICENSE.rst
+# ......................................................................
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+# implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# ......................................................................
 
 try:
 	try:
@@ -160,6 +162,34 @@ try:
 		from tests import test_book
 		if test_book.__name__ is None:
 			raise ImportError(str("Test module failed to import even the book special tests."))
+	except Exception as impErr:
+		print(str(''))
+		print(str(type(impErr)))
+		print(str(impErr))
+		print(str((impErr.args)))
+		print(str(''))
+		impErr = None
+		del impErr
+		raise ImportError(str("Test module failed completely."))
+		exit(1)
+	try:
+		from tests import test_version
+		if test_version.__name__ is None:
+			raise ImportError(str("Test module failed to import even the version special tests."))
+	except Exception as impErr:
+		print(str(''))
+		print(str(type(impErr)))
+		print(str(impErr))
+		print(str((impErr.args)))
+		print(str(''))
+		impErr = None
+		del impErr
+		raise ImportError(str("Test module failed completely."))
+		exit(1)
+	try:
+		from tests import test_clients_check
+		if test_clients_check.__name__ is None:
+			raise ImportError(str("Test module failed to import even the client special tests."))
 	except Exception as impErr:
 		print(str(''))
 		print(str(type(impErr)))
