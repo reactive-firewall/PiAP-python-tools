@@ -4,6 +4,24 @@
 #
 # Copyright (c) 2017 Mr. Walls
 #
+# # Pocket PiAP
+# ......................................................................
+# Copyright (c) 2017, Kendrick Walls
+# ......................................................................
+# Licensed under MIT (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# ......................................................................
+# http://www.github.com/reactive-firewall/PiAP-python-tools/LICENSE.rst
+# ......................................................................
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+# implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ......................................................................
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -136,6 +154,8 @@ cleanup:
 	$(QUIET)rm -f ./the_test_file*.enc 2>/dev/null || true
 	$(QUIET)rm -f ./.weak_test_key_* || true
 	$(QUIET)rm -f ./test.secret || true
+	$(QUIET)rm -f ../test.secret || true
+	$(QUIET)rm -f ./example*.log || true
 	$(QUIET)rm -f ./the_test_url_file*.txt 2>/dev/null || true
 	$(QUIET)rm -f /tmp/.beta_PiAP_weak_key 2>/dev/null || true
 

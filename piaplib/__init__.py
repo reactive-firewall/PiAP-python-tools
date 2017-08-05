@@ -1,22 +1,25 @@
 # -*- coding: utf-8 -*-
 
 # Pocket PiAP
-# ..................................
+# ......................................................................
 # Copyright (c) 2017, Kendrick Walls
-# ..................................
-# Licensed under the Apache License, Version 2.0 (the "License");
+# ......................................................................
+# Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# ..........................................
-# http://www.apache.org/licenses/LICENSE-2.0
-# ..........................................
+# ......................................................................
+# http://www.github.com/reactive-firewall/PiAP-python-tools/LICENSE.rst
+# ......................................................................
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+# implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# ......................................................................
 
-__version__ = """0.2.7"""
+__version__ = """0.2.8"""
+
 
 try:
 	import sys
@@ -31,11 +34,13 @@ except Exception as ImportErr:
 	del ImportErr
 	raise ImportError(str(u'PiAPlib Failed to Import'))
 
+
 try:
 	from . import pocket as pocket
 except Exception as importErr:
 	del importErr
 	import pocket as pocket
+
 
 try:
 	from . import book as book
@@ -43,11 +48,13 @@ except Exception as importErr:
 	del importErr
 	import book as book
 
+
 try:
 	from . import pku as pku
 except Exception as importErr:
 	del importErr
 	import pku as pku
+
 
 try:
 	from . import keyring as keyring
@@ -55,11 +62,13 @@ except Exception as importErr:
 	del importErr
 	import keyring as keyring
 
+
 try:
 	from . import lint as lint
 except Exception as importErr:
 	del importErr
 	import lint as lint
+
 
 if __name__ in u'__main__':
 	if pku.__name__ is None:
