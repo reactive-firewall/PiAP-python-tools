@@ -132,7 +132,7 @@ def randSSID(count=None):
 	WARNING: this is a placeholder.
 	count - length to return. Defaults to 20.
 	"""
-	if count is None or (isinstance(count, int) is False) or count <= 1:
+	if count is None or (isinstance(count, int) is False) or count < 1:
 		x_count = 20
 	else:
 		x_count = int(count)
@@ -222,7 +222,7 @@ def fastrandInt(count=None, max=512):
 			except Exception:
 				return int(int(bytearray(os.urandom(16))[8]) % max)
 		else:
-			return [fastrandInt(1, min, max) for someInt in range(x_count)]
+			return [fastrandInt(1, max) for someInt in range(x_count)]
 	except Exception as err:
 		print(str(u'FAILED DURRING RAND-INT. ABORT.'))
 		print(str(type(err)))

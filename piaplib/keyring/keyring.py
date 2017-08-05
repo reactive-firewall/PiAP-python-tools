@@ -72,12 +72,6 @@ def parseArgs(arguments=None):
 
 
 @remediation.error_handling
-def getTimeStamp():
-	"""Returns the time stamp."""
-	return remediation.getTimeStamp()
-
-
-@remediation.error_handling
 def useKeyTool(tool, arguments=[None]):
 	"""Handler for launching pocket-tools."""
 	if tool is None:
@@ -89,7 +83,7 @@ def useKeyTool(tool, arguments=[None]):
 				# print(str("keyring launching: "+tool))
 				theResult = KEYRING_UNITS[tool].main(arguments)
 			except Exception:
-				timestamp = getTimeStamp()
+				timestamp = remediation.getTimeStamp()
 				theResult = str(
 					timestamp +
 					" - WARNING - An error occured while handling the keyring tool." +

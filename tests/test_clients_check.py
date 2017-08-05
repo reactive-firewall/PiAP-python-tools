@@ -258,7 +258,7 @@ class MoreClientChecksTestSuite(unittest.TestCase):
 				False,
 				None
 			)
-			self.assertEquals(temp, str("UNKNOWN"))
+			self.assertEqual(temp, str("UNKNOWN"))
 			theResult = True
 		except Exception as err:
 			print(str(""))

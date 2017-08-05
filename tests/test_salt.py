@@ -206,6 +206,37 @@ class SaltTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
+	def test_keyring_salt_bad_main(self):
+		"""test that salt garbage in garbage out for saltify.main"""
+		theResult = True
+		try:
+			from .context import piaplib
+			if piaplib.__name__ is None:
+				theResult = False
+			from piaplib import keyring as keyring
+			if keyring.__name__ is None:
+				theResult = False
+			from keyring import saltify as saltify
+			if saltify.__name__ is None:
+				theResult = False
+			for junk_input in [str("--bad"), str("--junk")]:
+				with self.assertRaises(SystemExit):
+					output = saltify.main([str("--msg=a"), str("--salt=b"), junk_input])
+					self.assertEqual(int(output), int(2))
+			try:
+				output = saltify.main([None])
+			except SystemExit as err:
+				self.assertEqual(int(err.code), int(2))
+			theResult = True
+		except Exception as impErr:
+			print(str(""))
+			print(str(type(impErr)))
+			print(str(impErr))
+			print(str((impErr.args)))
+			print(str(""))
+			theResult = False
+		assert theResult
+
 
 if __name__ == '__main__':
 	unittest.main()

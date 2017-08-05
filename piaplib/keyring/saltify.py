@@ -91,23 +91,21 @@ def saltify(raw_msg, raw_salt):
 
 def main(argv=None):
 	args = parseArgs(argv)
-	if args is None or args.msg is None or args.salt is None:
-		return 2
-	else:
-		print(saltify(str(args.msg), str(args.salt)))
+	print(saltify(str(args.msg), str(args.salt)))
+	return 0
 
 
 if __name__ in u'__main__':
+	exitcode = 3
 	try:
 		import sys
-		main(sys.argv[1:])
+		exitcode = main(sys.argv[1:])
 	except Exception as err:
 		print(str(u'MAIN FAILED DURRING SALTIFY. ABORT.'))
 		print(str(type(err)))
 		print(str(err))
 		print(str(err.args))
 		del err
-		exit(255)
-	finally:
-		exit(0)
+		exitcode = 255
+	exit(exitcode)
 

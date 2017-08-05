@@ -81,6 +81,38 @@ class VersionTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
+	def test_version_bad_loop(self):
+		"""Test case for bad input of piaplib.book.version(JUNK)"""
+		from .context import piaplib
+		from piaplib import book as book
+		from book import version as version
+		theResult = True
+		for depends in [piaplib, book, version]:
+				if depends.__name__ is None:
+					theResult = False
+		try:
+			with self.assertRaises(BaseException):
+				for test_case_input in [str("JUNK"), None]:
+					temp = version.main([
+						str(test_case_input),
+						str("-v")
+					])
+					self.assertIsNotNone(temp)
+					temp = None
+			temp = version.getRunVersion(None, False)
+			self.assertIsNotNone(temp)
+			theResult = True
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			err = None
+			del err
+			theResult = False
+		assert theResult
+
 
 if __name__ == '__main__':
 	unittest.main()

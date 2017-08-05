@@ -330,6 +330,44 @@ class RandTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
+	def test_keyring_rand_each_count_test(self):
+		"""Test generate random output test-case of multi-counts."""
+		theResult = True
+		try:
+			from .context import piaplib
+			if piaplib.__name__ is None:
+				theResult = False
+			from piaplib import keyring as keyring
+			if keyring.__name__ is None:
+				theResult = False
+			from keyring import rand as rand
+			if rand.__name__ is None:
+				theResult = False
+			the_list = [
+				rand.fastrandInt,
+				rand.randInt,
+				rand.rand,
+				rand.randBool,
+				rand.randStr,
+				rand.randChar,
+				rand.randPW,
+				rand.randSSID,
+				rand.randIP,
+				rand.randPW
+			]
+			for theTest in the_list:
+				for theCount in range(0, 20, 5):
+					self.assertIsNotNone(theTest(theCount))
+		except Exception as impErr:
+			print(str("Bad count"))
+			print(str(""))
+			print(str(type(impErr)))
+			print(str(impErr))
+			print(str((impErr.args)))
+			print(str(""))
+			theResult = False
+		assert theResult
+
 	def test_keyring_rand_test_bias(self):
 		"""Test generate random output of multiple domains in 10000 tries test-case."""
 		theResult = True

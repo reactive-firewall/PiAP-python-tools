@@ -1434,7 +1434,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 		assert theResult
 
 	def test_d_python_command_bad_saltify(self):
-		"""Test case for piaplib.pocket.lint check users."""
+		"""Test case for piaplib.keyring.saltify JUNK."""
 		theResult = True
 		try:
 			from piaplib import pku as pku

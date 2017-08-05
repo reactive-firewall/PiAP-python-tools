@@ -115,25 +115,18 @@ class logs(object):
 			except Exception as err:
 				raise ImportError(err)
 				exit(3)
-		if baseconfig.__name__ is None:
-			logging.basicConfig(
-				level=logging.INFO,
-				format=str("%(asctime)s [piaplib] %(message)s"),
-				datefmt=str("%a %b %d %H:%M:%S %Z %Y")
-			)
+		if baseconfig.loadMainConfigFile()['PiAP-logging-outputs']['file']:
+			import os.path
+			prefix_path = baseconfig.loadMainConfigFile()['PiAP-logging']['dir']
+			file_path = os.path.join(prefix_path, str("piaplib.log"))
 		else:
-			if baseconfig.loadMainConfigFile()['PiAP-logging-outputs']['file']:
-				import os.path
-				prefix_path = baseconfig.loadMainConfigFile()['PiAP-logging']['dir']
-				file_path = os.path.join(prefix_path, str("piaplib.log"))
-			else:
-				file_path = sys.stdout
-			logging.basicConfig(
-				filename=file_path,
-				level=logging.INFO,
-				format=str("%(asctime)s [piaplib] %(message)s"),
-				datefmt=str("%a %b %d %H:%M:%S %Z %Y")
-			)
+			file_path = sys.stdout
+		logging.basicConfig(
+			filename=file_path,
+			level=logging.INFO,
+			format=str("%(asctime)s [piaplib] %(message)s"),
+			datefmt=str("%a %b %d %H:%M:%S %Z %Y")
+		)
 	except Exception:
 		logging.basicConfig(
 			level=logging.INFO,
