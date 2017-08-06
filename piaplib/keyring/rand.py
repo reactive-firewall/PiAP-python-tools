@@ -305,7 +305,7 @@ def randChar(count=None):
 		theRandomResult = str("")
 		for char_x in range(x_count):
 			char_rand_seed = str(RAND_CHARS[randInt(1, 0, 65)])
-			while str(char_rand_seed).isalnum() is False:
+			while (str(char_rand_seed).isalnum() or str(char_rand_seed).isspace()) is False:
 				char_rand_seed = str(RAND_CHARS[randInt(1, 0, 65)])
 			if (randBool(1)):
 				char_rand_seed = str(char_rand_seed).upper()
@@ -393,13 +393,12 @@ def useRandTool(tool, *args, **kwargs):
 @remediation.bug_handling
 def main(argv=None):
 	"""Simple but Random Main event."""
-	args = parseArgs(argv)
-	if args.random_action is not None:
-		if args.count is not None:
-			print(useRandTool(args.random_action, args.count))
-		else:
-			print(useRandTool(args.random_action))
-	else:
+	try:
+		args = parseArgs(argv)
+		print(useRandTool(args.random_action, args.count))
+	except Exception as err:
+		err = None
+		del(err)
 		return 3
 	return 0
 

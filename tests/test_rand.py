@@ -356,8 +356,35 @@ class RandTestSuite(unittest.TestCase):
 				rand.randPW
 			]
 			for theTest in the_list:
-				for theCount in range(0, 20, 5):
+				for theCount in range(1, 20, 5):
 					self.assertIsNotNone(theTest(theCount))
+		except Exception as impErr:
+			print(str("Bad count"))
+			print(str(""))
+			print(str(type(impErr)))
+			print(str(impErr))
+			print(str((impErr.args)))
+			print(str(""))
+			theResult = False
+		assert theResult
+
+	def test_keyring_rand_SSID_count_test(self):
+		"""Test generate random output test-case of multi-counts."""
+		theResult = True
+		try:
+			from .context import piaplib
+			if piaplib.__name__ is None:
+				theResult = False
+			from piaplib import keyring as keyring
+			if keyring.__name__ is None:
+				theResult = False
+			from keyring import rand as rand
+			if rand.__name__ is None:
+				theResult = False
+			for theCount in range(64):
+				thetest = rand.randSSID(theCount)
+				self.assertIsNotNone(thetest)
+				self.assertIsInstance(thetest, str)
 		except Exception as impErr:
 			print(str("Bad count"))
 			print(str(""))
@@ -373,6 +400,7 @@ class RandTestSuite(unittest.TestCase):
 		theResult = True
 		seen_alpha = False
 		seen_digit = False
+		seen_space = False
 		seen_special = False
 		try:
 			temp = None
@@ -389,10 +417,11 @@ class RandTestSuite(unittest.TestCase):
 			for rand_roll in range(10000):
 				seen_alpha = ((seen_alpha is True) or str(temp).isalpha())
 				seen_digit = ((seen_digit is True) or str(temp).isdigit())
+				seen_space = ((seen_space is True) or (str(temp).isspace() is True))
 				seen_special = ((seen_special is True) or (str(temp).isalnum() is False))
 				temp = str(rand.rand(1))
 				self.assertIsNotNone(temp)
-			if (seen_alpha is True) and (seen_digit is True) and (seen_special is True):
+			if seen_alpha and seen_digit and seen_special and seen_space:
 				theResult = (theResult is True)
 			temp = None
 			del(temp)
@@ -402,6 +431,26 @@ class RandTestSuite(unittest.TestCase):
 			print(str(impErr))
 			print(str((impErr.args)))
 			print(str(""))
+			theResult = False
+		assert theResult
+
+	def test_z_case_rand_insane_none(self):
+		"""Tests the imposible state for rand given bad tools"""
+		theResult = True
+		try:
+			from piaplib.keyring import rand as rand
+			if rand.__name__ is None:
+				raise ImportError("Failed to import rand")
+			self.assertIsNone(rand.useRandTool("NoSuchTool"))
+			self.assertIsNone(rand.useRandTool(None))
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			err = None
+			del err
 			theResult = False
 		assert theResult
 
