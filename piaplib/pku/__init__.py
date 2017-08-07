@@ -23,6 +23,7 @@ try:
 	import os
 	if str("pku") in __file__:
 		sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 except Exception:
 	raise ImportError("Pocket Knife Unit PKU failed to import.")
 
