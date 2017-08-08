@@ -254,6 +254,42 @@ class ConfigTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
+	def test_case_read_default_baseconfig(self):
+		"""Tests the write default configuration functions"""
+		theResult = False
+		try:
+			from piaplib import pku as pku
+			if pku.__name__ is None:
+				raise ImportError("Failed to import pku")
+			from pku import baseconfig as baseconfig
+			if baseconfig.__name__ is None:
+				raise ImportError("Failed to import baseconfig")
+			from pku import config as config
+			if config.__name__ is None:
+				raise ImportError("Failed to import config")
+			test_path = str("/tmp/test_baseconfig.cnf")
+			self.assertTrue(
+				config.writeMainConfigFile(test_path),
+				baseconfig.getDefaultMainConfigFile()
+			)
+			self.assertIsNotNone(baseconfig.loadMainConfigFile(test_path))
+			self.assertDictEqual(
+				baseconfig.loadMainConfigFile(test_path),
+				baseconfig.getDefaultMainConfigFile()
+			)
+			theResult = True
+		except Exception as err:
+			print(str(""))
+			print(str("Error in test of default config"))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			err = None
+			del err
+			theResult = False
+		assert theResult
+
 	def test_case_yaml_read_write_file(self):
 		"""Tests the YAML read and write functions"""
 		theResult = False
