@@ -205,7 +205,7 @@ def packForRest(message=None, keyStore=None):
 			stdout=subprocess.PIPE,
 			stderr=subprocess.PIPE
 		)
-		(ciphertext, stderrdata) = p1.communicate(message)
+		(ciphertext, stderrdata) = p1.communicate(utils.literal_str(message))
 		if isinstance(ciphertext, bytes):
 			ciphertext = ciphertext.decode('utf8')
 		# ciphertext = str(ciphertext).replace(str("\\n"), str(""))

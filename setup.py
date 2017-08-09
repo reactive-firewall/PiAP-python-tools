@@ -68,7 +68,7 @@ setup(
 	author="""reactive-firewall""",
 	author_email="""reactive-firewall@users.noreply.github.com""",
 	classifiers=class_tags,
-	url="""https://github.com/reactive-firewall/PiAP-python-tools.git""",
+	url="""https://github.com/reactive-firewall/PiAP-python-tools.git@stable""",
 	license=license,
 	packages=find_packages(exclude=("""tests""", """docs""")),
 )

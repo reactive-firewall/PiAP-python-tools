@@ -40,8 +40,8 @@ except Exception:
 	raise ImportError("Failed to import test context")
 
 
-class BookTestSuite(unittest.TestCase):
-	"""Special Pocket Book test cases."""
+class PKUTestSuite(unittest.TestCase):
+	"""Special Pocket PKU test cases."""
 
 	def test_absolute_truth_and_meaning(self):
 		"""Insanitty Test."""
@@ -55,8 +55,8 @@ class BookTestSuite(unittest.TestCase):
 			from .context import piaplib
 			if piaplib.__name__ is None:
 				theResult = False
-			from piaplib import pocket
-			if pocket.__name__ is None:
+			from pku import pku
+			if pku.__name__ is None:
 				theResult = False
 			theResult = True
 		except Exception as impErr:
@@ -65,35 +65,15 @@ class BookTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
-	def test_z_case_book_valid_main(self):
-		"""Tests the imposible state for book given bad tools"""
+	def test_z_case_pku_insane_none(self):
+		"""Tests the imposible state for pku given bad tools"""
 		theResult = True
 		try:
-			from piaplib import book as book
-			if book.__name__ is None:
-				raise ImportError("Failed to import book")
-			with self.assertRaises(Exception):
-				self.assertIsNotNone(book.book.main(["logs"]))
-		except Exception as err:
-			print(str(""))
-			print(str(type(err)))
-			print(str(err))
-			print(str((err.args)))
-			print(str(""))
-			err = None
-			del err
-			theResult = False
-		assert theResult
-
-	def test_z_case_book_insane_none(self):
-		"""Tests the imposible state for book given bad tools"""
-		theResult = True
-		try:
-			from piaplib import book as book
-			if book.__name__ is None:
-				raise ImportError("Failed to import book")
-			self.assertIsNotNone(book.book.useBookTool("NoSuchTool"))
-			self.assertIsNotNone(book.book.useBookTool(None))
+			from piaplib import pku as pku
+			if pku.__name__ is None:
+				raise ImportError("Failed to import pku")
+			self.assertIsNotNone(pku.pku.usePKUTool("NoSuchTool"))
+			self.assertIsNotNone(pku.pku.usePKUTool(None))
 		except Exception as err:
 			print(str(""))
 			print(str(type(err)))

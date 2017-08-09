@@ -56,19 +56,6 @@ def getDefaultMainConfigFile():
 	return default_config
 
 
-def writeDefaultMainConfigFile(confFile=str('/var/opt/PiAP/PiAP.conf')):
-	theResult = False
-	try:
-		if writeMainConfigFile(confFile, getDefaultMainConfigFile()):
-			theResult = True
-	except Exception as err:
-		print(str(err))
-		print(str(type(err)))
-		print(str((err.args)))
-		theResult = False
-	return theResult
-
-
 def mergeDicts(*dict_args):
 	"""
 	Given any number of dicts, shallow copy and merge into a new dict,
@@ -83,31 +70,7 @@ def mergeDicts(*dict_args):
 	return result
 
 
-def mergeConfigParser(theConfig=None, config_data=None, overwrite=False):
-	"""
-	Merges the Configuration Dictionary into a configparser.
-	param theConfig - configparser.ConfigParser the ConfigParser.
-	param config_data - dict the configuration to merge.
-	param overwrite - boolean determining if the dict is record of truth or if theConfig is.
-	"""
-	try:
-		if theConfig is None:
-			theConfig = configparser.ConfigParser(allow_no_value=True)
-		if config_data is not None:
-			for someSection in config_data.keys():
-				if not theConfig.has_section(someSection):
-					theConfig.add_section(someSection)
-				for someOption in config_data[someSection].keys():
-					if not theConfig.has_option(someSection, someOption) or (overwrite is True):
-						theConfig.set(someSection, someOption, config_data[someSection][someOption])
-	except Exception as err:
-		print(str(err))
-		print(str(type(err)))
-		print(str((err.args)))
-	return theConfig
-
-
-def parseConfigParser(config_data=None, theConfig=None, overwrite=True):
+def parseConfigParser(config_data=dict({}), theConfig=None, overwrite=True):
 	"""
 	Merges the Configuration Dictionary into a configparser.
 	param config_data - dict the configuration to merge.
@@ -122,45 +85,13 @@ def parseConfigParser(config_data=None, theConfig=None, overwrite=True):
 				if str(someSection) not in config_data.keys():
 					config_data[someSection] = dict({})
 				for someOpt in theConfig.options(someSection):
-					if str(someOpt) not in config_data[someSection].keys() or (overwrite is True):
+					if (str(someOpt) not in config_data[someSection].keys()) or (overwrite is True):
 						config_data[someSection][someOpt] = theConfig.get(someSection, someOpt)
 	except Exception as err:
 		print(str(err))
 		print(str(type(err)))
 		print(str((err.args)))
 	return config_data
-
-
-def writeMainConfigFile(confFile=str('/var/opt/PiAP/PiAP.conf'), config_data=None):  # noqa C901
-	"""Generates the Main Configuration file for PiAPlib"""
-	try:
-		mainConfig = configparser.ConfigParser(allow_no_value=True)
-		default_config = loadMainConfigFile(confFile)
-		mainConfig = mergeConfigParser(mainConfig, config_data, True)
-		mainConfig = mergeConfigParser(mainConfig, default_config, False)
-		try:
-			try:
-				import six
-				if six.PY2:
-					import io
-					with io.open(file=confFile, mode='w+', buffering=-1, encoding='utf-8') as cfile:
-						mainConfig.write(cfile)
-				else:
-					with open(confFile, 'wb') as cfile:
-						mainConfig.write(cfile)
-			except Exception:
-				import io
-				with io.open(file=confFile, mode='w+', buffering=-1, encoding='utf-8') as cfile:
-					mainConfig.write(cfile)
-		except Exception:
-			with open(confFile, 'wb') as cfile:
-				mainConfig.write(cfile)
-	except Exception as err:
-		print(str(err))
-		print(str(type(err)))
-		print(str((err.args)))
-		return False
-	return True
 
 
 def loadMainConfigFile(confFile='/var/opt/PiAP/PiAP.conf'):
@@ -198,5 +129,5 @@ def loadMainConfigFile(confFile='/var/opt/PiAP/PiAP.conf'):
 
 
 if __name__ in u'__main__':
-	raise NotImplementedError("ERROR: Can not run config as main. Yet?")
+	raise NotImplementedError("ERROR: Can not run baseconfig as main.")
 

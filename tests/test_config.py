@@ -231,8 +231,16 @@ class ConfigTestSuite(unittest.TestCase):
 			if config.__name__ is None:
 				raise ImportError("Failed to import config")
 			test_path = str("/tmp/test_config.cnf")
-			self.assertTrue(config.writeMainConfigFile(test_path))
+			self.assertTrue(
+				config.writeMainConfigFile(test_path),
+				config.getDefaultMainConfigFile()
+			)
 			self.assertIsNotNone(config.loadMainConfigFile(test_path))
+			self.maxDiff = None
+			self.assertDictEqual(
+				config.loadMainConfigFile(test_path),
+				config.getDefaultMainConfigFile()
+			)
 			theResult = True
 		except Exception as err:
 			print(str(""))
@@ -246,7 +254,7 @@ class ConfigTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
-	def test_case_write_default_baseconfig(self):
+	def test_case_read_default_baseconfig(self):
 		"""Tests the write default configuration functions"""
 		theResult = False
 		try:
@@ -255,13 +263,20 @@ class ConfigTestSuite(unittest.TestCase):
 				raise ImportError("Failed to import pku")
 			from pku import baseconfig as baseconfig
 			if baseconfig.__name__ is None:
+				raise ImportError("Failed to import baseconfig")
+			from pku import config as config
+			if config.__name__ is None:
 				raise ImportError("Failed to import config")
 			test_path = str("/tmp/test_baseconfig.cnf")
-			self.assertTrue(baseconfig.writeMainConfigFile(
-				test_path,
+			self.assertTrue(
+				config.writeMainConfigFile(test_path),
 				baseconfig.getDefaultMainConfigFile()
-			))
+			)
 			self.assertIsNotNone(baseconfig.loadMainConfigFile(test_path))
+			self.assertDictEqual(
+				baseconfig.loadMainConfigFile(test_path),
+				baseconfig.getDefaultMainConfigFile()
+			)
 			theResult = True
 		except Exception as err:
 			print(str(""))

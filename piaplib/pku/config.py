@@ -189,6 +189,18 @@ except Exception:
 	pass
 
 
+class dictParser(configparser.ConfigParser):
+	"""adds as_dict() to ConfigParser"""
+	@remediation.error_handling
+	def as_dict(self):
+		"""returns the config as a nested dict"""
+		theResult = dict(self._sections)
+		for somekey in theResult:
+			theResult[somekey] = dict(self._defaults, **theResult[somekey])
+			theResult[somekey].pop('__name__', None)
+		return theResult
+
+
 @remediation.error_handling
 def getDefaultMainConfigFile():
 	import os
@@ -201,13 +213,13 @@ def getDefaultMainConfigFile():
 			'char_lower': repr(1),
 			'char_range': repr(tuple(('${PiAP-rand:char_lower}', '${PiAP-rand:char_upper}'))),
 			'passphrase_length': repr(16),
-			'passphrase_encoding': str("utf-8"),
-			'SSID_length': repr(20)
+			'passphrase_encoding': str('utf-8'),
+			'ssid_length': repr(20)
 		}),
 		'PiAP-network-lan': dict({
 			'keyfile': repr(None),
 			'network_ipv4_on': repr(True),
-			'network_ipv4': repr(tuple(("10.0.40", 0))),
+			'network_ipv4': repr(tuple(('10.0.40', 0))),
 			'ipv4_dhcp_reserved': repr({}),
 			'network_ipv6_on': repr(False),
 			'network_ipv6': repr(None),
@@ -226,7 +238,7 @@ def writeDefaultMainConfigFile(confFile=str('/var/opt/PiAP/PiAP.conf')):
 
 
 @remediation.error_passing
-def mergeConfigParser(theConfig=None, config_data=None, overwrite=False):
+def mergeConfigParser(theConfig=None, config_data=dict({}), overwrite=False):
 	"""
 	Merges the Configuration Dictionary into a configparser.
 	param theConfig - configparser.ConfigParser the ConfigParser.
@@ -234,7 +246,7 @@ def mergeConfigParser(theConfig=None, config_data=None, overwrite=False):
 	param overwrite - boolean determining if the dict is record of truth or if theConfig is.
 	"""
 	if theConfig is None:
-		theConfig = configparser.ConfigParser(allow_no_value=True)
+		theConfig = dictParser(allow_no_value=True)
 	if config_data is not None:
 		for someSection in config_data.keys():
 			if not theConfig.has_section(someSection):
@@ -246,7 +258,7 @@ def mergeConfigParser(theConfig=None, config_data=None, overwrite=False):
 
 
 @remediation.error_handling
-def parseConfigParser(config_data=None, theConfig=None, overwrite=True):
+def parseConfigParser(config_data=dict({}), theConfig=None, overwrite=True):
 	"""
 	Merges the Configuration Dictionary into a configparser.
 	param config_data - dict the configuration to merge.
@@ -269,7 +281,7 @@ def parseConfigParser(config_data=None, theConfig=None, overwrite=True):
 def writeMainConfigFile(confFile=str('/var/opt/PiAP/PiAP.conf'), config_data=None):
 	"""Generates the Main Configuration file for PiAPlib"""
 	try:
-		mainConfig = configparser.ConfigParser(allow_no_value=True)
+		mainConfig = dictParser(allow_no_value=True)
 		default_config = loadMainConfigFile(confFile)
 		mainConfig = mergeConfigParser(mainConfig, config_data, True)
 		mainConfig = mergeConfigParser(mainConfig, default_config, False)
@@ -288,12 +300,26 @@ def writeMainConfigFile(confFile=str('/var/opt/PiAP/PiAP.conf'), config_data=Non
 
 
 @remediation.error_handling
+def readIniFile(filename, theparser=None):
+	""" cross-python load function """
+	with utils.open_func(file=filename, mode=u'r', encoding=u'utf-8') as configfile:
+		try:
+			import six
+			if six.PY2:
+				theparser.readfp(configfile, str(filename))
+			else:
+				theparser.read_file(configfile, str(filename))
+		except Exception:
+			theparser.readfp(configfile, str(filename))
+	return theparser
+
+
+@remediation.error_handling
 def loadMainConfigFile(confFile='/var/opt/PiAP/PiAP.conf'):
 	try:
-		mainConfig = configparser.ConfigParser(allow_no_value=True)
+		emptyConfig = dictParser(allow_no_value=True)
 		result_config = getDefaultMainConfigFile()
-		with utils.open_func(file=confFile, mode=u'r', encoding=u'utf-8') as configfile:
-			mainConfig.read(configfile)
+		mainConfig = readIniFile(str(confFile), emptyConfig)
 		result_config = parseConfigParser(result_config, mainConfig, True)
 	except Exception as err:
 		print(str(err))
