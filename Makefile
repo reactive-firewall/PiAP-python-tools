@@ -89,17 +89,17 @@ init:
 	$(QUIET)$(ECHO) "$@: Done."
 
 install: must_be_root
-	$(QUIET)python3 -m pip install "git+https://github.com/reactive-firewall/PiAP-python-tools.git@stable#egg=piaplib"
+	$(QUIET)python3 -m pip install --upgrade "git+https://github.com/reactive-firewall/PiAP-python-tools.git@stable#egg=piaplib"
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
 
 uninstall:
-	$(QUITE)$(QUIET)python3 -m pip uninstall piaplib || true
+	$(QUITE)$(QUIET)python3 -m pip uninstall -y piaplib || true
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
 
 purge: clean uninstall
-	$(QUIET)python3 -m pip uninstall piaplib && python -m pip uninstall piaplib || true
+	$(QUIET)python3 -m pip uninstall -y piaplib && python -m pip uninstall -y piaplib || true
 	$(QUIET)$(ECHO) "$@: Done."
 
 test: cleanup

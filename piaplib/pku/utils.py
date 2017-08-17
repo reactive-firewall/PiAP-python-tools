@@ -299,10 +299,8 @@ def xstr(some_str=None):
 def isWhiteListed(someString=None, whitelist=[]):
 	"""Determins if a raw input string is an exact string in the whitelist."""
 	for validString in [xstr(x) for x in compactList(whitelist)]:
-		if xstr(someString) in xstr(validString):
+		if xstr(someString) in validString:
 			return True
-		else:
-			continue
 	return False
 
 
