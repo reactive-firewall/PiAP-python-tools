@@ -787,7 +787,7 @@ and this will test reads.""")
 			del err
 			theResult = False
 		assert theResult
-	
+
 	def test_case_utils_lit_code_bytes(self):
 		"""Tests the literal_code with an byte value as input"""
 		theResult = True
@@ -873,7 +873,7 @@ and this will test reads.""")
 			del err
 			theResult = False
 		assert theResult
-	
+
 	def test_case_utils_miss_whitelist(self):
 		"""Tests the isWhiteListed with an invalid value as input"""
 		theResult = True
