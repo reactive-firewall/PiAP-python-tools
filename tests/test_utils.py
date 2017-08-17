@@ -787,6 +787,129 @@ and this will test reads.""")
 			del err
 			theResult = False
 		assert theResult
+	
+	def test_case_utils_lit_code_bytes(self):
+		"""Tests the literal_code with an byte value as input"""
+		theResult = True
+		try:
+			from piaplib import pku as pku
+			if pku.__name__ is None:
+				raise ImportError("Failed to import pku")
+			from pku import utils as utils
+			if utils.__name__ is None:
+				raise ImportError("Failed to import utils")
+			self.assertEqual(
+				utils.literal_code(bytes(str("test").encode("utf-8"))),
+				str("test")
+			)
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			err = None
+			del err
+			theResult = False
+		assert theResult
+
+	@unittest.skipUnless((sys.version_info < (3, 0)), "unicode class is not used in python 3")
+	def test_case_utils_lit_str_unicode(self):
+		"""Tests the literal_str with an unicode value as input"""
+		theResult = True
+		try:
+			from piaplib import pku as pku
+			if pku.__name__ is None:
+				raise ImportError("Failed to import pku")
+			from pku import utils as utils
+			if utils.__name__ is None:
+				raise ImportError("Failed to import utils")
+			self.assertEqual(
+				utils.literal_str(unicode(str("test"))),
+				str("test")
+			)
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			err = None
+			del err
+			theResult = False
+		assert theResult
+
+	def test_case_utils_match_whitelist(self):
+		"""Tests the isWhiteListed with a valid value as input"""
+		theResult = True
+		try:
+			from piaplib import pku as pku
+			if pku.__name__ is None:
+				raise ImportError("Failed to import pku")
+			from pku import utils as utils
+			if utils.__name__ is None:
+				raise ImportError("Failed to import utils")
+			match_value = str("This will match")
+			white_values = [
+				str("This will match"),
+				str("This will not match"),
+				str("This will never match"),
+				str("that will match"),
+				str("thIs wIll match")
+			]
+			self.assertTrue(utils.isWhiteListed(match_value, white_values))
+			for test_value in white_values:
+				self.assertIsInstance(
+					utils.isWhiteListed(test_value, [match_value]),
+					bool
+				)
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			err = None
+			del err
+			theResult = False
+		assert theResult
+	
+	def test_case_utils_miss_whitelist(self):
+		"""Tests the isWhiteListed with an invalid value as input"""
+		theResult = True
+		try:
+			from piaplib import pku as pku
+			if pku.__name__ is None:
+				raise ImportError("Failed to import pku")
+			from pku import utils as utils
+			if utils.__name__ is None:
+				raise ImportError("Failed to import utils")
+			match_value = str("This will NOT match")
+			white_values = [
+				str("This will match"),
+				str("This will not match"),
+				str("This will never match"),
+				str("that will match"),
+				str("thIs wIll match")
+			]
+			self.assertFalse(utils.isWhiteListed(match_value, white_values))
+			junk_list = [match_value, str("JUNK")]
+			for test_value in white_values:
+				self.assertIsInstance(
+					utils.isWhiteListed(test_value, junk_list),
+					bool
+				)
+				self.assertFalse(utils.isWhiteListed(test_value, junk_list))
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			err = None
+			del err
+			theResult = False
+		assert theResult
 
 
 if __name__ == u'__main__':

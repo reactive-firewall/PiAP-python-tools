@@ -10,7 +10,8 @@ Standards checklist:
 
 	Other Misc (just for navigation):
 	PEP324 - subproccess
-	RFC 4880 - pgpy (bsd compatable python pgp)
+	codesigning
+	RFC 4880 - pgpy (bsd compatable licenced python pgp)
 	
 	RFC3530 - NFSv4
 	
