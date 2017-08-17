@@ -825,7 +825,7 @@ and this will test reads.""")
 			if utils.__name__ is None:
 				raise ImportError("Failed to import utils")
 			self.assertEqual(
-				utils.literal_str(unicode(str("test"))),
+				utils.literal_str(unicode(str("test"))),  # noqa
 				str("test")
 			)
 		except Exception as err:
