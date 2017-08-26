@@ -76,6 +76,7 @@ class logsTestSuite(unittest.TestCase):
 			with self.assertLogs(None, level='INFO') as cm:
 				logobj = logs()
 				logobj(msg=str("test log call"), loglevel="INFO")
+				self.assertIsNotNone(cm)
 		except Exception as err:
 			print(str(""))
 			print(str(type(err)))
@@ -104,6 +105,7 @@ class logsTestSuite(unittest.TestCase):
 				with self.assertRaises(Exception):
 					logs.log(None, None)
 					logs.log(str("test log None"), None)
+				self.assertIsNotNone(cm)
 		except Exception as err:
 			print(str(""))
 			print(str(type(err)))
