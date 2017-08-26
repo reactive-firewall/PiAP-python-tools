@@ -40,13 +40,8 @@ except Exception:
 	raise ImportError("Failed to import test context")
 
 
-class BookTestSuite(unittest.TestCase):
-	"""Special Pocket Book test cases."""
-
-	def test_absolute_truth_and_meaning(self):
-		"""Insanitty Test."""
-		assert True
-		self.assertIsNone(None)
+class logsTestSuite(unittest.TestCase):
+	"""Special Pocket logbook test cases."""
 
 	def test_syntax(self):
 		"""Test case importing code."""
@@ -58,6 +53,9 @@ class BookTestSuite(unittest.TestCase):
 			from piaplib import pocket
 			if pocket.__name__ is None:
 				theResult = False
+			from piaplib import book as book
+			if book.__name__ is None:
+				theResult = False
 			theResult = True
 		except Exception as impErr:
 			print(str(type(impErr)))
@@ -65,14 +63,19 @@ class BookTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
-	def test_y_case_book_valid_main(self):
-		"""Tests the imposible state for book given future tools"""
+	def test_a_case_log_call(self):
+		"""Tests the odd state for logs called as class"""
 		theResult = True
 		try:
 			from piaplib import book as book
 			if book.__name__ is None:
 				raise ImportError("Failed to import book")
-			self.assertIsNotNone(book.book.useBookTool("version", ["all"]))
+			from book.logs import logs as logs
+			if logs.__name__ is None:
+				raise ImportError("Failed to import logs")
+			with self.assertLogs(None, level='INFO') as cm:
+				logobj = logs()
+				logobj(msg=str("test log call"), loglevel="INFO")
 		except Exception as err:
 			print(str(""))
 			print(str(type(err)))
@@ -84,15 +87,50 @@ class BookTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
-	def test_z_case_book_valid_main(self):
-		"""Tests the imposible state for book given bad tools"""
+	def test_b_case_log_call(self):
+		"""Tests the imposible state for logs missing input"""
 		theResult = True
 		try:
 			from piaplib import book as book
 			if book.__name__ is None:
 				raise ImportError("Failed to import book")
+			from book.logs import logs as logs
+			if logs.__name__ is None:
+				raise ImportError("Failed to import logs")
+			with self.assertLogs(None, level='INFO') as cm:
+				logs.log(str("test log call"), 'INFO')
+				with self.assertRaises(Exception):
+					logs.log(None, 'INFO')
+				with self.assertRaises(Exception):
+					logs.log(None, None)
+					logs.log(str("test log None"), None)
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			err = None
+			del err
+			theResult = False
+		assert theResult
+
+	def test_c_case_log_call(self):
+		"""Tests the imposible state for logs given junk input"""
+		theResult = True
+		try:
+			from piaplib import book as book
+			if book.__name__ is None:
+				raise ImportError("Failed to import book")
+			from book.logs import logs as logs
+			if logs.__name__ is None:
+				raise ImportError("Failed to import logs")
 			with self.assertRaises(Exception):
-				self.assertIsNotNone(book.book.main(["logs"]))
+				logs.log(["test log call"], 'INFO')
+			with self.assertRaises(Exception):
+				logs.log("test log call", ['INFO'])
+			with self.assertRaises(Exception):
+				logs.log("test log call", 'JUNK_VALUE')
 		except Exception as err:
 			print(str(""))
 			print(str(type(err)))
@@ -104,15 +142,18 @@ class BookTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
-	def test_z_case_book_insane_none(self):
-		"""Tests the imposible state for book given bad tools"""
+	def test_d_case_log_bad_main(self):
+		"""Tests the imposible state for logs main"""
 		theResult = True
 		try:
 			from piaplib import book as book
 			if book.__name__ is None:
 				raise ImportError("Failed to import book")
-			self.assertIsNotNone(book.book.useBookTool("NoSuchTool"))
-			self.assertIsNotNone(book.book.useBookTool(None))
+			from book.logs import logs as logs
+			if logs.__name__ is None:
+				raise ImportError("Failed to import logs")
+			with self.assertRaises(Exception):
+				logs.main(["test log call"])
 		except Exception as err:
 			print(str(""))
 			print(str(type(err)))

@@ -289,9 +289,11 @@ def get_client_lease_status_raw(client_row=None):
 	theRawLeaseStatus = u'UNKNOWN'
 	try:
 		# should probably move to config file
-		theRawLeaseStatus = utils.readFile("/var/lib/misc/dnsmasq.leases")
+		filepath = str("/var/lib/misc/dnsmasq.leases")
+		if (utils.xisfile(filepath) is True):
+			theRawLeaseStatus = utils.readFile(filepath)
 	except Exception as importErr:
-		print(str("ERROR: get_client_sta_status"))
+		print(str("ERROR: get_client_lease_status_raw"))
 		print(str(type(importErr)))
 		print(str(importErr))
 		print(str(importErr.args))

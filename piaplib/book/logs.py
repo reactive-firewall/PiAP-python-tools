@@ -150,7 +150,7 @@ class logs(object):
 	"""Mappings from different log levels to colors."""
 
 	def __call__(self, *args, **kwargs):
-		return logs.log(args, kwargs)
+		return logs.log(*args, **kwargs)
 
 	@staticmethod
 	def log(msg=str("Checked in"), loglevel="info"):
@@ -165,8 +165,6 @@ class logs(object):
 		if not isinstance(loglevel, str):
 			raise ValueError(str("Invalid log level"))
 		if (loglevel.lower() not in logs.logging_level.keys()):
-			raise ValueError(str("Invalid log level"))
-		if not isinstance(logs.logging_level[loglevel.lower()], int):
 			raise ValueError(str("Invalid log level"))
 		logger.log(
 			logs.logging_level[loglevel.lower()],

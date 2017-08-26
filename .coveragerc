@@ -15,6 +15,7 @@ exclude_lines =
     raise NotImplementedError
     raise ImportError
     except unittest.SkipTest
+    except subprocess.CalledProcessError
     except IOError
     except OSError
 

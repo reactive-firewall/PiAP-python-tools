@@ -58,10 +58,13 @@ try:
 		from piaplib.pku import remediation as remediation
 	except Exception:
 		import piaplib.pku.remediation as remediation
-	if remediation.__name__ is None:
-		raise ImportError("Failed to open PKU Remediation")
-	if logs.__name__ is None:
-		raise ImportError("Failed to open Pocket LogBook")
+	try:
+		from . import version as version
+	except Exception:
+		import book.version as version
+	for dep in [remediation, logs, version]:
+		if dep.__name__ is None:
+			raise ImportError("Failed to open dependency for book")
 except Exception as importErr:
 	print(str(importErr))
 	print(str(importErr.args))
@@ -75,9 +78,10 @@ __prog__ = """piaplib.book"""
 """The name of this PiAPLib tool is pocket book"""
 
 
-BOOK_UNITS = {u'logs': logs, u'cache': None}
+BOOK_UNITS = {u'logs': logs, u'cache': None, u'version': version}
 """	The Pocket Book Unit actions.
 	logs - logbook for logs and output
+	version - like the copyright page in old books
 	cache - cache and posibly memoization (FUTURE/RESERVED).
 	learn -  (FUTURE/RESERVED)
 	"""
