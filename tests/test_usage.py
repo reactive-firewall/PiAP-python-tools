@@ -662,9 +662,6 @@ class BasicUsageTestSuite(unittest.TestCase):
 		"""Test case for piaplib.keyring.rand --count=5."""
 		theResult = False
 		try:
-			import sys
-			if sys.__name__ is None:
-				raise ImportError("Failed to import system. WTF?!!")
 			thepython = getPythonCommand()
 			if (thepython is not None):
 				try:
@@ -770,9 +767,6 @@ class BasicUsageTestSuite(unittest.TestCase):
 		"""Test case for piaplib.keyring.clearify."""
 		theResult = False
 		try:
-			import sys
-			if sys.__name__ is None:
-				raise ImportError("Failed to import system. WTF?!!")
 			import piaplib.keyring.rand as rand
 			if rand.__name__ is None:
 				raise ImportError("Failed to import rand.")
@@ -851,9 +845,6 @@ class BasicUsageTestSuite(unittest.TestCase):
 		"""Test case for piaplib.lint.check.* --list."""
 		theResult = False
 		try:
-			import sys
-			if sys.__name__ is None:
-				raise ImportError("Failed to import system. WTF?!!")
 			thepython = getPythonCommand()
 			if (thepython is not None):
 				try:
@@ -893,9 +884,6 @@ class BasicUsageTestSuite(unittest.TestCase):
 		"""Test case for piaplib.pocket.lint check users."""
 		theResult = False
 		try:
-			import sys
-			if sys.__name__ is None:
-				raise ImportError("Failed to import system. WTF?!!")
 			thepython = getPythonCommand()
 			if (thepython is not None):
 				try:
@@ -945,9 +933,6 @@ class BasicUsageTestSuite(unittest.TestCase):
 		"""Test case for piaplib.pku.compile_interface dhcp iface."""
 		theResult = False
 		try:
-			import sys
-			if sys.__name__ is None:
-				raise ImportError("Failed to import system. WTF?!!")
 			thepython = getPythonCommand()
 			if (thepython is not None):
 				try:
@@ -998,9 +983,6 @@ class BasicUsageTestSuite(unittest.TestCase):
 		"""Test case for piaplib.pku.compile_interface static iface."""
 		theResult = False
 		try:
-			import sys
-			if sys.__name__ is None:
-				raise ImportError("Failed to import system. WTF?!!")
 			thepython = getPythonCommand()
 			if (thepython is not None):
 				try:
@@ -1057,9 +1039,6 @@ class BasicUsageTestSuite(unittest.TestCase):
 		"""Test case for piaplib.pocket.lint check users."""
 		theResult = False
 		try:
-			import sys
-			if sys.__name__ is None:
-				raise ImportError("Failed to import system. WTF?!!")
 			thepython = getPythonCommand()
 			if (thepython is not None):
 				try:
@@ -1111,9 +1090,6 @@ class BasicUsageTestSuite(unittest.TestCase):
 		"""Test case for piaplib.pocket.lint check users."""
 		theResult = False
 		try:
-			import sys
-			if sys.__name__ is None:
-				raise ImportError("Failed to import system. WTF?!!")
 			thepython = getPythonCommand()
 			if (thepython is not None):
 				try:
@@ -1166,9 +1142,6 @@ class BasicUsageTestSuite(unittest.TestCase):
 		"""Test case for piaplib.pocket.lint check users."""
 		theResult = False
 		try:
-			import sys
-			if sys.__name__ is None:
-				raise ImportError("Failed to import system. WTF?!!")
 			thepython = getPythonCommand()
 			if (thepython is not None):
 				try:
@@ -1217,9 +1190,6 @@ class BasicUsageTestSuite(unittest.TestCase):
 		"""Test case for piaplib.pocket.lint check users."""
 		theResult = False
 		try:
-			import sys
-			if sys.__name__ is None:
-				raise ImportError("Failed to import system. WTF?!!")
 			thepython = getPythonCommand()
 			if (thepython is not None):
 				try:
@@ -1267,9 +1237,6 @@ class BasicUsageTestSuite(unittest.TestCase):
 		"""Test case for piaplib.pocket.lint check users."""
 		theResult = False
 		try:
-			import sys
-			if sys.__name__ is None:
-				raise ImportError("Failed to import system. WTF?!!")
 			thepython = getPythonCommand()
 			if (thepython is not None):
 				try:
@@ -1318,9 +1285,6 @@ class BasicUsageTestSuite(unittest.TestCase):
 		"""Test case for piaplib.pocket.lint check iface."""
 		theResult = False
 		try:
-			import sys
-			if sys.__name__ is None:
-				raise ImportError("Failed to import system. WTF?!!")
 			thepython = getPythonCommand()
 			if (thepython is not None):
 				try:
@@ -1374,9 +1338,6 @@ class BasicUsageTestSuite(unittest.TestCase):
 			from pku import utils as utils
 			if utils.__name__ is None:
 				raise ImportError("Failed to import utils")
-			import sys
-			if sys.__name__ is None:
-				raise ImportError("Failed to import system. WTF?!!")
 			thepython = getPythonCommand()
 			if (thepython is not None):
 				test_salt_one = str(
@@ -1443,9 +1404,6 @@ class BasicUsageTestSuite(unittest.TestCase):
 			from pku import utils as utils
 			if utils.__name__ is None:
 				raise ImportError("Failed to import utils")
-			import sys
-			if sys.__name__ is None:
-				raise ImportError("Failed to import system. WTF?!!")
 			thepython = getPythonCommand()
 			if (thepython is not None):
 				theOutputtext = None
@@ -1543,9 +1501,6 @@ class BasicUsageTestSuite(unittest.TestCase):
 			from pku import utils as utils
 			if utils.__name__ is None:
 				raise ImportError("Failed to import utils")
-			import sys
-			if sys.__name__ is None:
-				raise ImportError("Failed to import system. WTF?!!")
 			thepython = getPythonCommand()
 			if (thepython is not None):
 				theOutputtext = None
@@ -1579,9 +1534,6 @@ class BasicUsageTestSuite(unittest.TestCase):
 		"""Test case for piaplib.pocket.lint do_execve calls."""
 		theResult = False
 		try:
-			import sys
-			if sys.__name__ is None:
-				raise ImportError("Failed to import system. WTF?!!")
 			thepython = getPythonCommand()
 			if (thepython is not None):
 				try:

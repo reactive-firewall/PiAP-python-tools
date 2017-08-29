@@ -178,6 +178,8 @@ def get_client_name(client_ip=None, use_html=False, lan_interface=None):
 def get_client_sta_status_raw():
 	"""list the raw status of client sta."""
 	theRawClientState = None
+	if not utils.xisfile(str("/opt/PiAP/hostapd_actions/clients")):
+		return str(u'UNKNOWN')
 	try:
 		import subprocess
 		try:
@@ -195,13 +197,6 @@ def get_client_sta_status_raw():
 				del lines
 			else:
 				theRawClientState = None
-		except FileNotFoundError as depErr:  # noqa F821
-			print(str(type(depErr)))
-			print(str(depErr))
-			print(str(depErr.args))
-			depErr = None
-			del depErr
-			theRawClientState = u'UNKNOWN'
 		except subprocess.CalledProcessError as subErr:
 			print(str(type(subErr)))
 			print(str(subErr))

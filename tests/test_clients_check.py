@@ -296,7 +296,7 @@ class MoreClientChecksTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
-	def test_clients_check_status_raw_cd(self):
+	def test_clients_check_status_raw_ce(self):
 		"""Test case for piaplib.lint.clients_check_status.get_client_lease_status_raw(None)"""
 		theResult = False
 		from .context import piaplib
