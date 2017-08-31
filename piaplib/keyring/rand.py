@@ -324,13 +324,14 @@ def randChar(count=None):
 
 
 RANDOM_TASKS = {
-	u'raw': rand, u'int': randInt, u'str': randStr, u'bool': randBool,
+	u'raw': rand, u'int': randInt, u'str': randStr, u'char': randChar, u'bool': randBool,
 	u'passphrase': randPW, u'SSID': randSSID, u'IP': randIP}
 """
 	The posible random actions.
 	raw - same as calling os.urandom(). This is default.
 	int - return a random integer.
 	str - return a random string.
+	str - return a random char/str.
 	bool - return a random boolean.
 	passphrase - return a random string to use as a passphrase. For automation; Not secure entry.
 	SSID - return a random string to use as a wifi SSID. For automation; Not secure entry.
@@ -387,7 +388,7 @@ def useRandTool(tool, *args, **kwargs):
 	if tool in RANDOM_TASKS.keys():
 		return RANDOM_TASKS[tool](*args, **kwargs)
 	else:
-		raise NotImplementedError("IMPOSIBLE STATE REACHED IN RAND-CHAR. ABORT.")
+		raise NotImplementedError("IMPOSIBLE STATE REACHED IN RAND-TOOL. ABORT.")
 
 
 @remediation.bug_handling

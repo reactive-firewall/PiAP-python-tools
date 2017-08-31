@@ -63,7 +63,7 @@ class logsTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
-	@unittest.skipUnless((sys.version_info >= (3, 3)), "Requires Python 3")
+	@unittest.skipUnless((sys.version_info >= (3, 4)), "Requires Python 3.4+")
 	def test_a_case_log_call(self):
 		"""Tests the odd state for logs called as class"""
 		theResult = True
@@ -89,7 +89,7 @@ class logsTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
-	@unittest.skipUnless((sys.version_info >= (3, 3)), "Requires Python 3")
+	@unittest.skipUnless((sys.version_info >= (3, 4)), "Requires Python 3.4+")
 	def test_b_case_log_call(self):
 		"""Tests the imposible state for logs missing input"""
 		theResult = True
