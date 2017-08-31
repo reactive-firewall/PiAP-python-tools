@@ -180,7 +180,7 @@ def get_iface_name(iface_name=None, use_html=False):
 @remediation.error_handling
 def get_iface_status_raw(interface=None):
 	"""list the raw status of interfaces."""
-	arguments = [str("ip"), str("addr")]
+	arguments = [str("ip"), str("addr"), str("show")]
 	if interface is not None:
 		tainted_name = taint_name(interface)
 		arguments = [str("ip"), str("addr"), str("show"), str(tainted_name)]

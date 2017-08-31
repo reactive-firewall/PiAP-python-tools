@@ -17,5 +17,8 @@ jobs:
             make test
       - run:
           command: |
+            make test-style
+      - run:
+          command: |
             make clean
 destination: tr1

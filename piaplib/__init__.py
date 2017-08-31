@@ -36,28 +36,24 @@ except Exception as ImportErr:
 
 
 try:
-	from . import pocket as pocket
-except Exception as importErr:
-	del importErr
-	import pocket as pocket
-
-
-try:
-	from . import book as book
+	if 'piaplib.book' not in sys.modules:
+		from . import book as book
 except Exception as importErr:
 	del importErr
 	import book as book
 
 
 try:
-	from . import pku as pku
+	if 'piaplib.pku' not in sys.modules:
+		from . import pku as pku
 except Exception as importErr:
 	del importErr
 	import pku as pku
 
 
 try:
-	from . import keyring as keyring
+	if 'piaplib.keyring' not in sys.modules:
+		from . import keyring as keyring
 except Exception as importErr:
 	del importErr
 	import keyring as keyring
@@ -71,6 +67,12 @@ except Exception as importErr:
 
 
 if __name__ in u'__main__':
+	try:
+		if 'piaplib.pocket' not in sys.modules:
+			from . import pocket as pocket
+	except Exception as importErr:
+		del importErr
+		import pocket as pocket
 	if pku.__name__ is None:
 		raise ImportError(str(u'Failed to open Pocket Knife Unit'))
 	if keyring.__name__ is None:

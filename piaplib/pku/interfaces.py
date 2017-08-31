@@ -42,7 +42,7 @@ __prog__ = """piaplib.pku.interfaces"""
 """The name of this PiAPLib tool is Pocket Knife Interfaces Unit"""
 
 
-IFACE_PREFIXES = [str("lan"), str("wlan"), str("eth"), str("usb"), str("br"), str("mon")]
+IFACE_PREFIXES = [str("lan"), str("wlan"), str("eth"), str("usb"), str("br"), str("mon"), str("enp0s")]
 """whitelist of valid iface prefixes"""
 
 
