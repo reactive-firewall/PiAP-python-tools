@@ -287,6 +287,7 @@ def packToFile(somefile, data, keyStore=None):
 		did_write = True
 	except Exception as clearerr:
 		raise remediation.PiAPError(clearerr, str("Failed to write or encrypt file."))
+		del(clearerr)
 		did_write = False
 	return did_write
 

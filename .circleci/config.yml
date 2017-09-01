@@ -11,6 +11,9 @@ jobs:
       - checkout
       - run:
           command: |
+            which openssl || true
+      - run:
+          command: |
             make clean
       - run:
           command: |
