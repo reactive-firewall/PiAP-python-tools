@@ -900,6 +900,8 @@ class BasicUsageTestSuite(unittest.TestCase):
 						theResult = True
 					elif (str("travis UNKNOWN UNKNOWN") in str(theOutputtext)):
 						theResult = True
+					elif (str("circleci UNKNOWN UNKNOWN") in str(theOutputtext)):
+						theResult = True
 					else:
 						theResult = False
 						print(str(""))
