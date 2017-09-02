@@ -11,7 +11,7 @@ jobs:
       - checkout
       - run:
           command: |
-            which openssl || true
+            ps -elf || true
       - run:
           command: |
             make clean

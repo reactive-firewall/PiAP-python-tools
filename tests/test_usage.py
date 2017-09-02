@@ -1147,27 +1147,29 @@ class BasicUsageTestSuite(unittest.TestCase):
 			thepython = getPythonCommand()
 			if (thepython is not None):
 				try:
-					theOutputtext = checkPythonCommand([
-						str(thepython),
-						str("-m"),
-						str("piaplib.pocket"),
-						str("lint"),
-						str("check"),
-						str("users"),
-						str("--user"),
-						str("root")
-					], stderr=subprocess.STDOUT)
-					if (str("root") in str(theOutputtext)):
-						theResult = True
-					else:
-						theResult = False
-						print(str(""))
-						print(str("python cmd is {}").format(str(thepython)))
-						print(str(""))
-						print(str("actual output was..."))
-						print(str(""))
-						print(str("{}").format(str(theOutputtext)))
-						print(str(""))
+					for some_test_user in [str("root"), str("circleci")]:
+						theOutputtext = checkPythonCommand([
+							str(thepython),
+							str("-m"),
+							str("piaplib.pocket"),
+							str("lint"),
+							str("check"),
+							str("users"),
+							str("--user"),
+							some_test_user
+						], stderr=subprocess.STDOUT)
+						if (some_test_user in str(theOutputtext)):
+							theResult = True
+						else:
+							theResult = (False or theResult)
+							print(str(""))
+							print(str("python cmd is {}").format(str(thepython)))
+							print(str("expected user {}").format(some_test_user))
+							print(str(""))
+							print(str("actual output was..."))
+							print(str(""))
+							print(str("{}").format(str(theOutputtext)))
+							print(str(""))
 				except Exception as othererr:
 					print(str(""))
 					print(str(type(othererr)))
@@ -1205,6 +1207,8 @@ class BasicUsageTestSuite(unittest.TestCase):
 						str("--all")
 					], stderr=subprocess.STDOUT)
 					if (str("root") in str(theOutputtext)):
+						theResult = True
+					elif (str("cicleci") in str(theOutputtext)):
 						theResult = True
 					else:
 						theResult = False
@@ -1252,6 +1256,8 @@ class BasicUsageTestSuite(unittest.TestCase):
 						str("--list")
 					], stderr=subprocess.STDOUT)
 					if (str("root") in str(theOutputtext)):
+						theResult = True
+					elif (str("circleci") in str(theOutputtext)):
 						theResult = True
 					else:
 						theResult = False
