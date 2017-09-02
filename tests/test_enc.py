@@ -339,11 +339,28 @@ class CryptoTestSuite(unittest.TestCase):
 				str("./.weak_test_key_{}").format(rand.randInt(1, 10, 99))
 			)
 			self.assertIsNotNone(theteststore)
-			test_write = clearify.packToFile(
-				sometestfile,
-				str("This is a test Message"),
-				theteststore
-			)
+			try:
+				test_write = clearify.packToFile(
+					sometestfile,
+					str("This is a test Message"),
+					theteststore
+				)
+			except Exception as dbugerr:
+				print(str("file:"))
+				print(str(sometestfile))
+				print(str(""))
+				print(str("keyfile:"))
+				print(str(theteststore))
+				print(str(""))
+				print(str("result:"))
+				print(str(test_write))
+				print(str(""))
+				print(str(type(dbugerr)))
+				print(str(dbugerr))
+				print(str((dbugerr.args)))
+				print(str(""))
+				err = None
+				del err
 			self.assertTrue(test_write)
 			if (test_write is True):
 				test_read = clearify.unpackFromFile(sometestfile, theteststore)
