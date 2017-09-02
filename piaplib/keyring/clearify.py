@@ -282,7 +282,7 @@ def packToFile(somefile, data, keyStore=None):
 		if someFilePath is not None:
 			encData = packForRest(data, keyStore)
 			with utils.open_func(file=someFilePath, mode=u'wb+') as enc_data_file:
-				utils.write_func(enc_data_file, utils.literal_str(encData).encode("utf-8"))
+				utils.write_func(enc_data_file, bytes(utils.literal_str(encData).encode(u'utf-8')))
 			del(encData)
 		did_write = True
 	except Exception as clearerr:
