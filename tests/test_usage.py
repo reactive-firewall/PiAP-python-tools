@@ -1208,7 +1208,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 					], stderr=subprocess.STDOUT)
 					if (str("root") in str(theOutputtext)):
 						theResult = True
-					elif (str("cicleci") in str(theOutputtext)):
+					elif (str("circleci") in str(theOutputtext)):
 						theResult = True
 					else:
 						theResult = False
