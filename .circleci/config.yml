@@ -23,6 +23,9 @@ jobs:
             make test
       - run:
           command: |
+            make clean
+      - run:
+          command: |
             make test-style
       - run:
           command: |
