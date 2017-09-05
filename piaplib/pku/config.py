@@ -139,13 +139,18 @@ def readYamlFile(somefile):
 		return None
 	read_data = None
 	try:
-		someFilePath = utils.addExtension(somefile, str('yaml'))
+		someFilePath = utils.addExtension(somefile, str('yml'))
 		with utils.open_func(file=someFilePath, mode=u'r', encoding=u'utf-8') as ymalfile:
-			if yaml.version_info < (0, 15):
+			try:
+				if yaml.version_info < (0, 15):
+					read_data = yaml.safe_load(ymalfile)
+				else:
+					yml = yaml.YAML(typ='safe', pure=True)  # 'safe' load and dump
+					read_data = yml.load(ymalfile)
+			except AttributeError as libyamlerr:
+				libyamlerr = None
+				del(libyamlerr)
 				read_data = yaml.safe_load(ymalfile)
-			else:
-				yml = yaml.YAML(typ='safe', pure=True)  # 'safe' load and dump
-				read_data = yml.load(ymalfile)
 	except Exception as yamlerr:
 		print("")
 		print("Error: Failed to load YAML file.")
@@ -163,7 +168,7 @@ def writeYamlFile(somefile, data):
 		return False
 	did_write = False
 	try:
-		someFilePath = utils.addExtension(somefile, str('yaml'))
+		someFilePath = utils.addExtension(somefile, str('yml'))
 		did_write = utils.writeFile(someFilePath, yaml.dump(data))
 	except Exception as yamlerr:
 		print("")

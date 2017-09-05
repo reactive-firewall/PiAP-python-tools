@@ -10,24 +10,33 @@ jobs:
     steps:
       - checkout
       - run:
+          name: "fetch and pull"
           command: |
             git fetch && git pull --all || true
       - run:
+          name: "install coverage attempt"
           command: |
             python3 -m pip install --user coverage || true
       - run:
+          shell: /bin/bash
+          name: "clean up for test"
           command: |
             make clean
       - run:
+          shell: /bin/bash
+          name: "Unit Tests"
           command: |
             make test
       - run:
+          name: "clean up from test"
           command: |
             make clean
       - run:
+          name: "check code style"
           command: |
             make test-style
       - run:
+          name: "clean up when done"
           command: |
             make clean
-destination: tr1
+destination: build
