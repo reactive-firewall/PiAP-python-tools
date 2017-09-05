@@ -14,7 +14,7 @@ jobs:
             git fetch && git pull --all || true
       - run:
           command: |
-            python3 -m pip install coverage || true
+            python3 -m pip install --user coverage || true
       - run:
           command: |
             make clean
