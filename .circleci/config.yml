@@ -3,7 +3,7 @@ jobs:
   build:
     working_directory: ~/PiAP-python-tools
     docker:
-      - image: circleci/python:3.6.1
+      - image: circleci/python:3.5.3
         environment:
           CI: cicleci
           POSTGRES_DB: circle_test
