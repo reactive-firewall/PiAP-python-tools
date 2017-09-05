@@ -39,7 +39,6 @@ except Exception:
 	raise ImportError("Failed to import test context")
 
 
-import profiling as profiling
 import unittest
 
 
