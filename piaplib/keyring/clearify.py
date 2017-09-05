@@ -281,10 +281,10 @@ def packToFile(somefile, data, keyStore=None):
 		someFilePath = utils.literal_code(utils.addExtension(str(somefile), str("enc")))
 		if someFilePath is not None:
 			encData = packForRest(data, keyStore)
-			if encData is None:
-				raise remediation.PiAPError(None, str("Failed to encrypt input."))
-			with utils.open_func(file=someFilePath, mode=u'wb+') as enc_data_file:
-				utils.write_func(enc_data_file, utils.literal_str(encData).encode(u'utf-8'))
+			utils.writeFile(
+				os.path.abspath(someFilePath),
+				str(encData)
+			)
 			del(encData)
 		did_write = True
 	except Exception as clearerr:
