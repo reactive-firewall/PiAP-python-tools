@@ -18,6 +18,10 @@ jobs:
           command: |
             python3 -m pip install --user coverage || true
       - run:
+          name: "install flake8 attempt"
+          command: |
+            python3 -m pip install --user flake8 || true
+      - run:
           shell: /bin/bash
           name: "clean up for test"
           command: |

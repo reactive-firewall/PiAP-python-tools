@@ -325,7 +325,6 @@ class CryptoTestSuite(unittest.TestCase):
 		assert theResult
 
 
-	@profiling.do_cprofile
 	def test_case_clearify_read_write(self):  # noqa C901
 		"""Tests the helper function pack to file of keyring.clearify and then unpack"""
 		theResult = False
