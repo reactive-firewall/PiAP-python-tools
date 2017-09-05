@@ -367,11 +367,6 @@ def write_func(someFile, the_data=None):
 			return someFile.write(literal_code(the_data))
 		else:
 			return someFile.write(the_data)
-	except TypeError as nostringerr:
-		if six.PY2:
-			return someFile.write(bytes(literal_code(the_data).encode("utf-8")))
-		else:
-			return someFile.write(bytes(str(the_data).encode("utf-8")))
 	except Exception:
 		return someFile.write(literal_code(the_data))
 
