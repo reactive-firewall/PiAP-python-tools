@@ -19,7 +19,7 @@
 # limitations under the License.
 # ......................................................................
 
-# Imports
+
 try:
 	import os
 	import sys
@@ -46,14 +46,9 @@ try:
 		from .. import interfaces as interfaces
 	except Exception:
 		import pku.interfaces as interfaces
-	if utils.__name__ is None:
-		raise ImportError("Failed to open PKU Utils")
-	if remediation.__name__ is None:
-		raise ImportError("Failed to open PKU Remediation")
-	if interfaces.__name__ is None:
-		raise ImportError("Failed to open PKU Interfaces")
-	if html_generator.__name__ is None:
-		raise ImportError("Failed to open HTML5 Pocket Lint")
+	for depends in [interfaces, html_generator, remediation, utils]:
+		if depends.__name__ is None:
+			raise ImportError("Failed to import depends.")
 except Exception as importErr:
 	print(str(importErr))
 	print(str(importErr.args))

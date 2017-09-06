@@ -43,17 +43,10 @@ try:
 		from piaplib.pku import baseconfig as baseconfig
 	except Exception:
 		import piaplib.pku.baseconfig as baseconfig
-	if baseconfig.__name__ is None:
-		raise ImportError("Failed to open PKU baseconfig")
 	try:
 		from .logs import logs as logs
-	except Exception as impErr:
-		impErr = None
-		del(impErr)
-		try:
-			import logs.logs as logs
-		except Exception:
-			raise ImportError("Error Importing logs")
+	except Exception:
+		import logs.logs as logs
 	try:
 		from piaplib.pku import remediation as remediation
 	except Exception:
@@ -62,7 +55,7 @@ try:
 		from . import version as version
 	except Exception:
 		import book.version as version
-	for dep in [remediation, logs, version]:
+	for dep in [baseconfig, remediation, logs, version]:
 		if dep.__name__ is None:
 			raise ImportError("Failed to open dependency for book")
 except Exception as importErr:
@@ -128,7 +121,6 @@ def main(argv=None):
 
 
 if __name__ in u'__main__':
-	import sys
 	exit_code = main(sys.argv[1:])
 	exit(exit_code)
 
