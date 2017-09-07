@@ -19,7 +19,6 @@
 # limitations under the License.
 # ......................................................................
 
-import unittest
 
 try:
 	try:
@@ -38,6 +37,9 @@ try:
 		raise ImportError(str("Test module failed completely."))
 except Exception:
 	raise ImportError("Failed to import test context")
+
+
+import unittest
 
 
 class CryptoTestSuite(unittest.TestCase):
@@ -149,7 +151,7 @@ class CryptoTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
-	def test_z_case_clearify_setKeyFile_no_key(self):
+	def test_z_z_case_clearify_setKeyFile_no_key(self):
 		"""Tests the helper function makeKeystoreFile(None, x) of keyring.clearify"""
 		theResult = True
 		try:
@@ -321,6 +323,7 @@ class CryptoTestSuite(unittest.TestCase):
 				raise unittest.SkipTest("BETA. Experemental feature not ready yet.")
 		assert theResult
 
+
 	def test_case_clearify_read_write(self):  # noqa C901
 		"""Tests the helper function pack to file of keyring.clearify and then unpack"""
 		theResult = False
@@ -328,6 +331,8 @@ class CryptoTestSuite(unittest.TestCase):
 			from piaplib.keyring import clearify as clearify
 			if clearify.__name__ is None:
 				raise ImportError("Failed to import clearify")
+			elif (clearify.hasBackendCommand() is not True):
+				raise unittest.SkipTest("Requires backend tool")
 			from piaplib.keyring import rand as rand
 			if rand.__name__ is None:
 				raise ImportError("Failed to import rand")

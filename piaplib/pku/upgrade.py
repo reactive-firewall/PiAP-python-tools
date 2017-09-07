@@ -19,10 +19,21 @@
 # limitations under the License.
 # ......................................................................
 
+
 try:
 	import piaplib as piaplib
 except Exception:
 	from . import piaplib as piaplib
+
+
+try:
+	from . import remediation as remediation
+except Exception:
+	try:
+		import remediation as remediation
+	except Exception:
+		raise ImportError("Error Importing remediation")
+
 
 try:
 	import warnings
@@ -32,23 +43,8 @@ try:
 		if imp.__name__ is None:
 			raise ImportError("Not Implemented.")
 	import pip as pip
-	try:
-		from . import remediation as remediation
-	except Exception:
-		try:
-			import remediation as remediation
-		except Exception:
-			raise ImportError("Error Importing remediation")
 except Exception:
 	try:
-		try:
-			from . import remediation as remediation
-		except Exception:
-			try:
-				import remediation as remediation
-			except Exception:
-				raise ImportError("Error Importing remediation")
-
 		class pip():
 			"""on-the-fly monkey patch for calling pip main"""
 

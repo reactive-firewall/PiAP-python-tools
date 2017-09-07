@@ -19,7 +19,7 @@
 # limitations under the License.
 # ......................................................................
 
-# Imports
+
 try:
 	import os
 	import sys
@@ -46,14 +46,9 @@ try:
 		from .. import interfaces as interfaces
 	except Exception:
 		import pku.interfaces as interfaces
-	if utils.__name__ is None:
-		raise ImportError("Failed to open PKU Utils")
-	if remediation.__name__ is None:
-		raise ImportError("Failed to open PKU Remediation")
-	if interfaces.__name__ is None:
-		raise ImportError("Failed to open PKU Interfaces")
-	if html_generator.__name__ is None:
-		raise ImportError("Failed to open HTML5 Pocket Lint")
+	for depends in [interfaces, html_generator, remediation, utils]:
+		if depends.__name__ is None:
+			raise ImportError("Failed to import depends.")
 except Exception as importErr:
 	print(str(importErr))
 	print(str(importErr.args))
@@ -178,6 +173,8 @@ def get_client_name(client_ip=None, use_html=False, lan_interface=None):
 def get_client_sta_status_raw():
 	"""list the raw status of client sta."""
 	theRawClientState = None
+	if not utils.xisfile(str("/opt/PiAP/hostapd_actions/clients")):
+		return str(u'UNKNOWN')
 	try:
 		import subprocess
 		try:
@@ -195,13 +192,6 @@ def get_client_sta_status_raw():
 				del lines
 			else:
 				theRawClientState = None
-		except FileNotFoundError as depErr:  # noqa F821
-			print(str(type(depErr)))
-			print(str(depErr))
-			print(str(depErr.args))
-			depErr = None
-			del depErr
-			theRawClientState = u'UNKNOWN'
 		except subprocess.CalledProcessError as subErr:
 			print(str(type(subErr)))
 			print(str(subErr))
@@ -289,9 +279,11 @@ def get_client_lease_status_raw(client_row=None):
 	theRawLeaseStatus = u'UNKNOWN'
 	try:
 		# should probably move to config file
-		theRawLeaseStatus = utils.readFile("/var/lib/misc/dnsmasq.leases")
+		filepath = str("/var/lib/misc/dnsmasq.leases")
+		if (utils.xisfile(filepath) is True):
+			theRawLeaseStatus = utils.readFile(filepath)
 	except Exception as importErr:
-		print(str("ERROR: get_client_sta_status"))
+		print(str("ERROR: get_client_lease_status_raw"))
 		print(str(type(importErr)))
 		print(str(importErr))
 		print(str(importErr.args))

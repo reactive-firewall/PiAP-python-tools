@@ -13,7 +13,7 @@ coverage:
           - piaplib/keyring
           - piaplib/book
       piaplib.book:
-        target: 80%
+        target: 90%
         flags: book
         paths:
           - piaplib/book
@@ -26,7 +26,7 @@ coverage:
         flags: lint
           - piaplib/lint
       piaplib.keyring:
-        target: 80%
+        target: 90%
         flags: keyring
         paths:
           - piaplib/keyring

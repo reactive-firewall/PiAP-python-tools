@@ -207,7 +207,7 @@ def packForRest(message=None, keyStore=None):
 		)
 		(ciphertext, stderrdata) = p1.communicate(utils.literal_str(message))
 		if isinstance(ciphertext, bytes):
-			ciphertext = ciphertext.decode('utf8')
+			ciphertext = ciphertext.decode(u'utf-8')
 		# ciphertext = str(ciphertext).replace(str("\\n"), str(""))
 		return ciphertext
 	else:
@@ -244,7 +244,7 @@ def unpackFromRest(ciphertext=None, keyStore=None):
 		)
 		(cleartext, stderrdata) = p2.communicate(str("{}{}").format(ciphertext, EOFNEWLINE))
 		if isinstance(cleartext, bytes):
-			cleartext = cleartext.decode('utf8')
+			cleartext = cleartext.decode(u'utf-8')
 		# cleartext = str(cleartext).replace(str("\\n"), str(""))
 		return str(cleartext)
 	else:
@@ -281,12 +281,15 @@ def packToFile(somefile, data, keyStore=None):
 		someFilePath = utils.literal_code(utils.addExtension(str(somefile), str("enc")))
 		if someFilePath is not None:
 			encData = packForRest(data, keyStore)
-			with utils.open_func(file=someFilePath, mode=u'wb+') as enc_data_file:
-				utils.write_func(enc_data_file, utils.literal_str(encData).encode("utf-8"))
+			utils.writeFile(
+				os.path.abspath(someFilePath),
+				str(encData)
+			)
 			del(encData)
 		did_write = True
 	except Exception as clearerr:
 		raise remediation.PiAPError(clearerr, str("Failed to write or encrypt file."))
+		del(clearerr)
 		did_write = False
 	return did_write
 

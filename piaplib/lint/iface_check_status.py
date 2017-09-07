@@ -40,30 +40,19 @@ try:
 			raise ImportError("Error Importing logs")
 	try:
 		from .. import utils as utils
-	except Exception:
-		import pku.utils as utils
-	try:
 		from .. import remediation as remediation
-	except Exception:
-		import pku.remediation as remediation
-	try:
-		from . import html_generator as html_generator
-	except Exception as ImpErr:
-		ImpErr = None
-		del ImpErr
-		import html_generator as html_generator
-	try:
 		from .. import interfaces as interfaces
 	except Exception:
+		import pku.utils as utils
+		import pku.remediation as remediation
 		import pku.interfaces as interfaces
-	if utils.__name__ is None:
-		raise ImportError("Failed to open PKU Utils")
-	if remediation.__name__ is None:
-		raise ImportError("Failed to open PKU Remediation")
-	if interfaces.__name__ is None:
-		raise ImportError("Failed to open PKU Interfaces")
-	if html_generator.__name__ is None:
-		raise ImportError("Failed to open HTML5 Pocket Lint")
+	try:
+		from . import html_generator as html_generator
+	except Exception:
+		import html_generator as html_generator
+	for depend in [utils, remediation, interfaces, html_generator]:
+		if depend.__name__ is None:
+			raise ImportError("Failed to import piaplib components.")
 except Exception as importErr:
 	print(str(importErr))
 	print(str(importErr.args))
@@ -180,7 +169,7 @@ def get_iface_name(iface_name=None, use_html=False):
 @remediation.error_handling
 def get_iface_status_raw(interface=None):
 	"""list the raw status of interfaces."""
-	arguments = [str("ip"), str("addr")]
+	arguments = [str("ip"), str("addr"), str("show")]
 	if interface is not None:
 		tainted_name = taint_name(interface)
 		arguments = [str("ip"), str("addr"), str("show"), str(tainted_name)]

@@ -271,6 +271,60 @@ class MoreClientChecksTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
+	def test_clients_check_status_raw_cc(self):
+		"""Test case for piaplib.lint.clients_check_status.get_client_sta_status_raw()"""
+		theResult = False
+		from .context import piaplib
+		from piaplib import lint as lint
+		from piaplib import pku as pku
+		from pku import interfaces as interfaces
+		from lint import clients_check_status as clients_check_status
+		for depends in [piaplib, pku, interfaces, lint, clients_check_status]:
+			if depends.__name__ is None:
+				theResult = False
+		try:
+			self.assertIsNotNone(clients_check_status.get_client_sta_status_raw())
+			theResult = True
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			err = None
+			del err
+			theResult = False
+		assert theResult
+
+	def test_clients_check_status_raw_ce(self):
+		"""Test case for piaplib.lint.clients_check_status.get_client_lease_status_raw(None)"""
+		theResult = False
+		from .context import piaplib
+		from piaplib import lint as lint
+		from piaplib import pku as pku
+		from pku import interfaces as interfaces
+		from lint import clients_check_status as clients_check_status
+		for depends in [piaplib, pku, interfaces, lint, clients_check_status]:
+			if depends.__name__ is None:
+				theResult = False
+		try:
+			self.assertIsNotNone(clients_check_status.get_client_lease_status_raw())
+			self.assertEqual(
+				str(clients_check_status.get_client_lease_status_raw()),
+				str("UNKNOWN")
+			)
+			theResult = True
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			err = None
+			del err
+			theResult = False
+		assert theResult
+
 
 if __name__ == '__main__':
 	unittest.main()
