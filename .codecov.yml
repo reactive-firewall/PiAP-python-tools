@@ -15,27 +15,50 @@ coverage:
       piaplib.book:
         target: 90%
         flags: book
+        base: auto
         paths:
           - piaplib/book
       piaplib.pku:
         target: 70%
         flags: pku
+        base: auto
+        paths:
           - piaplib/pku
       piaplib.lint:
         target: 70%
         flags: lint
+        base: auto
+        paths:
           - piaplib/lint
       piaplib.keyring:
         target: 90%
         flags: keyring
+        base: auto
         paths:
           - piaplib/keyring
       tests:
         target: 80%
         flags: tests
+        base: auto
         paths:
           - tests
-
+  notify:
+    slack:
+      default:
+        url: secret:RyYF2QemmISpOyoWnSEeRHbhHRBEV6dM07jBCvdGXsdUtyJjp6MOOPmnhBFJ1bfkwyncbf51Bu9bVa5atAyvehOAdrotKVkMbrm1U4GWFh+XEWXLDjywBSCXcVw+QL9gCBGljDoJcBs+5kLYTJfuoJ+Hty287xYWOgKLCvjXFKo=
+        threshold: 2%
+        only_pulls: false
+        branches: null
+        flags:
+          - piaplib
+          - tests
+        paths:
+          - piaplib/
+          - piaplib/lint
+          - piaplib/pku
+          - piaplib/keyring
+          - piaplib/book
+          - tests/
 flags:
   piaplib:
     paths:
