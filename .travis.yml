@@ -16,18 +16,12 @@ matrix:
     python:  "2.7"
     dist: trusty
   - os: linux
-    python:  "2.7"
-    dist: precice
-  - os: linux
     python:  "3.3"
   - os: linux
     python:  "3.4"
   - os: linux
     python:  "3.5"
     dist: trusty
-  - os: linux
-    python:  "3.5"
-    dist: precice
   - os: linux
     python:  "3.6"
   - os: linux
@@ -38,7 +32,8 @@ matrix:
     python:  "3.7-dev"
   - os: linux
     python: "pypy"  # PyPy2 2.5.0
-    dist: precise
+  - os: linux
+    python: "pypy3"
   - os: linux
     python:  "pypy-5.3.1"
   - os: linux
