@@ -41,6 +41,7 @@
 # copies or substantial portions of the Software.
 #
 
+SHELL=/bin/bash
 
 ifeq "$(ECHO)" ""
 	ECHO=echo
@@ -121,6 +122,7 @@ test-tox: cleanup
 
 test-style: cleanup
 	$(QUIET)flake8 --ignore=W191,W391 --max-line-length=100 --verbose --count --config=.flake8.ini
+	$(QUIET)tests/check_spelling 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
 
 cleanup:
