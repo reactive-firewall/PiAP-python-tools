@@ -128,6 +128,7 @@ test-style: cleanup
 cleanup:
 	$(QUIET)rm -f tests/*.pyc 2>/dev/null || true
 	$(QUIET)rm -f tests/*~ 2>/dev/null || true
+	$(QUIET)rm -Rf docs/_build 2>/dev/null || true
 	$(QUIET)rm -Rf tests/__pycache__ 2>/dev/null || true
 	$(QUIET)rm -f piaplib/*.pyc 2>/dev/null || true
 	$(QUIET)rm -Rf piaplib/__pycache__ 2>/dev/null || true
