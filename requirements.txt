@@ -6,7 +6,7 @@
 # argparse - builtin - PSF licence
 argparse>=1.4.0
 # argparse - builtin - PSF licence
-setuptools>=35.0.2
+setuptools>=36.5.0
 # virtualenv - MIT
 virtualenv>=15.0.1
 # six - MIT
@@ -15,7 +15,7 @@ six>=1.0.0
 #pgpy>=0.4.1
 tox>=2.7.0
 #py>=1.4.33
-pip>=8.2
+pip>=9.0
 requests>=2.14.2
 # cryptography - Apache 2
 #cryptography>=1.2.3
