@@ -10,6 +10,8 @@ addons:
   hosts:
   - pocket.PiAP.local
 
+env:
+
 matrix:
   include:
   - os: linux
@@ -44,6 +46,7 @@ matrix:
   - os: osx
     osx_image: xcode6.4
     language: generic
+    env: TRAVIS_PYTHON_VERSION="2.7"
   - os: osx
     osx_image: xcode7.2
     language: generic
@@ -78,29 +81,31 @@ matrix:
 install:  "make init"
 
 before_install:
+  - if [ $TRAVIS_OS_NAME == osx ] ; then travis_wait git -C "$(brew --repo homebrew/core)" fetch --unshallow || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then travis_retry brew tap homebrew/versions || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then travis_wait brew upgrade || travis_retry brew upgrade || true ; fi
-  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python2.6 $INSTALL || true ; fi
-  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python26 $INSTALL || true ; fi
-  - if [ $TRAVIS_OS_NAME == osx ] ; then travis_wait brew install python3 $INSTALL || true ; fi
-  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3.3 $INSTALL || true ; fi
-  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install py3.3 $INSTALL || true ; fi
-  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3.4 $INSTALL || true ; fi
-  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python34 $INSTALL || true ; fi
-  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install py3.4 $INSTALL || true ; fi
-  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3.5 $INSTALL || true ; fi
-  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python35 $INSTALL || true ; fi
-  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install py3.5 $INSTALL || true ; fi
-  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3.6 $INSTALL || true ; fi
-  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python36 $INSTALL || true ; fi
-  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install py3.6 $INSTALL || true ; fi
-  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python2.7 $INSTALL || true ; fi
-  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python27 $INSTALL || true ; fi
-  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install py2.7 $INSTALL || true ; fi
-  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3.6 $INSTALL || true ; fi
-  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3.7 $INSTALL || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python2.6 || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python26 || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then travis_wait brew install python3 || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3.3 || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install py3.3 || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3.4 || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python34 || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install py3.4 || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3.5 || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python35 || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install py3.5 || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3.6 || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python36 || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install py3.6 || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python2.7 || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python27 || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install py2.7 || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3.6 || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3.7 || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install coverage $INSTALL || true ; fi
-  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install codecov $INSTALL || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install codecov || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install pip || true ; fi
   - travis_retry pip install tox || pip install tox || true ;
   - travis_retry pip install coverage || true ;
   - travis_retry pip install codecov || true ;
