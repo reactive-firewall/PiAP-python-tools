@@ -17,7 +17,6 @@
 ### Stable:
 [![status](https://travis-ci.org/reactive-firewall/PiAP-python-tools.svg?branch=stable)](https://travis-ci.org/reactive-firewall/PiAP-python-tools)
 [![CircleCI](https://circleci.com/gh/reactive-firewall/PiAP-python-tools/tree/stable.svg?style=svg)](https://circleci.com/gh/reactive-firewall/PiAP-python-tools/tree/stable)
-[![CircleCI](https://circleci.com/gh/reactive-firewall/PiAP-python-tools/tree/master.svg?style=svg)](https://circleci.com/gh/reactive-firewall/PiAP-python-tools/tree/master)
 [![Python 3](https://pyup.io/repos/github/reactive-firewall/PiAP-python-tools/python-3-shield.svg)](https://pyup.io/repos/github/reactive-firewall/PiAP-python-tools/)
 [![Updates](https://pyup.io/repos/github/reactive-firewall/PiAP-python-tools/shield.svg)](https://pyup.io/repos/github/reactive-firewall/PiAP-python-tools/)
 [![Dependency Status](https://gemnasium.com/badges/github.com/reactive-firewall/PiAP-python-tools.svg)](https://gemnasium.com/github.com/reactive-firewall/PiAP-python-tools)
