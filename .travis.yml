@@ -37,17 +37,13 @@ matrix:
   - os: linux
     python:  "3.7-dev"
   - os: linux
-    python: "pypy"  # PyPy2 2.5.0
+    python:  "pypy"  # PyPy2 2.5.0
   - os: linux
-    python: "pypy3"
+    python:  "pypy3"
   - os: linux
     python:  "pypy-5.3.1"
   - os: linux
-    python:  "nightly" # currently points to 3.6-dev
-  - os: osx
-    osx_image: xcode6.4
-    language: generic
-    env: TRAVIS_PYTHON_VERSION="2.7"
+    python:  "nightly" # currently points to 3.7-dev
   - os: osx
     osx_image: xcode7.2
     language: generic
@@ -83,10 +79,10 @@ install:  "make init"
 before_install:
   - if [ $TRAVIS_OS_NAME == osx ] ; then travis_wait git -C "$(brew --repo homebrew/core)" fetch --unshallow || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then travis_retry brew tap homebrew/versions || true ; fi
-  - if [ $TRAVIS_OS_NAME == osx ] ; then travis_wait 35 brew upgrade || travis_retry brew upgrade || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then travis_wait brew upgrade || travis_retry brew upgrade || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python2.6 || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python26 || true ; fi
-  - if [ $TRAVIS_OS_NAME == osx ] ; then travis_wait 25 brew install python3 || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then travis_wait brew install python3 || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3.3 || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install py3.3 || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3.4 || true ; fi
