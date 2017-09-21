@@ -6,7 +6,7 @@ jobs:
       - image: circleci/python:3.5.3
         environment:
           CI: cicleci
-          POSTGRES_DB: circle_test
+          DEBIAN_FRONTEND: noninteractive
     steps:
       - checkout
       - run:
@@ -14,6 +14,12 @@ jobs:
           command: |
             git fetch && git pull --all || true
       - run:
+          shell: /bin/bash
+          name: "install depends attempt"
+          command: |
+            python3 -m pip install --user -r ./requirements.txt || true
+      - run:
+          shell: /bin/bash
           name: "install coverage attempt"
           command: |
             python3 -m pip install --user coverage || true
@@ -32,15 +38,17 @@ jobs:
           command: |
             make test
       - run:
+          shell: /bin/bash
           name: "clean up from test"
           command: |
             make clean
       - run:
           shell: /bin/bash
-          name: "check code style"
+          name: "check code style and spelling"
           command: |
             make test-style || python3 -m flake8 --ignore=W191,W391 --max-line-length=100 --verbose --count --config=.flake8.ini --max-complexity=15
       - run:
+          shell: /bin/bash
           name: "clean up when done"
           command: |
             make clean
