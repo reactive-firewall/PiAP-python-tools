@@ -179,10 +179,9 @@ def isLineForUser(someLine=None, username=None):
 	try:
 		doesMatch = utils.isLineForMatch(someLine, username)
 	except Exception as matchErr:
-		if not use_html:
-			logs.log(str(type(matchErr)), "Error")
-			logs.log(str(matchErr), "Error")
-			logs.log(str((matchErr.args)), "Error")
+		logs.log(str(type(matchErr)), "Error")
+		logs.log(str(matchErr), "Error")
+		logs.log(str((matchErr.args)), "Error")
 		matchErr = None
 		del matchErr
 		doesMatch = False
