@@ -129,11 +129,11 @@ def useTool(tool, arguments=[None]):
 				POCKET_UNITS[tool].main(arguments)
 			except Exception:
 				logs.log(str(
-					" - WARNING - An error occured while handling the shell. Cascading failure."
+					" - WARNING - An error occurred while handling the shell. Cascading failure."
 				), "Warning")
 		except Exception:
 			logs.log(
-				str("CRITICAL - An error occured while handling the cascading failure."),
+				str("CRITICAL - An error occurred while handling the cascading failure."),
 				"error"
 			)
 	else:
@@ -159,12 +159,12 @@ def main(argv=None):
 			logs.log(str(cerr), "Warning")
 			logs.log(str(cerr.args), "Warning")
 			logs.log(str(
-				" - UNKNOWN - An error occured while handling the arguments. Cascading failure."
+				" - UNKNOWN - An error occurred while handling the arguments. Cascading failure."
 			), "Warning")
 			exit(3)
 	except Exception:
 		logs.log(
-			str(" UNKNOWN - An error occured while handling the failure. Cascading failure."),
+			str(" UNKNOWN - An error occurred while handling the failure. Cascading failure."),
 			"warning"
 		)
 		exit(3)

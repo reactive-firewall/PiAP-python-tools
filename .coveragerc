@@ -5,7 +5,7 @@ parallel = True
 include = piaplib*,tests*
 # Regexes for lines to exclude from consideration
 exclude_lines =
-    # Have to re-enable the standard pragma
+    # Have to re-enable the standard pragma rules
     pragma: no cover
 
     except Exception

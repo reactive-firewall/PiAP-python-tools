@@ -90,7 +90,7 @@ except Exception:
 
 
 """
-Upgrades are basicly just done via pip right now.
+Upgrades are basically just done via pip right now.
 """
 
 
@@ -104,7 +104,7 @@ def parseargs(arguments=None):
 	parser = argparse.ArgumentParser(
 		prog=__prog__,
 		description='Run piaplib upgrade functions.',
-		epilog='Basicly a python wrapper for pip install --upgrade.'
+		epilog='basically a python wrapper for pip install --upgrade.'
 	)
 	the_action = parser.add_mutually_exclusive_group()
 	the_action.add_argument(

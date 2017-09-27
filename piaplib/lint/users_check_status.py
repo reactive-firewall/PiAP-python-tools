@@ -362,7 +362,7 @@ def get_user_list():
 			theResult = [x for x in theResult if utils.xstr(reserved_lines) not in utils.xstr(x)]
 	except Exception as parseErr:
 		logs.log(
-			str("user_check_status.get_user_list: ERROR: ACTION will not be compleated! ABORT!"),
+			str("user_check_status.get_user_list: ERROR: ACTION will not be completed! ABORT!"),
 			"Error"
 		)
 		logs.log(str(type(parseErr)), "Error")
@@ -472,7 +472,7 @@ def get_user_status(user_name=None, use_html=False):  # noqa C901
 		del user_tty
 	except Exception as errcrit:
 		logs.log(
-			str("user_check_status.get_user_status: ERROR: ACTION will not be compleated! ABORT!"),
+			str("user_check_status.get_user_status: ERROR: ACTION will not be completed! ABORT!"),
 			"Error"
 		)
 		logs.log(str(type(errcrit)), "Error")
@@ -507,7 +507,7 @@ def get_user_ttys(user=None, use_html=False):
 			)
 	except Exception as errcrit:
 		logs.log(
-			str("user_check_status.get_user_ttys: ERROR: ACTION will not be compleated! ABORT!"),
+			str("user_check_status.get_user_ttys: ERROR: ACTION will not be completed! ABORT!"),
 			"Error"
 		)
 		logs.log(str(type(errcrit)), "Error")
@@ -552,7 +552,7 @@ def get_user_ip(user=None, use_html=False):
 				theResult = "UNKNOWN"
 	except Exception as errcrit:
 		logs.log(
-			str("user_check_status.get_user_ip: ERROR: ACTION will not be compleated! ABORT!"),
+			str("user_check_status.get_user_ip: ERROR: ACTION will not be completed! ABORT!"),
 			"Error"
 		)
 		logs.log(str(type(errcrit)), "Error")

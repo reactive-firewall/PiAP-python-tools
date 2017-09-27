@@ -97,9 +97,9 @@ __prog__ = """piaplib.version"""
 def getKeyringVersion(verbose=False):
 	"""returns the keyring version."""
 	try:
-		from keyring import clearify as clearify
+		from keyring import clarify as clarify
 	except Exception:
-		import piaplib.keyring.clearify as clearify
+		import piaplib.keyring.clarify as clarify
 	try:
 		from keyring import keyring as keyring
 	except Exception:
@@ -111,14 +111,14 @@ def getKeyringVersion(verbose=False):
 		version=str(piaplib.__version__)
 	)
 	if verbose:
-		if clearify.hasBackendCommand():
+		if clarify.hasBackendCommand():
 			keyring_version = str(
 				"Pocket Keyring: {version}\nBackend Cryptographic Library: {backend}\n" +
 				"Cryptographic Algorithm: {algo}"
 			).format(
 				version=str(keyring_version),
-				backend=str(clearify.getBackendCommand()),
-				algo=str(clearify.getAlgoForOS())
+				backend=str(clarify.getBackendCommand()),
+				algo=str(clarify.getAlgoForOS())
 			)
 	return keyring_version
 

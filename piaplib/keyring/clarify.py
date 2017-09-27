@@ -21,7 +21,7 @@
 
 
 # SEE NOTE ON Backend HOOKS BELOW
-# Currently backends are NOT part of PiAP in anyway and may be subject to thier own licences.
+# Currently backends are NOT part of PiAP in anyway and may be subject to their own licences.
 
 
 try:
@@ -68,8 +68,8 @@ except Exception:
 	import pku.utils as utils
 
 
-__prog__ = """piaplib.keyring.clearify"""
-"""The name of this PiAPLib tool is clearify"""
+__prog__ = """piaplib.keyring.clarify"""
+"""The name of this PiAPLib tool is clarify"""
 
 
 DEFAULT_BETA_FILE_PATH = str("""/var/opt/PiAP/.beta_W1AsYRUDzyZx""")
@@ -358,11 +358,11 @@ def parseArgs(arguments=None):
 				dest='clear_action',
 				const=theaction,
 				action='store_const',
-				help='The clearify service option.'
+				help='The clarify service option.'
 			)
 		theArgs = parser.parse_args(arguments)
 	except Exception as err:
-		print(str("FAILED DURRING CLEARIFY.. ABORT."))
+		print(str("FAILED DURING clarify.. ABORT."))
 		print(str(type(err)))
 		print(str(err))
 		print(str(err.args))
@@ -393,7 +393,7 @@ def main(argv=None):
 		else:
 			return output
 	except Exception as err:
-		print(str("FAILED DURRING CLEARIFY. ABORT."))
+		print(str("FAILED DURING clarify. ABORT."))
 		print(str(type(err)))
 		print(str(err))
 		print(str(err.args))
@@ -410,7 +410,7 @@ if __name__ in u'__main__':
 		import sys
 		exitcode = main(sys.argv[1:])
 	except Exception as err:
-		print(str("MAIN FAILED DURRING CLEARIFY. ABORT."))
+		print(str("MAIN FAILED DURING clarify. ABORT."))
 		print(str(type(err)))
 		print(str(err))
 		print(str(err.args))

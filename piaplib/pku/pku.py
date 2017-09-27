@@ -127,11 +127,11 @@ def usePKUTool(tool, arguments=[None]):
 				logs.log(str("pku launching: {}").format(str(tool)), "DEBUG")
 				PKU_UNITS[tool].main(arguments)
 			except Exception:
-				logs.log(str("An error occured while handling the PKU tool. "), "WARNING")
+				logs.log(str("An error occurred while handling the PKU tool. "), "WARNING")
 				logs.log(str("Cascading failure."), "Error")
 				return 3
 		except Exception:
-			logs.log(str("An error occured while handling the cascading failure."), "CRITICAL")
+			logs.log(str("An error occurred while handling the cascading failure."), "CRITICAL")
 			return 3
 		return 0
 	else:
@@ -151,13 +151,13 @@ def main(argv=None):
 			logs.log(str(cerr), "Error")
 			logs.log(str(cerr.args), "Error")
 			logs.log(
-				str(" UNKNOWN - An error occured while handling the arguments. Command failure."),
+				str(" UNKNOWN - An error occurred while handling the arguments. Command failure."),
 				"Error"
 			)
 			return 2
 	except Exception:
 		logs.log(
-			str(" UNKNOWN - An error occured while handling the failure. Cascading failure."),
+			str(" UNKNOWN - An error occurred while handling the failure. Cascading failure."),
 			"Error"
 		)
 		return 2

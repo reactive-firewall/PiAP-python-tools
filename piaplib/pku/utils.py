@@ -82,7 +82,7 @@ def literal_code(raw_input=None):
 	"""A simple attempt at validating raw python unicode. Always expect CWE-20.
 		param raw_input - the tainted given input.
 		Returns:
-			byte string / unicode - the literal code if posible to represent,
+			byte string / unicode - the literal code if possible to represent,
 			None - otherwise
 	"""
 	try:
@@ -91,7 +91,7 @@ def literal_code(raw_input=None):
 		elif isinstance(raw_input, str):
 			return raw_input.encode("utf-8").decode("utf-8")
 	except Exception as malformErr:
-		logs.log("[CWE-20] Possible malformed string attack occured.", "info")
+		logs.log("[CWE-20] Possible malformed string attack occurred.", "info")
 		malformErr = None
 		del(malformErr)
 		return None
@@ -103,7 +103,7 @@ def literal_str(raw_input=None):
 	"""A simple attempt at validating utf-8 encoding. Always expect CWE-20.
 		param raw_input - the tainted string given as input.
 		Returns:
-			String - the literal string if posible to represent,
+			String - the literal string if possible to represent,
 			None - otherwise
 	"""
 	try:
@@ -116,7 +116,7 @@ def literal_str(raw_input=None):
 		else:
 			raise UnicodeDecodeError("Malformed Raw String")
 	except Exception as malformErr:
-		logs.log(str("[CWE-20] Possible malformed string attack occured."), "info")
+		logs.log(str("[CWE-20] Possible malformed string attack occurred."), "info")
 		malformErr = None
 		del(malformErr)
 		return None
@@ -137,7 +137,7 @@ def memoize(func):
 			return cache[key]
 		except Exception as memoErr:
 			logs.log(
-				str("[CWE-233] Possible malformed argument attack occured. Skipping cache."),
+				str("[CWE-233] Possible malformed argument attack occurred. Skipping cache."),
 				"Warning"
 			)
 			memoErr = None
@@ -267,7 +267,7 @@ def compactList(list, intern_func=None):
 	"""
 	Compacts Lists
 	Adapted from some now forgoten forum about flattening arrays, and sorting.
-	Cleaned up to be Pep8 compatable.
+	Cleaned up to be Pep8 compatible.
 	"""
 	if intern_func is None:
 		def intern_func(x):

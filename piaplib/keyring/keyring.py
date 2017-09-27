@@ -86,11 +86,11 @@ def useKeyTool(tool, arguments=[None]):
 				timestamp = remediation.getTimeStamp()
 				theResult = str(
 					timestamp +
-					" - WARNING - An error occured while handling the keyring tool." +
+					" - WARNING - An error occurred while handling the keyring tool." +
 					"Cascading failure."
 				)
 		except Exception:
-			theResult = str("CRITICAL - An error occured while handling the cascading failure.")
+			theResult = str("CRITICAL - An error occurred while handling the cascading failure.")
 		return theResult
 	else:
 		return None
@@ -107,7 +107,7 @@ def main(argv=None):
 	except Exception as cerr:
 		print(str(cerr))
 		print(str(cerr.args))
-		print(str(" UNKNOWN - An error occured while handling the arguments. Command failure."))
+		print(str(" UNKNOWN - An error occurred while handling the arguments. Command failure."))
 		exit(3)
 	exit(0)
 

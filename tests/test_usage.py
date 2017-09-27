@@ -1308,7 +1308,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 					if (str("eth0") in str(theOutputtext)):
 						theResult = True
 					elif (str("enp0s") in str(theOutputtext)):
-						raise unittest.SkipTest("function ok, but not a compatable Test network")
+						raise unittest.SkipTest("function ok, but not a compatible Test network")
 					else:
 						theResult = False
 						print(str(""))
@@ -1319,7 +1319,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 						print(str("{}").format(str(theOutputtext)))
 						print(str(""))
 				except unittest.SkipTest:
-					raise unittest.SkipTest("function ok, but not a compatable Test network")
+					raise unittest.SkipTest("function ok, but not a compatible Test network")
 				except Exception as othererr:
 					print(str(""))
 					print(str(type(othererr)))
@@ -1330,7 +1330,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 					del othererr
 					theResult = False
 		except unittest.SkipTest:
-			raise unittest.SkipTest("function ok, but not a compatable Test network")
+			raise unittest.SkipTest("function ok, but not a compatible Test network")
 		except Exception as err:
 			print(str(""))
 			print(str(type(err)))
