@@ -7,6 +7,7 @@ include = piaplib*,tests*
 exclude_lines =
     # Have to re-enable the standard pragma rules
     pragma: no cover
+	from . import
 
     except Exception
     except BaseException:

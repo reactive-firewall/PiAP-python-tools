@@ -238,7 +238,7 @@ def main(argv=None):
 		logs.log(str(type(err)), "Critical")
 		logs.log(str(err), "Critical")
 		logs.log(str(err.args), "Critical")
-	return 3
+		return 3
 
 
 if __name__ in u'__main__':
