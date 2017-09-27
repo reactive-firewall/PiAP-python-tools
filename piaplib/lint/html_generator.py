@@ -19,11 +19,12 @@
 # limitations under the License.
 # ......................................................................
 
+
 """
 	A collection of utility functions to generate html taglets for php
 """
 
-# Imports
+
 try:
 	import os
 	import sys
@@ -223,17 +224,22 @@ def gen_html_label(content=None, role=HTML_LABEL_ROLES[0], id=None, name=None):
 		if name is not None and has_special_html_chars(name) is not True:
 			return str(
 				u'<span class=\"label label-{}\" name=\"{}\" id=\"{}\">{}</span>'
-			).format(role, str(name), str(id), str(content))
+			).format(
+				role,
+				utils.literal_str(name),
+				utils.literal_str(id),
+				utils.literal_str(content)
+			)
 		else:
 			return str(
 				u'<span class=\"label label-{}\" id=\"{}\">{}</span>'
-			).format(role, id, str(content))
+			).format(role, has_special_html_chars(id), utils.literal_str(content))
 	elif name is not None and has_special_html_chars(name) is not True:
 		return str(
 			u'<span class=\"label label-{}\" name=\"{}\">{}</span>'
-		).format(role, id, str(content))
+		).format(role, utils.literal_str(id), utils.literal_str(content))
 	else:
 		return str(
 			u'<span class=\"label label-{}\">{}</span>'
-		).format(role, str(content))
+		).format(role, utils.literal_str(content))
 

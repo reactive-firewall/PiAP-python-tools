@@ -218,6 +218,36 @@ class BasicHTMLTestSuite(unittest.TestCase):
 				theResult = False
 		assert theResult
 
+	def test_d_html_gen_tagless_raw(self):
+		"""Test case for gen Tag with no given tag, name, nor id."""
+		theResult = False
+		try:
+			from lint import html_generator as html_generator
+		except Exception:
+			import lint.html_generator as html_generator
+		if html_generator.__name__ is None:
+			theResult = False
+		else:
+			try:
+				test_content = str("""this is a test for tags""")
+				output_gen = html_generator.gen_html_tag(
+					content=test_content
+				)
+				if (test_content in output_gen and str("</") not in output_gen):
+						theResult = True
+				else:
+					theResult = False
+			except Exception as err:
+				print(str(""))
+				print(str(type(err)))
+				print(str(err))
+				print(str((err.args)))
+				print(str(""))
+				err = None
+				del err
+				theResult = False
+		assert theResult
+
 	def test_d_html_gen_td(self):
 		"""Test case for gen TD"""
 		theResult = False
@@ -400,8 +430,37 @@ class BasicHTMLTestSuite(unittest.TestCase):
 				theResult = False
 		assert theResult
 
+	def test_d_html_gen_ul_id_name(self):
+		"""Test case for gen UL without name but with id"""
+		theResult = False
+		try:
+			from lint import html_generator as html_generator
+		except Exception:
+			import lint.html_generator as html_generator
+		if html_generator.__name__ is None:
+			theResult = False
+		else:
+			try:
+				output_gen = html_generator.gen_html_ul(
+					["this is a test"], id="test_id", name=None
+				)
+				if (str("<ul") in output_gen and str("""name=\"test_id\"""") in output_gen):
+					theResult = True
+				else:
+					theResult = False
+			except Exception as err:
+				print(str(""))
+				print(str(type(err)))
+				print(str(err))
+				print(str((err.args)))
+				print(str(""))
+				err = None
+				del err
+				theResult = False
+		assert theResult
+
 	def test_d_html_gen_ul_no_value(self):
-		"""Test case for gen UL without name"""
+		"""Test case for gen UL without values"""
 		theResult = True
 		try:
 			from lint import html_generator as html_generator
@@ -447,6 +506,41 @@ class BasicHTMLTestSuite(unittest.TestCase):
 						html_generator.HTML_LABEL_ROLES[role_label],
 						"test_id",
 						"test_lable"
+					)
+					if (str("<span") in output_gen and str("</span>") in output_gen):
+						if (str(html_generator.HTML_LABEL_ROLES[role_label]) in output_gen):
+							theResult = True
+						else:
+							theResult = False
+					else:
+						theResult = False
+			except Exception as err:
+				print(str(""))
+				print(str(type(err)))
+				print(str(err))
+				print(str((err.args)))
+				print(str(""))
+				err = None
+				del err
+				theResult = False
+		assert theResult
+
+	def test_d_html_gen_lable_nameless(self):
+		"""Test case for gen lable without name"""
+		theResult = False
+		try:
+			from lint import html_generator as html_generator
+		except Exception:
+			import lint.html_generator as html_generator
+		if html_generator.__name__ is None:
+			theResult = False
+		else:
+			try:
+				for role_label in range(5):
+					output_gen = html_generator.gen_html_label(
+						"this is a test",
+						html_generator.HTML_LABEL_ROLES[role_label],
+						"test_id"
 					)
 					if (str("<span") in output_gen and str("</span>") in output_gen):
 						if (str(html_generator.HTML_LABEL_ROLES[role_label]) in output_gen):
