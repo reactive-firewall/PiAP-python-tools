@@ -231,6 +231,7 @@ class BasicHTMLTestSuite(unittest.TestCase):
 			try:
 				test_content = str("""this is a test for tags""")
 				output_gen = html_generator.gen_html_tag(
+					tag=None,
 					content=test_content
 				)
 				if (test_content in output_gen and str("</") not in output_gen):
