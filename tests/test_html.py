@@ -561,6 +561,42 @@ class BasicHTMLTestSuite(unittest.TestCase):
 				theResult = False
 		assert theResult
 
+	def test_e_html_gen_lable_idless(self):
+		"""Test case for gen lable without id and with name"""
+		theResult = False
+		try:
+			from lint import html_generator as html_generator
+		except Exception:
+			import lint.html_generator as html_generator
+		if html_generator.__name__ is None:
+			theResult = False
+		else:
+			try:
+				for role_label in range(5):
+					output_gen = html_generator.gen_html_label(
+						"this is a test",
+						html_generator.HTML_LABEL_ROLES[role_label],
+						id=None,
+						name=str("test_name")
+					)
+					theResult = False
+					self.assertIsNotNone(output_gen)
+					if (str("name=") in output_gen and str("test_name") in output_gen):
+						if (str("<span") in output_gen and str("</span>") in output_gen):
+							if (str(html_generator.HTML_LABEL_ROLES[role_label]) in output_gen):
+								theResult = True
+					self.assertTrue(theResult)
+			except Exception as err:
+				print(str(""))
+				print(str(type(err)))
+				print(str(err))
+				print(str((err.args)))
+				print(str(""))
+				err = None
+				del err
+				theResult = False
+		assert theResult
+
 	def test_e_html_gen_li(self):
 		"""Test case for gen Li."""
 		theResult = False

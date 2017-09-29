@@ -237,7 +237,7 @@ def gen_html_label(content=None, role=HTML_LABEL_ROLES[0], id=None, name=None):
 	elif name is not None and has_special_html_chars(name) is not True:
 		return str(
 			u'<span class=\"label label-{}\" name=\"{}\">{}</span>'
-		).format(role, utils.literal_str(id), utils.literal_str(content))
+		).format(role, utils.literal_str(name), utils.literal_str(content))
 	else:
 		return str(
 			u'<span class=\"label label-{}\">{}</span>'
