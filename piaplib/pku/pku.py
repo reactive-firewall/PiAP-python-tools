@@ -30,7 +30,7 @@ try:
 		from . import upgrade as upgrade
 except Exception as err:
 	try:
-		if 'piaplib.pku.upgrade' not in sys.modules
+		if 'piaplib.pku.upgrade' not in sys.modules:
 			import piaplib.pku.upgrade as upgrade
 	except Exception:
 		raise ImportError("Error Importing upgrade tools")
