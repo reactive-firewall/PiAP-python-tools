@@ -24,13 +24,17 @@ try:
 except Exception:
 	from . import piaplib as piaplib
 
+
 try:
-	from . import upgrade as upgrade
+	if 'piaplib.pku.upgrade' not in sys.modules:
+		from . import upgrade as upgrade
 except Exception as err:
 	try:
-		import piaplib.pku.upgrade as upgrade
+		if 'piaplib.pku.upgrade' not in sys.modules
+			import piaplib.pku.upgrade as upgrade
 	except Exception:
 		raise ImportError("Error Importing upgrade tools")
+
 
 try:
 	from . import config as config
@@ -40,6 +44,7 @@ except Exception:
 	except Exception:
 		raise ImportError("Error Importing config")
 
+
 try:
 	from . import utils as utils
 except Exception:
@@ -47,6 +52,7 @@ except Exception:
 		import utils as utils
 	except Exception:
 		raise ImportError("Error Importing utils")
+
 
 try:
 	from . import remediation as remediation
@@ -56,6 +62,7 @@ except Exception:
 	except Exception:
 		raise ImportError("Error Importing remediation")
 
+
 try:
 	from . import interfaces as interfaces
 except Exception:
@@ -64,6 +71,7 @@ except Exception:
 	except Exception:
 		raise ImportError("Error Importing interfaces")
 
+
 try:
 	from piaplib.book.logs import logs as logs
 except Exception:
@@ -71,6 +79,7 @@ except Exception:
 		from ..book.logs import logs as logs
 	except Exception:
 		raise ImportError("Error Importing logs")
+
 
 try:
 	import argparse
