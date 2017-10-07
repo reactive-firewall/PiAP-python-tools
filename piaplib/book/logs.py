@@ -193,7 +193,6 @@ def main(argv=None):
 	"""The Main Event makes no sense to logs yet."""
 	try:
 		raise NotImplementedError("CRITICAL - Pocket Book logs main() not implemented.")
-		return 3
 	except Exception as err:
 		logs.log(str(type(err)), "Critical")
 		logs.log(str(err), "Critical")

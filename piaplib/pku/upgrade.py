@@ -192,7 +192,7 @@ def upgradepip():
 
 
 @remediation.error_passing
-def upgradeapt():
+def upgradeAPT():
 	"""Upgrade system via apt."""
 	try:
 		import apt
@@ -203,11 +203,9 @@ def upgradeapt():
 		cache.upgrade()
 		cache.open(None)
 		for pkg in cache.get_changes():
-			print(pkg.sourcePackageName, pkg.isUpgradeable)
+			logs.log((pkg.sourcePackageName, pkg.isUpgradeable), "Info")
 	except Exception as permErr:
-		logs.log(str(type(permErr)))
-		logs.log(str(permErr))
-		logs.log(str((permErr.args)))
+		remediation.error_breakpoint(permErr, "upgradeAPT")
 		permErr = None
 		del(permErr)
 	return None
@@ -318,6 +316,7 @@ def upgradePiAPlib_webui():
 def upgradeAll():
 	"""Upgrade piaplib and requirements via pip."""
 	upgradepip()
+	upgradeAPT()
 	upgradePiAPlib()
 	upgradePiAPlib_depends()
 	# upgradePiAPlib_webui()

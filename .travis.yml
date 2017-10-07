@@ -135,10 +135,14 @@ script:
 
 after_success:
   - coverage combine || true
+  - coverage xml || true
   - codecov || true
   - travis_retry python3 -m pip install python-coveralls || python3 -m pip install python-coveralls || true ;
   - coveralls 2>/dev/null || true
   - travis_retry python -m pip uninstall -y PyYAML || travis_retry python3 -m pip uninstall -y PyYAML || true
   - if [ $TRAVIS_OS_NAME == osx ] ; then true ; wait ; else coverage run -p -m piaplib.pocket pku upgrade --upgrade-all || true ; fi ;
   - if [ $TRAVIS_OS_NAME == osx ] ; then echo "SKIP codecov" ; else codecov || exit $? ; fi ;
+  - travis_retry python3 -m pip install python-coveralls || python3 -m pip install python-coveralls || true ;
+  - coveralls 2>/dev/null || true
+  - travis_retry python -m pip uninstall -y PyYAML || travis_retry python3 -m pip uninstall -y PyYAML || true
 
