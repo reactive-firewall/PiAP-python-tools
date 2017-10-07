@@ -21,6 +21,26 @@
 
 
 try:
+	import argparse
+except Exception:
+	raise ImportError("Error Importing argparse tools")
+
+
+try:
+	import subprocess
+	import threading
+except Exception:
+	raise ImportError("Error Importing threading tools")
+
+
+try:
+	import os
+	import sys
+except Exception:
+	raise ImportError("Error Importing system tools")
+
+
+try:
 	import piaplib as piaplib
 except Exception:
 	from . import piaplib as piaplib
@@ -51,7 +71,6 @@ except Exception:
 			@remediation.bug_handling
 			def main(args=None, stderr=None):
 				"""function for backend subprocess check_output command"""
-				import subprocess
 				theOutput = None
 				try:
 					if args is None or args is [None]:
@@ -67,6 +86,7 @@ except Exception:
 	except Exception:
 		raise ImportError("Not Implemented.")
 
+
 try:
 	from . import utils as utils
 except Exception:
@@ -74,6 +94,7 @@ except Exception:
 		import utils as utils
 	except Exception:
 		raise ImportError("Error Importing utils")
+
 
 try:
 	from . import remediation as remediation
@@ -83,16 +104,17 @@ except Exception:
 	except Exception:
 		raise ImportError("Error Importing remediation")
 
-try:
-	import argparse
-except Exception:
-	raise ImportError("Error Importing argparse tools")
-
 
 try:
-	import threading
+	from piaplib.book.logs import logs as logs
 except Exception:
-	raise ImportError("Error Importing threading tools")
+	try:
+		from book.logs import logs as logs
+	except Exception:
+		try:
+			from piaplib.book.logs import logs as logs
+		except Exception:
+			raise ImportError("Error Importing logs")
 
 
 """
@@ -100,7 +122,7 @@ Upgrades are basically just done via pip right now.
 """
 
 
-__prog__ = """piaplib.pku.upgrades"""
+__prog__ = """piaplib.pku.upgrade"""
 """The name of this PiAPLib tool is Pocket Knife Upgrade Unit"""
 
 
@@ -127,7 +149,7 @@ def parseargs(arguments=None):
 		dest='upgrade_pip',
 		default=False,
 		action='store_true',
-		help='Upgrade the pip module. This is needed for hashes in the future. EXPEREMENTAL.'
+		help='Upgrade the pip module. This is needed for piaplib dependencies. BETA FEATURE.'
 	)
 	the_action.add_argument(
 		'-W',
@@ -135,7 +157,7 @@ def parseargs(arguments=None):
 		dest='upgrade_web',
 		default=False,
 		action='store_true',
-		help='Upgrade the piaplib webroot module. This is needed for hashes in the future. EXPEREMENTAL.'
+		help='Upgrade the piaplib webroot module. EXPERIMENTAL.'
 	)
 	the_action.add_argument(
 		'-A',
@@ -163,10 +185,7 @@ def upgradepip():
 	try:
 		pip.main(args=["install", "--upgrade", "pip"])
 	except Exception as permErr:
-		print(str(type(permErr)))
-		print(str(permErr))
-		print(str((permErr.args)))
-		permErr = ""
+		remediation.error_breakpoint(permErr)
 		permErr = None
 		del(permErr)
 	return None
@@ -178,7 +197,7 @@ def upgradeapt():
 	try:
 		import apt
 		import apt.cache
-		cache=apt.Cache()
+		cache = apt.Cache()
 		cache.update()
 		cache.open(None)
 		cache.upgrade()
@@ -186,10 +205,9 @@ def upgradeapt():
 		for pkg in cache.get_changes():
 			print(pkg.sourcePackageName, pkg.isUpgradeable)
 	except Exception as permErr:
-		print(str(type(permErr)))
-		print(str(permErr))
-		print(str((permErr.args)))
-		permErr = ""
+		logs.log(str(type(permErr)))
+		logs.log(str(permErr))
+		logs.log(str((permErr.args)))
 		permErr = None
 		del(permErr)
 	return None
@@ -227,12 +245,12 @@ def wait_for_threads_to_drain(names=[]):
 			continue
 		elif names is not None and (len(names) > 0):
 			if t.getName() in names:
-				logging.debug('joining %s', t.getName())
+				logs.log(str("joining {}").format(t.getName()), "Debug")
 				t.join()
 			else:
 				continue
 		else:
-			logging.debug('joining %s', t.getName())
+			logs.log(str("joining {}").format(t.getName()), "Debug")
 			t.join()
 	return None
 
@@ -256,7 +274,7 @@ def doPythonCommand(args=[None], stderr=None):
 	return theOutput
 
 
-# need somthing like:
+# need something like:
 # def createPathToDir(path, mode=751)
 # os.mkdir(path=os.path.abspath(path), mode=751, dir_fd=None)
 # if os.path.isdir(os.path.abspath("""/opt/PiAP/sbin/""")) is False:
@@ -280,17 +298,19 @@ def upgradePiAPlib_webui():
 	# check script
 	# lock state
 	try:
-		upgrade_thread = threading.Thread(name='PiAP Upgrade Thread', 
-			target=doPythonCommand, 
-			args=(["bash", str(script_prefix + "upgrade.sh")], None,))
-		t2.start()
+		upgrade_thread = threading.Thread(
+			name='PiAP Upgrade Thread',
+			target=doPythonCommand,
+			args=(["bash", str(script_prefix + "upgrade.sh")], None,)
+		)
+		upgrade_thread.start()
 	except Exception:
-		print("PANIC - upgrade failed to start")
+		logs.log(str("PANIC - upgrade failed to start"), "CRITICAL")
 	# not sure if this is needed utils.cleanFileResource("upgrade.sh")
 	try:
 		wait_for_threads_to_drain(['PiAP Upgrade Thread'])
 	except Exception:
-		print("PANIC - upgrade failed to stop safely")
+		logs.log(str("PANIC - upgrade failed to stop safely"), "CRITICAL")
 	return None
 
 
@@ -300,7 +320,7 @@ def upgradeAll():
 	upgradepip()
 	upgradePiAPlib()
 	upgradePiAPlib_depends()
-	#upgradePiAPlib_webui()
+	# upgradePiAPlib_webui()
 	return None
 
 
@@ -325,7 +345,6 @@ def main(argv=None):
 
 if __name__ == u'__main__':
 	try:
-		import sys
 		if (sys.argv is not None and (sys.argv is not []) and (len(sys.argv) > 1)):
 			main(sys.argv[1:])
 	except Exception as main_err:

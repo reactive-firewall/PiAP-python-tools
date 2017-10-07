@@ -33,6 +33,7 @@ except Exception as err:
 	raise ImportError(err)
 	exit(3)
 
+
 try:
 	import sys
 	if sys.__name__ is None:
@@ -54,13 +55,13 @@ except Exception as err:
 try:
 	import piaplib as piaplib
 except Exception:
-	from . import piaplib as piaplib
+	from .. import piaplib as piaplib
 try:
-	from pku import utils as utils
+	from piaplib.pku import utils as utils
 except Exception:
 	import piaplib.pku.utils as utils
 try:
-	from pku import remediation as remediation
+	from piplib.pku import remediation as remediation
 except Exception:
 	import piaplib.pku.remediation as remediation
 try:
@@ -69,7 +70,7 @@ except Exception as impErr:
 	impErr = None
 	del(impErr)
 	try:
-		import logs.logs as logs
+		import piaplib.book.logs.logs as logs
 	except Exception:
 		raise ImportError("Error Importing logs for version")
 
@@ -97,17 +98,20 @@ __prog__ = """piaplib.version"""
 def getKeyringVersion(verbose=False):
 	"""returns the keyring version."""
 	try:
+		from piaplib import keyring
+		if keyring.__name__ is False:
+			raise NotImplementedError("Failed to import keyring")
+	except Exception:
+		import piaplib.keyring
+	try:
 		from keyring import clarify as clarify
 	except Exception:
 		import piaplib.keyring.clarify as clarify
-	try:
-		from keyring import keyring as keyring
-	except Exception:
-		import piaplib.keyring.keyring as keyring
+	import piaplib.keyring.__main__
 	keyring_version = str(
 		"{name} {version}"
 	).format(
-		name=str(keyring.__prog__),
+		name=str(piaplib.keyring.__main__.__prog__),
 		version=str(piaplib.__version__)
 	)
 	if verbose:

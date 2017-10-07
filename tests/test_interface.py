@@ -69,14 +69,9 @@ class iFaceTestSuite(unittest.TestCase):
 		"""Tests the imposible state for pku.interface given bad input"""
 		theResult = True
 		try:
-			from piaplib import pku as pku
-			if pku.__name__ is None:
-				theResult = False
-			from pku import interfaces as interfaces
-			if interfaces.__name__ is None:
-				raise ImportError("Failed to import iface")
-			self.assertIsNone(pku.interfaces.taint_name("NoSuchName"))
-			self.assertIsNone(pku.interfaces.taint_name(None))
+			import piaplib.pku.interfaces
+			self.assertIsNone(piaplib.pku.interfaces.taint_name("NoSuchName"))
+			self.assertIsNone(piaplib.pku.interfaces.taint_name(None))
 		except Exception as err:
 			print(str(""))
 			print(str(type(err)))
@@ -101,7 +96,7 @@ class iFaceTestSuite(unittest.TestCase):
 			if interfaces.__name__ is None:
 				raise ImportError("Failed to import iface")
 			try:
-				pku.interfaces.disable_iface("eth1", False)
+				interfaces.disable_iface("eth1", False)
 				theResult = True
 			except subprocess.CalledProcessError as junkErr:
 				del(junkErr)
@@ -129,7 +124,7 @@ class iFaceTestSuite(unittest.TestCase):
 			if interfaces.__name__ is None:
 				raise ImportError("Failed to import iface")
 			try:
-				pku.interfaces.enable_iface("eth1")
+				interfaces.enable_iface("eth1")
 				theResult = True
 			except subprocess.CalledProcessError as junkErr:
 				del(junkErr)

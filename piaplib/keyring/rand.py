@@ -34,12 +34,13 @@ except Exception:
 
 
 try:
-	from ..pku import remediation as remediation
+	from piaplib.pku import remediation as remediation
 except Exception:
 	try:
-		import pku.remediation as remediation
+		import piaplib.pku.remediation as remediation
 	except Exception:
 		raise ImportError("Error Importing remediation")
+
 
 RAND_CHARS = [
 	str("""a"""), str("""b"""), str("""c"""), str("""d"""), str("""e"""), str("""f"""),
@@ -303,9 +304,9 @@ def randChar(count=None):
 
 
 def ensurePositiveCount(count=None):
-	"""Ensures the count is greater than zero"""
+	"""Ensures the given count is an integer with value greater than or equal tozero."""
 	if count is None or (isinstance(count, int) is False) or count <= 1:
-		p_count = 1
+		p_count = int(1)
 	else:
 		p_count = int(count)
 	return p_count

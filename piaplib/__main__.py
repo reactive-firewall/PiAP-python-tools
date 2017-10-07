@@ -18,24 +18,14 @@
 # limitations under the License.
 # ......................................................................
 
-
 try:
-	import sys
-	import os
-	if str("book") in __file__:
-		__sys_path__ = os.path.abspath(os.path.join(os.path.dirname(__file__), '.'))
-		if __sys_path__ not in sys.path:
-			sys.path.insert(0, __sys_path__)
-except Exception:
-	raise ImportError("Pocket Book failed to import.")
-
-
-def main(argv=None):
-	"""The main event"""
-	import piaplib.book.__main__
-	return piaplib.book.__main__.main(argv)
-
+	from . import pocket as pocket
+except Exception as importErr:
+	del importErr
+	import pocket as pocket
 
 if __name__ in u'__main__':
-	main(sys.argv[1:])
+	import sys
+	pocket.main(sys.argv[1:])
+	exit(0)
 

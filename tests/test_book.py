@@ -69,10 +69,8 @@ class BookTestSuite(unittest.TestCase):
 		"""Tests the imposible state for book given future tools"""
 		theResult = True
 		try:
-			from piaplib import book as book
-			if book.__name__ is None:
-				raise ImportError("Failed to import book")
-			self.assertIsNotNone(book.book.useBookTool("version", ["all"]))
+			import piaplib.book.__main__
+			self.assertIsNotNone(piaplib.book.__main__.useBookTool("version", ["all"]))
 		except Exception as err:
 			print(str(""))
 			print(str(type(err)))
@@ -88,11 +86,9 @@ class BookTestSuite(unittest.TestCase):
 		"""Tests the imposible state for book given bad tools"""
 		theResult = True
 		try:
-			from piaplib import book as book
-			if book.__name__ is None:
-				raise ImportError("Failed to import book")
+			import piaplib.book.__main__
 			with self.assertRaises(Exception):
-				self.assertIsNotNone(book.book.main(["logs"]))
+				self.assertIsNotNone(piaplib.book.__main__.main(["logs"]))
 		except Exception as err:
 			print(str(""))
 			print(str(type(err)))
@@ -108,11 +104,9 @@ class BookTestSuite(unittest.TestCase):
 		"""Tests the imposible state for book given bad tools"""
 		theResult = True
 		try:
-			from piaplib import book as book
-			if book.__name__ is None:
-				raise ImportError("Failed to import book")
-			self.assertIsNotNone(book.book.useBookTool("NoSuchTool"))
-			self.assertIsNotNone(book.book.useBookTool(None))
+			import piaplib.book.__main__
+			self.assertIsNotNone(piaplib.book.__main__.useBookTool("NoSuchTool"))
+			self.assertIsNotNone(piaplib.book.__main__.useBookTool(None))
 		except Exception as err:
 			print(str(""))
 			print(str(type(err)))

@@ -24,8 +24,17 @@ __version__ = """0.2.9"""
 try:
 	import sys
 	import os
-	if 'piaplib' in __file__:
-		sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+	try:
+		if str("piaplib") in __file__:
+			search_list = [
+				os.path.abspath(os.path.join(os.path.dirname(__file__), '..')),
+				os.path.abspath(os.path.join(os.path.dirname(__file__), '.'))
+			]
+			for __sys_path__ in search_list:
+				if __sys_path__ not in sys.path:
+					sys.path.insert(0, __sys_path__)
+	except Exception:
+		raise ImportError("PiAPlib failed to import.")
 except Exception as ImportErr:
 	print(str(type(ImportErr)))
 	print(str(ImportErr))

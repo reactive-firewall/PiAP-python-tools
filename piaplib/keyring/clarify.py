@@ -50,9 +50,9 @@ except Exception:
 
 
 try:
-	from ..pku import remediation as remediation
+	from piaplib.pku import remediation as remediation
 except Exception:
-	import pku.remediation as remediation
+	import piaplib.pku.remediation as remediation
 
 try:
 	from remediation import PiAPError as PiAPError
@@ -63,9 +63,9 @@ except Exception:
 		raise ImportError("Error Importing PiAPError")
 
 try:
-	from ..pku import utils as utils
+	from piaplib.pku import utils as utils
 except Exception:
-	import pku.utils as utils
+	import piaplib.pku.utils as utils
 
 
 __prog__ = """piaplib.keyring.clarify"""

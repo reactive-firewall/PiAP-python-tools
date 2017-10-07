@@ -241,42 +241,29 @@ class BasicUsageTestSuite(unittest.TestCase):
 				theResult = False
 		assert theResult
 
-	def test_c_python_command_pocket(self):
+	def test_d_python_command_main(self):
 		"""Test case for piaplib.pocket help."""
 		theResult = False
 		try:
-			import sys
-			if sys.__name__ is None:
-				raise ImportError("Failed to import system. WTF?!!")
 			thepython = getPythonCommand()
 			if (thepython is not None):
-				try:
-					theOutputtext = checkPythonCommand([
-						str(thepython),
-						str("-m"),
-						str("piaplib.pocket"),
-						str("--help")
-					], stderr=subprocess.STDOUT)
-					if (str("usage:") in str(theOutputtext)):
-						theResult = True
-					else:
-						theResult = False
-						print(str(""))
-						print(str("python cmd is {}").format(str(thepython)))
-						print(str(""))
-						print(str("actual output was..."))
-						print(str(""))
-						print(str("{}").format(str(theOutputtext)))
-						print(str(""))
-				except Exception as othererr:
-					print(str(""))
-					print(str(type(othererr)))
-					print(str(othererr))
-					print(str((othererr.args)))
-					print(str(""))
-					othererr = None
-					del othererr
+				theOutputtext = checkPythonCommand([
+					str(thepython),
+					str("-m"),
+					str("piaplib"),
+					str("--help")
+				], stderr=subprocess.STDOUT)
+				if (str("usage:") in str(theOutputtext)):
+					theResult = True
+				else:
 					theResult = False
+					print(str(""))
+					print(str("python cmd is {}").format(str(thepython)))
+					print(str(""))
+					print(str("actual output was..."))
+					print(str(""))
+					print(str("{}").format(str(theOutputtext)))
+					print(str(""))
 		except Exception as err:
 			print(str(""))
 			print(str(type(err)))
@@ -298,10 +285,10 @@ class BasicUsageTestSuite(unittest.TestCase):
 			thepython = getPythonCommand()
 			test_units = [
 				"lint.lint",
-				"pku.pku",
-				"book.book",
+				"pku.__main__",
+				"book.__main__",
 				"book.version",
-				"keyring.keyring"
+				"keyring.__main__"
 			]
 			if (thepython is not None):
 				try:
@@ -615,8 +602,8 @@ class BasicUsageTestSuite(unittest.TestCase):
 			test_units = [
 				"keyring.saltify",
 				"keyring.rand",
-				"keyring.clearify",
-				"keyring.keyring"
+				"keyring.clarify",
+				"keyring.__main__"
 			]
 			if (thepython is not None):
 				try:
@@ -763,8 +750,8 @@ class BasicUsageTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
-	def test_keyring_clear_io(self):
-		"""Test case for piaplib.keyring.clearify."""
+	def test_keyring_clarify_io(self):
+		"""Test case for piaplib.keyring.clarify."""
 		theResult = False
 		try:
 			import piaplib.keyring.rand as rand
@@ -788,7 +775,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 						arguments = [
 							str(thepython),
 							str("-m"),
-							str("piaplib.keyring.clearify"),
+							str("piaplib.keyring.clarify"),
 							str("{}").format(str(unit)),
 							str("--msg={}").format(theOutputtext),
 							str("-S=testSeedNeedstobelong"),

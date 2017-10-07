@@ -19,10 +19,47 @@
 # limitations under the License.
 # ......................................................................
 
-import os
-import sys
-import argparse
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+try:
+	import sys
+	if sys.__name__ is None:
+		raise ImportError("OMG! we could not import os. We're like in the matrix! ABORT. ABORT.")
+except Exception as err:
+	raise ImportError(err)
+	exit(3)
+
+
+try:
+	import os
+	if os.__name__ is None:
+		raise ImportError("OMG! we could not import os. We're like in the matrix! ABORT. ABORT.")
+except Exception as err:
+	raise ImportError(err)
+	exit(3)
+
+
+try:
+	import argparse
+	if argparse.__name__ is None:
+		raise ImportError("OMG! we could not import argparse. We're in need of a fix! ABORT.")
+except Exception as err:
+	raise ImportError(err)
+	exit(3)
+
+
+try:
+	if str("piaplib") in __file__:
+		__sys_path__ = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+		if __sys_path__ not in sys.path:
+			sys.path.insert(0, __sys_path__)
+except Exception as importErr:
+	print(str(importErr))
+	print(str(importErr.args))
+	importErr = None
+	del importErr
+	raise ImportError("Failed to import " + str(__file__))
+	exit(255)
+
 
 try:
 	import piaplib as piaplib
@@ -65,13 +102,13 @@ __prog__ = "pocket"
 """The name of this program is pocket"""
 
 POCKET_UNITS = {
-	u'pku': pku.pku,
+	u'book': book,
+	u'pku': pku,
 	u'protector': None,
 	u'blade': None,
-	u'keyring': keyring.keyring,
+	u'keyring': keyring,
 	u'lint': lint.lint,
-	u'fruitsnack': None,
-	u'book': book.book
+	u'fruitsnack': None
 }
 """ The Pocket Knife Units available.
 	pku - the pocket knife unit. The everything pocket tool.
@@ -127,7 +164,10 @@ def useTool(tool, arguments=[None]):
 			try:
 				# print(str("PiAP launching: "+tool))
 				POCKET_UNITS[tool].main(arguments)
-			except Exception:
+			except Exception as error:
+				logs.log(str(type(error)), "Warning")
+				logs.log(str(error), "Error")
+				logs.log(str((error.args)), "Warning")
 				logs.log(str(
 					" - WARNING - An error occurred while handling the shell. Cascading failure."
 				), "Warning")

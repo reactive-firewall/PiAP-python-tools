@@ -439,7 +439,7 @@ def appendFile(somefile, somedata):
 	except OSError:
 		theResult = False
 	except Exception as err:
-		logs.log(str("Write Failed on file {}").format(theWritePath), "Warning")
+		logs.log(str("Write Failed on file {}").format(theWritePath), "Debug")
 		logs.log(str(type(err)), "Warning")
 		logs.log(str(err), "Warning")
 		logs.log(str((err.args)), "Warning")
