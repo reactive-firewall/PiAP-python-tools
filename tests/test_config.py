@@ -254,7 +254,7 @@ class ConfigTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
-	def test_case_parse_empty_baseconfig(self):
+	def test_case_of_parse_empty_baseconfig(self):
 		"""Tests the parse configuration functions given empty values"""
 		theResult = False
 		try:
@@ -264,7 +264,6 @@ class ConfigTestSuite(unittest.TestCase):
 			from pku import baseconfig as baseconfig
 			if baseconfig.__name__ is None:
 				raise ImportError("Failed to import baseconfig")
-			test_path = str("/tmp/test_baseconfig.cnf")
 			self.assertIsNotNone(
 				baseconfig.parseConfigParser(
 					config_data=None,
