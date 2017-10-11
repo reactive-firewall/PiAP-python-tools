@@ -321,8 +321,6 @@ class ConfigTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
-mainConfig = configparser.ConfigParser(allow_no_value=True)
-
 	def test_case_yaml_read_write_file(self):
 		"""Tests the YAML read and write functions"""
 		theResult = False
