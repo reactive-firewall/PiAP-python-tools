@@ -16,6 +16,7 @@ matrix:
   include:
   - os: linux
     python:  "2.7"
+    env: TRAVIS_PYTHON_VERSION="2.7"
     dist: trusty
   - os: linux
     python:  "3.3"
@@ -44,6 +45,7 @@ matrix:
     python:  "pypy-5.3.1"
   - os: linux
     python:  "nightly" # currently points to 3.7-dev
+    env: TRAVIS_PYTHON_VERSION="3.7-dev"
   - os: osx
     osx_image: xcode7.2
     language: generic
@@ -111,6 +113,8 @@ before_install:
   - travis_retry python3 -m pip install coverage || python3 -m pip install coverage || true ;
   - travis_retry python3 -m pip install codecov || python3 -m pip install codecov || true ;
   - travis_retry python3 -m pip install -r requirements.txt || python3 -m pip install -r requirements.txt || true ;
+  - mkdir -p -m 755 "/opt/PiAP/hostapd_actions/" || true
+  - cp -vf ./tests/mock/clients /opt/PiAP/hostapd_actions/clients || true
   - echo "Dependencies should be sane now."
 
 script:
@@ -127,13 +131,18 @@ script:
   - make clean ;
   - mv -vf ".coverall.Lasting.45678.12345" .coverage 2>/dev/null || true
   - if [ $TRAVIS_OS_NAME == osx ] ; then true ; wait ; else pip install --upgrade -e git+https://github.com/reactive-firewall/PiAP-python-tools.git@${TRAVIS_PULL_REQUEST_SHA:-${TRAVIS_COMMIT}}#egg=piaplib ; fi ; wait ;
+  - bash ./tests/check_spelling || exit $? ;
 
 after_success:
   - coverage combine || true
+  - coverage xml || true
   - codecov || true
   - travis_retry python3 -m pip install python-coveralls || python3 -m pip install python-coveralls || true ;
   - coveralls 2>/dev/null || true
   - travis_retry python -m pip uninstall -y PyYAML || travis_retry python3 -m pip uninstall -y PyYAML || true
   - if [ $TRAVIS_OS_NAME == osx ] ; then true ; wait ; else coverage run -p -m piaplib.pocket pku upgrade --upgrade-all || true ; fi ;
   - if [ $TRAVIS_OS_NAME == osx ] ; then echo "SKIP codecov" ; else codecov || exit $? ; fi ;
+  - travis_retry python3 -m pip install python-coveralls || python3 -m pip install python-coveralls || true ;
+  - coveralls 2>/dev/null || true
+  - travis_retry python -m pip uninstall -y PyYAML || travis_retry python3 -m pip uninstall -y PyYAML || true
 

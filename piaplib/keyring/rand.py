@@ -34,12 +34,13 @@ except Exception:
 
 
 try:
-	from ..pku import remediation as remediation
+	from piaplib.pku import remediation as remediation
 except Exception:
 	try:
-		import pku.remediation as remediation
+		import piaplib.pku.remediation as remediation
 	except Exception:
 		raise ImportError("Error Importing remediation")
+
 
 RAND_CHARS = [
 	str("""a"""), str("""b"""), str("""c"""), str("""d"""), str("""e"""), str("""f"""),
@@ -54,7 +55,7 @@ RAND_CHARS = [
 	str("""?"""), str("""/"""), str("""'"""), str(""";"""), str("""["""), str("""]"""),
 	str("""{"""), str("""}"""), str("""|"""), str("""~"""), str("""\""""), str(""" """)
 ]
-"""Posible Chars for randChar (which is not so random, as it is very qwerty based)"""
+"""Possible Chars for randChar (which is not so random, as it is very qwerty based)"""
 
 
 __prog__ = """piaplib.keyring.rand"""
@@ -64,23 +65,20 @@ __prog__ = """piaplib.keyring.rand"""
 @remediation.error_handling
 def rand(count=None):
 	"""wrapper for os.urandom()"""
-	if count is None or (isinstance(count, int) is False) or count <= 1:
-		x_count = 512
-	else:
-		x_count = count
+	x_count = ensurePositiveCount(count)
 	try:
 		theEntropy = os.urandom(x_count)
 		if isinstance(theEntropy, str):
 			theEntropy = bytes(theEntropy)
 		return theEntropy
 	except Exception as err:
-		print(str(u'FAILED DURRING RAND. ABORT.'))
+		print(str(u'FAILED DURING RAND. ABORT.'))
 		print(str(type(err)))
 		print(str(err))
 		print(str(err.args))
 		err = None
 		del err
-	raise AssertionError("IMPOSIBLE STATE REACHED IN RAND. ABORT.")
+	raise AssertionError("IMPOSSIBLE STATE REACHED IN RAND. ABORT.")
 
 
 @remediation.error_handling
@@ -95,7 +93,7 @@ def randStr(count=None):
 		choices = [randInt(1, 1, 99) for x in range(x_count)]
 		return str("").join([string.printable[m] for m in choices if m is not int(69)])
 	except Exception as err:
-		print(str(u'FAILED DURRING RAND-STR. ABORT.'))
+		print(str(u'FAILED DURING RAND-STR. ABORT.'))
 		print(str(type(err)))
 		print(str(err))
 		print(str(err.args))
@@ -116,7 +114,7 @@ def randPW(count=None):
 		choices = [randInt(1, 1, 95) for x in range(x_count)]
 		return str(str("").join([string.printable[m] for m in choices if m is not int(69)]))
 	except Exception as err:
-		print(str(u'FAILED DURRING RAND-PW. ABORT.'))
+		print(str(u'FAILED DURING RAND-PW. ABORT.'))
 		print(str(type(err)))
 		print(str(err))
 		print(str(err.args))
@@ -132,10 +130,7 @@ def randSSID(count=None):
 	WARNING: this is a placeholder.
 	count - length to return. Defaults to 20.
 	"""
-	if count is None or (isinstance(count, int) is False) or count < 1:
-		x_count = 20
-	else:
-		x_count = int(count)
+	x_count = ensurePositiveCount(count)
 	try:
 		if x_count <= 1:
 			return randChar(1)
@@ -148,13 +143,13 @@ def randSSID(count=None):
 				theResult = theResult.join(nextChar)
 			return theResult
 	except Exception as err:
-		print(str(u'FAILED DURRING RAND-SSID. ABORT.'))
+		print(str(u'FAILED DURING RAND-SSID. ABORT.'))
 		print(str(type(err)))
 		print(str(err))
 		print(str(err.args))
 		err = None
 		del err
-	raise AssertionError("IMPOSIBLE STATE REACHED IN RAND-SSID. ABORT.")
+	raise AssertionError("IMPOSSIBLE STATE REACHED IN RAND-SSID. ABORT.")
 
 
 @remediation.error_handling
@@ -170,10 +165,7 @@ def randIP(count=None, min=0, max=256):
 		min = 1
 	if max is None or (isinstance(max, int) is False) or max <= 0 or max <= min or max >= 256:
 		max = 255
-	if count is None or (isinstance(count, int) is False) or count <= 1:
-		x_count = 1
-	else:
-		x_count = int(count)
+	x_count = ensurePositiveCount(count)
 	try:
 		if x_count <= 1:
 			return str(str("{0}.{1}.{2}.{3}").format(
@@ -186,13 +178,13 @@ def randIP(count=None, min=0, max=256):
 				theResult.append(randIP(1, min, max))
 			return theResult
 	except Exception as err:
-		print(str(u'FAILED DURRING RAND-IIP. ABORT.'))
+		print(str(u'FAILED DURING RAND-IIP. ABORT.'))
 		print(str(type(err)))
 		print(str(err))
 		print(str(err.args))
 		err = None
 		del err
-	raise AssertionError("IMPOSIBLE STATE REACHED IN RAND-IP. ABORT.")
+	raise AssertionError("IMPOSSIBLE STATE REACHED IN RAND-IP. ABORT.")
 
 
 @remediation.error_handling
@@ -207,10 +199,7 @@ def fastrandInt(count=None, max=512):
 	min = 0
 	if max is None or (isinstance(max, int) is False) or max <= 0 or max <= min:
 		max = 512
-	if count is None or (isinstance(count, int) is False) or count <= 1:
-		x_count = 1
-	else:
-		x_count = int(count)
+	x_count = ensurePositiveCount(count)
 	try:
 		if x_count <= 1:
 			try:
@@ -224,13 +213,13 @@ def fastrandInt(count=None, max=512):
 		else:
 			return [fastrandInt(1, max) for someInt in range(x_count)]
 	except Exception as err:
-		print(str(u'FAILED DURRING RAND-INT. ABORT.'))
+		print(str(u'FAILED DURING RAND-INT. ABORT.'))
 		print(str(type(err)))
 		print(str(err))
 		print(str(err.args))
 		err = None
 		del err
-	raise AssertionError("IMPOSIBLE STATE REACHED IN RAND-INT. ABORT.")
+	raise AssertionError("IMPOSSIBLE STATE REACHED IN RAND-INT. ABORT.")
 
 
 @remediation.error_handling
@@ -246,10 +235,7 @@ def randInt(count=None, min=0, max=512):
 		return int(fastrandInt(1, max))
 	if max is None or (isinstance(max, int) is False) or max <= 0 or max <= min:
 		max = 512
-	if count is None or (isinstance(count, int) is False) or count <= 1:
-		x_count = 1
-	else:
-		x_count = int(count)
+	x_count = ensurePositiveCount(count)
 	try:
 		if x_count <= 1:
 			entropy_seed = int(fastrandInt(1, max))
@@ -260,22 +246,19 @@ def randInt(count=None, min=0, max=512):
 		else:
 			return [randInt(1, min, max) for someInt in range(x_count)]
 	except Exception as err:
-		print(str(u'FAILED DURRING RAND-INT. ABORT.'))
+		print(str(u'FAILED DURING RAND-INT. ABORT.'))
 		print(str(type(err)))
 		print(str(err))
 		print(str(err.args))
 		err = None
 		del err
-	raise AssertionError("IMPOSIBLE STATE REACHED IN RAND-INT. ABORT.")
+	raise AssertionError("IMPOSSIBLE STATE REACHED IN RAND-INT. ABORT.")
 
 
 @remediation.error_handling
 def randBool(count=None):
 	"""wrapper for str(os.urandom())"""
-	if count is None or (isinstance(count, int) is False) or count <= 1:
-		x_count = 1
-	else:
-		x_count = count
+	x_count = ensurePositiveCount(count)
 	try:
 		if x_count == 1:
 			return (bool(((randInt(1, 0, 512) % 2) == 0)) is True)
@@ -285,22 +268,19 @@ def randBool(count=None):
 				theResult.append(randBool(1))
 			return theResult
 	except Exception as err:
-		print(str(u'FAILED DURRING RAND-BOOL. ABORT.'))
+		print(str(u'FAILED DURING RAND-BOOL. ABORT.'))
 		print(str(type(err)))
 		print(str(err))
 		print(str(err.args))
 		err = None
 		del err
-	raise AssertionError("IMPOSIBLE STATE REACHED IN RAND-BOOL. ABORT.")
+	raise AssertionError("IMPOSSIBLE STATE REACHED IN RAND-BOOL. ABORT.")
 
 
 @remediation.error_handling
 def randChar(count=None):
 	"""wrapper for str(os.urandom())"""
-	if count is None or (isinstance(count, int) is False) or count <= 1:
-		x_count = 1
-	else:
-		x_count = int(count)
+	x_count = ensurePositiveCount(count)
 	try:
 		theRandomResult = str("")
 		for char_x in range(x_count):
@@ -312,7 +292,7 @@ def randChar(count=None):
 			theRandomResult = str("{0}{1}").format(theRandomResult, str(char_rand_seed))
 		return theRandomResult
 	except Exception as err:
-		print(str(u'FAILED DURRING RAND-CHAR. ABORT.'))
+		print(str(u'FAILED DURING RAND-CHAR. ABORT.'))
 		print(str(type(err)))
 		print(str(err))
 		print(str(err.args))
@@ -320,14 +300,23 @@ def randChar(count=None):
 		print(str(len(RAND_CHARS)))
 		err = None
 		del err
-	raise AssertionError("IMPOSIBLE STATE REACHED IN RAND-CHAR. ABORT.")
+	raise AssertionError("IMPOSSIBLE STATE REACHED IN RAND-CHAR. ABORT.")
+
+
+def ensurePositiveCount(count=None):
+	"""Ensures the given count is an integer with value greater than or equal tozero."""
+	if count is None or (isinstance(count, int) is False) or count <= 1:
+		p_count = int(1)
+	else:
+		p_count = int(count)
+	return p_count
 
 
 RANDOM_TASKS = {
 	u'raw': rand, u'int': randInt, u'str': randStr, u'char': randChar, u'bool': randBool,
 	u'passphrase': randPW, u'SSID': randSSID, u'IP': randIP}
 """
-	The posible random actions.
+	The possible random actions.
 	raw - same as calling os.urandom(). This is default.
 	int - return a random integer.
 	str - return a random string.
@@ -370,7 +359,7 @@ def parseArgs(arguments=[None]):
 		)
 		theArgs = parser.parse_args(arguments)
 	except Exception as err:
-		print(str(u'FAILED DURRING RAND. ABORT.'))
+		print(str(u'FAILED DURING RAND. ABORT.'))
 		print(str(type(err)))
 		print(str(err))
 		print(str(err.args))
@@ -388,7 +377,7 @@ def useRandTool(tool, *args, **kwargs):
 	if tool in RANDOM_TASKS.keys():
 		return RANDOM_TASKS[tool](*args, **kwargs)
 	else:
-		raise NotImplementedError("IMPOSIBLE STATE REACHED IN RAND-TOOL. ABORT.")
+		raise NotImplementedError("IMPOSSIBLE STATE REACHED IN RAND-TOOL. ABORT.")
 
 
 @remediation.bug_handling
@@ -406,11 +395,10 @@ def main(argv=None):
 
 if __name__ in u'__main__':
 	try:
-		import sys
 		error_code = main(sys.argv[1:])
 		exit(error_code)
 	except Exception as err:
-		print(str(u'MAIN FAILED DURRING RAND. ABORT.'))
+		print(str(u'MAIN FAILED DURING RAND. ABORT.'))
 		print(str(type(err)))
 		print(str(err))
 		print(str(err.args))

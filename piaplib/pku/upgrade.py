@@ -21,6 +21,26 @@
 
 
 try:
+	import argparse
+except Exception:
+	raise ImportError("Error Importing argparse tools")
+
+
+try:
+	import subprocess
+	import threading
+except Exception:
+	raise ImportError("Error Importing threading tools")
+
+
+try:
+	import os
+	import sys
+except Exception:
+	raise ImportError("Error Importing system tools")
+
+
+try:
 	import piaplib as piaplib
 except Exception:
 	from . import piaplib as piaplib
@@ -51,7 +71,6 @@ except Exception:
 			@remediation.bug_handling
 			def main(args=None, stderr=None):
 				"""function for backend subprocess check_output command"""
-				import subprocess
 				theOutput = None
 				try:
 					if args is None or args is [None]:
@@ -67,6 +86,7 @@ except Exception:
 	except Exception:
 		raise ImportError("Not Implemented.")
 
+
 try:
 	from . import utils as utils
 except Exception:
@@ -74,6 +94,7 @@ except Exception:
 		import utils as utils
 	except Exception:
 		raise ImportError("Error Importing utils")
+
 
 try:
 	from . import remediation as remediation
@@ -83,18 +104,25 @@ except Exception:
 	except Exception:
 		raise ImportError("Error Importing remediation")
 
+
 try:
-	import argparse
+	from piaplib.book.logs import logs as logs
 except Exception:
-	raise ImportError("Error Importing argparse tools")
+	try:
+		from book.logs import logs as logs
+	except Exception:
+		try:
+			from piaplib.book.logs import logs as logs
+		except Exception:
+			raise ImportError("Error Importing logs")
 
 
 """
-Upgrades are basicly just done via pip right now.
+Upgrades are basically just done via pip right now.
 """
 
 
-__prog__ = """piaplib.pku.upgrades"""
+__prog__ = """piaplib.pku.upgrade"""
 """The name of this PiAPLib tool is Pocket Knife Upgrade Unit"""
 
 
@@ -104,7 +132,7 @@ def parseargs(arguments=None):
 	parser = argparse.ArgumentParser(
 		prog=__prog__,
 		description='Run piaplib upgrade functions.',
-		epilog='Basicly a python wrapper for pip install --upgrade.'
+		epilog='basically a python wrapper for pip install --upgrade.'
 	)
 	the_action = parser.add_mutually_exclusive_group()
 	the_action.add_argument(
@@ -121,7 +149,15 @@ def parseargs(arguments=None):
 		dest='upgrade_pip',
 		default=False,
 		action='store_true',
-		help='Upgrade the pip module. This is needed for hashes in the future. EXPEREMENTAL.'
+		help='Upgrade the pip module. This is needed for piaplib dependencies. BETA FEATURE.'
+	)
+	the_action.add_argument(
+		'-W',
+		'--upgrade-webroot',
+		dest='upgrade_web',
+		default=False,
+		action='store_true',
+		help='Upgrade the piaplib webroot module. EXPERIMENTAL.'
 	)
 	the_action.add_argument(
 		'-A',
@@ -129,7 +165,7 @@ def parseargs(arguments=None):
 		dest='upgrade_all',
 		default=False,
 		action='store_true',
-		help='Upgrade the piaplib. This is the default.'
+		help='Upgrade all of the piaplib.'
 	)
 	parser.add_argument(
 		'-V',
@@ -149,10 +185,27 @@ def upgradepip():
 	try:
 		pip.main(args=["install", "--upgrade", "pip"])
 	except Exception as permErr:
-		print(str(type(permErr)))
-		print(str(permErr))
-		print(str((permErr.args)))
-		permErr = ""
+		remediation.error_breakpoint(permErr)
+		permErr = None
+		del(permErr)
+	return None
+
+
+@remediation.error_passing
+def upgradeAPT():
+	"""Upgrade system via apt."""
+	try:
+		import apt
+		import apt.cache
+		cache = apt.Cache()
+		cache.update()
+		cache.open(None)
+		cache.upgrade()
+		cache.open(None)
+		for pkg in cache.get_changes():
+			logs.log((pkg.sourcePackageName, pkg.isUpgradeable), "Info")
+	except Exception as permErr:
+		remediation.error_breakpoint(permErr, "upgradeAPT")
 		permErr = None
 		del(permErr)
 	return None
@@ -171,7 +224,7 @@ def upgradePiAPlib_depends():
 	"""Upgrade piaplib via pip."""
 	upsream_repo_depends = str(
 		"https://raw.githubusercontent.com/reactive-firewall" +
-		"/PiAP-python-tools/master/requirements.txt"
+		"/PiAP-python-tools/stable/requirements.txt"
 	)
 	utils.getFileResource(upsream_repo_depends, "temp_req.txt")
 	pip.main(args=[
@@ -183,16 +236,79 @@ def upgradePiAPlib_depends():
 	return None
 
 
+def wait_for_threads_to_drain(names=[]):
+	main_thread = threading.currentThread()
+	for t in threading.enumerate():
+		if t is main_thread:
+			continue
+		elif names is not None and (len(names) > 0):
+			if t.getName() in names:
+				logs.log(str("joining {}").format(t.getName()), "Debug")
+				t.join()
+			else:
+				continue
+		else:
+			logs.log(str("joining {}").format(t.getName()), "Debug")
+			t.join()
+	return None
+
+
+@remediation.error_handling
+def doPythonCommand(args=[None], stderr=None):
+	"""function for backend subprocess shell command"""
+	theOutput = None
+	try:
+		if args is None or args is [None]:
+			theOutput = subprocess.check_output(["exit 1 ; #"])
+		else:
+			theOutput = subprocess.check_output(args, stderr=stderr)
+	except Exception:
+		theOutput = None
+	try:
+		if isinstance(theOutput, bytes):
+			theOutput = theOutput.decode('utf8')
+	except UnicodeDecodeError:
+		theOutput = bytes(theOutput)
+	return theOutput
+
+
+# need something like:
+# def createPathToDir(path, mode=751)
+# os.mkdir(path=os.path.abspath(path), mode=751, dir_fd=None)
+# if os.path.isdir(os.path.abspath("""/opt/PiAP/sbin/""")) is False:
+# os.mkdir(path="""/opt""", mode=1777, dir_fd=None)
+# os.chown("""/opt/""", 0, 0, dir_fd=None, follow_symlinks=True)
+# os.mkdir(path="""/opt/PiAP/""", mode=751, dir_fd=None)
+# os.chown("""/opt/PiAP/""", 0, 0, dir_fd=None, follow_symlinks=True)
+# should test access
+
 @remediation.error_passing
 def upgradePiAPlib_webui():
 	"""Upgrade PiAP version via update script."""
 	upsream_repo_depends = str(
 		"https://raw.githubusercontent.com/reactive-firewall" +
-		"/Pocket-PiAP/master/upgrade.sh"
+		"/Pocket-PiAP/stable/upgrade.sh"
 	)
-	utils.getFileResource(upsream_repo_depends, "upgrade.sh")
-	# run script here
-	utils.cleanFileResource("upgrade.sh")
+	script_prefix = str("""/opt/PiAP/sbin/""")
+	if os.path.isdir(os.path.abspath("""/opt/PiAP/sbin/""")) is False:
+		script_prefix = str("""/var/tmp/""")
+	utils.getFileResource(upsream_repo_depends, str(script_prefix + "upgrade.sh"))
+	# check script
+	# lock state
+	try:
+		upgrade_thread = threading.Thread(
+			name='PiAP Upgrade Thread',
+			target=doPythonCommand,
+			args=(["bash", str(script_prefix + "upgrade.sh")], None,)
+		)
+		upgrade_thread.start()
+	except Exception:
+		logs.log(str("PANIC - upgrade failed to start"), "CRITICAL")
+	# not sure if this is needed utils.cleanFileResource("upgrade.sh")
+	try:
+		wait_for_threads_to_drain(['PiAP Upgrade Thread'])
+	except Exception:
+		logs.log(str("PANIC - upgrade failed to stop safely"), "CRITICAL")
 	return None
 
 
@@ -200,8 +316,10 @@ def upgradePiAPlib_webui():
 def upgradeAll():
 	"""Upgrade piaplib and requirements via pip."""
 	upgradepip()
+	upgradeAPT()
 	upgradePiAPlib()
 	upgradePiAPlib_depends()
+	# upgradePiAPlib_webui()
 	return None
 
 
@@ -215,6 +333,9 @@ def main(argv=None):
 	elif args.upgrade_pip is True:
 		upgradepip()
 		return 0
+	elif args.upgrade_web is True:
+		upgradePiAPlib_webui()
+		return 0
 	elif args.upgrade_all is True:
 		upgradeAll()
 		return 0
@@ -223,7 +344,6 @@ def main(argv=None):
 
 if __name__ == u'__main__':
 	try:
-		import sys
 		if (sys.argv is not None and (sys.argv is not []) and (len(sys.argv) > 1)):
 			main(sys.argv[1:])
 	except Exception as main_err:

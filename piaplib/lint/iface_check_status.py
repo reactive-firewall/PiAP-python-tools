@@ -331,7 +331,7 @@ def main(argv=None):
 		return 0
 	except Exception as main_err:
 		logs.log(
-			str("iface_check_status: REALLY BAD ERROR: ACTION will not be compleated! ABORT!"),
+			str("iface_check_status: REALLY BAD ERROR: ACTION will not be completed! ABORT!"),
 			"Error"
 		)
 		logs.log(str(main_err), "Error")
@@ -348,7 +348,7 @@ if __name__ == u'__main__':
 		exit(exitcode)
 	except Exception as main_err:
 		logs.log(
-			str("iface_check_status: REALLY BAD ERROR: ACTION will not be compleated! ABORT!"),
+			str("iface_check_status: REALLY BAD ERROR: ACTION will not be completed! ABORT!"),
 			"Error"
 		)
 		logs.log(str(main_err), "Error")

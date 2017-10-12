@@ -333,7 +333,7 @@ def get_client_lease_status(client_mac=None):
 
 @utils.memoize
 def get_client_list(lan_interface=None):
-	"""list the availabel clients."""
+	"""list the available clients."""
 	theResult = None
 	try:
 		theRawClientState = get_client_arp_status_raw(None, lan_interface)
@@ -500,7 +500,7 @@ def main(argv=None):
 			print(show_client(ip, verbose, output_html, client_interface))
 		return 0
 	except Exception as main_err:
-		print(str("client_check_status: REALLY BAD ERROR: ACTION will not be compleated! ABORT!"))
+		print(str("client_check_status: REALLY BAD ERROR: ACTION will not be completed! ABORT!"))
 		print(str(main_err))
 		print(str(main_err.args))
 	return 1
@@ -512,7 +512,7 @@ if __name__ == u'__main__':
 		exitcode = main(sys.argv[1:])
 		exit(exitcode)
 	except Exception as main_err:
-		print(str("client_check_status: REALLY BAD ERROR: ACTION will not be compleated! ABORT!"))
+		print(str("client_check_status: REALLY BAD ERROR: ACTION will not be completed! ABORT!"))
 		print(str(main_err))
 		print(str(main_err.args))
 	exit(1)

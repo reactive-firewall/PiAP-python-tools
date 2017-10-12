@@ -190,7 +190,7 @@ def main(argv=None):
 			restart_iface(interface)
 			return 0
 	except Exception as err:
-		print(str("interfaces: REALLY BAD ERROR: ACTION will not be compleated! ABORT!"))
+		print(str("interfaces: REALLY BAD ERROR: ACTION will not be completed! ABORT!"))
 		print(str(type(err)))
 		print(str(err))
 		print(str(err.args))

@@ -86,14 +86,9 @@ class KeyringTestSuite(unittest.TestCase):
 		"""test that keyring garbage in garbage out for keyring.useKeyTool"""
 		theResult = True
 		try:
-			from .context import piaplib
-			if piaplib.__name__ is None:
-				theResult = False
-			from piaplib import keyring as keyring
-			if keyring.__name__ is None:
-				theResult = False
+			import piaplib.keyring.__main__
 			for junk_input in [str("BADTOOL"), None]:
-				self.assertIsNone(keyring.keyring.useKeyTool(junk_input, [str("--help")]))
+				self.assertIsNone(piaplib.keyring.__main__.useKeyTool(junk_input, [str("--help")]))
 			theResult = True
 		except Exception as impErr:
 			print(str(""))

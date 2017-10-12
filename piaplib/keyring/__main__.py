@@ -20,28 +20,38 @@
 # ......................................................................
 
 try:
-	import os
 	import sys
+	import os
 	import argparse
-	sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-except Exception:
-	raise NotImplementedError("OMG! We could not import the os. We're like in the matrix!")
-	exit(3)
+	try:
+		if str("keyring") in __file__:
+			__sys_path__ = os.path.abspath(os.path.dirname(__file__))
+			if __sys_path__ not in sys.path:
+				sys.path.insert(0, __sys_path__)
+	except Exception:
+		raise ImportError("PiAPlib Keyring failed to import.")
+except Exception as ImportErr:
+	print(str(type(ImportErr)))
+	print(str(ImportErr))
+	print(str((ImportErr.args)))
+	ImportErr = None
+	del ImportErr
+	raise ImportError(u'Keyring Failed to Import')
 
 try:
 	from . import saltify as saltify
 except Exception:
-	import saltify as saltify
+	import piaplib.keyring.saltify as saltify
 
 try:
 	from . import rand as rand
 except Exception:
-	import rand as rand
+	import piaplib.keyring.rand as rand
 
 try:
-	from ..pku import remediation as remediation
+	from piaplib.pku import remediation as remediation
 except Exception:
-	import pku.remediation as remediation
+	import piaplib.pku.remediation as remediation
 
 
 __prog__ = """piaplib.keyring"""
@@ -51,6 +61,7 @@ __prog__ = """piaplib.keyring"""
 KEYRING_UNITS = {u'saltify': saltify, u'rand': rand, u'keys': None}
 """ The Pocket Knife Unit actions.
 	saltify - HMAC salt functions.
+	rand - convenience random functions.
 	keys -  (FUTURE/RESERVED)
 	"""
 
@@ -86,11 +97,11 @@ def useKeyTool(tool, arguments=[None]):
 				timestamp = remediation.getTimeStamp()
 				theResult = str(
 					timestamp +
-					" - WARNING - An error occured while handling the keyring tool." +
+					" - WARNING - An error occurred while handling the keyring tool." +
 					"Cascading failure."
 				)
 		except Exception:
-			theResult = str("CRITICAL - An error occured while handling the cascading failure.")
+			theResult = str("CRITICAL - An error occurred while handling the cascading failure.")
 		return theResult
 	else:
 		return None
@@ -107,7 +118,7 @@ def main(argv=None):
 	except Exception as cerr:
 		print(str(cerr))
 		print(str(cerr.args))
-		print(str(" UNKNOWN - An error occured while handling the arguments. Command failure."))
+		print(str(" UNKNOWN - An error occurred while handling the arguments. Command failure."))
 		exit(3)
 	exit(0)
 

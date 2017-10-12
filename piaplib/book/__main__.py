@@ -21,10 +21,13 @@
 
 
 try:
-	import os
 	import sys
+	import os
 	import argparse
-	sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+	if str("book") in __file__:
+		__sys_path__ = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+		if str(__sys_path__) not in sys.path:
+			sys.path.insert(0, __sys_path__)
 except Exception as importErr:
 	print(str(importErr))
 	print(str(importErr.args))
@@ -37,7 +40,7 @@ except Exception as importErr:
 try:
 	try:
 		import piaplib as piaplib
-	except Exception:
+	except Exception as err:
 		from . import piaplib as piaplib
 	try:
 		from piaplib.pku import baseconfig as baseconfig

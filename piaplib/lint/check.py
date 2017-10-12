@@ -109,7 +109,7 @@ def useCheckTool(tool, arguments=[None]):
 			theResult = CHECK_UNITS[tool].main(arguments)
 		except Exception:
 			logs.log(
-				str("An error occured while handling the health check tool. Cascading failure."),
+				str("An error occurred while handling the health check tool. Cascading failure."),
 				"WARNING"
 			)
 			theResult = None
@@ -129,7 +129,7 @@ def main(argv=None):
 		except Exception as cerr:
 			logs.log(
 				str(
-					"An error occured while handling the arguments. Command failure."
+					"An error occurred while handling the arguments. Command failure."
 				),
 				"ERROR"
 			)
@@ -142,7 +142,7 @@ def main(argv=None):
 	except Exception:
 		logs.log(
 			str(
-				"An error occured while handling the failure. Cascading failure."
+				"An error occurred while handling the failure. Cascading failure."
 			),
 			"ERROR"
 		)

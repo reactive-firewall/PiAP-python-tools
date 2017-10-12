@@ -53,7 +53,7 @@ def parseArgs(arguments=None):
 		)
 		theArgs = parser.parse_args(arguments)
 	except Exception as err:
-		print(str(u'FAILED DURRING SALTIFY. ABORT.'))
+		print(str(u'FAILED DURING SALTIFY. ABORT.'))
 		print(str(type(err)))
 		print(str(err))
 		print(str(err.args))
@@ -101,7 +101,7 @@ if __name__ in u'__main__':
 		import sys
 		exitcode = main(sys.argv[1:])
 	except Exception as err:
-		print(str(u'MAIN FAILED DURRING SALTIFY. ABORT.'))
+		print(str(u'MAIN FAILED DURING SALTIFY. ABORT.'))
 		print(str(type(err)))
 		print(str(err))
 		print(str(err.args))

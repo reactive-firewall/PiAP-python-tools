@@ -127,7 +127,7 @@ if __name__ in u'__main__':
 		error_code = main(sys.argv[1:])
 		exit(error_code)
 	except Exception as err:
-		print(str(u'MAIN FAILED DURRING LINT. ABORT.'))
+		print(str(u'MAIN FAILED DURING LINT. ABORT.'))
 		print(str(type(err)))
 		print(str(err))
 		print(str(err.args))
