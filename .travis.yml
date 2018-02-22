@@ -30,6 +30,7 @@ matrix:
     env: TRAVIS_PYTHON_VERSION="3.5"
   - os: linux
     python:  "3.6"
+    env: TRAVIS_PYTHON_VERSION="3.6"
   - os: linux
     dist: trusty
     python:  "3.5-dev" # 3.5 development branch
