@@ -3,7 +3,7 @@
 
 # Pocket PiAP
 # ......................................................................
-# Copyright (c) 2017, Kendrick Walls
+# Copyright (c) 2017-2018, Kendrick Walls
 # ......................................................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
@@ -121,11 +121,7 @@ def parseargs(arguments=None):
 def taint_name(rawtxt):
 	"""check the interface arguments"""
 	tainted_input = str(rawtxt).lower()
-	for test_iface in interfaces.INTERFACE_CHOICES:
-		if str(tainted_input) in str(test_iface):
-			return str(test_iface)
-	return None
-
+	return piaplib.pku.interfaces.taint_name(tainted_input)
 
 def show_iface(iface_name=None, is_verbose=False, use_html=False):
 	"""enable the given interface by calling ifup."""
