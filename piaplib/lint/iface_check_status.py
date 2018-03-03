@@ -121,7 +121,8 @@ def parseargs(arguments=None):
 def taint_name(rawtxt):
 	"""check the interface arguments"""
 	tainted_input = str(rawtxt).lower()
-	return piaplib.pku.interfaces.taint_name(tainted_input)
+	return interfaces.taint_name(tainted_input)
+
 
 def show_iface(iface_name=None, is_verbose=False, use_html=False):
 	"""enable the given interface by calling ifup."""

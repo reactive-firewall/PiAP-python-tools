@@ -1296,6 +1296,8 @@ class BasicUsageTestSuite(unittest.TestCase):
 						theResult = True
 					elif (str("enp0s") in str(theOutputtext)):
 						raise unittest.SkipTest("function ok, but not a compatible Test network")
+					elif (str("en0") in str(theOutputtext)):
+						raise unittest.SkipTest("function ok, but not a compatible Test network")
 					else:
 						theResult = False
 						print(str(""))

@@ -24,9 +24,11 @@ matrix:
     dist: trusty
   - os: linux
     python:  "3.3"
+    env: TRAVIS_PYTHON_VERSION="3.3"
     dist: trusty
   - os: linux
     python:  "3.4"
+    env: TRAVIS_PYTHON_VERSION="3.4"
     dist: trusty
   - os: linux
     python:  "3.5"
@@ -38,12 +40,16 @@ matrix:
   - os: linux
     dist: trusty
     python:  "3.5-dev" # 3.5 development branch
+    env: TRAVIS_PYTHON_VERSION="3.5"
   - os: linux
     python:  "3.6-dev"
+    env: TRAVIS_PYTHON_VERSION="3.6"
   - os: linux
     python:  "3.7-dev"
+    env: TRAVIS_PYTHON_VERSION="3.7"
   - os: linux
     python:  "3.8-dev"
+    env: TRAVIS_PYTHON_VERSION="3.8"
   - os: linux
     python:  "pypy"  # PyPy2 2.5.0
   - os: linux
@@ -79,8 +85,10 @@ matrix:
     python:  "2.6"
   - os: linux
     python:  "3.7-dev"
+    env: TRAVIS_PYTHON_VERSION="3.7"
   - os: linux
     python:  "3.8-dev"
+    env: TRAVIS_PYTHON_VERSION="3.8"
   - os: linux
     python:  "nightly"
   - os: linux
