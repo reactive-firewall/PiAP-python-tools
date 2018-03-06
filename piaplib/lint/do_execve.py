@@ -20,7 +20,7 @@
 # ......................................................................
 
 """
-	The PiAP equivilant of the execve call.
+	The PiAP equivalent of the execve call.
 	while probably the point of failure for the security of PiAP, this function
 	does attempt to add some security to the workflow of calling other tools.
 	considerations:
@@ -249,7 +249,7 @@ def main(argv=None):
 			tainted_input = [utils.literal_str(x) for x in args.unsafe_input]
 		unsafe_main(tainted_input, chroot_path, tainted_uid, tainted_gid)
 	except Exception as mainErr:
-		print(str(u'MAIN FAILED DURRING UNSAFE COMMAND. ABORT.'))
+		print(str(u'MAIN FAILED DURING UNSAFE COMMAND. ABORT.'))
 		print(str(type(mainErr)))
 		print(str(mainErr))
 		print(str(mainErr.args))
@@ -265,13 +265,13 @@ if __name__ in u'__main__':
 		else:
 			raise Exception("MAIN FAILED WHEN FOUND TO BE CWE-20 UNSAFE. ABORT.")
 	except Exception as err:
-		print(str(u'MAIN FAILED DURRING UNSAFE COMMAND. ABORT.'))
+		print(str(u'MAIN FAILED DURING UNSAFE COMMAND. ABORT.'))
 		print(str(type(err)))
 		print(str(err))
 		print(str(err.args))
 		err = None
 		del err
-		print(str(u'MAIN FAILED DURRING UNSAFE COMMAND. ABORT.'))
+		print(str(u'MAIN FAILED DURING UNSAFE COMMAND. ABORT.'))
 		exit(255)
 	finally:
 		exit(0)

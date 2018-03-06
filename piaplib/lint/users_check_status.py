@@ -147,9 +147,10 @@ def show_user(user_name=None, is_verbose=False, use_html=False):
 			)
 			theResult = utils.literal_str(the_temp_Result)
 	except Exception as cmdErr:
-		logs.log(str(type(cmdErr)), "Error")
-		logs.log(str(cmdErr), "Error")
-		logs.log(str((cmdErr.args)), "Error")
+		if not use_html:
+			logs.log(str(type(cmdErr)), "Error")
+			logs.log(str(cmdErr), "Error")
+			logs.log(str((cmdErr.args)), "Error")
 		theResult = "UNKNOWN"
 	return theResult
 
@@ -358,11 +359,11 @@ def get_user_list():
 			logs.log(str((cmdErr.args)), "Error")
 			theResult = []
 		# while one line is probably faster here, two is more readable
-		for reserved_lines in ["UID", "message+"]:
+		for reserved_lines in ["UID", "message+", str("""USER""")]:
 			theResult = [x for x in theResult if utils.xstr(reserved_lines) not in utils.xstr(x)]
 	except Exception as parseErr:
 		logs.log(
-			str("user_check_status.get_user_list: ERROR: ACTION will not be compleated! ABORT!"),
+			str("user_check_status.get_user_list: ERROR: ACTION will not be completed! ABORT!"),
 			"Error"
 		)
 		logs.log(str(type(parseErr)), "Error")
@@ -395,22 +396,26 @@ def get_user_status(user_name=None, use_html=False):  # noqa C901
 			if (str("root SYSTEM\n") not in status_txt):
 				theWorks = utils.compactList(
 					[str(
-						str(x).split(u' ', 2)[-1]
-					) for x in status_txt.split(u'\n') if (x is not None) and (len(x) > 0)]
+						str(x).split(u' ', 1)[1:]
+					) for x in status_txt.split("""\n""") if (x is not None) and (len(x) > 0)]
 				)
 				known_work_cases = dict({
 					u'/usr/sbin/cron': u'SYSTEM AUTOMATION',
-					u'/usr/sbin/ntpd': u'TIMEKEEPING SERVICES',
-					u'/usr/sbin/rsyslogd': u'LOGGING SERVICES',
+					u'ntpd': u'TIMEKEEPING SERVICES',
+					u'syslogd': u'LOGGING SERVICES',
 					u'wlan1': u'NETWORK SERVICES',
 					u'usb0': u'NETWORK SERVICES',
 					u'eth0': u'NETWORK SERVICES',
 					u'wlan0': u'NETWORK SERVICES',
 					u'wlan2': u'NETWORK SERVICES',
+					u'lan0': u'NETWORK SERVICES',
+					u'lan1': u'NETWORK SERVICES',
+					u'avahi-daemon:': u'mDNS-SERVER SERVICES',
 					u'wpa_supplicant': u'WPA SERVICES',
 					u'/usr/sbin/hostapd': u'AP SERVICES',
 					u'/sbin/dhcpcd': u'DHCP-CLIENT SERVICES',
 					u'/usr/sbin/dnsmasq': u'DNS-DHCP-SERVER SERVICES',
+					u'/lib/systemd/systemd-resolved': u'DNS-SERVER SERVICES',
 					u'/usr/bin/freshclam': u'SYSTEM DEFENSE',
 					u'/usr/bin/denyhosts.py': u'SYSTEM DEFENSE',
 					u'/usr/bin/rkhunter': u'SYSTEM DEFENSE',
@@ -442,7 +447,7 @@ def get_user_status(user_name=None, use_html=False):  # noqa C901
 							temp_txt = html_generator.gen_html_label(u'Logging', u'info')
 						elif (u'TIMEKEEPING SERVICES' in temp_txt):
 							temp_txt = html_generator.gen_html_label(u'Clock', u'info')
-						elif (u'DNS-DHCP-SERVER' in temp_txt):
+						elif (u'DNS' in temp_txt and u'SERVICES' in temp_txt):
 							temp_txt = html_generator.gen_html_label(u'Local Domain', u'info')
 						elif (u'SYSTEM' in temp_txt):
 							temp_txt = html_generator.gen_html_label(u'System', u'info')
@@ -472,7 +477,7 @@ def get_user_status(user_name=None, use_html=False):  # noqa C901
 		del user_tty
 	except Exception as errcrit:
 		logs.log(
-			str("user_check_status.get_user_status: ERROR: ACTION will not be compleated! ABORT!"),
+			str("user_check_status.get_user_status: ERROR: ACTION will not be completed! ABORT!"),
 			"Error"
 		)
 		logs.log(str(type(errcrit)), "Error")
@@ -506,13 +511,14 @@ def get_user_ttys(user=None, use_html=False):
 				str(u'user_status_tty_{}').format(user)
 			)
 	except Exception as errcrit:
-		logs.log(
-			str("user_check_status.get_user_ttys: ERROR: ACTION will not be compleated! ABORT!"),
-			"Error"
-		)
-		logs.log(str(type(errcrit)), "Error")
-		logs.log(str(errcrit), "Error")
-		logs.log(str((errcrit.args)), "Error")
+		if not use_html:
+			logs.log(
+				str("user_check_status.get_user_ttys: ERROR: ACTION will not be completed! ABORT!"),
+				"Error"
+			)
+			logs.log(str(type(errcrit)), "Error")
+			logs.log(str(errcrit), "Error")
+			logs.log(str((errcrit.args)), "Error")
 		theResult = None
 	return theResult
 
@@ -551,13 +557,14 @@ def get_user_ip(user=None, use_html=False):
 			else:
 				theResult = "UNKNOWN"
 	except Exception as errcrit:
-		logs.log(
-			str("user_check_status.get_user_ip: ERROR: ACTION will not be compleated! ABORT!"),
-			"Error"
-		)
-		logs.log(str(type(errcrit)), "Error")
-		logs.log(str(errcrit), "Error")
-		logs.log(str((errcrit.args)), "Error")
+		if not use_html:
+			logs.log(
+				str("user_check_status.get_user_ip: ERROR: ACTION will not be completed! ABORT!"),
+				"Error"
+			)
+			logs.log(str(type(errcrit)), "Error")
+			logs.log(str(errcrit), "Error")
+			logs.log(str((errcrit.args)), "Error")
 		theResult = "UNKNOWN"
 	return theResult
 
@@ -572,14 +579,15 @@ def main(argv=None):  # noqa C901
 		if args.output_html is not None:
 				output_html = (args.output_html is True)
 		if args.show_all is True:
+			output = ""
 			if output_html:
-				print(
-					"<table class=\"table table-striped\">" +
-					"<thead><th>User</th><th>TTYs</th><th>Host</th><th>Activity</th></thead><tbody>"
-				)
+				output = str("<table class=\"table table-striped\">")
+				output += str("<thead><th>User</th><th>TTYs</th><th>Host</th>")
+				output += str("<th>Activity</th></thead><tbody>")
 			try:
 				for user_name in get_user_list():
-					print(show_user(user_name, verbose, output_html))
+					output += str(show_user(user_name, verbose, output_html))
+					output += str("""\n""")
 			except Exception as content_err:
 				if output_html:
 					# might need to add error alert here
@@ -591,6 +599,7 @@ def main(argv=None):  # noqa C901
 					logs.log(str((content_err.args)), "Error")
 					content_err = None
 					del(content_err)
+			print(output)
 			if output_html:
 				print("</tbody></table>")
 		else:

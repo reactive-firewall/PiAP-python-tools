@@ -19,11 +19,12 @@
 # limitations under the License.
 # ......................................................................
 
+
 """
 	A collection of utility functions to generate html taglets for php
 """
 
-# Imports
+
 try:
 	import os
 	import sys
@@ -62,7 +63,7 @@ HTML_LABEL_ROLES = [
 
 def has_special_html_chars(raw_str=None):
 	"""
-	Determins if the string have special html charterers.
+	Determines if the string have special html charterers.
 	param somestr -- The string to test.
 	Returns:
 	True -- if the string has special charterers.
@@ -89,6 +90,53 @@ def has_special_html_chars(raw_str=None):
 	return False
 
 
+def gen_html_tag(tag="div", content=None, id=None, name=None):
+	"""
+	Generates a table row html tr taglet.
+	param tag -- The type of taglet.
+	param content -- The content of the taglet.
+	param name -- The optional name of the taglet.
+	param id -- The optional id of the taglet.
+	Returns:
+	str -- the html string of the taglet.
+	"""
+	if tag is None or (isinstance(tag, str) is False):
+		return content
+	if id is not None and has_special_html_chars(id) is not True:
+		if name is not None and has_special_html_chars(name) is not True:
+			return str(
+				u'<{thetag} name=\"{thename}\" id=\"{theid}\">{thecontent}</{thetag}>'
+			).format(
+				thetag=utils.literal_str(tag),
+				thename=utils.literal_str(name),
+				theid=utils.literal_str(id),
+				thecontent=utils.literal_str(content)
+			)
+		else:
+			return str(
+				u'<{thetag} id=\"{theid}\">{thecontent}</{thetag}>'
+			).format(
+				thetag=utils.literal_str(tag),
+				theid=utils.literal_str(id),
+				thecontent=utils.literal_str(content)
+			)
+	elif name is not None and has_special_html_chars(name) is not True:
+		return str(
+			u'<{thetag} name=\"{thename}\">{thecontent}</{thetag}>'
+		).format(
+			thetag=utils.literal_str(tag),
+			thename=utils.literal_str(name),
+			thecontent=utils.literal_str(content)
+		)
+	else:
+		return str(
+			u'<{thetag}>{thecontent}</{thetag}>'
+		).format(
+			thetag=utils.literal_str(tag),
+			thecontent=utils.literal_str(content)
+		)
+
+
 def gen_html_tr(content=None, id=None, name=None):
 	"""
 	Generates a table row html tr taglet.
@@ -98,23 +146,7 @@ def gen_html_tr(content=None, id=None, name=None):
 	Returns:
 	str -- the html string of the tr taglet.
 	"""
-	if id is not None and has_special_html_chars(id) is not True:
-		if name is not None and has_special_html_chars(name) is not True:
-			return str(
-				u'<tr name=\"{}\" id=\"{}\">{}</tr>'
-			).format(utils.literal_str(name), utils.literal_str(id), utils.literal_str(content))
-		else:
-			return str(u'<tr id=\"{}\">{}</tr>').format(
-				utils.literal_str(id),
-				utils.literal_str(content)
-			)
-	elif name is not None and has_special_html_chars(name) is not True:
-			return str(u'<tr name=\"{}\">{}</tr>').format(
-				utils.literal_str(id),
-				utils.literal_str(str(content))
-			)
-	else:
-		return str(u'<tr>{}</tr>').format(str(content))
+	return gen_html_tag("tr", content, id, name)
 
 
 def gen_html_td(content=None, id=None, name=None):
@@ -126,19 +158,7 @@ def gen_html_td(content=None, id=None, name=None):
 	Returns:
 	str -- the html string of the td taglet.
 	"""
-	if id is not None and has_special_html_chars(id) is not True:
-		if name is not None and has_special_html_chars(name) is not True:
-			return str(u'<td name=\"{}\" id=\"{}\">{}</td>').format(
-				str(name),
-				str(id),
-				str(content)
-			)
-		else:
-			return str(u'<td id=\"{}\">{}</td>').format(id, str(content))
-	elif name is not None and has_special_html_chars(name) is not True:
-			return str(u'<td name=\"{}\">{}</td>').format(id, str(content))
-	else:
-		return str(u'<td>{}</td>').format(str(content))
+	return gen_html_tag("td", content, id, name)
 
 
 def gen_html_ul(somelist=None, id=None, name=None):
@@ -184,19 +204,7 @@ def gen_html_li(item=None, id=None, name=None):
 	Returns:
 	str -- the html string of the li taglet.
 	"""
-	if id is not None and has_special_html_chars(id) is not True:
-		if name is not None and has_special_html_chars(name) is not True:
-			return str(u'<li name=\"{}\" id=\"{}\">{}</li>').format(
-				utils.literal_str(name),
-				utils.literal_str(id),
-				utils.literal_str(item)
-			)
-		else:
-			return str(u'<li id=\"{}\">{}</li>').format(id, utils.literal_str(item))
-	elif name is not None and has_special_html_chars(name) is not True:
-			return str(u'<li name=\"{}\">{}</li>').format(id, utils.literal_str(item))
-	else:
-		return str(u'<li>{}</li>').format(utils.literal_str(item))
+	return gen_html_tag("li", item, id, name)
 
 
 def gen_html_label(content=None, role=HTML_LABEL_ROLES[0], id=None, name=None):
@@ -210,23 +218,28 @@ def gen_html_label(content=None, role=HTML_LABEL_ROLES[0], id=None, name=None):
 	str -- the html string of the td taglet.
 	"""
 	# WARN: not ready for prod - check types, errors, etc,
-	# security auditors: if you are reading this you found somthing
+	# security auditors: if you are reading this you found something
 	# I forgot to make ready for prod. patches welcome. CWE-20 BUG
 	if id is not None and has_special_html_chars(id) is not True:
 		if name is not None and has_special_html_chars(name) is not True:
 			return str(
 				u'<span class=\"label label-{}\" name=\"{}\" id=\"{}\">{}</span>'
-			).format(role, str(name), str(id), str(content))
+			).format(
+				role,
+				utils.literal_str(name),
+				utils.literal_str(id),
+				utils.literal_str(content)
+			)
 		else:
 			return str(
 				u'<span class=\"label label-{}\" id=\"{}\">{}</span>'
-			).format(role, id, str(content))
+			).format(role, has_special_html_chars(id), utils.literal_str(content))
 	elif name is not None and has_special_html_chars(name) is not True:
-			return str(
-				u'<span class=\"label label-{}\" name=\"{}\">{}</span>'
-			).format(role, id, str(content))
+		return str(
+			u'<span class=\"label label-{}\" name=\"{}\">{}</span>'
+		).format(role, utils.literal_str(name), utils.literal_str(content))
 	else:
 		return str(
 			u'<span class=\"label label-{}\">{}</span>'
-		).format(role, str(content))
+		).format(role, utils.literal_str(content))
 

@@ -50,6 +50,17 @@ except Exception as err:
 	exit(3)
 
 
+try:
+	import sys
+	import os
+	if str("book") in __file__:
+		__sys_path__ = os.path.abspath(os.path.join(os.path.dirname(__file__), '.'))
+		if __sys_path__ not in sys.path:
+			sys.path.insert(0, __sys_path__)
+except Exception:
+	raise ImportError("Pocket Book failed to import.")
+
+
 class ANSIColors:
 	"""ANSI colored text"""
 	ENDC = """\033[0m"""
@@ -182,7 +193,6 @@ def main(argv=None):
 	"""The Main Event makes no sense to logs yet."""
 	try:
 		raise NotImplementedError("CRITICAL - Pocket Book logs main() not implemented.")
-		return 3
 	except Exception as err:
 		logs.log(str(type(err)), "Critical")
 		logs.log(str(err), "Critical")

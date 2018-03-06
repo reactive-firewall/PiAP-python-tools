@@ -19,7 +19,6 @@
 # limitations under the License.
 # ......................................................................
 
-import unittest
 
 try:
 	try:
@@ -38,6 +37,9 @@ try:
 		raise ImportError(str("Test module failed completely."))
 except Exception:
 	raise ImportError("Failed to import test context")
+
+
+import unittest
 
 
 class CryptoTestSuite(unittest.TestCase):
@@ -65,15 +67,16 @@ class CryptoTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
-	def test_y_case_clearify_hasbackend(self):
-		"""Tests the helper function hasBackendCommand of keyring.clearify"""
+	def test_a_case_clarify_hasbackend(self):
+		"""Tests the helper function hasBackendCommand of keyring.clarify"""
 		theResult = True
 		try:
-			from piaplib.keyring import clearify as clearify
-			if clearify.__name__ is None:
-				raise ImportError("Failed to import clearify")
-			theTest = (clearify.hasBackendCommand() is True)
-			theTest = (theTest is True or clearify.hasBackendCommand() is False)
+			from piaplib.keyring import clarify as clarify
+			if clarify.__name__ is None:
+				raise ImportError("Failed to import clarify")
+			theTest = (clarify.hasBackendCommand() is True)
+			self.assertIsNotNone(clarify.hasBackendCommand())
+			theTest = (theTest is True or clarify.hasBackendCommand() is False)
 			self.assertTrue(theTest)
 		except Exception as err:
 			print(str(""))
@@ -86,14 +89,14 @@ class CryptoTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
-	def test_z_case_clearify_getKeyFile(self):
-		"""Tests the helper function getKeyFilePath of keyring.clearify"""
+	def test_b_case_clarify_getKeyFile(self):
+		"""Tests the helper function getKeyFilePath of keyring.clarify"""
 		theResult = True
 		try:
-			from piaplib.keyring import clearify as clearify
-			if clearify.__name__ is None:
-				raise ImportError("Failed to import clearify")
-			self.assertIsNotNone(clearify.getKeyFilePath())
+			from piaplib.keyring import clarify as clarify
+			if clarify.__name__ is None:
+				raise ImportError("Failed to import clarify")
+			self.assertIsNotNone(clarify.getKeyFilePath())
 		except Exception as err:
 			print(str(""))
 			print(str(type(err)))
@@ -105,14 +108,14 @@ class CryptoTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
-	def test_z_case_clearify_setKeyFile(self):
-		"""Tests the helper function makeKeystoreFile of keyring.clearify"""
+	def test_b_case_clarify_setKeyFile(self):
+		"""Tests the helper function makeKeystoreFile of keyring.clarify"""
 		theResult = True
 		try:
-			from piaplib.keyring import clearify as clearify
-			if clearify.__name__ is None:
-				raise ImportError("Failed to import clearify")
-			self.assertIsNotNone(clearify.makeKeystoreFile(
+			from piaplib.keyring import clarify as clarify
+			if clarify.__name__ is None:
+				raise ImportError("Failed to import clarify")
+			self.assertIsNotNone(clarify.makeKeystoreFile(
 				str("This is not a real key"),
 				str("./test.secret")
 			))
@@ -127,14 +130,14 @@ class CryptoTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
-	def test_z_case_clearify_setKeyFile_no_path(self):
-		"""Tests the helper function makeKeystoreFile(x, None) of keyring.clearify"""
+	def test_z_case_clarify_setKeyFile_no_path(self):
+		"""Tests the helper function makeKeystoreFile(x, None) of keyring.clarify"""
 		theResult = True
 		try:
-			from piaplib.keyring import clearify as clearify
-			if clearify.__name__ is None:
-				raise ImportError("Failed to import clearify")
-			self.assertIsNotNone(clearify.makeKeystoreFile(
+			from piaplib.keyring import clarify as clarify
+			if clarify.__name__ is None:
+				raise ImportError("Failed to import clarify")
+			self.assertIsNotNone(clarify.makeKeystoreFile(
 				str("This is not a real key"),
 				None
 			))
@@ -149,14 +152,14 @@ class CryptoTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
-	def test_z_z_case_clearify_setKeyFile_no_key(self):
-		"""Tests the helper function makeKeystoreFile(None, x) of keyring.clearify"""
+	def test_z_z_case_clarify_setKeyFile_no_key(self):
+		"""Tests the helper function makeKeystoreFile(None, x) of keyring.clarify"""
 		theResult = True
 		try:
-			from piaplib.keyring import clearify as clearify
-			if clearify.__name__ is None:
-				raise ImportError("Failed to import clearify")
-			self.assertIsNotNone(clearify.makeKeystoreFile(
+			from piaplib.keyring import clarify as clarify
+			if clarify.__name__ is None:
+				raise ImportError("Failed to import clarify")
+			self.assertIsNotNone(clarify.makeKeystoreFile(
 				None,
 				str("./test.secret")
 			))
@@ -171,14 +174,14 @@ class CryptoTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
-	def test_z_case_clearify_setKeyFile_none(self):
-		"""Tests the helper function makeKeystoreFile(None) of keyring.clearify"""
+	def test_z_case_clarify_setKeyFile_none(self):
+		"""Tests the helper function makeKeystoreFile(None) of keyring.clarify"""
 		theResult = True
 		try:
-			from piaplib.keyring import clearify as clearify
-			if clearify.__name__ is None:
-				raise ImportError("Failed to import clearify")
-			self.assertIsNotNone(clearify.makeKeystoreFile(None))
+			from piaplib.keyring import clarify as clarify
+			if clarify.__name__ is None:
+				raise ImportError("Failed to import clarify")
+			self.assertIsNotNone(clarify.makeKeystoreFile(None))
 		except Exception as err:
 			print(str(""))
 			print(str(type(err)))
@@ -190,14 +193,14 @@ class CryptoTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
-	def test_z_case_clearify_main_bad(self):
-		"""Tests the helper function main(bad stuff) of keyring.clearify"""
+	def test_z_case_clarify_main_bad(self):
+		"""Tests the helper function main(bad stuff) of keyring.clarify"""
 		theResult = True
 		try:
-			from piaplib.keyring import clearify as clearify
-			if clearify.__name__ is None:
-				raise ImportError("Failed to import clearify")
-			self.assertIsNotNone(clearify.main([
+			from piaplib.keyring import clarify as clarify
+			if clarify.__name__ is None:
+				raise ImportError("Failed to import clarify")
+			self.assertIsNotNone(clarify.main([
 				str("--pack"),
 				str("-msg=None")
 			]), 2)
@@ -212,14 +215,14 @@ class CryptoTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
-	def test_z_case_clearify_main_lazy(self):
-		"""Tests the helper function main(lazy stuff) of keyring.clearify"""
+	def test_d_case_clarify_main_lazy(self):
+		"""Tests the helper function main(lazy stuff) of keyring.clarify"""
 		theResult = True
 		try:
-			from piaplib.keyring import clearify as clearify
-			if clearify.__name__ is None:
-				raise ImportError("Failed to import clearify")
-			self.assertIsNotNone(clearify.main([
+			from piaplib.keyring import clarify as clarify
+			if clarify.__name__ is None:
+				raise ImportError("Failed to import clarify")
+			self.assertIsNotNone(clarify.main([
 				str("--pack"),
 				str("--msg=testing")
 			]))
@@ -233,14 +236,14 @@ class CryptoTestSuite(unittest.TestCase):
 			del err
 		assert theResult
 
-	def test_case_clearify_main_a(self):
-		"""Tests the helper function main pack of keyring.clearify"""
+	def test_case_clarify_main_a(self):
+		"""Tests the helper function main pack of keyring.clarify"""
 		theResult = True
 		try:
-			from piaplib.keyring import clearify as clearify
-			if clearify.__name__ is None:
-				raise ImportError("Failed to import clearify")
-			test_out = clearify.main([
+			from piaplib.keyring import clarify as clarify
+			if clarify.__name__ is None:
+				raise ImportError("Failed to import clarify")
+			test_out = clarify.main([
 				str("--pack"),
 				str("--msg=\"This is a test Message\""),
 				str("-K=testkeyneedstobelong")
@@ -269,8 +272,8 @@ class CryptoTestSuite(unittest.TestCase):
 				raise unittest.SkipTest("BETA. Experemental feature not ready yet.")
 		assert theResult
 
-	def test_case_clearify_main_b(self):
-		"""Tests the helper function main unpack of keyring.clearify"""
+	def test_case_clarify_main_b(self):
+		"""Tests the helper function main unpack of keyring.clarify"""
 		theResult = True
 		try:
 			temp_msg = None
@@ -289,10 +292,10 @@ class CryptoTestSuite(unittest.TestCase):
 					str("--msg=\"{}\"").format(temp_msg),
 					str("-K=testkeyneedstobelong")
 				]
-			from piaplib.keyring import clearify as clearify
-			if clearify.__name__ is None:
-				raise ImportError("Failed to import clearify")
-			test_out = clearify.main(args)
+			from piaplib.keyring import clarify as clarify
+			if clarify.__name__ is None:
+				raise ImportError("Failed to import clarify")
+			test_out = clarify.main(args)
 			try:
 				if isinstance(test_out, bytes):
 					test_out = test_out.decode('utf8')
@@ -321,32 +324,33 @@ class CryptoTestSuite(unittest.TestCase):
 				raise unittest.SkipTest("BETA. Experemental feature not ready yet.")
 		assert theResult
 
-	def test_case_clearify_read_write(self):  # noqa C901
-		"""Tests the helper function pack to file of keyring.clearify and then unpack"""
+
+	def test_case_clarify_read_write(self):  # noqa C901
+		"""Tests the helper function pack to file of keyring.clarify and then unpack"""
 		theResult = False
 		try:
-			from piaplib.keyring import clearify as clearify
-			if clearify.__name__ is None:
-				raise ImportError("Failed to import clearify")
-			elif (clearify.hasBackendCommand() is not True):
+			from piaplib.keyring import clarify as clarify
+			if clarify.__name__ is None:
+				raise ImportError("Failed to import clarify")
+			elif (clarify.hasBackendCommand() is not True):
 				raise unittest.SkipTest("Requires backend tool")
 			from piaplib.keyring import rand as rand
 			if rand.__name__ is None:
 				raise ImportError("Failed to import rand")
 			sometestfile = str("./the_test_file.enc")
-			theteststore = clearify.makeKeystoreFile(
+			theteststore = clarify.makeKeystoreFile(
 				str("testkeyneedstobelong"),
 				str("./.weak_test_key_{}").format(rand.randInt(1, 10, 99))
 			)
 			self.assertIsNotNone(theteststore)
-			test_write = clearify.packToFile(
+			test_write = clarify.packToFile(
 				sometestfile,
 				str("This is a test Message"),
 				theteststore
 			)
 			self.assertTrue(test_write)
 			if (test_write is True):
-				test_read = clearify.unpackFromFile(sometestfile, theteststore)
+				test_read = clarify.unpackFromFile(sometestfile, theteststore)
 				try:
 					if isinstance(test_read, bytes):
 						test_read = test_read.decode('utf8')

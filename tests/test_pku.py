@@ -55,7 +55,7 @@ class PKUTestSuite(unittest.TestCase):
 			from .context import piaplib
 			if piaplib.__name__ is None:
 				theResult = False
-			from pku import pku
+			from piaplib import pku
 			if pku.__name__ is None:
 				theResult = False
 			theResult = True
@@ -69,11 +69,9 @@ class PKUTestSuite(unittest.TestCase):
 		"""Tests the imposible state for pku given bad tools"""
 		theResult = True
 		try:
-			from piaplib import pku as pku
-			if pku.__name__ is None:
-				raise ImportError("Failed to import pku")
-			self.assertIsNotNone(pku.pku.usePKUTool("NoSuchTool"))
-			self.assertIsNotNone(pku.pku.usePKUTool(None))
+			import piaplib.pku.__main__
+			self.assertIsNotNone(piaplib.pku.__main__.usePKUTool("NoSuchTool"))
+			self.assertIsNotNone(piaplib.pku.__main__.usePKUTool(None))
 		except Exception as err:
 			print(str(""))
 			print(str(type(err)))

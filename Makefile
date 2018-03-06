@@ -2,7 +2,7 @@
 
 # License
 #
-# Copyright (c) 2017 Mr. Walls
+# Copyright (c) 2017-2018 Mr. Walls
 #
 # # Pocket PiAP
 # ......................................................................
@@ -41,6 +41,7 @@
 # copies or substantial portions of the Software.
 #
 
+SHELL=/bin/bash
 
 ifeq "$(ECHO)" ""
 	ECHO=echo
@@ -116,16 +117,18 @@ test-mats: cleanup
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-tox: cleanup
-	$(QUIET)tox -v --
+	$(QUIET)tox -v -- || tail -n 500 .tox/py*/log/py*.log 2>/dev/null
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-style: cleanup
 	$(QUIET)flake8 --ignore=W191,W391 --max-line-length=100 --verbose --count --config=.flake8.ini
+	$(QUIET)tests/check_spelling 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
 
 cleanup:
 	$(QUIET)rm -f tests/*.pyc 2>/dev/null || true
 	$(QUIET)rm -f tests/*~ 2>/dev/null || true
+	$(QUIET)rm -Rf docs/_build 2>/dev/null || true
 	$(QUIET)rm -Rf tests/__pycache__ 2>/dev/null || true
 	$(QUIET)rm -f piaplib/*.pyc 2>/dev/null || true
 	$(QUIET)rm -Rf piaplib/__pycache__ 2>/dev/null || true

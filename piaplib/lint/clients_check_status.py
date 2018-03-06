@@ -19,7 +19,7 @@
 # limitations under the License.
 # ......................................................................
 
-# Imports
+
 try:
 	import os
 	import sys
@@ -46,14 +46,9 @@ try:
 		from .. import interfaces as interfaces
 	except Exception:
 		import pku.interfaces as interfaces
-	if utils.__name__ is None:
-		raise ImportError("Failed to open PKU Utils")
-	if remediation.__name__ is None:
-		raise ImportError("Failed to open PKU Remediation")
-	if interfaces.__name__ is None:
-		raise ImportError("Failed to open PKU Interfaces")
-	if html_generator.__name__ is None:
-		raise ImportError("Failed to open HTML5 Pocket Lint")
+	for depends in [interfaces, html_generator, remediation, utils]:
+		if depends.__name__ is None:
+			raise ImportError("Failed to import depends.")
 except Exception as importErr:
 	print(str(importErr))
 	print(str(importErr.args))
@@ -338,7 +333,7 @@ def get_client_lease_status(client_mac=None):
 
 @utils.memoize
 def get_client_list(lan_interface=None):
-	"""list the availabel clients."""
+	"""list the available clients."""
 	theResult = None
 	try:
 		theRawClientState = get_client_arp_status_raw(None, lan_interface)
@@ -505,7 +500,7 @@ def main(argv=None):
 			print(show_client(ip, verbose, output_html, client_interface))
 		return 0
 	except Exception as main_err:
-		print(str("client_check_status: REALLY BAD ERROR: ACTION will not be compleated! ABORT!"))
+		print(str("client_check_status: REALLY BAD ERROR: ACTION will not be completed! ABORT!"))
 		print(str(main_err))
 		print(str(main_err.args))
 	return 1
@@ -517,7 +512,7 @@ if __name__ == u'__main__':
 		exitcode = main(sys.argv[1:])
 		exit(exitcode)
 	except Exception as main_err:
-		print(str("client_check_status: REALLY BAD ERROR: ACTION will not be compleated! ABORT!"))
+		print(str("client_check_status: REALLY BAD ERROR: ACTION will not be completed! ABORT!"))
 		print(str(main_err))
 		print(str(main_err.args))
 	exit(1)

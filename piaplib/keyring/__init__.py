@@ -18,11 +18,17 @@
 # limitations under the License.
 # ......................................................................
 
+
 try:
 	import sys
 	import os
-	if 'keyring' in __file__:
-		sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+	try:
+		if str("keyring") in __file__:
+			__sys_path__ = os.path.abspath(os.path.dirname(__file__))
+			if __sys_path__ not in sys.path:
+				sys.path.insert(0, __sys_path__)
+	except Exception:
+		raise ImportError("PiAPlib keyring failed to import.")
 except Exception as ImportErr:
 	print(str(type(ImportErr)))
 	print(str(ImportErr))
@@ -31,12 +37,14 @@ except Exception as ImportErr:
 	del ImportErr
 	raise ImportError(u'Keyring Failed to Import')
 
-try:
-	from . import keyring as keyring
-except Exception as importErr:
-	del importErr
-	import keyring as keyring
 
-if keyring.__name__ is None:
-	raise ImportError(u'Keyring Failed to Import')
+def main(argv=None):
+	"""The main event"""
+	import piaplib.keyring.__main__
+	return piaplib.keyring.__main__.main(argv)
+
+
+if __name__ in u'__main__':
+	main(sys.argv[1:])
+
 

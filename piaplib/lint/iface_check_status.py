@@ -3,7 +3,7 @@
 
 # Pocket PiAP
 # ......................................................................
-# Copyright (c) 2017, Kendrick Walls
+# Copyright (c) 2017-2018, Kendrick Walls
 # ......................................................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
@@ -40,30 +40,19 @@ try:
 			raise ImportError("Error Importing logs")
 	try:
 		from .. import utils as utils
-	except Exception:
-		import pku.utils as utils
-	try:
 		from .. import remediation as remediation
-	except Exception:
-		import pku.remediation as remediation
-	try:
-		from . import html_generator as html_generator
-	except Exception as ImpErr:
-		ImpErr = None
-		del ImpErr
-		import html_generator as html_generator
-	try:
 		from .. import interfaces as interfaces
 	except Exception:
+		import pku.utils as utils
+		import pku.remediation as remediation
 		import pku.interfaces as interfaces
-	if utils.__name__ is None:
-		raise ImportError("Failed to open PKU Utils")
-	if remediation.__name__ is None:
-		raise ImportError("Failed to open PKU Remediation")
-	if interfaces.__name__ is None:
-		raise ImportError("Failed to open PKU Interfaces")
-	if html_generator.__name__ is None:
-		raise ImportError("Failed to open HTML5 Pocket Lint")
+	try:
+		from . import html_generator as html_generator
+	except Exception:
+		import html_generator as html_generator
+	for depend in [utils, remediation, interfaces, html_generator]:
+		if depend.__name__ is None:
+			raise ImportError("Failed to import piaplib components.")
 except Exception as importErr:
 	print(str(importErr))
 	print(str(importErr.args))
@@ -132,10 +121,7 @@ def parseargs(arguments=None):
 def taint_name(rawtxt):
 	"""check the interface arguments"""
 	tainted_input = str(rawtxt).lower()
-	for test_iface in interfaces.INTERFACE_CHOICES:
-		if str(tainted_input) in str(test_iface):
-			return str(test_iface)
-	return None
+	return interfaces.taint_name(tainted_input)
 
 
 def show_iface(iface_name=None, is_verbose=False, use_html=False):
@@ -342,7 +328,7 @@ def main(argv=None):
 		return 0
 	except Exception as main_err:
 		logs.log(
-			str("iface_check_status: REALLY BAD ERROR: ACTION will not be compleated! ABORT!"),
+			str("iface_check_status: REALLY BAD ERROR: ACTION will not be completed! ABORT!"),
 			"Error"
 		)
 		logs.log(str(main_err), "Error")
@@ -359,7 +345,7 @@ if __name__ == u'__main__':
 		exit(exitcode)
 	except Exception as main_err:
 		logs.log(
-			str("iface_check_status: REALLY BAD ERROR: ACTION will not be compleated! ABORT!"),
+			str("iface_check_status: REALLY BAD ERROR: ACTION will not be completed! ABORT!"),
 			"Error"
 		)
 		logs.log(str(main_err), "Error")

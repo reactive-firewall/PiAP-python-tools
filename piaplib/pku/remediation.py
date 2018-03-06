@@ -42,6 +42,14 @@ except Exception as err:
 	raise ImportError(err)
 	exit(3)
 
+try:
+	import functools
+	if functools.__name__ is None:
+		raise NotImplementedError("OMG! We could not import the functools. We're blind to Errors!")
+except Exception as err:
+	raise ImportError(err)
+	exit(3)
+
 
 try:
 	from piaplib.book.logs import logs as logs
@@ -85,7 +93,6 @@ def getTimeStamp():
 
 def error_passing(func):
 	"""Runs a function in try-except-raise"""
-	import functools
 
 	@functools.wraps(func)
 	def helper_func(*args, **kwargs):
@@ -95,9 +102,9 @@ def error_passing(func):
 			theOutput = func(*args, **kwargs)
 		except Exception as err:
 			timestamp = getTimeStamp()
-			logs.log(str("An error occured at {}").format(timestamp), "Error")
+			logs.log(str("An error occurred at {}").format(timestamp), "Error")
 			logs.log(str(func), "Debug")
-			baton = PiAPError(err, str("An error occured in {}.").format(str(func)))
+			baton = PiAPError(err, str("An error occurred in {}.").format(str(func)))
 			# sys.exc_clear()
 			err = None
 			del err
@@ -111,13 +118,13 @@ def error_passing(func):
 def error_breakpoint(error, context=None):
 	"""Just logs the error and returns None"""
 	timestamp = getTimeStamp()
-	logs.log(str("An error occured at {}").format(timestamp), "Error")
+	logs.log(str("An error occurred at {}").format(timestamp), "Error")
 	logs.log(str(context), "Debug")
-	logs.log(str(type(error)), "Error")
+	logs.log(str(type(error)), "Debug")
 	logs.log(str(error), "Error")
 	if isinstance(error, PiAPError):
 		logs.log(str(error.cause), "Error")
-		logs.log(str(type(error.cause)), "Error")
+		logs.log(str(type(error.cause)), "Debug")
 		logs.log(str((error.args)), "Error")
 	else:
 		logs.log(str((error.args)), "Error")
@@ -126,7 +133,6 @@ def error_breakpoint(error, context=None):
 
 def error_handling(func):
 	"""Runs a function in try-except"""
-	import functools
 
 	@functools.wraps(func)
 	def safety_func(*args, **kwargs):
@@ -146,7 +152,6 @@ def error_handling(func):
 
 def bug_handling(func):
 	"""Runs a function in try-except"""
-	import functools
 
 	@functools.wraps(func)
 	def main_func(*args, **kwargs):
@@ -156,13 +161,13 @@ def bug_handling(func):
 			theOutput = func(*args, **kwargs)
 		except Exception as err:
 			timestamp = getTimeStamp()
-			logs.log(str("An error occured at {}").format(timestamp), "CRITICAL")
+			logs.log(str("An error occurred at {}").format(timestamp), "CRITICAL")
 			logs.log(str(func), "Debug")
-			logs.log(str(type(err)), "CRITICAL")
+			logs.log(str(type(err)), "Debug")
 			logs.log(str(err), "CRITICAL")
 			logs.log(str((err.args)), "CRITICAL")
 			logs.log(str(""), "CRITICAL")
-			logs.log(str("Action will not be compleated! ABORT!"), "CRITICAL")
+			logs.log(str("Action will not be completed! ABORT!"), "CRITICAL")
 			logs.log(str("You found a bug. Please report this to my creator."), "CRITICAL")
 			logs.log(str(""), "CRITICAL")
 			# sys.exc_clear()
@@ -180,7 +185,6 @@ def warning_handling(func):
 		Exceptions will be logged only as warnings.
 		func - a function to call.
 	"""
-	import functools
 
 	@functools.wraps(func)
 	def warned_func(*args, **kwargs):
@@ -190,7 +194,7 @@ def warning_handling(func):
 			theOutput = func(*args, **kwargs)
 		except Exception as err:
 			timestamp = getTimeStamp()
-			logs.log(str("An error occured at {}").format(timestamp), "Warning")
+			logs.log(str("An error occurred at {}").format(timestamp), "Warning")
 			logs.log(str(func), "Debug")
 			logs.log(str(type(err)), "Warning")
 			logs.log(str(err), "Warning")
@@ -208,7 +212,7 @@ def warning_handling(func):
 @bug_handling
 def main(argv=None):
 	"""The Main Event makes no sense to remediation."""
-	raise NotImplementedError("CRITICAL - PKU remediation main() not implemented. yet?")
+	raise NotImplementedError("Warning - PKU remediation main() not implemented. yet?")
 
 
 if __name__ in u'__main__':

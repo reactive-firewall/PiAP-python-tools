@@ -21,7 +21,7 @@
 
 
 # SEE NOTE ON Backend HOOKS BELOW
-# Currently backends are NOT part of PiAP in anyway and may be subject to thier own licences.
+# Currently backends are NOT part of PiAP in anyway and may be subject to their own licences.
 
 
 try:
@@ -50,9 +50,9 @@ except Exception:
 
 
 try:
-	from ..pku import remediation as remediation
+	from piaplib.pku import remediation as remediation
 except Exception:
-	import pku.remediation as remediation
+	import piaplib.pku.remediation as remediation
 
 try:
 	from remediation import PiAPError as PiAPError
@@ -63,13 +63,13 @@ except Exception:
 		raise ImportError("Error Importing PiAPError")
 
 try:
-	from ..pku import utils as utils
+	from piaplib.pku import utils as utils
 except Exception:
-	import pku.utils as utils
+	import piaplib.pku.utils as utils
 
 
-__prog__ = """piaplib.keyring.clearify"""
-"""The name of this PiAPLib tool is clearify"""
+__prog__ = """piaplib.keyring.clarify"""
+"""The name of this PiAPLib tool is clarify"""
 
 
 DEFAULT_BETA_FILE_PATH = str("""/var/opt/PiAP/.beta_W1AsYRUDzyZx""")
@@ -207,7 +207,7 @@ def packForRest(message=None, keyStore=None):
 		)
 		(ciphertext, stderrdata) = p1.communicate(utils.literal_str(message))
 		if isinstance(ciphertext, bytes):
-			ciphertext = ciphertext.decode('utf8')
+			ciphertext = ciphertext.decode(u'utf-8')
 		# ciphertext = str(ciphertext).replace(str("\\n"), str(""))
 		return ciphertext
 	else:
@@ -244,7 +244,7 @@ def unpackFromRest(ciphertext=None, keyStore=None):
 		)
 		(cleartext, stderrdata) = p2.communicate(str("{}{}").format(ciphertext, EOFNEWLINE))
 		if isinstance(cleartext, bytes):
-			cleartext = cleartext.decode('utf8')
+			cleartext = cleartext.decode(u'utf-8')
 		# cleartext = str(cleartext).replace(str("\\n"), str(""))
 		return str(cleartext)
 	else:
@@ -281,8 +281,10 @@ def packToFile(somefile, data, keyStore=None):
 		someFilePath = utils.literal_code(utils.addExtension(str(somefile), str("enc")))
 		if someFilePath is not None:
 			encData = packForRest(data, keyStore)
-			with utils.open_func(file=someFilePath, mode=u'wb+') as enc_data_file:
-				utils.write_func(enc_data_file, utils.literal_str(encData).encode("utf-8"))
+			utils.writeFile(
+				os.path.abspath(someFilePath),
+				str(encData)
+			)
 			del(encData)
 		did_write = True
 	except Exception as clearerr:
@@ -356,11 +358,11 @@ def parseArgs(arguments=None):
 				dest='clear_action',
 				const=theaction,
 				action='store_const',
-				help='The clearify service option.'
+				help='The clarify service option.'
 			)
 		theArgs = parser.parse_args(arguments)
 	except Exception as err:
-		print(str("FAILED DURRING CLEARIFY.. ABORT."))
+		print(str("FAILED DURING clarify.. ABORT."))
 		print(str(type(err)))
 		print(str(err))
 		print(str(err.args))
@@ -391,7 +393,7 @@ def main(argv=None):
 		else:
 			return output
 	except Exception as err:
-		print(str("FAILED DURRING CLEARIFY. ABORT."))
+		print(str("FAILED DURING clarify. ABORT."))
 		print(str(type(err)))
 		print(str(err))
 		print(str(err.args))
@@ -408,7 +410,7 @@ if __name__ in u'__main__':
 		import sys
 		exitcode = main(sys.argv[1:])
 	except Exception as err:
-		print(str("MAIN FAILED DURRING CLEARIFY. ABORT."))
+		print(str("MAIN FAILED DURING clarify. ABORT."))
 		print(str(type(err)))
 		print(str(err))
 		print(str(err.args))

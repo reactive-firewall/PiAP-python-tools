@@ -1,22 +1,22 @@
 Standards checklist:
 	Code Style:
-	 - PEP8 for python files
+	 - [x] PEP8 for python files
 	saltify.py:
-	 - RFC 2104 HMAC class.
-	 - Also complies with RFC 4231.
-	 - see HMAC API in PEP 247.
-	setup.cfg 
-	 - PEP 345 -- Metadata for Python Software Packages 1.2
+	 - [x] RFC 2104 HMAC class.
+	 - [x] Also complies with RFC 4231.
+	 - [x] see HMAC API in PEP 247.
+	setup.cfg
+	 - [x] PEP 345 -- Metadata for Python Software Packages 1.2
 
 	Other Misc (just for navigation):
-	PEP324 - subproccess
-	codesigning
-	RFC 4880 - pgpy (bsd compatable licenced python pgp)
+	- [x] PEP324 - subproccess
+	- [x] PEP20 - zen of python
+	- [] RFC 3530 - NFSv4
+	Codesigning:
+	- [] RFC 4880 - pgpy (bsd compatible licenced python pgp)
 	
-	RFC3530 - NFSv4
-	
-	
-	encryption:
+	Encryption usage:
+	ECC - by default
 	aes-256-ctr
 	- ??
 	aes-256-cbc
