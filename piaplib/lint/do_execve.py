@@ -43,12 +43,12 @@ try:
 	except Exception:
 		from .. import piaplib as piaplib
 	try:
-        	from ..pku import remediation as remediation
+		from ..pku import remediation as remediation
 	except Exception:
-        	try:
-               		import pku.remediation as remediation
-        	except Exception:
-                	raise ImportError("Error Importing remediation")
+		try:
+			import pku.remediation as remediation
+		except Exception:
+			raise ImportError("Error Importing remediation")
 	try:
 		from .. import utils as utils
 	except Exception:
