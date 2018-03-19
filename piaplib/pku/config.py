@@ -315,7 +315,10 @@ def readIniFile(filename, theparser=None):
 			else:
 				theparser.read_file(configfile, str(filename))
 		except Exception:
-			theparser.readfp(configfile, str(filename))
+			import warnings
+			with warnings.catch_warnings():
+				warnings.filterwarnings("ignore", category=DeprecationWarning)
+				theparser.readfp(configfile, str(filename))
 	return theparser
 
 
