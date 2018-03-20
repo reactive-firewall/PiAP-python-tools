@@ -6,22 +6,22 @@
 # argparse - builtin - PSF licence
 argparse>=1.4.0
 # argparse - builtin - PSF licence
-setuptools>=36.5.0
+setuptools>=38.5.2
 # virtualenv - MIT
-virtualenv>=15.0.1
+virtualenv>=15.1.0
 # six - MIT
 six>=1.0.0
 # pgpy - BSD 3-Clause licensed
 #pgpy>=0.4.1
-tox>=2.9.0
+tox>=3.0.0
 #py>=1.4.33
-pip>=9.0
-requests>=2.14.2
+pip>=9.0.1
+requests>=2.18.4
 # cryptography - Apache 2
 #cryptography>=1.2.3
 # pycrypto - MIT
 #pycrypto>=2.6.1
-urllib3>=1.13.1
+urllib3>=1.22.0
 # ruamel.yaml - MIT
 #ruamel.yaml>=0.14.12
 # pyyaml - MIT
