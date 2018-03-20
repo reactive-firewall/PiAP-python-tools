@@ -211,37 +211,42 @@ def get_iface_status(iface=u'lo', use_html=False):
 	theResult = None
 	status_txt = get_iface_status_raw(iface)
 	if use_html is False:
+		theResult = str("UNKNOWN")
 		if status_txt is not None:
 			if (str(" DOWN") in str(status_txt)):
 				theResult = str("DOWN")
 			elif (str(" UP") in str(status_txt)):
 				theResult = str("UP")
-			else:
-				theResult = str("UNKNOWN")
-		else:
-			theResult = str("UNKNOWN")
 	else:
-		if status_txt is not None:
-			if (str(" DOWN") in str(status_txt)):
-				theResult = html_generator.gen_html_td(
-					html_generator.gen_html_label(str("DOWN"), u'danger'),
-					str(u'iface_status_value_{}').format(iface)
-				)
-			elif (str(" UP") in str(status_txt)):
-				theResult = html_generator.gen_html_td(
-					html_generator.gen_html_label(str("UP"), u'success'),
-					str(u'iface_status_value_{}').format(iface)
-				)
-			else:
-				theResult = html_generator.gen_html_td(
-					html_generator.gen_html_label(str("UNKNOWN"), u'default'),
-					str(u'iface_status_value_{}').format(iface)
-				)
-		else:
-			theResult = html_generator.gen_html_td(
-				html_generator.gen_html_label(str("UNKNOWN"), u'default'),
-				str(u'iface_status_value_{}').format(iface)
-			)
+		theResult = generate_iface_status_html(iface, status_txt)
+	return theResult
+
+
+def generate_iface_status_html(iface=u'lo', status_txt="UNKNOWN"):
+	"""Generates the html for interface of given status. Status is UNKNOWN by default."""
+	status = "UNKNOWN"
+	valid_status = html_generator.HTML_LABEL_ROLES[0]
+	if status_txt is not None:
+		if (str(" DOWN") in str(status_txt)):
+			status = "DOWN"
+			valid_status = html_generator.HTML_LABEL_STATUS[u'CRITICAL']
+		elif (str(" UP") in str(status_txt)):
+			status = "UP"
+			valid_status = html_generator.HTML_LABEL_STATUS[u'OK']
+	return generate_iface_status_html_raw(iface, status, valid_status)
+
+
+def generate_iface_status_html_raw(iface=u'lo', status="UNKNOWN", lable=None):
+	"""Generates the raw html for interface of given status with the given lable"""
+	if lable in html_generator.HTML_LABEL_ROLES:
+		theResult = html_generator.gen_html_td(
+			html_generator.gen_html_label(str(status), lable),
+			str(u'iface_status_value_{}').format(iface)
+		)
+	else:
+		theResult = generate_iface_status_html_raw(
+			iface, "UNKNOWN", html_generator.HTML_LABEL_ROLES[0]
+		)
 	return theResult
 
 
