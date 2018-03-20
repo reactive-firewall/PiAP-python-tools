@@ -84,10 +84,7 @@ def rand(count=None):
 @remediation.error_handling
 def randStr(count=None):
 	"""wrapper for str(os.urandom())"""
-	if count is None or (isinstance(count, int) is False) or count <= 1:
-		x_count = randInt(1, 1, 512)
-	else:
-		x_count = count
+	x_count = sanitizeCount(count)
 	try:
 		import string
 		choices = [randInt(1, 1, 99) for x in range(x_count)]
@@ -105,10 +102,7 @@ def randStr(count=None):
 @remediation.error_handling
 def randPW(count=None):
 	"""wrapper for str(os.urandom())"""
-	if count is None or (isinstance(count, int) is False) or count <= 1:
-		x_count = randInt(1, 1, 512)
-	else:
-		x_count = count
+	x_count = sanitizeCount(count)
 	try:
 		import string
 		choices = [randInt(1, 1, 95) for x in range(x_count)]
@@ -310,6 +304,15 @@ def ensurePositiveCount(count=None):
 	else:
 		p_count = int(count)
 	return p_count
+
+
+@remediation.error_passing
+def sanitizeCount(count):
+	if count is None or (isinstance(count, int) is False) or count <= 1:
+		x_count = randInt(1, 1, 512)
+	else:
+		x_count = count
+	return x_count
 
 
 RANDOM_TASKS = {
