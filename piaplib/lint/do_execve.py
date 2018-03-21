@@ -3,7 +3,7 @@
 
 # Pocket PiAP
 # ......................................................................
-# Copyright (c) 2017, Kendrick Walls
+# Copyright (c) 2017-2018, Kendrick Walls
 # ......................................................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@
 	does attempt to add some security to the workflow of calling other tools.
 	considerations:
 	CWE-20
+	CWE-242
 	POSIX.1-2008 Sec. 11.2.3
 	With great power comes great responsibility. This is the only command that
 	should be called to run sudo. Oh and fear the CWE-20.
@@ -41,6 +42,13 @@ try:
 		import piaplib as piaplib
 	except Exception:
 		from .. import piaplib as piaplib
+	try:
+		from ..pku import remediation as remediation
+	except Exception:
+		try:
+			import pku.remediation as remediation
+		except Exception:
+			raise ImportError("Error Importing remediation")
 	try:
 		from .. import utils as utils
 	except Exception:
@@ -59,24 +67,27 @@ __prog__ = str("""do_execve.py""")
 """This tool is called do_execve.py."""
 
 
+@remediation.error_handling
 def taint_int(raw_input):
 	"""Ensure the input makes some sense. Always expect CWE-20."""
+	finalResult = False
 	try:
 		if raw_input is None:
-			return False
+			finalResult = False
 		elif isinstance(utils.literal_str(raw_input), str) and int(raw_input, 10) > 2:
-			return True
+			finalResult = True
 		elif isinstance(raw_input, int) and int(raw_input) > 2:
-			return True
+			finalResult = True
 		else:
-			return False
+			finalResult = False
 	except ValueError as junk:
 		junk = None
 		del junk
-		return False
-	return False
+		finalResult = False
+	return finalResult
 
 
+@remediation.error_handling
 def parseargs(tainted_arguments=None):
 	"""Parse the given arguments."""
 	try:
@@ -122,6 +133,11 @@ def parseargs(tainted_arguments=None):
 			help='The command arguments.'
 		)
 		parser.add_argument(
+			'-o', '--out',
+			dest='unsafe_output', default=False, action='store_true',
+			help='Return the command output.'
+		)
+		parser.add_argument(
 			'-V', '--version',
 			action='version', version=str(
 				"%(prog)s {}"
@@ -141,6 +157,7 @@ def parseargs(tainted_arguments=None):
 	return theResult
 
 
+@remediation.error_handling
 def runUnsafeCommand(arguments, error_fd=None):
 	"""Run the actual Unsafe command. Mighty creator help us."""
 	theRawOutput = None
@@ -155,7 +172,7 @@ def runUnsafeCommand(arguments, error_fd=None):
 		]
 		if arguments is None or isinstance(arguments, list) is not True:
 			arguments = [u'exit', u'0']
-		elif not os.access(arguments[0], os.X_OK) or not utils.isWhiteListed(arguments[0], WHTLIST):
+		elif (not os.access(arguments[0], os.X_OK)) and (not utils.isWhiteListed(arguments[0], WHTLIST)):
 			arguments = [u'exit', u'1']
 		try:
 			err_fd = subprocess.STDOUT
@@ -191,7 +208,8 @@ def runUnsafeCommand(arguments, error_fd=None):
 	return theRawOutput
 
 
-def unsafe_main(unsafe_input=None, chrootpath=None, uid=None, gid=None):
+@remediation.error_handling
+def unsafe_main(unsafe_input=None, chrootpath=None, uid=None, gid=None, passOutput=False):
 	"""
 	The main unsafe work.
 	Fork and drop privileges try to chroot. Then run unsafe input.
@@ -218,8 +236,9 @@ def unsafe_main(unsafe_input=None, chrootpath=None, uid=None, gid=None):
 				badChrootErr = None
 				del badChrootErr
 				os.chdir(chrootpath)
-			runUnsafeCommand(unsafe_input)
-			sys.exit(0)
+			tainted_output = runUnsafeCommand(unsafe_input)
+			if (passOutput is not None and passOutput is True):
+				return tainted_output
 	except Exception as unsafeErr:
 		print(str(type(unsafeErr)))
 		print(str(unsafeErr))
@@ -227,9 +246,10 @@ def unsafe_main(unsafe_input=None, chrootpath=None, uid=None, gid=None):
 		unsafeErr = None
 		del unsafeErr
 		os.abort()
-	return False
+	return None
 
 
+@remediation.error_handling
 def main(argv=None):
 	"""The main event."""
 	try:
@@ -247,7 +267,10 @@ def main(argv=None):
 			chroot_path = args.chroot_path
 		if args.unsafe_input is not None:
 			tainted_input = [utils.literal_str(x) for x in args.unsafe_input]
-		unsafe_main(tainted_input, chroot_path, tainted_uid, tainted_gid)
+		if args.unsafe_output is not False:
+			print(unsafe_main(tainted_input, chroot_path, tainted_uid, tainted_gid, True))
+		else:
+			unsafe_main(tainted_input, chroot_path, tainted_uid, tainted_gid, False)
 	except Exception as mainErr:
 		print(str(u'MAIN FAILED DURING UNSAFE COMMAND. ABORT.'))
 		print(str(type(mainErr)))

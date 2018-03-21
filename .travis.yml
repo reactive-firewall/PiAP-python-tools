@@ -1,6 +1,10 @@
 language: python
 sudo: false
 
+python:
+
+dist:
+
 branches:
   only:
     - stable
@@ -20,9 +24,11 @@ matrix:
     dist: trusty
   - os: linux
     python:  "3.3"
+    env: TRAVIS_PYTHON_VERSION="3.3"
     dist: trusty
   - os: linux
     python:  "3.4"
+    env: TRAVIS_PYTHON_VERSION="3.4"
     dist: trusty
   - os: linux
     python:  "3.5"
@@ -30,13 +36,20 @@ matrix:
     env: TRAVIS_PYTHON_VERSION="3.5"
   - os: linux
     python:  "3.6"
+    env: TRAVIS_PYTHON_VERSION="3.6"
   - os: linux
     dist: trusty
     python:  "3.5-dev" # 3.5 development branch
+    env: TRAVIS_PYTHON_VERSION="3.5"
   - os: linux
     python:  "3.6-dev"
+    env: TRAVIS_PYTHON_VERSION="3.6"
   - os: linux
     python:  "3.7-dev"
+    env: TRAVIS_PYTHON_VERSION="3.7"
+  - os: linux
+    python:  "3.8-dev"
+    env: TRAVIS_PYTHON_VERSION="3.8"
   - os: linux
     python:  "pypy"  # PyPy2 2.5.0
   - os: linux
@@ -61,12 +74,23 @@ matrix:
   - os: osx
     osx_image: xcode9
     language: generic
-  allow_failure:
+  allow_failures:
+  - os: linux
+    python:  "nightly" # currently points to 3.7-dev
+    env: TRAVIS_PYTHON_VERSION="3.7-dev"
   - os: osx
     osx_image: xcode6.4
     language: generic
   - os: linux
     python:  "2.6"
+  - os: linux
+    python:  "3.7-dev"
+    env: TRAVIS_PYTHON_VERSION="3.7"
+  - os: linux
+    python:  "3.8-dev"
+    env: TRAVIS_PYTHON_VERSION="3.8"
+  - os: linux
+    python:  "nightly"
   - os: linux
     python:  "3.2"
   - os: linux
@@ -75,6 +99,9 @@ matrix:
     python:  "pypy3"
   - os: linux
     python:  "pypy-5.3.1"
+  - os: linux
+    python:  "nightly" # currently points to 3.7-dev
+    env: TRAVIS_PYTHON_VERSION="3.7-dev"
 
 install:  "make init"
 
@@ -104,6 +131,8 @@ before_install:
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install coverage $INSTALL || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install codecov || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install pip || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then export VERSIONER_PYTHON_VERSION=${TRAVIS_PYTHON_VERSION:-3.6} || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then defaults write com.apple.versioner.python Version $TRAVIS_PYTHON_VERSION || true ; fi
   - travis_retry pip install tox || pip install tox || true ;
   - travis_retry pip install coverage || true ;
   - travis_retry pip install codecov || true ;
