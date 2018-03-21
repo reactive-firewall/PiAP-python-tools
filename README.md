@@ -1,6 +1,6 @@
 # PiAP-python-tools _beta_
 
-## This is still in beta. THINGS ARE STILL IN EARLY DEVELOPMENT.
+## This is still in beta. THINGS ARE STILL IN DEVELOPMENT. Testers welcome to join the beta, see [Pocket-PiAP](https://github.com/reactive-firewall/Pocket-PiAP) for more details.
 
 ## Status
 
