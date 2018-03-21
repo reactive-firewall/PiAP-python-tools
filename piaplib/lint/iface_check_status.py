@@ -38,14 +38,9 @@ try:
 			print(str(err.args))
 			print("")
 			raise ImportError("Error Importing logs")
-	try:
-		from .. import utils as utils
-		from .. import remediation as remediation
-		from .. import interfaces as interfaces
-	except Exception:
-		import pku.utils as utils
-		import pku.remediation as remediation
-		import pku.interfaces as interfaces
+	import pku.utils as utils
+	import pku.remediation as remediation
+	import pku.interfaces as interfaces
 	try:
 		from . import html_generator as html_generator
 	except Exception:
