@@ -283,7 +283,7 @@ class ConfigTestSuite(unittest.TestCase):
 			del err
 			theResult = False
 		assert theResult
-	
+
 	def test_case_of_parse_mock_baseconfig(self):
 		"""Tests the parse configuration functions given mocked values"""
 		theResult = False
