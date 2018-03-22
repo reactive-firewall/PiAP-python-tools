@@ -25,8 +25,8 @@ except Exception as importErr:
 	del importErr
 	import pocket as pocket
 
+
 if __name__ in u'__main__':
 	import sys
 	pocket.main(sys.argv[1:])
-	exit(0)
-
+	sys.exit(0)

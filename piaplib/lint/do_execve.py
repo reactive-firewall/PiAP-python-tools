@@ -34,6 +34,7 @@
 # Imports
 try:
 	import os
+	import os.path
 	import sys
 	import argparse
 	import subprocess
@@ -62,6 +63,19 @@ except Exception as importErr:
 	del importErr
 	raise ImportError("Failed to import do_execve")
 	exit(255)
+
+try:
+	from piaplib.book.logs import logs as logs
+except Exception:
+	try:
+		from book.logs import logs as logs
+	except Exception as err:
+		print(str(type(err)))
+		print(str(err))
+		print(str(err.args))
+		print("")
+		raise ImportError("Failed to import logs for do_execve")
+		exit(255)
 
 __prog__ = str("""do_execve.py""")
 """This tool is called do_execve.py."""
@@ -162,18 +176,16 @@ def runUnsafeCommand(arguments, error_fd=None):
 	"""Run the actual Unsafe command. Mighty creator help us."""
 	theRawOutput = None
 	err_fd = None
-	# POSIX.1-2008 Sec. 11.2.3 - refork
-	if os.fork():
-		exit(0)
 	try:
 		WHTLIST = [
 			str("""exit"""),
-			str("""which""")
+			str("""which"""),
+			str("""/bin/echo""")
 		]
 		if arguments is None or isinstance(arguments, list) is not True:
-			arguments = [u'exit', u'0']
+			arguments = [WHTLIST[0], u'0']
 		elif (not os.access(arguments[0], os.X_OK)) and (not utils.isWhiteListed(arguments[0], WHTLIST)):
-			arguments = [u'exit', u'1']
+			arguments = [WHTLIST[0], u'1']
 		try:
 			err_fd = subprocess.STDOUT
 			if error_fd is not None:
@@ -218,31 +230,45 @@ def unsafe_main(unsafe_input=None, chrootpath=None, uid=None, gid=None, passOutp
 		pid = os.fork()
 		if pid is not None and pid > 0:
 			# this is the parent process... do whatever needs to be done as the parent
-			print(str(u'OK - PiAP Launched pid {} as SANDBOXED COMMAND.').format(pid))
+			logs.log(
+				str(u'OK - PiAP Launched pid {} as SANDBOXED COMMAND.').format(pid),
+				"Debug"
+			)
 		else:
 			# we are the child process... lets do that plugin thing!
+			if chrootpath is not None:
+				try:
+					if os.geteuid() > 0:
+						os.chdir(str(os.path.abspath(chrootpath)))
+					else:
+						os.chroot(str(os.path.abspath(chrootpath)))
+				except OSError as badChrootErr:
+					remediation.error_breakpoint(badChrootErr)
+					badChrootErr = None
+					del badChrootErr
+					try:
+						os.chdir(str(os.path.abspath(chrootpath)))
+					except Exception:
+						os.kill(pid)
+						return None
 			if taint_int(uid):
-				os.setuid(uid)
+				os.seteuid(int(uid))
 			if taint_int(gid):
-				os.setuid(gid)
-			try:
-				os.chroot(chrootpath)
-			except OSError as badChrootErr:
-				print(str(""))
-				print(str("ERROR: ") + str(type(badChrootErr)))
-				print(str("ERROR: ") + str(badChrootErr))
-				print(str("ERROR: ") + str((badChrootErr.args)))
-				print(str(""))
-				badChrootErr = None
-				del badChrootErr
-				os.chdir(chrootpath)
-			tainted_output = runUnsafeCommand(unsafe_input)
-			if (passOutput is not None and passOutput is True):
-				return tainted_output
+				os.setegid(int(gid))
+			# POSIX.1-2008 Sec. 11.2.3 - refork
+			tainted_pid = os.fork()
+			if tainted_pid is not None and tainted_pid > 0:
+				# this is the parent process... do whatever needs to be done as the parent
+				logs.log(
+					str(u'OK - PiAP Launched pid {} as TAINTED COMMAND.').format(tainted_pid),
+					"Warn"
+				)
+			else:
+				tainted_output = runUnsafeCommand(unsafe_input)
+				if (passOutput is not None and passOutput is True):
+					return tainted_output
 	except Exception as unsafeErr:
-		print(str(type(unsafeErr)))
-		print(str(unsafeErr))
-		print(str(unsafeErr.args))
+		remediation.error_breakpoint(unsafeErr)
 		unsafeErr = None
 		del unsafeErr
 		os.abort()

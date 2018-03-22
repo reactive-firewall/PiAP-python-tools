@@ -141,6 +141,14 @@ def debugBlob(blob=None):
 	return True
 
 
+def debugtestError(someError=None):
+	print(str(""))
+	print(str(type(someError)))
+	print(str(someError))
+	print(str((someError.args)))
+	print(str(""))
+
+
 class BasicUsageTestSuite(unittest.TestCase):
 	"""Basic functional test cases."""
 
@@ -265,13 +273,9 @@ class BasicUsageTestSuite(unittest.TestCase):
 					print(str("{}").format(str(theOutputtext)))
 					print(str(""))
 		except Exception as err:
-			print(str(""))
-			print(str(type(err)))
-			print(str(err))
-			print(str((err.args)))
-			print(str(""))
-			othererr = None
-			del othererr
+			debugtestError(err)
+			err = None
+			del err
 			theResult = False
 		assert theResult
 
@@ -311,22 +315,14 @@ class BasicUsageTestSuite(unittest.TestCase):
 							print(str("{}").format(str(theOutputtext)))
 							print(str(""))
 				except Exception as othererr:
-					print(str(""))
-					print(str(type(othererr)))
-					print(str(othererr))
-					print(str((othererr.args)))
-					print(str(""))
+					debugtestError(othererr)
 					othererr = None
 					del othererr
 					theResult = False
 		except Exception as err:
-			print(str(""))
-			print(str(type(err)))
-			print(str(err))
-			print(str((err.args)))
-			print(str(""))
-			othererr = None
-			del othererr
+			debugtestError(err)
+			err = None
+			del err
 			theResult = False
 		assert theResult
 
@@ -354,13 +350,9 @@ class BasicUsageTestSuite(unittest.TestCase):
 					else:
 						theResult = False
 		except Exception as err:
-			print(str(""))
-			print(str(type(err)))
-			print(str(err))
-			print(str((err.args)))
-			print(str(""))
-			othererr = None
-			del othererr
+			debugtestError(err)
+			err = None
+			del err
 			theResult = False
 		assert theResult
 
@@ -393,22 +385,14 @@ class BasicUsageTestSuite(unittest.TestCase):
 							print(str("{}").format(str(theOutputtext)))
 							print(str(""))
 				except Exception as othererr:
-					print(str(""))
-					print(str(type(othererr)))
-					print(str(othererr))
-					print(str((othererr.args)))
-					print(str(""))
+					debugtestError(othererr)
 					othererr = None
 					del othererr
 					theResult = False
 		except Exception as err:
-			print(str(""))
-			print(str(type(err)))
-			print(str(err))
-			print(str((err.args)))
-			print(str(""))
-			othererr = None
-			del othererr
+			debugtestError(err)
+			err = None
+			del err
 			theResult = False
 		assert theResult
 
@@ -444,13 +428,9 @@ class BasicUsageTestSuite(unittest.TestCase):
 						print(str("{}").format(str(theOutputtext)))
 						print(str(""))
 		except Exception as err:
-			print(str(""))
-			print(str(type(err)))
-			print(str(err))
-			print(str((err.args)))
-			print(str(""))
-			othererr = None
-			del othererr
+			debugtestError(err)
+			err = None
+			del err
 			theResult = False
 		assert theResult
 
@@ -487,22 +467,14 @@ class BasicUsageTestSuite(unittest.TestCase):
 							print(str("{}").format(str(theOutputtext)))
 							print(str(""))
 				except Exception as othererr:
-					print(str(""))
-					print(str(type(othererr)))
-					print(str(othererr))
-					print(str((othererr.args)))
-					print(str(""))
+					debugtestError(othererr)
 					othererr = None
 					del othererr
 					theResult = False
 		except Exception as err:
-			print(str(""))
-			print(str(type(err)))
-			print(str(err))
-			print(str((err.args)))
-			print(str(""))
-			othererr = None
-			del othererr
+			debugtestError(err)
+			err = None
+			del err
 			theResult = False
 		assert theResult
 
@@ -538,13 +510,9 @@ class BasicUsageTestSuite(unittest.TestCase):
 						print(str("{}").format(str(theOutputtext)))
 						print(str(""))
 		except Exception as err:
-			print(str(""))
-			print(str(type(err)))
-			print(str(err))
-			print(str((err.args)))
-			print(str(""))
-			othererr = None
-			del othererr
+			debugtestError(err)
+			err = None
+			del err
 			theResult = False
 		assert theResult
 
@@ -581,13 +549,9 @@ class BasicUsageTestSuite(unittest.TestCase):
 						print(str("{}").format(str(theOutputtext)))
 						print(str(""))
 		except Exception as err:
-			print(str(""))
-			print(str(type(err)))
-			print(str(err))
-			print(str((err.args)))
-			print(str(""))
-			othererr = None
-			del othererr
+			debugtestError(err)
+			err = None
+			del err
 			theResult = False
 		assert theResult
 
@@ -626,22 +590,14 @@ class BasicUsageTestSuite(unittest.TestCase):
 							print(str("{}").format(str(theOutputtext)))
 							print(str(""))
 				except Exception as othererr:
-					print(str(""))
-					print(str(type(othererr)))
-					print(str(othererr))
-					print(str((othererr.args)))
-					print(str(""))
+					debugtestError(othererr)
 					othererr = None
 					del othererr
 					theResult = False
 		except Exception as err:
-			print(str(""))
-			print(str(type(err)))
-			print(str(err))
-			print(str((err.args)))
-			print(str(""))
-			othererr = None
-			del othererr
+			debugtestError(err)
+			err = None
+			del err
 			theResult = False
 		assert theResult
 
@@ -677,22 +633,14 @@ class BasicUsageTestSuite(unittest.TestCase):
 							print(str("{}").format(str(len(theOutputtext))))
 							print(str(""))
 				except Exception as othererr:
-					print(str(""))
-					print(str(type(othererr)))
-					print(str(othererr))
-					print(str((othererr.args)))
-					print(str(""))
+					debugtestError(othererr)
 					othererr = None
 					del othererr
 					theResult = False
 		except Exception as err:
-			print(str(""))
-			print(str(type(err)))
-			print(str(err))
-			print(str((err.args)))
-			print(str(""))
-			othererr = None
-			del othererr
+			debugtestError(err)
+			err = None
+			del err
 			theResult = False
 		assert theResult
 
@@ -731,22 +679,14 @@ class BasicUsageTestSuite(unittest.TestCase):
 							print(str("{}").format(str(theOutputtext)))
 							print(str(""))
 				except Exception as othererr:
-					print(str(""))
-					print(str(type(othererr)))
-					print(str(othererr))
-					print(str((othererr.args)))
-					print(str(""))
+					debugtestError(othererr)
 					othererr = None
 					del othererr
 					theResult = False
 		except Exception as err:
-			print(str(""))
-			print(str(type(err)))
-			print(str(err))
-			print(str((err.args)))
-			print(str(""))
-			othererr = None
-			del othererr
+			debugtestError(err)
+			err = None
+			del err
 			theResult = False
 		assert theResult
 
@@ -807,24 +747,16 @@ class BasicUsageTestSuite(unittest.TestCase):
 				except unittest.SkipTest:
 					raise unittest.SkipTest("BETA. Experemental feature not ready yet.")
 				except Exception as othererr:
-					print(str(""))
-					print(str(type(othererr)))
-					print(str(othererr))
-					print(str((othererr.args)))
-					print(str(""))
+					debugtestError(othererr)
 					othererr = None
 					del othererr
 					theResult = False
 		except unittest.SkipTest:
 			raise unittest.SkipTest("BETA. Experemental feature not ready yet.")
 		except Exception as err:
-			print(str(""))
-			print(str(type(err)))
-			print(str(err))
-			print(str((err.args)))
-			print(str(""))
-			othererr = None
-			del othererr
+			debugtestError(err)
+			err = None
+			del err
 			theResult = False
 		assert theResult
 
@@ -848,22 +780,14 @@ class BasicUsageTestSuite(unittest.TestCase):
 						else:
 							theResult = False
 				except Exception as othererr:
-					print(str(""))
-					print(str(type(othererr)))
-					print(str(othererr))
-					print(str((othererr.args)))
-					print(str(""))
+					debugtestError(othererr)
 					othererr = None
 					del othererr
 					theResult = False
 		except Exception as err:
-			print(str(""))
-			print(str(type(err)))
-			print(str(err))
-			print(str((err.args)))
-			print(str(""))
-			othererr = None
-			del othererr
+			debugtestError(err)
+			err = None
+			del err
 			theResult = False
 		assert theResult
 
@@ -899,22 +823,14 @@ class BasicUsageTestSuite(unittest.TestCase):
 						print(str("{}").format(str(theOutputtext)))
 						print(str(""))
 				except Exception as othererr:
-					print(str(""))
-					print(str(type(othererr)))
-					print(str(othererr))
-					print(str((othererr.args)))
-					print(str(""))
+					debugtestError(othererr)
 					othererr = None
 					del othererr
 					theResult = False
 		except Exception as err:
-			print(str(""))
-			print(str(type(err)))
-			print(str(err))
-			print(str((err.args)))
-			print(str(""))
-			othererr = None
-			del othererr
+			debugtestError(err)
+			err = None
+			del err
 			theResult = False
 		assert theResult
 
@@ -949,22 +865,14 @@ class BasicUsageTestSuite(unittest.TestCase):
 						print(str("{}").format(str(theOutputtext)))
 						print(str(""))
 				except Exception as othererr:
-					print(str(""))
-					print(str(type(othererr)))
-					print(str(othererr))
-					print(str((othererr.args)))
-					print(str(""))
+					debugtestError(othererr)
 					othererr = None
 					del othererr
 					theResult = False
 		except Exception as err:
-			print(str(""))
-			print(str(type(err)))
-			print(str(err))
-			print(str((err.args)))
-			print(str(""))
-			othererr = None
-			del othererr
+			debugtestError(err)
+			err = None
+			del err
 			theResult = False
 		assert theResult
 
@@ -1005,22 +913,14 @@ class BasicUsageTestSuite(unittest.TestCase):
 						print(str("{}").format(str(theOutputtext)))
 						print(str(""))
 				except Exception as othererr:
-					print(str(""))
-					print(str(type(othererr)))
-					print(str(othererr))
-					print(str((othererr.args)))
-					print(str(""))
+					debugtestError(othererr)
 					othererr = None
 					del othererr
 					theResult = False
 		except Exception as err:
-			print(str(""))
-			print(str(type(err)))
-			print(str(err))
-			print(str((err.args)))
-			print(str(""))
-			othererr = None
-			del othererr
+			debugtestError(err)
+			err = None
+			del err
 			theResult = False
 		assert theResult
 
@@ -1056,22 +956,14 @@ class BasicUsageTestSuite(unittest.TestCase):
 						print(str("{}").format(str(theOutputtext)))
 						print(str(""))
 				except Exception as othererr:
-					print(str(""))
-					print(str(type(othererr)))
-					print(str(othererr))
-					print(str((othererr.args)))
-					print(str(""))
+					debugtestError(othererr)
 					othererr = None
 					del othererr
 					theResult = False
 		except Exception as err:
-			print(str(""))
-			print(str(type(err)))
-			print(str(err))
-			print(str((err.args)))
-			print(str(""))
-			othererr = None
-			del othererr
+			debugtestError(err)
+			err = None
+			del err
 			theResult = False
 		assert theResult
 
@@ -1117,13 +1009,9 @@ class BasicUsageTestSuite(unittest.TestCase):
 					del othererr
 					theResult = False
 		except Exception as err:
-			print(str(""))
-			print(str(type(err)))
-			print(str(err))
-			print(str((err.args)))
-			print(str(""))
-			othererr = None
-			del othererr
+			debugtestError(err)
+			err = None
+			del err
 			theResult = False
 		assert theResult
 
@@ -1167,13 +1055,9 @@ class BasicUsageTestSuite(unittest.TestCase):
 					del othererr
 					theResult = False
 		except Exception as err:
-			print(str(""))
-			print(str(type(err)))
-			print(str(err))
-			print(str((err.args)))
-			print(str(""))
-			othererr = None
-			del othererr
+			debugtestError(err)
+			err = None
+			del err
 			theResult = False
 		assert theResult
 
@@ -1216,13 +1100,9 @@ class BasicUsageTestSuite(unittest.TestCase):
 					del othererr
 					theResult = False
 		except Exception as err:
-			print(str(""))
-			print(str(type(err)))
-			print(str(err))
-			print(str((err.args)))
-			print(str(""))
-			othererr = None
-			del othererr
+			debugtestError(err)
+			err = None
+			del err
 			theResult = False
 		assert theResult
 
@@ -1265,13 +1145,9 @@ class BasicUsageTestSuite(unittest.TestCase):
 					del othererr
 					theResult = False
 		except Exception as err:
-			print(str(""))
-			print(str(type(err)))
-			print(str(err))
-			print(str((err.args)))
-			print(str(""))
-			othererr = None
-			del othererr
+			debugtestError(err)
+			err = None
+			del err
 			theResult = False
 		assert theResult
 
@@ -1321,13 +1197,9 @@ class BasicUsageTestSuite(unittest.TestCase):
 		except unittest.SkipTest:
 			raise unittest.SkipTest("function ok, but not a compatible Test network")
 		except Exception as err:
-			print(str(""))
-			print(str(type(err)))
-			print(str(err))
-			print(str((err.args)))
-			print(str(""))
-			othererr = None
-			del othererr
+			debugtestError(err)
+			err = None
+			del err
 			theResult = False
 		assert theResult
 
@@ -1387,13 +1259,9 @@ class BasicUsageTestSuite(unittest.TestCase):
 					del othererr
 					theResult = False
 		except Exception as err:
-			print(str(""))
-			print(str(type(err)))
-			print(str(err))
-			print(str((err.args)))
-			print(str(""))
-			othererr = None
-			del othererr
+			debugtestError(err)
+			err = None
+			del err
 			theResult = False
 		assert theResult
 
@@ -1440,13 +1308,9 @@ class BasicUsageTestSuite(unittest.TestCase):
 					], stderr=subprocess.STDOUT)
 				self.assertIsNone(theOutputtext)
 		except Exception as err:
-			print(str(""))
-			print(str(type(err)))
-			print(str(err))
-			print(str((err.args)))
-			print(str(""))
-			othererr = None
-			del othererr
+			debugtestError(err)
+			err = None
+			del err
 			theResult = False
 		assert theResult
 
@@ -1484,13 +1348,9 @@ class BasicUsageTestSuite(unittest.TestCase):
 					del(junkErr)
 				# self.assertIsNone(theOutputtext)
 		except Exception as err:
-			print(str(""))
-			print(str(type(err)))
-			print(str(err))
-			print(str((err.args)))
-			print(str(""))
-			othererr = None
-			del othererr
+			debugtestError(err)
+			err = None
+			del err
 			theResult = False
 		assert theResult
 
@@ -1517,13 +1377,9 @@ class BasicUsageTestSuite(unittest.TestCase):
 						self.assertIsNotNone(theOutputtext)
 				theResult = True
 		except Exception as err:
-			print(str(""))
-			print(str(type(err)))
-			print(str(err))
-			print(str((err.args)))
-			print(str(""))
-			othererr = None
-			del othererr
+			debugtestError(err)
+			err = None
+			del err
 			theResult = False
 		assert theResult
 
@@ -1556,13 +1412,9 @@ class BasicUsageTestSuite(unittest.TestCase):
 				], stderr=subprocess.STDOUT)
 				self.assertIsNotNone(theOutputtext)
 		except Exception as err:
-			print(str(""))
-			print(str(type(err)))
-			print(str(err))
-			print(str((err.args)))
-			print(str(""))
-			othererr = None
-			del othererr
+			debugtestError(err)
+			err = None
+			del err
 			theResult = False
 		assert theResult
 
@@ -1593,13 +1445,9 @@ class BasicUsageTestSuite(unittest.TestCase):
 					del othererr
 					theResult = False
 		except Exception as err:
-			print(str(""))
-			print(str(type(err)))
-			print(str(err))
-			print(str((err.args)))
-			print(str(""))
-			othererr = None
-			del othererr
+			debugtestError(err)
+			err = None
+			del err
 			theResult = False
 		assert theResult
 

@@ -146,6 +146,11 @@ before_install:
   - cp -vf ./tests/mock/clients /opt/PiAP/hostapd_actions/clients || true
   - echo "Dependencies should be sane now."
 
+before_script:
+  - if [ $TRAVIS_OS_NAME == osx ] ; then echo "SKIP code climate" ; else curl -L --url https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 -o ./cc-test-reporter 3>/dev/null 2>/dev/null || true ; fi ;
+  - if [ $TRAVIS_OS_NAME == osx ] ; then echo "SKIP code climate" ; else chmod +x ./cc-test-reporter || true ; fi ;
+  - if [ $TRAVIS_OS_NAME == osx ] ; then echo "SKIP code climate" ; else ./cc-test-reporter before-build || true ; fi ;
+
 script:
   - make clean ;
   - if [ $TRAVIS_OS_NAME == osx ] ; then echo "SKIP make test" ; else make test || exit $? ; fi ;
@@ -162,9 +167,17 @@ script:
   - if [ $TRAVIS_OS_NAME == osx ] ; then true ; wait ; else pip install --upgrade -e git+https://github.com/reactive-firewall/PiAP-python-tools.git@${TRAVIS_PULL_REQUEST_SHA:-${TRAVIS_COMMIT}}#egg=piaplib ; fi ; wait ;
   - bash ./tests/check_spelling || exit $? ;
 
+after_failure:
+  - coverage combine 2>/dev/null || true
+  - coverage xml 2>/dev/null || true
+  - if [ $TRAVIS_OS_NAME == osx ] ; then echo "SKIP code climate" ; else ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT || true ; fi ;
+  - codecov 2>/dev/null || true
+  - make clean 2>/dev/nul || true
+
 after_success:
   - coverage combine || true
   - coverage xml || true
+  - if [ $TRAVIS_OS_NAME == osx ] ; then echo "SKIP code climate" ; else ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT || true ; fi ;
   - codecov || true
   - travis_retry python3 -m pip install python-coveralls || python3 -m pip install python-coveralls || true ;
   - coveralls 2>/dev/null || true

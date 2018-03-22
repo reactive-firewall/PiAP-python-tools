@@ -74,6 +74,9 @@ class LintiFaceTestSuite(unittest.TestCase):
 				self.assertIsNotNone(
 					iface_check_status.generate_iface_status_html_raw("lo", "UNKNOWN", None)
 				)
+				self.assertIsNotNone(
+					iface_check_status.generate_iface_status_html("lo", "UNKNOWN")
+				)
 			except Exception as err:
 				print(str(""))
 				print(str(type(err)))
