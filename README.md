@@ -1,6 +1,6 @@
 # PiAP-python-tools _beta_
 
-## This is still in beta. THINGS ARE STILL IN EARLY DEVELOPMENT.
+## This is still in beta. THINGS ARE STILL IN DEVELOPMENT. Testers welcome to join the beta, see [Pocket-PiAP](https://github.com/reactive-firewall/Pocket-PiAP) for more details.
 
 ## Status
 
@@ -13,7 +13,9 @@
 [![Dependency Status](https://www.versioneye.com/user/projects/59141686eb858e002d45d36e/badge.svg?style=flat-round)](https://www.versioneye.com/user/projects/59141686eb858e002d45d36e)
 [![code coverage](https://codecov.io/gh/reactive-firewall/PiAP-python-tools/branch/master/graph/badge.svg)](https://codecov.io/gh/reactive-firewall/PiAP-python-tools/branch/master/)
 [![Coverage Status](https://coveralls.io/repos/github/reactive-firewall/PiAP-python-tools/badge.svg?branch=master)](https://coveralls.io/github/reactive-firewall/PiAP-python-tools?branch=master)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/38ed008754b3aa7fea09/test_coverage)](https://codeclimate.com/github/reactive-firewall/PiAP-python-tools/test_coverage)
 ![commits-since](https://img.shields.io/github/commits-since/reactive-firewall/PiAP-python-tools/stable.svg?maxAge=9000)
+[![Maintainability](https://api.codeclimate.com/v1/badges/38ed008754b3aa7fea09/maintainability)](https://codeclimate.com/github/reactive-firewall/PiAP-python-tools/maintainability)
 
 ### Stable:
 [![status](https://travis-ci.org/reactive-firewall/PiAP-python-tools.svg?branch=stable)](https://travis-ci.org/reactive-firewall/PiAP-python-tools)

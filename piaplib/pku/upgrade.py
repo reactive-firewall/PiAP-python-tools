@@ -59,6 +59,7 @@ try:
 	import warnings
 	with warnings.catch_warnings():
 		warnings.filterwarnings("ignore", category=PendingDeprecationWarning)
+		warnings.filterwarnings("ignore", category=DeprecationWarning)
 		import imp
 		if imp.__name__ is None:
 			raise ImportError("Not Implemented.")

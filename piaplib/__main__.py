@@ -1,8 +1,9 @@
+#! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
 # Pocket PiAP
 # ......................................................................
-# Copyright (c) 2017, Kendrick Walls
+# Copyright (c) 2017-2018, Kendrick Walls
 # ......................................................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,8 +25,8 @@ except Exception as importErr:
 	del importErr
 	import pocket as pocket
 
+
 if __name__ in u'__main__':
 	import sys
 	pocket.main(sys.argv[1:])
-	exit(0)
-
+	sys.exit(0)

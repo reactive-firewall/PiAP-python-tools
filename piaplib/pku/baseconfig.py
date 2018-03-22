@@ -46,6 +46,9 @@ def getDefaultMainConfigFile():
 				'syslog': repr(False),
 				'file': repr(False),
 				'stdout': repr(True)
+			}),
+			'PiAP-piaplib': dict({
+				'loaded': repr(False)
 			})
 		})
 	except Exception as err:

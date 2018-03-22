@@ -1,6 +1,10 @@
 language: python
 sudo: false
 
+python:
+
+dist:
+
 branches:
   only:
     - stable
@@ -20,9 +24,11 @@ matrix:
     dist: trusty
   - os: linux
     python:  "3.3"
+    env: TRAVIS_PYTHON_VERSION="3.3"
     dist: trusty
   - os: linux
     python:  "3.4"
+    env: TRAVIS_PYTHON_VERSION="3.4"
     dist: trusty
   - os: linux
     python:  "3.5"
@@ -30,13 +36,20 @@ matrix:
     env: TRAVIS_PYTHON_VERSION="3.5"
   - os: linux
     python:  "3.6"
+    env: TRAVIS_PYTHON_VERSION="3.6"
   - os: linux
     dist: trusty
     python:  "3.5-dev" # 3.5 development branch
+    env: TRAVIS_PYTHON_VERSION="3.5"
   - os: linux
     python:  "3.6-dev"
+    env: TRAVIS_PYTHON_VERSION="3.6"
   - os: linux
     python:  "3.7-dev"
+    env: TRAVIS_PYTHON_VERSION="3.7"
+  - os: linux
+    python:  "3.8-dev"
+    env: TRAVIS_PYTHON_VERSION="3.8"
   - os: linux
     python:  "pypy"  # PyPy2 2.5.0
   - os: linux
@@ -61,12 +74,23 @@ matrix:
   - os: osx
     osx_image: xcode9
     language: generic
-  allow_failure:
+  allow_failures:
+  - os: linux
+    python:  "nightly" # currently points to 3.7-dev
+    env: TRAVIS_PYTHON_VERSION="3.7-dev"
   - os: osx
     osx_image: xcode6.4
     language: generic
   - os: linux
     python:  "2.6"
+  - os: linux
+    python:  "3.7-dev"
+    env: TRAVIS_PYTHON_VERSION="3.7"
+  - os: linux
+    python:  "3.8-dev"
+    env: TRAVIS_PYTHON_VERSION="3.8"
+  - os: linux
+    python:  "nightly"
   - os: linux
     python:  "3.2"
   - os: linux
@@ -75,6 +99,9 @@ matrix:
     python:  "pypy3"
   - os: linux
     python:  "pypy-5.3.1"
+  - os: linux
+    python:  "nightly" # currently points to 3.7-dev
+    env: TRAVIS_PYTHON_VERSION="3.7-dev"
 
 install:  "make init"
 
@@ -104,6 +131,8 @@ before_install:
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install coverage $INSTALL || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install codecov || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install pip || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then export VERSIONER_PYTHON_VERSION=${TRAVIS_PYTHON_VERSION:-3.6} || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then defaults write com.apple.versioner.python Version $TRAVIS_PYTHON_VERSION || true ; fi
   - travis_retry pip install tox || pip install tox || true ;
   - travis_retry pip install coverage || true ;
   - travis_retry pip install codecov || true ;
@@ -116,6 +145,11 @@ before_install:
   - mkdir -p -m 755 "/opt/PiAP/hostapd_actions/" || true
   - cp -vf ./tests/mock/clients /opt/PiAP/hostapd_actions/clients || true
   - echo "Dependencies should be sane now."
+
+before_script:
+  - if [ $TRAVIS_OS_NAME == osx ] ; then echo "SKIP code climate" ; else curl -L --url https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 -o ./cc-test-reporter 3>/dev/null 2>/dev/null || true ; fi ;
+  - if [ $TRAVIS_OS_NAME == osx ] ; then echo "SKIP code climate" ; else chmod +x ./cc-test-reporter || true ; fi ;
+  - if [ $TRAVIS_OS_NAME == osx ] ; then echo "SKIP code climate" ; else ./cc-test-reporter before-build || true ; fi ;
 
 script:
   - make clean ;
@@ -133,9 +167,17 @@ script:
   - if [ $TRAVIS_OS_NAME == osx ] ; then true ; wait ; else pip install --upgrade -e git+https://github.com/reactive-firewall/PiAP-python-tools.git@${TRAVIS_PULL_REQUEST_SHA:-${TRAVIS_COMMIT}}#egg=piaplib ; fi ; wait ;
   - bash ./tests/check_spelling || exit $? ;
 
+after_failure:
+  - coverage combine 2>/dev/null || true
+  - coverage xml 2>/dev/null || true
+  - if [ $TRAVIS_OS_NAME == osx ] ; then echo "SKIP code climate" ; else ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT || true ; fi ;
+  - codecov 2>/dev/null || true
+  - make clean 2>/dev/nul || true
+
 after_success:
   - coverage combine || true
   - coverage xml || true
+  - if [ $TRAVIS_OS_NAME == osx ] ; then echo "SKIP code climate" ; else ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT || true ; fi ;
   - codecov || true
   - travis_retry python3 -m pip install python-coveralls || python3 -m pip install python-coveralls || true ;
   - coveralls 2>/dev/null || true

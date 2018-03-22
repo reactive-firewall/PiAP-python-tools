@@ -2,11 +2,11 @@
 
 # License
 #
-# Copyright (c) 2017 Mr. Walls
+# Copyright (c) 2017-2018 Mr. Walls
 #
 # # Pocket PiAP
 # ......................................................................
-# Copyright (c) 2017, Kendrick Walls
+# Copyright (c) 2017-2018, Kendrick Walls
 # ......................................................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
@@ -117,12 +117,13 @@ test-mats: cleanup
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-tox: cleanup
-	$(QUIET)tox -v --
+	$(QUIET)tox -v -- || tail -n 500 .tox/py*/log/py*.log 2>/dev/null
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-style: cleanup
 	$(QUIET)flake8 --ignore=W191,W391 --max-line-length=100 --verbose --count --config=.flake8.ini
 	$(QUIET)tests/check_spelling 2>/dev/null || true
+	$(QUIET)tests/check_codecov_config 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
 
 cleanup:

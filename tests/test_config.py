@@ -266,8 +266,47 @@ class ConfigTestSuite(unittest.TestCase):
 				raise ImportError("Failed to import baseconfig")
 			self.assertIsNotNone(
 				baseconfig.parseConfigParser(
-					config_data=None,
-					theConfig=baseconfig.getDefaultMainConfigFile(),
+					config_data=baseconfig.getDefaultMainConfigFile(),
+					theConfig=None,
+					overwrite=True
+				)
+			)
+			theResult = True
+		except Exception as err:
+			print(str(""))
+			print(str("Error in test of parsing default config"))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			err = None
+			del err
+			theResult = False
+		assert theResult
+
+	def test_case_of_parse_mock_baseconfig(self):
+		"""Tests the parse configuration functions given mocked values"""
+		theResult = False
+		try:
+			from piaplib import pku as pku
+			if pku.__name__ is None:
+				raise ImportError("Failed to import pku")
+			from pku import baseconfig as baseconfig
+			if baseconfig.__name__ is None:
+				raise ImportError("Failed to import baseconfig")
+			from pku.baseconfig import configparser
+			if configparser.__name__ is None:
+				raise ImportError("Failed to import configparser")
+			cfg_mock_data = configparser.ConfigParser()
+			cfg_mock_data.add_section('PiAP-logging')
+			cfg_mock_data.set('PiAP-logging', 'mode', 'stdout')
+			cfg_mock_data.set('PiAP-logging', 'dir', '/var/log')
+			cfg_mock_data.set('PiAP-logging', 'keyFile', repr(None))
+			cfg_mock_data.set('PiAP-logging', 'encryptlogs', repr(False))
+			self.assertIsNotNone(
+				baseconfig.parseConfigParser(
+					config_data=baseconfig.getDefaultMainConfigFile(),
+					theConfig=cfg_mock_data,
 					overwrite=True
 				)
 			)
