@@ -234,6 +234,7 @@ def unsafe_main(unsafe_input=None, chrootpath=None, uid=None, gid=None, passOutp
 				str(u'OK - PiAP Launched pid {} as SANDBOXED COMMAND.').format(pid),
 				"Debug"
 			)
+			exit(0)
 		else:
 			# we are the child process... lets do that plugin thing!
 			if chrootpath is not None:
@@ -263,6 +264,7 @@ def unsafe_main(unsafe_input=None, chrootpath=None, uid=None, gid=None, passOutp
 					str(u'OK - PiAP Launched pid {} as TAINTED COMMAND.').format(tainted_pid),
 					"Warn"
 				)
+				exit(0)
 			else:
 				tainted_output = runUnsafeCommand(unsafe_input)
 				if (passOutput is not None and passOutput is True):
