@@ -117,15 +117,6 @@ def parseargs(arguments=None):
 	return theResult
 
 
-def taint_name(rawtxt):
-	"""check the interface arguments"""
-	tainted_input = str(rawtxt).lower()
-	for test_username in get_user_list():
-		if tainted_input in test_username:
-			return test_username
-	return None
-
-
 def show_user(user_name=None, is_verbose=False, use_html=False):
 	"""show the given user."""
 	theResult = None
@@ -340,6 +331,15 @@ def get_user_work_status_raw(user_name=None):
 	return theRawOutput
 
 
+def taint_name(rawtxt):
+	"""check the interface arguments"""
+	tainted_input = str(rawtxt).lower()
+	for test_username in get_user_list():
+		if tainted_input in test_username:
+			return test_username
+	return None
+
+
 # TODO: memoize this function
 def get_user_list():
 	"""list the available users."""
@@ -379,11 +379,12 @@ def get_user_status(user_name=None, use_html=False):  # noqa C901
 	try:
 		user_tty = None
 		status_list = []
-		if user_name is not None:
-			user_tty = get_user_ttys(user_name, False)
-		status_txt = get_system_work_status_raw(user_name)
+		t_user_name = taint_name(user_name)
+		if taint_name(user_name) is not None:
+			user_tty = get_user_ttys(t_user_name, False)
+		status_txt = get_system_work_status_raw(t_user_name)
 		if (user_tty is not None) and (str(user_tty).lower() not in str("console")):
-			status_txt = get_user_work_status_raw(user_name)
+			status_txt = get_user_work_status_raw(t_user_name)
 			if status_txt is None:
 				status_list = ["UNKNOWN"]
 			else:
@@ -467,7 +468,7 @@ def get_user_status(user_name=None, use_html=False):  # noqa C901
 		else:
 			theResult = html_generator.gen_html_td(
 				html_generator.gen_html_ul(status_list),
-				str(u'user_status_what_{}').format(user_name)
+				str(u'user_status_what_{}').format(t_user_name)
 			)
 		status_list = None
 		del status_list
