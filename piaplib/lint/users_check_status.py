@@ -3,7 +3,7 @@
 
 # Pocket PiAP
 # ......................................................................
-# Copyright (c) 2017, Kendrick Walls
+# Copyright (c) 2017-2018, Kendrick Walls
 # ......................................................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
@@ -33,6 +33,10 @@ try:
 		from .. import utils as utils
 	except Exception:
 		import pku.utils as utils
+	try:
+		from .. import remediation as remediation
+	except Exception:
+		import pku.remediation as remediation
 	try:
 		from . import html_generator as html_generator
 	except Exception as ImpErr:
@@ -76,10 +80,7 @@ def parseargs(arguments=None):
 			description='Report the state of a given user.',
 			epilog='Basically ps wrapper.'
 		)
-		parser.add_argument(
-			'-u', '--user',
-			default=None, help='The user to show.'
-		)
+		parser.add_argument('-u', '--user', default=None, help='The user to show.')
 		parser.add_argument(
 			'-l', '--list',
 			default=False, action='store_true',
@@ -95,17 +96,7 @@ def parseargs(arguments=None):
 			dest='show_all', default=False,
 			action='store_true', help='show all users.'
 		)
-		the_action = parser.add_mutually_exclusive_group(required=False)
-		the_action.add_argument(
-			'-v', '--verbose',
-			dest='verbose_mode', default=False,
-			action='store_true', help='Enable verbose mode.'
-		)
-		the_action.add_argument(
-			'-q', '--quiet',
-			dest='verbose_mode', default=False,
-			action='store_false', help='Disable the given interface.'
-		)
+		utils._handleVerbosityArgs(parser, default=False)
 		parser.add_argument(
 			'-V', '--version',
 			action='version', version=str(
@@ -115,6 +106,24 @@ def parseargs(arguments=None):
 	except Exception as parseErr:
 		parser.error(str(parseErr))
 	return theResult
+
+
+def _handleVerbosityArgs(argParser, default=False):
+	"""utility function to handle the verbosity flags for the given argument parser."""
+	if ((argParser is None) or (not isinstance(argParser, argparse.ArgumentParser))):
+		raise InvalidArgumentError("argParser must be of type argparse.ArgumentParser")
+	the_action = argParser.add_mutually_exclusive_group(required=False)
+	the_action.add_argument(
+		'-v', '--verbose',
+		dest='verbose_mode', default=False,
+		action='store_true', help='Enable verbose mode.'
+	)
+	the_action.add_argument(
+		'-q', '--quiet',
+		dest='verbose_mode', default=False,
+		action='store_false', help='Disable the given interface.'
+	)
+	return argParser
 
 
 def show_user(user_name=None, is_verbose=False, use_html=False):

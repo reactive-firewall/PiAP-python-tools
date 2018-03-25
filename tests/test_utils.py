@@ -911,6 +911,30 @@ and this will test reads.""")
 			theResult = False
 		assert theResult
 
+	def test_case_utils_miss_arg_verbose(self):
+		"""Tests the utils._handleVerbosityArgs with an invalid value as input"""
+		theResult = False
+		try:
+			from piaplib import pku as pku
+			if pku.__name__ is None:
+				raise ImportError("Failed to import pku")
+			from pku import utils as utils
+			if utils.__name__ is None:
+				raise ImportError("Failed to import utils")
+			with self.assertRaises(RuntimeError):
+				utils._handleVerbosityArgs(argParser=None, default=True)
+			theResult = True
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			err = None
+			del err
+			theResult = False
+		assert theResult
+
 
 if __name__ == u'__main__':
 	unittest.main()

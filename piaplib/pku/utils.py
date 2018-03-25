@@ -3,7 +3,7 @@
 
 # Pocket PiAP
 # ......................................................................
-# Copyright (c) 2017, Kendrick Walls
+# Copyright (c) 2017-2018, Kendrick Walls
 # ......................................................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ except Exception as err:
 try:
 	import sys
 	if sys.__name__ is None:
-		raise ImportError("OMG! we could not import os. We're like in the matrix! ABORT. ABORT.")
+		raise ImportError("OMG! we could not import sys. We're like in the matrix! ABORT. ABORT.")
 except Exception as err:
 	raise ImportError(err)
 	exit(3)
@@ -173,6 +173,7 @@ def compactSpace(theInput_Str):
 
 
 @remediation.error_handling
+@memoize
 def extractMACAddr(theInputStr):
 	"""Extract the MAC addresses from a string."""
 	theResult = []
@@ -185,6 +186,7 @@ def extractMACAddr(theInputStr):
 
 
 @remediation.error_handling
+@memoize
 def extractInts(theInputStr):
 	"""Extract the ints from a string."""
 	theResult = extractRegexPattern(theInputStr, """([1234567890]+)+""")
@@ -192,6 +194,7 @@ def extractInts(theInputStr):
 
 
 @remediation.error_handling
+@memoize
 def extractInt(theInputStr):
 	"""Extract an int from a string."""
 	theResult = extractInts(theInputStr)
@@ -199,6 +202,7 @@ def extractInt(theInputStr):
 
 
 @remediation.error_handling
+@memoize
 def extractIfaceNames(theInputStr):
 	"""Extracts the expected iface names."""
 	return extractRegexPattern(
@@ -210,6 +214,7 @@ def extractIfaceNames(theInputStr):
 
 
 @remediation.error_handling
+@memoize
 def extractTTYs(theInputStr):
 	"""Extract the TTYs from a string."""
 	theResult = []
@@ -222,6 +227,7 @@ def extractTTYs(theInputStr):
 
 
 @remediation.error_handling
+@memoize
 def extractIPv4(theInputStr):
 	"""Extract the Ipv4 addresses from a string. Simple x.x.x.x matching, no checks."""
 	theResult = []
@@ -235,6 +241,7 @@ def extractIPv4(theInputStr):
 
 
 @remediation.error_handling
+@memoize
 def extractIPAddr(theInputStr):
 	"""Extract the Ipv4 addresses from a string. Simple x.x.x.x matching, no checks."""
 	theResult = []
@@ -304,6 +311,29 @@ def isWhiteListed(someString=None, whitelist=[]):
 		if xstr(someString) in validString:
 			return True
 	return False
+
+
+
+""" Argument Parsing """
+
+
+@remediation.error_passing
+def _handleVerbosityArgs(argParser, default=False):
+	"""utility function to handle the verbosity flags for the given argument parser."""
+	if ((argParser is None) or (not isinstance(argParser, argparse.ArgumentParser))):
+		raise InvalidArgumentError("argParser must be of type argparse.ArgumentParser")
+	the_action = argParser.add_mutually_exclusive_group(required=False)
+	the_action.add_argument(
+		'-v', '--verbose',
+		dest='verbose_mode', default=False,
+		action='store_true', help='Enable verbose mode.'
+	)
+	the_action.add_argument(
+		'-q', '--quiet',
+		dest='verbose_mode', default=False,
+		action='store_false', help='Disable the given interface.'
+	)
+	return argParser
 
 
 """ I/O and Files """
@@ -456,27 +486,59 @@ def appendFile(somefile, somedata):
 	return theResult
 
 
-@remediation.error_handling
-def getFileResource(someURL, outFile):
-	"""Downloads a file from the given URL."""
+@remediation.error_passing
+def urlretrieve(url, filename):
+	""" cross-python urlretrive function """
+	try:
+		import six
+		if six.PY2:
+			return _python2urlretrieve(url, filename)
+		else:
+			import requests
+			r = requests.get(url)
+			if r is None:
+				raise AssertionError("URL could not be opened - BUG")
+			if r.status_code is not None:
+				return writeFile(filename, r.contents)
+	except Exception as err:
+		remediation.error_breakpoint(err)
+		return _python2urlretrieve(url, filename)
+	raise AssertionError("URL could not be opened - BUG")
+
+
+@remediation.error_passing
+def _python2urlretrieve(url, filename):
+	""" python2 url function. DO NOT CALL DIRECTLY. """
 	import warnings
 	with warnings.catch_warnings():
 		warnings.filterwarnings("ignore", category=DeprecationWarning)
 		import urllib
 		try:
 			tempfile = urllib.FancyURLopener()
+			tempfile.addheader('DNT', '1')
+			tempfile.addheader('Connection', 'close')
+			tempfile.addheader('user-agent', 'mozilla/5.0')
 		except Exception:
 			import urllib.request
-			tempfile = urllib.request.FancyURLopener()
-		try:
-			tempfile.retrieve(someURL, outFile)
-		except Exception:
-			return False
-		try:
-			logs.log(str("fetched file {}").format(someURL), "Debug")
-		except Exception:
-			pass
-		return True
+			return urllib.request.urlretrieve(url, filename)
+		return tempfile.retrieve(*args, **kwargs)
+	raise AssertionError("URL could not be opened - BUG")
+
+
+@remediation.error_handling
+def getFileResource(someURL, outFile):
+	"""Downloads a file from the given URL."""
+	try:
+		urlretrieve(url=someURL, filename=outFile)
+	except Exception as err:
+		remediation.error_breakpoint(err)
+		logs.log(str("Failed to fetched file {}").format(someURL), "Debug")
+		return False
+	try:
+		logs.log(str("fetched file {}").format(someURL), "Debug")
+	except Exception:
+		pass
+	return True
 
 
 @remediation.error_handling

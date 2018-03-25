@@ -125,17 +125,7 @@ def parseargs(tainted_arguments=None):
 			default=None, type=str, required=False,
 			help='the sandbox to play in.'
 		)
-		the_action = parser.add_mutually_exclusive_group(required=False)
-		the_action.add_argument(
-			'-v', '--verbose',
-			dest='verbose_mode', default=False,
-			action='store_true', help='Enable verbose mode.'
-		)
-		the_action.add_argument(
-			'-q', '--quiet',
-			dest='verbose_mode', default=False,
-			action='store_false', help='Disable the verbose mode.'
-		)
+		utils._handleVerbosityArgs(parser, default=False)
 		parser.add_argument(
 			'-c', '--cmd',
 			dest='unsafe_input', action='append',

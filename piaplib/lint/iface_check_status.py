@@ -90,17 +90,7 @@ def parseargs(arguments=None):
 			dest='show_all', default=False,
 			action='store_true', help='show all interfaces.'
 		)
-		the_action = parser.add_mutually_exclusive_group(required=False)
-		the_action.add_argument(
-			'-v', '--verbose',
-			dest='verbose_mode', default=False,
-			action='store_true', help='Enable verbose mode.'
-		)
-		the_action.add_argument(
-			'-q', '--quiet',
-			dest='verbose_mode', default=False,
-			action='store_false', help='Disable the given interface.'
-		)
+		utils._handleVerbosityArgs(parser, default=False)
 		parser.add_argument(
 			'-V', '--version',
 			action='version', version=str(
