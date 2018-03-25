@@ -42,6 +42,14 @@ except Exception as err:
 	exit(3)
 
 try:
+	import argparse
+	if argparse.__name__ is None:
+		raise ImportError("OMG! we could not import argparse. ABORT.")
+except Exception as err:
+	raise ImportError(err)
+	exit(3)
+
+try:
 	from piaplib.book.logs import logs as logs
 except Exception:
 	try:
