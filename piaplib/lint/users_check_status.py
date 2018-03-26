@@ -72,6 +72,7 @@ __prog__ = """users_check_status"""
 """The Program's name"""
 
 
+@remediation.error_handling
 def parseargs(arguments=None):
 	"""Parse the arguments"""
 	try:
@@ -108,6 +109,7 @@ def parseargs(arguments=None):
 	return theResult
 
 
+@remediation.error_handling
 def show_user(user_name=None, is_verbose=False, use_html=False):
 	"""show the given user."""
 	theResult = None
@@ -137,6 +139,7 @@ def show_user(user_name=None, is_verbose=False, use_html=False):
 	return theResult
 
 
+@remediation.error_passing
 def get_user_name(user_name=None, use_html=False):
 	if user_name is None:
 		return None
@@ -155,6 +158,7 @@ def get_user_name(user_name=None, use_html=False):
 		return html_generator.gen_html_td(user, str(u'user_name_{}').format(user))
 
 
+@remediation.error_passing
 def isLineForUser(someLine=None, username=None):
 	"""determins if a raw output line is for a user"""
 	doesMatch = False
@@ -170,6 +174,7 @@ def isLineForUser(someLine=None, username=None):
 	return doesMatch
 
 
+@remediation.error_handling
 def get_system_work_status_raw(user_name=None):
 	"""list the raw status of system work."""
 	theuserState = None
@@ -248,6 +253,7 @@ def get_system_work_status_raw(user_name=None):
 	return theuserState
 
 
+@remediation.error_handling
 @utils.memoize
 def get_w_cmd_args():
 	"""Either -his or -wnh depending on system."""
@@ -265,6 +271,7 @@ def get_w_cmd_args():
 
 
 # TODO: memoize this function
+@remediation.error_passing
 def get_user_work_status_raw(user_name=None):
 	"""list the raw status of user work."""
 	theRawOutput = None
@@ -322,6 +329,7 @@ def get_user_work_status_raw(user_name=None):
 	return theRawOutput
 
 
+@remediation.error_handling
 def taint_name(rawtxt):
 	"""check the interface arguments"""
 	tainted_input = str(rawtxt).lower()
@@ -561,6 +569,7 @@ def get_user_ip(user=None, use_html=False):
 	return theResult
 
 
+@remediation.bug_handling
 def main(argv=None):  # noqa C901
 	"""The main function."""
 	args = parseargs(argv)
