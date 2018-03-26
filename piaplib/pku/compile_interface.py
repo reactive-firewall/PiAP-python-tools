@@ -42,6 +42,15 @@ except Exception:
 
 
 try:
+	from . import utils as utils
+except Exception:
+	try:
+		import utils as utils
+	except Exception:
+		raise ImportError("Error Importing utils")
+
+
+try:
 	import argparse
 except Exception as importError:
 	print(str("Error Importing argparse lib"))
@@ -281,46 +290,6 @@ def parseArgs(args=None):
 		parser.error("parser tool bug")
 		return None
 	return parser.parse_args(args)
-
-
-def readFile(somefile):
-	read_data = None
-	theReadPath = str(somefile)
-	with open(theReadPath, 'r', encoding='utf-8') as f:
-		read_data = f.read()
-	f.close()
-	return read_data
-
-
-def extractRegexPattern(theInput_Str, theInputPattern):
-	import re
-	sourceStr = str(theInput_Str)
-	prog = re.compile(theInputPattern)
-	theList = prog.findall(sourceStr)
-	return theList
-
-
-def extractMACAddr(theInputStr):
-	return extractRegexPattern(
-		theInputStr,
-		"""(?:(?:[[:print:]]*){0,1}(?P<Mac>(?:(?:[0-9a-fA-F]{1,2}[\:]{1}){5}""" +
-		"""(?:[0-9a-fA-F]{1,2}){1}){1})+(?:[[:print:]]*){0,1})+"""
-	)
-
-
-def compactList(list, intern_func=None):
-	if intern_func is None:
-		def intern_func(x):
-			return x
-	seen = {}
-	result = []
-	for item in list:
-		marker = intern_func(item)
-		if marker in seen:
-			continue
-		seen[marker] = 1
-		result.append(item)
-	return result
 
 
 def compile_iface_name(media_type='eth', index=0, vlanID=None):
