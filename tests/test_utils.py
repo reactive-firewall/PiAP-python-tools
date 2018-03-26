@@ -607,8 +607,11 @@ and this will test reads.""")
 			else:
 				theResult = False
 			if (theResult is False):
-				print(str("fetch failed"))
-				print(str(""))
+				if sys.platform.startswith("linux"):
+					print(str("fetch failed"))
+					print(str(""))
+				else:
+					raise unittest.SkipTest("BETA. Experemental feature not ready yet.")
 		except Exception as err:
 			print(str(""))
 			print(str(type(err)))
