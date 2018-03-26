@@ -967,7 +967,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
-	def test_d_python_command_check_clientss_html(self):
+	def test_d_python_command_check_clients_html(self):
 		"""Test case for piaplib.pocket.lint check users."""
 		theResult = False
 		try:

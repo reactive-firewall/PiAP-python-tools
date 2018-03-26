@@ -90,7 +90,7 @@ def parseargs(arguments=None):
 			dest='show_all', default=False,
 			action='store_true', help='show all interfaces.'
 		)
-		utils._handleVerbosityArgs(parser, default=False)
+		parser = utils._handleVerbosityArgs(parser, default=False)
 		parser.add_argument(
 			'-V', '--version',
 			action='version', version=str(

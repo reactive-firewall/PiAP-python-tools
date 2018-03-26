@@ -321,7 +321,6 @@ def isWhiteListed(someString=None, whitelist=[]):
 	return False
 
 
-
 """ Argument Parsing """
 
 
@@ -529,7 +528,7 @@ def _python2urlretrieve(url, filename):
 		except Exception:
 			import urllib.request
 			return urllib.request.urlretrieve(url, filename)
-		return tempfile.retrieve(*args, **kwargs)
+		return tempfile.retrieve(url, filename)
 	raise AssertionError("URL could not be opened - BUG")
 
 
@@ -589,5 +588,4 @@ if __name__ in u'__main__':
 	except Exception:
 		raise ImportError("Error running main")
 	exit(0)
-
 

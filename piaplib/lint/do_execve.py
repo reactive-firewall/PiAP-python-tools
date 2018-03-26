@@ -125,7 +125,7 @@ def parseargs(tainted_arguments=None):
 			default=None, type=str, required=False,
 			help='the sandbox to play in.'
 		)
-		utils._handleVerbosityArgs(parser, default=False)
+		parser = utils._handleVerbosityArgs(parser, default=False)
 		parser.add_argument(
 			'-c', '--cmd',
 			dest='unsafe_input', action='append',
