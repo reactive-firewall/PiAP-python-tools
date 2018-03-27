@@ -53,7 +53,7 @@ except Exception as ImportErr:
 	def text(*args, **kwargs):
 		"""Helpful if you don't have a hypothisis!"""
 		return str("""This is a test Message.""")
-	
+
 	def note(*args, **kwargs):
 		"""Helpful if you don't have a hypothisis!"""
 		print(str(*args, **kwargs))
