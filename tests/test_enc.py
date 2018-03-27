@@ -409,7 +409,7 @@ class CryptoTestSuite(unittest.TestCase):
 				raise unittest.SkipTest("BETA. Experemental feature not ready yet.")
 		assert theResult
 
-	@given(text().filter(lambda x: repr(str(x)) not in repr(str(repr(x)))))
+	@given(filter((lambda x: repr(str(x)) not in repr(str(repr(x)))), text()))
 	def test_case_clarify_write_inverts_read(self, someInput):  # noqa C901
 		"""Tests the write then read workflow of keyring.clarify with fuzzing."""
 		theResult = False
