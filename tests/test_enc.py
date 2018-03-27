@@ -52,9 +52,7 @@ except Exception as ImportErr:
 
 	def text(*args, **kwargs):
 		"""Helpful if you don't have a hypothisis!"""
-		def someFunction():
-			return str("""This is a test Message.""")
-		return someFunction
+		return str("""This is a test Message.""")
 	
 	def note(*args, **kwargs):
 		"""Helpful if you don't have a hypothisis!"""
@@ -409,12 +407,13 @@ class CryptoTestSuite(unittest.TestCase):
 				raise unittest.SkipTest("BETA. Experemental feature not ready yet.")
 		assert theResult
 
-	@given(filter((lambda x: repr(str(x)) not in repr(str(repr(x)))), text()))
+	@given(text())
 	def test_case_clarify_write_inverts_read(self, someInput):  # noqa C901
 		"""Tests the write then read workflow of keyring.clarify with fuzzing."""
 		theResult = False
 		assume(isinstance(someInput, str))
 		assume(len(str(someInput)) > 3)
+		assume(repr(str(someInput)) not in repr(str(repr(someInput))))
 		someMessageText = str(repr(someInput))
 		try:
 			from piaplib.keyring import clarify as clarify
