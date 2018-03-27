@@ -43,6 +43,8 @@ try:
 		import piaplib as piaplib
 	except Exception:
 		from .. import piaplib as piaplib
+	if piaplib.__name__ is None:
+		raise ImportError("Failed to open piaplib")
 	try:
 		from ..pku import remediation as remediation
 	except Exception:
@@ -141,11 +143,7 @@ def parseargs(tainted_arguments=None):
 			dest='unsafe_output', default=False, action='store_true',
 			help='Return the command output.'
 		)
-		parser.add_argument(
-			'-V', '--version',
-			action='version', version=str(
-				"%(prog)s {}"
-			).format(str(piaplib.__version__)))
+		parser = utils._handleVersionArgs(parser)
 		theResult = parser.parse_args(tainted_arguments)
 	except Exception as parseErr:
 		try:

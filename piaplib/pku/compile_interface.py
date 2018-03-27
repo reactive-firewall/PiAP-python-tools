@@ -3,7 +3,7 @@
 
 # Pocket PiAP
 # ......................................................................
-# Copyright (c) 2017, Kendrick Walls
+# Copyright (c) 2017-2018, Kendrick Walls
 # ......................................................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,11 +25,6 @@ THERE MAY BE REGULATIONS GOVERNING USE OF WIFI SETTINGS IN MANY AREAS.
 """
 
 """ THIS CODE IS NOT IN A USEABLE STATE """
-
-try:
-	import piaplib as piaplib
-except Exception:
-	from . import piaplib as piaplib
 
 
 try:
@@ -274,14 +269,7 @@ def parseArgs(args=None):
 		parser.add_argument('-n', '--netmask', default=None, help='STATIC - Netmask')
 		parser.add_argument('-g', '--gw', default=None, help='STATIC - the gw IP')
 		parser.add_argument('-v', '--vlanid', dest='vlanid', default=None, help='the vlan')
-		parser.add_argument(
-			'-V',
-			'--version',
-			action='version',
-			version=str(
-				"%(prog)s {}"
-			).format(str(piaplib.__version__))
-		)
+		parser = utils._handleVersionArgs(parser)
 		parser = addWiFiArgs(parser)
 	except Exception as err:
 		print(str(type(err)))

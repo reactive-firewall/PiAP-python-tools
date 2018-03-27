@@ -116,14 +116,20 @@ def main(argv=None):
 		keyring_cmd = args.keyring_unit
 		useKeyTool(keyring_cmd, extra)
 	except Exception as cerr:
-		print(str(cerr))
-		print(str(cerr.args))
-		print(str(" UNKNOWN - An error occurred while handling the arguments. Command failure."))
+		remediation.error_breakpoint(cerr, str(u'piaplib.keyring.__MAIN__.main()'))
 		exit(3)
 	exit(0)
 
 
 if __name__ in u'__main__':
-	main(sys.argv[1:])
+	try:
+		error_code = main(sys.argv[1:])
+		exit(error_code)
+	except Exception as err:
+		remediation.error_breakpoint(err, str(u'piaplib.keyring.__MAIN__'))
+		del err
+		exit(255)
+	finally:
+		exit(0)
 
 

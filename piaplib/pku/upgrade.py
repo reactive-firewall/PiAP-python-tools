@@ -3,7 +3,7 @@
 
 # Pocket PiAP
 # ......................................................................
-# Copyright (c) 2017, Kendrick Walls
+# Copyright (c) 2017-2018, Kendrick Walls
 # ......................................................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
@@ -38,12 +38,6 @@ try:
 	import sys
 except Exception:
 	raise ImportError("Error Importing system tools")
-
-
-try:
-	import piaplib as piaplib
-except Exception:
-	from . import piaplib as piaplib
 
 
 try:
@@ -168,14 +162,7 @@ def parseargs(arguments=None):
 		action='store_true',
 		help='Upgrade all of the piaplib.'
 	)
-	parser.add_argument(
-		'-V',
-		'--version',
-		action='version',
-		version=str(
-			"%(prog)s {}"
-		).format(str(piaplib.__version__))
-	)
+	parser = utils._handleVersionArgs(parser)
 	theResult = parser.parse_known_args(arguments)
 	return theResult
 

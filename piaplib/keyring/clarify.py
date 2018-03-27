@@ -205,9 +205,9 @@ def packForRest(message=None, keyStore=None):
 			stdout=subprocess.PIPE,
 			stderr=subprocess.PIPE
 		)
-		(ciphertext, stderrdata) = p1.communicate(utils.literal_str(message))
+		(ciphertext, stderrdata) = p1.communicate(utils.literal_code(message))
 		if isinstance(ciphertext, bytes):
-			ciphertext = ciphertext.decode(u'utf-8')
+			ciphertext = ciphertext.decode(u'unicode_escape')
 		# ciphertext = str(ciphertext).replace(str("\\n"), str(""))
 		return ciphertext
 	else:
@@ -242,11 +242,12 @@ def unpackFromRest(ciphertext=None, keyStore=None):
 			stdout=subprocess.PIPE,
 			stderr=subprocess.PIPE
 		)
-		(cleartext, stderrdata) = p2.communicate(str("{}{}").format(ciphertext, EOFNEWLINE))
+		(cleartext, stderrdata) = p2.communicate(utils.literal_code(
+			str("{}{}").format(utils.literal_str(ciphertext), EOFNEWLINE))
+		)
 		if isinstance(cleartext, bytes):
-			cleartext = cleartext.decode(u'utf-8')
-		# cleartext = str(cleartext).replace(str("\\n"), str(""))
-		return str(cleartext)
+			cleartext = cleartext.decode(u'unicode_escape')
+		return utils.literal_str(cleartext)
 	else:
 		raise NotImplementedError("No Implemented Backend - BUG")
 
@@ -257,7 +258,7 @@ def unpackFromFile(somefile, keyStore=None):
 	read_data = None
 	try:
 		someFilePath = utils.addExtension(somefile, str('enc'))
-		with utils.open_func(someFilePath, mode=u'r', encoding=u'utf-8') as enc_data_file:
+		with utils.open_func(someFilePath, mode=u'r', encoding=u'unicode_escape') as enc_data_file:
 			read_enc_data = enc_data_file.read()
 			read_data = unpackFromRest(read_enc_data, keyStore)
 	except Exception as clearerr:
@@ -351,6 +352,7 @@ def parseArgs(arguments=None):
 			required=False,
 			help='The file with the cryptographic Key String.'
 		)
+		parser = utils._handleVersionArgs(parser)
 		thegroup = parser.add_mutually_exclusive_group(required=True)
 		for theaction in WEAK_ACTIONS.keys():
 			thegroup.add_argument(

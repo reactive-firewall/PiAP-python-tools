@@ -50,6 +50,11 @@ except Exception as err:
 	exit(3)
 
 try:
+	import piaplib as piaplib
+except Exception:
+	from . import piaplib as piaplib
+
+try:
 	from piaplib.book.logs import logs as logs
 except Exception:
 	try:
@@ -339,6 +344,22 @@ def _handleVerbosityArgs(argParser, default=False):
 		'-q', '--quiet',
 		dest='verbose_mode', default=False,
 		action='store_false', help='Disable the given interface.'
+	)
+	return argParser
+
+
+@remediation.error_passing
+def _handleVersionArgs(argParser):
+	"""utility function to handle the verbosity flags for the given argument parser."""
+	if ((argParser is None) or (not isinstance(argParser, argparse.ArgumentParser))):
+		raise argparse.InvalidArgumentError("argParser must be of type argparse.ArgumentParser")
+	argParser.add_argument(
+		'-V',
+		'--version',
+		action='version',
+		version=str(
+			"%(prog)s {}"
+		).format(str(piaplib.__version__))
 	)
 	return argParser
 

@@ -26,10 +26,6 @@ try:
 	import argparse
 	sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 	try:
-		import piaplib as piaplib
-	except Exception:
-		from . import piaplib as piaplib
-	try:
 		from .. import utils as utils
 	except Exception:
 		import pku.utils as utils
@@ -98,11 +94,7 @@ def parseargs(arguments=None):
 			action='store_true', help='show all users.'
 		)
 		parser = utils._handleVerbosityArgs(parser, default=False)
-		parser.add_argument(
-			'-V', '--version',
-			action='version', version=str(
-				"%(prog)s {}"
-			).format(str(piaplib.__version__)))
+		parser = utils._handleVersionArgs(parser)
 		theResult = parser.parse_args(arguments)
 	except Exception as parseErr:
 		parser.error(str(parseErr))

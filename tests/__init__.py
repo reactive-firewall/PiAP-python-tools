@@ -47,10 +47,12 @@ try:
 	from tests import test_version
 	from tests import test_clients_check
 	from tests import test_interface
+	from tests import test_enc
+	from tests import test_lint_iface
 	depends = [
 		profiling, test_basic, test_strings, test_utils, test_pocket, test_config,
 		test_rand, test_salt, test_lint, test_book, test_logs, test_pku, test_version,
-		test_clients_check, test_interface
+		test_clients_check, test_interface, test_enc, test_lint_iface
 	]
 	for unit_test in depends:
 		try:

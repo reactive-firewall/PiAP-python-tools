@@ -45,7 +45,7 @@ try:
 		from . import html_generator as html_generator
 	except Exception:
 		import html_generator as html_generator
-	for depend in [utils, remediation, interfaces, html_generator]:
+	for depend in [piaplib, utils, remediation, interfaces, html_generator]:
 		if depend.__name__ is None:
 			raise ImportError("Failed to import piaplib components.")
 except Exception as importErr:
@@ -91,11 +91,7 @@ def parseargs(arguments=None):
 			action='store_true', help='show all interfaces.'
 		)
 		parser = utils._handleVerbosityArgs(parser, default=False)
-		parser.add_argument(
-			'-V', '--version',
-			action='version', version=str(
-				"%(prog)s {}"
-			).format(str(piaplib.__version__)))
+		parser = utils._handleVersionArgs(parser)
 		theResult = parser.parse_args(arguments)
 	except Exception as parseErr:
 		parser.error(str(parseErr))

@@ -3,7 +3,7 @@
 
 # Pocket PiAP
 # ......................................................................
-# Copyright (c) 2017, Kendrick Walls
+# Copyright (c) 2017-2018, Kendrick Walls
 # ......................................................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,17 +25,20 @@ except Exception:
 	raise ImportError("WTF, no system?!?!")
 
 try:
-	import piaplib as piaplib
-except Exception:
-	from . import piaplib as piaplib
-
-try:
 	from . import remediation as remediation
 except Exception:
 	try:
 		import remediation as remediation
 	except Exception:
 		raise ImportError("Error Importing remediation")
+
+try:
+	from . import utils as utils
+except Exception:
+	try:
+		import utils as utils
+	except Exception:
+		raise ImportError("Error Importing utils")
 
 
 __prog__ = """piaplib.pku.interfaces"""
@@ -100,14 +103,7 @@ def parseargs(arguments=None):
 			action='store_true',
 			help='Disable and then re-enable the given interface. (default)'
 		)
-		parser.add_argument(
-			'-V',
-			'--version',
-			action='version',
-			version=str(
-				"%(prog)s {}"
-			).format(str(piaplib.__version__))
-		)
+		parser = utils._handleVersionArgs(parser)
 		(theResult, extras) = parser.parse_known_args(arguments)
 	except Exception as err:
 		print(str(type(err)))

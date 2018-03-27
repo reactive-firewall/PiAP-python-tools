@@ -3,7 +3,7 @@
 
 # Pocket PiAP
 # ......................................................................
-# Copyright (c) 2017, Kendrick Walls
+# Copyright (c) 2017-2018, Kendrick Walls
 # ......................................................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,15 +19,33 @@
 # limitations under the License.
 # ......................................................................
 
-import os
-import sys
-import argparse
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
 try:
-	import piaplib as piaplib
-except Exception:
-	from .. import piaplib as piaplib
+	import os
+	import sys
+	import argparse
+	sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+	try:
+		import piaplib as piaplib
+	except Exception:
+		from .. import piaplib as piaplib
+	try:
+		from .. import utils as utils
+	except Exception:
+		import pku.utils as utils
+	try:
+		from .. import remediation as remediation
+	except Exception:
+		import pku.remediation as remediation
+	for depends in [piaplib, remediation, utils]:
+		if depends.__name__ is None:
+			raise ImportError("Failed to import depends.")
+except Exception as importErr:
+	print(str(importErr))
+	print(str(importErr.args))
+	importErr = None
+	del importErr
+	raise ImportError("Failed to import " + str(__file__))
+	exit(255)
 
 try:
 	from . import clients_check_status as clients_check_status
@@ -43,14 +61,6 @@ try:
 	from . import users_check_status as users_check_status
 except Exception:
 	import users_check_status as users_check_status
-
-try:
-	from piaplib.pku import remediation as remediation
-except Exception:
-	try:
-		import piaplib.pku.remediation as remediation
-	except Exception:
-		raise ImportError("Error Importing remediation")
 
 try:
 	from piaplib.book.logs import logs as logs
@@ -91,9 +101,7 @@ def parseArgs(arguments=None):
 		choices=CHECK_UNITS.keys(),
 		help='the pocket service check option.'
 	)
-	parser.add_argument('-V', '--version', action='version', version=str(
-		"%(prog)s {}"
-	).format(str(piaplib.__version__)))
+	parser = utils._handleVersionArgs(parser)
 	return parser.parse_known_args(arguments)
 
 

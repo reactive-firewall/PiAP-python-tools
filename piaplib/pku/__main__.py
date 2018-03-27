@@ -3,7 +3,7 @@
 
 # Pocket PiAP
 # ......................................................................
-# Copyright (c) 2017, Kendrick Walls
+# Copyright (c) 2017-2018, Kendrick Walls
 # ......................................................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
@@ -62,10 +62,15 @@ except Exception as importErr:
 
 
 try:
-	import piaplib as piaplib
-except Exception:
-	from . import piaplib as piaplib
-
+	try:
+		import piaplib as piaplib
+	except Exception:
+		from . import piaplib as piaplib
+	if piaplib.__name__ is None:
+		raise ImportError("OMG! we could not import argparse. We're in need of a fix! ABORT.")
+except Exception as err:
+	raise ImportError(err)
+	exit(3)
 
 try:
 	import piaplib.pku.upgrade as upgrade
@@ -164,9 +169,7 @@ def parseArgs(arguments=None):
 		choices=PKU_UNITS.keys(),
 		help='the pocket pku service option.'
 	)
-	parser.add_argument('-V', '--version', action='version', version=str(
-		"%(prog)s {}"
-	).format(str(piaplib.__version__)))
+	parser = utils._handleVersionArgs(parser)
 	return parser.parse_known_args(arguments)
 
 
