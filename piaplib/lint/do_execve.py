@@ -188,26 +188,25 @@ def getCommandWhitelist():
 
 @remediation.error_handling
 def chworkingdir(sandboxPath=None):
-	if sandboxPath is not None:
-		try:
-			if os.access(os.path.abspath(sandboxPath), os.F_OK):
-				if os.geteuid() > 0:
-					os.chdir(str(os.path.abspath(sandboxPath)))
-				else:
-					os.chroot(str(os.path.abspath(sandboxPath)))
-			else:
-				os.abort()
-		except OSError as badChrootErr:
-			remediation.error_breakpoint(badChrootErr)
-			badChrootErr = None
-			del badChrootErr
-			try:
+	if sandboxPath is None:
+		sandboxPath = os.path.abspath("/tmp")
+	try:
+		if os.access(os.path.abspath(sandboxPath), os.F_OK):
+			if os.geteuid() > 0:
 				os.chdir(str(os.path.abspath(sandboxPath)))
-			except Exception:
-				logs.log(str("""CRASH - PiAP aborted from sandboxing"""), "CRITICAL")
-				os.abort()
-	else:
-		os.chdir(str(os.path.abspath("/tmp")))
+			else:
+				os.chroot(str(os.path.abspath(sandboxPath)))
+		else:
+			os.abort()
+	except OSError as badChrootErr:
+		remediation.error_breakpoint(badChrootErr)
+		badChrootErr = None
+		del badChrootErr
+		try:
+			os.chdir(str(os.path.abspath(sandboxPath)))
+		except Exception:
+			logs.log(str("""CRASH - PiAP aborted from sandboxing"""), "CRITICAL")
+			os.abort()
 	return None
 
 
