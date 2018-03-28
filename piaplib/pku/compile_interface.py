@@ -391,10 +391,11 @@ def main(argv=None):
 if __name__ in u'__main__':
 	try:
 		import sys
-		main(sys.argv[1:])
-	except Exception as err:
-		print(str(err))
-		print(str((err.args)))
-		exit(1)
+		if (sys.argv is not None and (sys.argv is not []) and (len(sys.argv) > 1)):
+			exit(main(sys.argv[1:]))
+		else:
+			exit(main(["--help"]))
+	except Exception:
+		raise ImportError("Error running main")
 	exit(0)
 

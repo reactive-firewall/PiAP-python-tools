@@ -330,16 +330,13 @@ def main(argv=None):
 	return 3
 
 
-if __name__ == u'__main__':
+if __name__ in u'__main__':
 	try:
 		if (sys.argv is not None and (sys.argv is not []) and (len(sys.argv) > 1)):
-			main(sys.argv[1:])
-	except Exception as main_err:
-		print(str("upgrade: REALLY BAD ERROR: PiAPLib Refused to upgrade! ABORT!"))
-		print(str(type(main_err)))
-		print(str(main_err))
-		print(str(main_err.args[0]))
-		main_err = None
-		del(main_err)
-		exit(3)
+			exit(main(sys.argv[1:]))
+		else:
+			exit(main(["--help"]))
+	except Exception:
+		raise ImportError("Error running main")
+	exit(3)
 

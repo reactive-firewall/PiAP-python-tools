@@ -3,7 +3,7 @@
 
 # Pocket PiAP
 # ......................................................................
-# Copyright (c) 2017, Kendrick Walls
+# Copyright (c) 2017-2018, Kendrick Walls
 # ......................................................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,19 +23,13 @@ import unittest
 
 try:
 	try:
-		import sys
-		import os
-		sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), str('..'))))
-		sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), str('.'))))
+		import context
 	except Exception as ImportErr:
-		print(str(''))
-		print(str(type(ImportErr)))
-		print(str(ImportErr))
-		print(str((ImportErr.args)))
-		print(str(''))
 		ImportErr = None
 		del ImportErr
-		raise ImportError(str("Test module failed completely."))
+		from . import context
+	if context.__name__ is None:
+		raise ImportError("Failed to import context")
 except Exception:
 	raise ImportError("Failed to import test context")
 
@@ -106,6 +100,33 @@ class ConfigTestSuite(unittest.TestCase):
 			theResult = (theResult or (config.hasJsonSupport() is False))
 		except Exception as err:
 			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			err = None
+			del err
+			theResult = False
+		assert theResult
+
+	def test__case_json_attempt_bad_write_file(self):
+		"""Tests the JSON write functions with no data. Should return False."""
+		theResult = False
+		try:
+			from piaplib import pku as pku
+			if pku.__name__ is None:
+				raise ImportError("Failed to import pku")
+			from pku import config as config
+			if config.__name__ is None:
+				raise ImportError("Failed to import config")
+			somefile = str("the_test_file.json")
+			if (config.writeJsonFile(somefile, None) is False):
+				theResult = True
+			else:
+				theResult = False
+		except Exception as err:
+			print(str(""))
+			print(str("Error in test of json write-read"))
 			print(str(type(err)))
 			print(str(err))
 			print(str((err.args)))
@@ -369,6 +390,7 @@ class ConfigTestSuite(unittest.TestCase):
 			from pku import config as config
 			if config.__name__ is None:
 				raise ImportError("Failed to import config")
+			somefile = str("the_test_file.yml")
 			if config.hasYamlSupport() is True:
 				theBlob = dict({
 					u'test': {
@@ -376,7 +398,6 @@ class ConfigTestSuite(unittest.TestCase):
 						u'read_test': u'and this will test reads.'
 					}
 				})
-				somefile = str("the_test_file.yml")
 				if (config.writeYamlFile(somefile, theBlob) is True):
 					try:
 						readback = config.readYamlFile(somefile)
@@ -425,7 +446,7 @@ class ConfigTestSuite(unittest.TestCase):
 					print(str(type(theBlob)))
 					print(str(""))
 			else:
-				theResult = True
+				theResult = (not config.writeYamlFile(somefile, None))
 				print(str("SKIPPED: no yaml support"))
 		except Exception as err:
 			print(str(""))

@@ -22,8 +22,13 @@
 try:
 	import sys
 	import os
+	_DIR_NAME = str(".")
+	_PARENT_DIR_NAME = str("..")
+	_BASE_NAME = os.path.dirname(__file__)
 	if 'piaplib' in __file__:
-		sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+		sys.path.insert(0, os.path.abspath(os.path.join(_BASE_NAME, _PARENT_DIR_NAME)))
+	if 'tests' in __file__:
+		sys.path.insert(0, os.path.abspath(os.path.join(_BASE_NAME, _DIR_NAME)))
 except Exception as ImportErr:
 	print(str(type(ImportErr)))
 	print(str(ImportErr))

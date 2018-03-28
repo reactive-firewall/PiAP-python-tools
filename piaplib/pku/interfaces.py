@@ -195,7 +195,13 @@ def main(argv=None):
 	return 0
 
 
-if __name__ == u'__main__':
-	if (sys.argv is not None and (sys.argv is not []) and (len(sys.argv) > 1)):
-		exit(main(sys.argv[1:]))
+if __name__ in u'__main__':
+	try:
+		if (sys.argv is not None and (sys.argv is not []) and (len(sys.argv) > 1)):
+			exit(main(sys.argv[1:]))
+		else:
+			exit(main(["--help"]))
+	except Exception:
+		raise ImportError("Error running main")
+	exit(0)
 

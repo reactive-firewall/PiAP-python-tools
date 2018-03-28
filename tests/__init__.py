@@ -69,7 +69,6 @@ try:
 			impErr = None
 			del impErr
 			raise ImportError(str("Test module failed completely."))
-			exit(1)
 except Exception as badErr:
 	print(str(''))
 	print(str(type(badErr)))

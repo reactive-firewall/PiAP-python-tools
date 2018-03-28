@@ -217,7 +217,6 @@ def main(argv=None):
 
 if __name__ in u'__main__':
 	try:
-		import sys
 		exit(main(sys.argv[1:]))
 	except Exception:
 		exit(3)

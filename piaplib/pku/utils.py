@@ -107,7 +107,6 @@ def literal_code(raw_input=None):
 		logs.log("[CWE-20] Possible malformed string attack occurred.", "info")
 		malformErr = None
 		del(malformErr)
-		return None
 	return None
 
 
@@ -130,7 +129,6 @@ def literal_str(raw_input=None):
 		logs.log(str("[CWE-20] Possible malformed string attack occurred."), "info")
 		malformErr = None
 		del(malformErr)
-		return None
 	return None
 
 
@@ -606,7 +604,6 @@ def main(argv=None):
 
 if __name__ in u'__main__':
 	try:
-		import sys
 		if (sys.argv is not None and (sys.argv is not []) and (len(sys.argv) > 1)):
 			exit(main(sys.argv[1:]))
 		else:
