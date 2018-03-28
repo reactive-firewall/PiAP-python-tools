@@ -85,26 +85,16 @@ def parseArgs(arguments=None):
 @remediation.error_handling
 def useKeyTool(tool, arguments=[None]):
 	"""Handler for launching pocket-tools."""
-	if tool is None:
-		return None
-	if tool in KEYRING_UNITS.keys():
-		theResult = None
+	theResult = None
+	if tool is not None and tool in KEYRING_UNITS.keys():
 		try:
-			try:
-				# print(str("keyring launching: "+tool))
-				theResult = KEYRING_UNITS[tool].main(arguments)
-			except Exception:
-				timestamp = remediation.getTimeStamp()
-				theResult = str(
-					timestamp +
-					" - WARNING - An error occurred while handling the keyring tool." +
-					"Cascading failure."
-				)
-		except Exception:
-			theResult = str("CRITICAL - An error occurred while handling the cascading failure.")
-		return theResult
-	else:
-		return None
+			theResult = KEYRING_UNITS[tool].main(arguments)
+		except Exception as err:
+			remediation.error_breakpoint(err, u'piaplib.keyring.__MAIN__.useKeyTool')
+			err = None
+			del err
+			theResult = None
+	return theResult
 
 
 @remediation.error_handling
