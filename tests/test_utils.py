@@ -612,6 +612,10 @@ and this will test reads.""")
 					print(str(""))
 				else:
 					raise unittest.SkipTest("BETA. Experemental feature not ready yet.")
+		except unittest.SkipTest as skiper:
+			skiper = None
+			del skiper
+			raise unittest.SkipTest("BETA. Experemental feature not ready yet.")
 		except Exception as err:
 			print(str(""))
 			print(str(type(err)))

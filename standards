@@ -12,6 +12,7 @@ Standards checklist:
 	- [x] PEP324 - subproccess
 	- [x] PEP20 - zen of python
 	- [] RFC 3530 - NFSv4
+    - [] RFC 2616 - user agents are optional
 	Codesigning:
 	- [] RFC 4880 - pgpy (bsd compatible licenced python pgp)
 	

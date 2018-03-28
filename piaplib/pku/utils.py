@@ -99,7 +99,7 @@ def literal_code(raw_input=None):
 			None - otherwise
 	"""
 	try:
-		if isinstance(raw_input, bytes):
+		if isinstance(raw_input, bytes) or isinstance(raw_input, unicode):
 			return raw_input.decode("utf-8")
 		elif isinstance(raw_input, str):
 			return raw_input.encode("utf-8").decode("utf-8")
@@ -121,11 +121,9 @@ def literal_str(raw_input=None):
 	"""
 	try:
 		if isinstance(raw_input, bytes):
-			return str(raw_input.decode("utf-8"))
-		elif isinstance(raw_input, str):
-			return str(raw_input.encode("utf-8").decode("utf-8"))
-		elif isinstance(raw_input, unicode):
-			return str(raw_input.encode("utf-8").decode("utf-8"))
+			return raw_input.decode("utf-8")
+		elif isinstance(raw_input, str) or isinstance(raw_input, unicode):
+			return raw_input.encode("utf-8").decode("utf-8")
 		else:
 			raise UnicodeDecodeError("Malformed Raw String")
 	except Exception as malformErr:
@@ -514,6 +512,11 @@ def appendFile(somefile, somedata):
 	return theResult
 
 
+def getUserAgent():
+	"""returns the non-descript mozilla/5.0 (Linux) - PLACEHOLDER - need to randomize this."""
+	return str("""mozilla/5.0 (Linux)""")
+
+
 @remediation.error_passing
 def urlretrieve(url, filename):
 	""" cross-python urlretrive function """
@@ -523,11 +526,13 @@ def urlretrieve(url, filename):
 			return _python2urlretrieve(url, filename)
 		else:
 			import requests
-			r = requests.get(url)
+			piaplib_headers = {'DNT': '1', 'Connection': 'close', 'user-agent': getUserAgent()}
+			r = requests.get(url, headers=piaplib_headers)
 			if r is None:
 				raise AssertionError("URL could not be opened - BUG")
 			if r.status_code is not None:
-				return writeFile(filename, r.contents)
+				r.encoding = "utf-8"
+				return writeFile(filename, r.content)
 	except Exception as err:
 		remediation.error_breakpoint(err)
 		return _python2urlretrieve(url, filename)

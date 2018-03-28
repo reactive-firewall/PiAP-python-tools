@@ -90,7 +90,7 @@ def taint_int(raw_input):
 	try:
 		if raw_input is None:
 			finalResult = False
-		elif isinstance(utils.literal_str(raw_input), str) and int(raw_input, 10) > 2:
+		elif isinstance(utils.literal_code(raw_input), str) and int(raw_input, 10) > 2:
 			finalResult = True
 		elif isinstance(raw_input, int) and int(raw_input) > 2:
 			finalResult = True
@@ -160,19 +160,67 @@ def parseargs(tainted_arguments=None):
 
 
 @remediation.error_handling
+def getCommandWhitelist():
+	"""The list of allowed commands."""
+	wht_list = [
+		str("""exit"""),
+		str("""which"""),
+		str("""/bin/echo"""),
+		str("""/bin/ps"""),
+		str("""/usr/bin/sudo""")
+	]
+	gen_list = [
+		str("""client_status.bash"""),
+		str("""disk_status.bash"""),
+		str("""fw_status.bash"""),
+		str("""interfaces_status.bash"""),
+		str("""memory_status.bash"""),
+		str("""temperature_status.bash"""),
+		str("""user_status.bash"""),
+		str("""reboot.bash"""),
+		str("""power_off.bash""")
+	]
+	prefix = str("""/srv/PiAP/bin/""")
+	piap_command_list = [str("""{}{}""").format(prefix, x) for x in utils.compactList(gen_list)]
+	wht_list = utils.compactList(wht_list + piap_command_list)
+	return wht_list
+
+
+@remediation.error_handling
+def chworkingdir(sandboxPath=None):
+	if sandboxPath is not None:
+		try:
+			if os.access(os.path.abspath(sandboxPath), os.F_OK):
+				if os.geteuid() > 0:
+					os.chdir(str(os.path.abspath(sandboxPath)))
+				else:
+					os.chroot(str(os.path.abspath(sandboxPath)))
+			else:
+				os.abort()
+		except OSError as badChrootErr:
+			remediation.error_breakpoint(badChrootErr)
+			badChrootErr = None
+			del badChrootErr
+			try:
+				os.chdir(str(os.path.abspath(sandboxPath)))
+			except Exception:
+				logs.log(str("""CRASH - PiAP aborted from sandboxing"""), "CRITICAL")
+				os.abort()
+	else:
+		os.chdir(str(os.path.abspath("/tmp")))
+	return None
+
+
+@remediation.error_handling
 def runUnsafeCommand(arguments, error_fd=None):
 	"""Run the actual Unsafe command. Mighty creator help us."""
 	theRawOutput = None
 	err_fd = None
 	try:
-		WHTLIST = [
-			str("""exit"""),
-			str("""which"""),
-			str("""/bin/echo""")
-		]
+		WHTLIST = getCommandWhitelist()
 		if arguments is None or isinstance(arguments, list) is not True:
 			arguments = [WHTLIST[0], u'0']
-		elif (not os.access(arguments[0], os.X_OK)) and (not utils.isWhiteListed(arguments[0], WHTLIST)):
+		elif (not os.access(arguments[0], os.X_OK)) or (not utils.isWhiteListed(arguments[0], WHTLIST)):
 			arguments = [WHTLIST[0], u'1']
 		try:
 			err_fd = subprocess.STDOUT
@@ -214,54 +262,42 @@ def unsafe_main(unsafe_input=None, chrootpath=None, uid=None, gid=None, passOutp
 	The main unsafe work.
 	Fork and drop privileges try to chroot. Then run unsafe input.
 	"""
-	try:
-		pid = os.fork()
-		if pid is not None and pid > 0:
-			# this is the parent process... do whatever needs to be done as the parent
-			logs.log(
-				str(u'OK - PiAP Launched pid {} as SANDBOXED COMMAND.').format(pid),
-				"Debug"
-			)
-			exit(0)
-		else:
+	ppid = os.getpid()
+	pid = os.fork()
+	if pid is not None and pid > ppid:
+		# this is the parent process... do whatever needs to be done as the parent
+		logs.log(
+			str("""OK - PiAP Launched pid {} as SANDBOXED COMMAND.""").format(pid),
+			"Debug"
+		)
+		exit(0)
+	else:
+		try:
 			# we are the child process... lets do that plugin thing!
 			if chrootpath is not None:
-				try:
-					if os.geteuid() > 0:
-						os.chdir(str(os.path.abspath(chrootpath)))
-					else:
-						os.chroot(str(os.path.abspath(chrootpath)))
-				except OSError as badChrootErr:
-					remediation.error_breakpoint(badChrootErr)
-					badChrootErr = None
-					del badChrootErr
-					try:
-						os.chdir(str(os.path.abspath(chrootpath)))
-					except Exception:
-						os.kill(pid)
-						return None
+				chworkingdir(chrootpath)
 			if taint_int(uid):
 				os.seteuid(int(uid))
 			if taint_int(gid):
-				os.setegid(int(gid))
-			# POSIX.1-2008 Sec. 11.2.3 - refork
-			tainted_pid = os.fork()
-			if tainted_pid is not None and tainted_pid > 0:
-				# this is the parent process... do whatever needs to be done as the parent
-				logs.log(
-					str(u'OK - PiAP Launched pid {} as TAINTED COMMAND.').format(tainted_pid),
-					"Warn"
-				)
-				exit(0)
-			else:
-				tainted_output = runUnsafeCommand(unsafe_input)
-				if (passOutput is not None and passOutput is True):
-					return tainted_output
-	except Exception as unsafeErr:
-		remediation.error_breakpoint(unsafeErr)
-		unsafeErr = None
-		del unsafeErr
-		os.abort()
+				os.setgid(int(gid))
+		except Exception as unsafeErr:
+			remediation.error_breakpoint(unsafeErr)
+			unsafeErr = None
+			del unsafeErr
+			os.abort()
+		# POSIX.1-2008 Sec. 11.2.3 - refork
+		tainted_pid = os.fork()
+		if tainted_pid is not None and tainted_pid > 0:
+			# this is the parent process... do whatever needs to be done as the parent
+			logs.log(
+				str("""OK - PiAP Launched pid {} as TAINTED COMMAND.""").format(tainted_pid),
+				"Warn"
+			)
+			exit(0)
+		else:
+			tainted_output = runUnsafeCommand(unsafe_input)
+			if (passOutput is not None and passOutput is True):
+				return tainted_output
 	return None
 
 
@@ -284,14 +320,12 @@ def main(argv=None):
 		if args.unsafe_input is not None:
 			tainted_input = [utils.literal_str(x) for x in args.unsafe_input]
 		if args.unsafe_output is not False:
-			print(unsafe_main(tainted_input, chroot_path, tainted_uid, tainted_gid, True))
+			unsafe_output = unsafe_main(tainted_input, chroot_path, tainted_uid, tainted_gid, True)
+			print(utils.literal_str(unsafe_output))
 		else:
 			unsafe_main(tainted_input, chroot_path, tainted_uid, tainted_gid, False)
 	except Exception as mainErr:
-		print(str(u'MAIN FAILED DURING UNSAFE COMMAND. ABORT.'))
-		print(str(type(mainErr)))
-		print(str(mainErr))
-		print(str(mainErr.args))
+		remediation.error_breakpoint(mainErr, str(u'MAIN FAILED DURING UNSAFE COMMAND. ABORT.'))
 		mainErr = None
 		del mainErr
 	return False
@@ -304,13 +338,9 @@ if __name__ in u'__main__':
 		else:
 			raise Exception("MAIN FAILED WHEN FOUND TO BE CWE-20 UNSAFE. ABORT.")
 	except Exception as err:
-		print(str(u'MAIN FAILED DURING UNSAFE COMMAND. ABORT.'))
-		print(str(type(err)))
-		print(str(err))
-		print(str(err.args))
+		remediation.error_breakpoint(err, str(u'MAIN FAILED DURING UNSAFE COMMAND. ABORT.'))
 		err = None
 		del err
-		print(str(u'MAIN FAILED DURING UNSAFE COMMAND. ABORT.'))
 		exit(255)
 	finally:
 		exit(0)
