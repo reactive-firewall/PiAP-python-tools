@@ -5,7 +5,7 @@ Standards checklist:
 	 - [x] RFC 2104 HMAC class.
 	 - [x] Also complies with RFC 4231.
 	 - [x] see HMAC API in PEP 247.
-	setup.cfg
+	setup.cfg:
 	 - [x] PEP 345 -- Metadata for Python Software Packages 1.2
 
 	Other Misc (just for navigation):

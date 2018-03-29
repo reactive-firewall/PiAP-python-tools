@@ -76,8 +76,8 @@ DEFAULT_BETA_FILE_PATH = str("""/var/opt/PiAP/.beta_W1AsYRUDzyZx""")
 """THIS IS A PLACEHOLDER. WILL move this to a config file."""
 
 
-KEY_BLOCK_SIZE = 44
-"""KEY_BLOCK_SIZE = len(base64.standard_b64encode(bytes(os.urandom(32)))) = 44"""
+# KEY_BLOCK_SIZE = 44
+# """KEY_BLOCK_SIZE = len(base64.standard_b64encode(bytes(os.urandom(32)))) = 44"""
 
 
 EOFNEWLINE = str(os.linesep)
@@ -115,12 +115,14 @@ def getBackendCommand():
 @utils.memoize
 def hasBackendCommand():
 	"""True if the backend command is available."""
+	hasbackend = False
 	try:
 		if (getBackendCommand() is not None):
-			return True
+			hasbackend = True
 	except Exception:
-		return False
-	return False
+		hasbackend = False
+	finally:
+		return hasbackend
 
 
 @remediation.error_passing
@@ -206,8 +208,9 @@ def packForRest(message=None, keyStore=None):
 			stderr=subprocess.PIPE
 		)
 		(ciphertext, stderrdata) = p1.communicate(utils.literal_code(message))
+		p1.wait()
 		if isinstance(ciphertext, bytes):
-			ciphertext = ciphertext.decode(u'unicode_escape')
+			ciphertext = ciphertext.decode(u'utf-8')
 		# ciphertext = str(ciphertext).replace(str("\\n"), str(""))
 		return ciphertext
 	else:
@@ -243,10 +246,11 @@ def unpackFromRest(ciphertext=None, keyStore=None):
 			stderr=subprocess.PIPE
 		)
 		(cleartext, stderrdata) = p2.communicate(utils.literal_code(
-			str("{}{}").format(utils.literal_str(ciphertext), EOFNEWLINE))
+			str("{}{}").format(utils.literal_code(ciphertext), EOFNEWLINE))
 		)
+		p2.wait()
 		if isinstance(cleartext, bytes):
-			cleartext = cleartext.decode(u'unicode_escape')
+			cleartext = cleartext.decode(u'utf-8')
 		return utils.literal_str(cleartext)
 	else:
 		raise NotImplementedError("No Implemented Backend - BUG")
@@ -258,7 +262,7 @@ def unpackFromFile(somefile, keyStore=None):
 	read_data = None
 	try:
 		someFilePath = utils.addExtension(somefile, str('enc'))
-		with utils.open_func(someFilePath, mode=u'r', encoding=u'unicode_escape') as enc_data_file:
+		with utils.open_func(someFilePath, mode=u'r', encoding=u'utf-8') as enc_data_file:
 			read_enc_data = enc_data_file.read()
 			read_data = unpackFromRest(read_enc_data, keyStore)
 	except Exception as clearerr:
@@ -305,8 +309,8 @@ WEAK_ACTIONS = {u'pack': packForRest, u'unpack': unpackFromRest}
 @remediation.error_handling
 def parseArgs(arguments=None):
 	theArgs = argparse.Namespace()
-	salt_rand = str(rand.randPW(16)).replace("%", "%%")
-	key_rand = str(rand.randPW(16)).replace("%", "%%")
+	salt_rand = str(rand.randPW(24)).replace("%", "%%")
+	key_rand = str(rand.randPW(24)).replace("%", "%%")
 	try:
 		parser = argparse.ArgumentParser(
 			prog=__prog__,

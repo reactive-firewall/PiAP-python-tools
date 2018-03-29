@@ -59,6 +59,11 @@ def getDefaultMainConfigFile():
 	return default_config
 
 
+def isLoaded():
+	"""returns False. Overloaded by config class."""
+	return getDefaultMainConfigFile()['PiAP-piaplib']['loaded']
+
+
 def mergeDicts(*dict_args):
 	"""
 	Given any number of dicts, shallow copy and merge into a new dict,

@@ -56,6 +56,9 @@ except Exception:
 		raise ImportError("Error Importing baseconfig for config")
 
 
+global _MAIN_CONFIG_DATA
+
+
 def hasJsonSupport():
 	support_json = False
 	try:
@@ -232,6 +235,58 @@ def getDefaultMainConfigFile():
 		})
 	})
 	return baseconfig.mergeDicts(baseconfig.getDefaultMainConfigFile(), default_config)
+
+
+def _raw_getMainConfig():
+	"""returns raw global _MAIN_CONFIG_DATA"""
+	return globals()._MAIN_CONFIG_DATA
+
+
+def _raw_setMainConfig(newValue):
+	"""sets raw global _MAIN_CONFIG_DATA"""
+	if newValue is None:
+		newValue = _raw_getMainConfig()
+	globals()._MAIN_CONFIG_DATA = newValue
+
+
+@remediation.error_handling
+def getMainConfig():
+	if _raw_getMainConfig() is None:
+		tempValue = loadMainConfigFile()
+		tempValue['PiAP-piaplib']['loaded'] = True
+		_raw_setMainConfig(newValue=tempValue)
+	return _raw_getMainConfig()
+
+
+@remediation.error_handling
+def isLoaded():
+	"""True if config is loaded."""
+	return getMainConfig()['PiAP-piaplib']['loaded']
+
+
+@remediation.error_handling
+def hasMainConfigOptionsFor(somekey=None):
+	"""Returns True if the main configurtion has the given key, otherwise False."""
+	hasValue = False
+	if somekey is not None and isLoaded() and (getMainConfig().has_section(somekey)):
+		hasValue = True
+	return hasValue
+
+
+@remediation.error_handling
+def hasMainConfigOptionFor(mainSectionKey=None):
+	"""True if config key maps to value."""
+	hasValue = False
+	if mainSectionKey is None or not isLoaded():
+		hasValue = False
+	if str(""".""") not in str(mainSectionKey):
+		hasValue = hasMainConfigOptionsFor(mainSectionKey)
+	else:
+		kp = str(mainSectionKey).split(""".""")
+		main_config = getMainConfig()
+		if (main_config.has_section(kp[0]) and (main_config[kp[0]].has_option[kp[1]])):
+			hasValue = True
+	return hasValue
 
 
 @remediation.error_handling
