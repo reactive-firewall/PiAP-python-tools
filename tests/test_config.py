@@ -45,6 +45,22 @@ def dict_compare(d1, d2):
 class ConfigTestSuite(unittest.TestCase):
 	"""Basic config test cases."""
 
+	def setUp(self):
+		"""sets up the configuration tests."""
+		from .context import piaplib as piaplib
+		if piaplib.__name__ is None:
+			raise ImportError("Failed to import pku")
+		from piaplib import pocket as pocket
+		if pocket.__name__ is None:
+			raise ImportError("Failed to import utils")
+		from piaplib import pku as pku
+		if pku.__name__ is None:
+			raise ImportError("Failed to import pku")
+		from pku import config as config
+		if config.__name__ is None:
+			raise ImportError("Failed to import config")
+		assert config.isLoaded()
+
 	def test_absolute_truth_and_meaning(self):
 		"""Insanitty Test."""
 		assert True
@@ -67,12 +83,18 @@ class ConfigTestSuite(unittest.TestCase):
 		"""Test case importing code."""
 		theResult = True
 		try:
-			from .context import piaplib
+			from .context import piaplib as piaplib
 			if piaplib.__name__ is None:
-				theResult = False
-			from piaplib import pocket
+				raise ImportError("Failed to import pku")
+			from piaplib import pocket as pocket
 			if pocket.__name__ is None:
-				theResult = False
+				raise ImportError("Failed to import utils")
+			from piaplib import pku as pku
+			if pku.__name__ is None:
+				raise ImportError("Failed to import pku")
+			from pku import config as config
+			if config.__name__ is None:
+				raise ImportError("Failed to import config")
 		except Exception as impErr:
 			print(str(type(impErr)))
 			print(str(impErr))

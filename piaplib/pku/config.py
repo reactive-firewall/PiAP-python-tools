@@ -56,7 +56,7 @@ except Exception:
 		raise ImportError("Error Importing baseconfig for config")
 
 
-global _MAIN_CONFIG_DATA
+_MAIN_CONFIG_DATA = None
 
 
 def hasJsonSupport():
@@ -239,14 +239,19 @@ def getDefaultMainConfigFile():
 
 def _raw_getMainConfig():
 	"""returns raw global _MAIN_CONFIG_DATA"""
-	return globals()._MAIN_CONFIG_DATA
+	global _MAIN_CONFIG_DATA
+	if _MAIN_CONFIG_DATA is not None:
+		return _MAIN_CONFIG_DATA
+	else:
+		return None
 
 
 def _raw_setMainConfig(newValue):
 	"""sets raw global _MAIN_CONFIG_DATA"""
+	global _MAIN_CONFIG_DATA
 	if newValue is None:
 		newValue = _raw_getMainConfig()
-	globals()._MAIN_CONFIG_DATA = newValue
+	_MAIN_CONFIG_DATA = newValue
 
 
 @remediation.error_handling
@@ -261,7 +266,7 @@ def getMainConfig():
 @remediation.error_handling
 def isLoaded():
 	"""True if config is loaded."""
-	return getMainConfig()['PiAP-piaplib']['loaded']
+	return getMainConfig() is not None and getMainConfig()['PiAP-piaplib']['loaded']
 
 
 @remediation.error_handling
