@@ -325,6 +325,35 @@ class MoreClientChecksTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
+	def test_case_client_insane_mac_none(self):
+		"""Tests the imposible state for client mac given bad values"""
+		theResult = True
+		try:
+			from lint import clients_check_status as clients_check_status
+		except Exception:
+			import lint.clients_check_status as clients_check_status
+		if clients_check_status.__name__ is None:
+			theResult = False
+		else:
+			try:
+				test_mac = str("11:AA:22:33:44:55")
+				self.assertIsNotNone(
+					clients_check_status.get_client_lease_status(test_mac)
+				)
+				self.assertIsNotNone(
+					clients_check_status.get_client_lease_status(None)
+				)
+			except Exception as err:
+				print(str(""))
+				print(str(type(err)))
+				print(str(err))
+				print(str((err.args)))
+				print(str(""))
+				err = None
+				del err
+				theResult = False
+		assert theResult
+
 
 if __name__ == '__main__':
 	unittest.main()

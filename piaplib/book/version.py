@@ -253,4 +253,4 @@ if __name__ in u'__main__':
 		exitcode = 3
 	exit(exitcode)
 
-
+# vcgencmd get_config int

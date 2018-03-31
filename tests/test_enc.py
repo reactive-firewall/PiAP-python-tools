@@ -38,7 +38,6 @@ try:
 except Exception:
 	raise ImportError("Failed to import test context")
 
-import unittest
 
 try:
 	from hypothesis import given
@@ -63,6 +62,9 @@ except Exception as ImportErr:
 		if not condition:
 			raise unittest.SkipTest(str("Failed test assumption: {}").format(repr(condition)))
 		return True
+
+
+import unittest
 
 
 class CryptoTestSuite(unittest.TestCase):

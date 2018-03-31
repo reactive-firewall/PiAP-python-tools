@@ -37,6 +37,7 @@ except Exception as ImportErr:
 	del ImportErr
 	raise ImportError(u'PiAPlib Failed to Import')
 
+
 try:
 	import piaplib as piaplib
 	if piaplib.__name__ is None:
