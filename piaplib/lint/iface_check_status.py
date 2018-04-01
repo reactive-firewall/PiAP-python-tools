@@ -148,28 +148,29 @@ def get_iface_name(iface_name=None, use_html=False):
 def get_iface_status_raw(interface=None):
 	"""list the raw status of interfaces."""
 	arguments = [str("ip"), str("addr"), str("show")]
+	theRawIfaceState = None
 	if interface is not None:
 		tainted_name = taint_name(interface)
+	if tainted_name is not None:
 		arguments = [str("ip"), str("addr"), str("show"), str(tainted_name)]
-	theRawIfaceState = None
-	import subprocess
-	try:
-		theRawIfaceState = subprocess.check_output(arguments, stderr=subprocess.STDOUT)
-	except subprocess.CalledProcessError as subErr:
-		logs.log(str("ERROR"), "Error")
-		logs.log(str(type(subErr)), "Error")
-		logs.log(str(subErr), "Error")
-		logs.log(str(subErr.args), "Error")
-		logs.log(str(""), "Error")
-		subErr = None
-		del subErr
-		theRawIfaceState = None
-	except Exception as cmdErr:
-		logs.log(str(cmdErr), "Error")
-		logs.log(str(cmdErr.args), "Error")
-		cmdErr = None
-		del cmdErr
-		theRawIfaceState = None
+		import subprocess
+		try:
+			theRawIfaceState = subprocess.check_output(arguments, stderr=subprocess.STDOUT)
+		except subprocess.CalledProcessError as subErr:
+			logs.log(str("ERROR"), "Error")
+			logs.log(str(type(subErr)), "Error")
+			logs.log(str(subErr), "Error")
+			logs.log(str(subErr.args), "Error")
+			logs.log(str(""), "Error")
+			subErr = None
+			del subErr
+			theRawIfaceState = None
+		except Exception as cmdErr:
+			logs.log(str(cmdErr), "Error")
+			logs.log(str(cmdErr.args), "Error")
+			cmdErr = None
+			del cmdErr
+			theRawIfaceState = None
 	return theRawIfaceState
 
 
