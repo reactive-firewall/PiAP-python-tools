@@ -119,7 +119,8 @@ class LintiFaceTestSuite(unittest.TestCase):
 				theResult = False
 		assert theResult
 
-	def test_case_iface_list_insane_none(self):
+	@unittest.skipUnless(sys.platform.startswith("linux"), "Requires linux")
+	def test_case_iface_list_output(self):
 		"""Tests the imposible state for iface list given None values"""
 		theResult = False
 		try:
@@ -130,9 +131,11 @@ class LintiFaceTestSuite(unittest.TestCase):
 			theResult = False
 		else:
 			try:
-				theResult = iface_check_status.get_iface_ip_list("eth0", False) or theResult
-				theResult = iface_check_status.get_iface_ip_list("en0", False) or theResult
-				theResult = iface_check_status.get_iface_ip_list("lo", False) or theResult
+				for test_iface in [str("eth0"), str("en0"), str("lo")]:
+					if theResult:
+						continue
+					elif test_iface in iface_check_status.get_iface_ip_list(test_iface, False):
+						theResult = True
 			except Exception as err:
 				print(str(""))
 				print(str(type(err)))
