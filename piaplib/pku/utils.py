@@ -198,7 +198,7 @@ def extractMACAddr(theInputStr):
 @memoize
 def extractInts(theInputStr):
 	"""Extract the ints from a string."""
-	theResult = extractRegexPattern(theInputStr, """([1234567890]+)+""")
+	theResult = extractRegexPattern(theInputStr, """(\d+)+""")
 	return theResult
 
 
