@@ -121,7 +121,7 @@ class LintiFaceTestSuite(unittest.TestCase):
 
 	@unittest.skipUnless(sys.platform.startswith("linux"), "Requires linux")
 	def test_case_iface_list_output(self):
-		"""Tests the imposible state for iface list given None values"""
+		"""Tests the normal state for iface list given values"""
 		theResult = False
 		try:
 			from lint import iface_check_status as iface_check_status
@@ -132,10 +132,13 @@ class LintiFaceTestSuite(unittest.TestCase):
 		else:
 			try:
 				for test_iface in [str("eth0"), str("en0"), str("lo")]:
-					if theResult:
-						continue
-					elif test_iface in iface_check_status.get_iface_ip_list(test_iface, False):
-						theResult = True
+					try:
+						if theResult:
+							continue
+						elif test_iface in iface_check_status.get_iface_ip_list(test_iface, False):
+							theResult = True
+					except Exception:
+							continue
 			except Exception as err:
 				print(str(""))
 				print(str(type(err)))
