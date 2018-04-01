@@ -1166,6 +1166,59 @@ class BasicUsageTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
+	@unittest.skipUnless(sys.platform.startswith("linux"), "Requires linux")
+	def test_d_python_command_check_iface_html(self):
+		"""Test case for piaplib.pocket.lint check iface with html."""
+		theResult = False
+		try:
+			thepython = getPythonCommand()
+			if (thepython is not None):
+				try:
+					theOutputtext = checkPythonCommand([
+						str(thepython),
+						str("-m"),
+						str("piaplib.pocket"),
+						str("lint"),
+						str("check"),
+						str("iface"),
+						str("--all"),
+						str("--html")
+					], stderr=subprocess.STDOUT)
+					if (str("eth0") in str(theOutputtext)):
+						theResult = True
+					elif (str("enp0s") in str(theOutputtext)):
+						raise unittest.SkipTest("function ok, but not a compatible Test network")
+					elif (str("en0") in str(theOutputtext)):
+						raise unittest.SkipTest("function ok, but not a compatible Test network")
+					else:
+						theResult = False
+						print(str(""))
+						print(str("python cmd is {}").format(str(thepython)))
+						print(str(""))
+						print(str("actual output was..."))
+						print(str(""))
+						print(str("{}").format(str(theOutputtext)))
+						print(str(""))
+				except unittest.SkipTest:
+					raise unittest.SkipTest("function ok, but not a compatible Test network")
+				except Exception as othererr:
+					print(str(""))
+					print(str(type(othererr)))
+					print(str(othererr))
+					print(str((othererr.args)))
+					print(str(""))
+					othererr = None
+					del othererr
+					theResult = False
+		except unittest.SkipTest:
+			raise unittest.SkipTest("function ok, but not a compatible Test network")
+		except Exception as err:
+			debugtestError(err)
+			err = None
+			del err
+			theResult = False
+		assert theResult
+
 	def test_d_python_command_saltify(self):
 		"""Test case for piaplib.pocket.lint check users."""
 		theResult = False

@@ -160,6 +160,7 @@ cleanup:
 	$(QUIET)rm -f ./test.secret || true
 	$(QUIET)rm -f ../test.secret || true
 	$(QUIET)rm -f ./example*.log || true
+	$(QUIET)rm -Rf ./.hypothesis/ 2>/dev/null || true
 	$(QUIET)rm -f ./the_test_url_file*.txt 2>/dev/null || true
 	$(QUIET)rm -f /tmp/.beta_PiAP_weak_key 2>/dev/null || true
 

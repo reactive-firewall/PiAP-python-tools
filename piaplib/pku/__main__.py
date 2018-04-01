@@ -221,21 +221,10 @@ def main(argv=None):
 
 
 if __name__ in u'__main__':
-	if utils.__name__ is None:
-		raise ImportError("Error Importing utils")
-	if config.__name__ is None:
-		raise ImportError("Error Importing config")
-	if interfaces.__name__ is None:
-		raise ImportError("Error Importing interfaces")
-	if upgrade.__name__ is None:
-		raise ImportError("Error Importing upgrade")
-	if remediation.__name__ is None:
-		raise ImportError("Error Importing remediation")
-	if logs.__name__ is None:
-		raise ImportError("Error Importing logs")
-	exit_code = 3
+	for unit_test in [utils, config, interfaces, upgrade, remediation, logs]:
+		if unit_test.__name__ is None:
+			raise ImportError(str("Error Importing {}}").format(str(unit_test)))
 	try:
-		import sys
 		if (sys.argv is not None and (sys.argv is not []) and (len(sys.argv) > 1)):
 			exit_code = main(sys.argv[1:])
 		else:
