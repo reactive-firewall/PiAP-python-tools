@@ -149,6 +149,7 @@ def get_iface_status_raw(interface=None):
 	"""list the raw status of interfaces."""
 	arguments = [str("ip"), str("addr"), str("show")]
 	theRawIfaceState = None
+	tainted_name = None
 	if interface is not None:
 		tainted_name = taint_name(interface)
 	if tainted_name is not None:
