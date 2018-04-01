@@ -158,9 +158,6 @@ class LintiFaceTestSuite(unittest.TestCase):
 			theResult = False
 		else:
 			try:
-				self.assertIsNone(
-					iface_check_status.get_iface_ip_list(None, False)
-				)
 				self.assertIsNotNone(
 					iface_check_status.get_iface_ip_list(None, True)
 				)

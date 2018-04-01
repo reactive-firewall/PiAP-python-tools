@@ -69,37 +69,20 @@ def parseargs(arguments=None):
 			epilog='Basicly a python wrapper for iface.'
 		)
 		parser.add_argument(
-			'-i',
-			'--interface',
-			default=INTERFACE_CHOICES[0],
-			choices=INTERFACE_CHOICES,
+			'-i', '--interface', default=INTERFACE_CHOICES[0], choices=INTERFACE_CHOICES,
 			help='The interface to use.'
 		)
 		the_action = parser.add_mutually_exclusive_group()
 		the_action.add_argument(
-			'-u',
-			'--up',
-			'--enable',
-			dest='enable_action',
-			default=False,
-			action='store_true',
+			'-u', '--up', '--enable', dest='enable_action', default=False, action='store_true',
 			help='Enable the given interface.'
 		)
 		the_action.add_argument(
-			'-d',
-			'--down',
-			'--disable',
-			dest='disable_action',
-			default=False,
-			action='store_true',
+			'-d', '--down', '--disable', dest='disable_action', default=False, action='store_true',
 			help='Disable the given interface.'
 		)
 		the_action.add_argument(
-			'-r',
-			'--down-up',
-			'--restart',
-			dest='restart_action',
-			default=True,
+			'-r', '--down-up', '--restart', dest='restart_action', default=True,
 			action='store_true',
 			help='Disable and then re-enable the given interface. (default)'
 		)
@@ -170,21 +153,22 @@ def restart_iface(iface_name="lo"):
 @remediation.bug_handling
 def main(argv=None):
 	try:
+		theResult = 1
 		args = None
 		if (argv is not None and (argv is not []) and (len(argv) >= 1)):
 			(args, extras) = parseargs(argv)
 		if args is None:
-			return 3
+			theResult = 3
 		interface = args.interface
 		if args.enable_action is True:
 			enable_iface(interface)
-			return 0
+			theResult = 0
 		elif args.disable_action is True:
 			disable_iface(interface, False)
-			return 0
+			theResult = 0
 		elif args.restart_action is True:
 			restart_iface(interface)
-			return 0
+			theResult = 0
 	except Exception as err:
 		print(str("interfaces: REALLY BAD ERROR: ACTION will not be completed! ABORT!"))
 		print(str(type(err)))
@@ -192,7 +176,7 @@ def main(argv=None):
 		print(str(err.args))
 		err = None
 		del(err)
-	return 0
+	return theResult
 
 
 if __name__ in u'__main__':
