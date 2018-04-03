@@ -142,6 +142,8 @@ before_install:
   - travis_retry python3 -m pip install coverage || python3 -m pip install coverage || true ;
   - travis_retry python3 -m pip install codecov || python3 -m pip install codecov || true ;
   - travis_retry python3 -m pip install -r requirements.txt || python3 -m pip install -r requirements.txt || true ;
+  - travis_retry python3 -m pip install hypothisis || python3 -m pip install hypothisis || true ;
+  - travis_retry python -m pip install hypothisis || python -m pip install hypothisis || true ;
   - mkdir -p -m 755 "/opt/PiAP/hostapd_actions/" || true
   - cp -vf ./tests/mock/clients /opt/PiAP/hostapd_actions/clients || true
   - echo "Dependencies should be sane now."
