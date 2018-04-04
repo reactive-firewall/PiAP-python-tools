@@ -127,18 +127,14 @@ class LintiFaceTestSuite(unittest.TestCase):
 			from lint import iface_check_status as iface_check_status
 		except Exception:
 			import lint.iface_check_status as iface_check_status
-		if iface_check_status.__name__ is None:
-			theResult = False
-		else:
+		if iface_check_status.__name__ is not None:
 			try:
 				for test_iface in [str("eth0"), str("en0"), str("lo")]:
-					try:
-						if theResult:
-							continue
-						elif test_iface in iface_check_status.get_iface_ip_list(test_iface, False):
-							theResult = True
-					except Exception:
-							continue
+					theOutput = iface_check_status.get_iface_ip_list(test_iface, False)
+					if theResult is True:
+						continue
+					elif test_iface in theOutput:
+						theResult = True
 			except Exception as err:
 				print(str(""))
 				print(str(type(err)))
