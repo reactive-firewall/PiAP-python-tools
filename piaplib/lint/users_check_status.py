@@ -167,6 +167,38 @@ def isLineForUser(someLine=None, username=None):
 
 
 @remediation.error_handling
+@utils.memoize
+def get_ps_cmd_path():
+	"""Either /bin/ps or ps depending on system."""
+	try:
+		if (str(sys.platform).lower().startswith(str("""darwin""")) is True):
+			return str("""/bin/ps""")
+		else:
+			return str("""ps""")
+	except Exception as someErr:
+		logs.log(str(type(someErr)), "Error")
+		logs.log(str(someErr), "Error")
+		logs.log(str((someErr.args)), "Error")
+	return str("""ps""")
+
+
+@remediation.error_handling
+@utils.memoize
+def get_sort_cmd_path():
+	"""Either /usr/bin/sort or sort depending on system."""
+	try:
+		if (str(sys.platform).lower().startswith(str("""darwin""")) is True):
+			return str("""/usr/bin/sort""")
+		else:
+			return str("""sort""")
+	except Exception as someErr:
+		logs.log(str(type(someErr)), "Error")
+		logs.log(str(someErr), "Error")
+		logs.log(str((someErr.args)), "Error")
+	return str("""sort""")
+
+
+@remediation.error_handling
 def get_system_work_status_raw(user_name=None):
 	"""list the raw status of system work."""
 	theuserState = None
@@ -175,10 +207,11 @@ def get_system_work_status_raw(user_name=None):
 		try:
 			# hard-coded white-list cmds
 			p1 = subprocess.Popen(
-				[str("ps"), str("-eo"), str("user,command")],
+				[utils.literal_str(get_ps_cmd_path()), str("-eo"), str("user,command")],
 				shell=False,
 				stdout=subprocess.PIPE,
-				stderr=None
+				stderr=None,
+				close_fds=True
 			)
 			p2 = subprocess.Popen(
 				[
@@ -189,7 +222,8 @@ def get_system_work_status_raw(user_name=None):
 				],
 				shell=False,
 				stdin=p1.stdout,
-				stdout=subprocess.PIPE
+				stdout=subprocess.PIPE,
+				close_fds=True
 			)
 			p3 = subprocess.Popen(
 				[
@@ -200,22 +234,28 @@ def get_system_work_status_raw(user_name=None):
 				],
 				shell=False,
 				stdin=p2.stdout,
-				stdout=subprocess.PIPE
+				stdout=subprocess.PIPE,
+				close_fds=True
 			)
 			p4 = subprocess.Popen(
-				[utils.literal_str("""sort""")],
+				[utils.literal_str(get_sort_cmd_path())],
 				shell=False,
 				stdin=p3.stdout,
-				stdout=subprocess.PIPE
+				stdout=subprocess.PIPE,
+				close_fds=True
 			)
 			p5 = subprocess.Popen(
 				[utils.literal_str("""uniq""")],
 				shell=False,
 				stdin=p4.stdout,
-				stdout=subprocess.PIPE
+				stdout=subprocess.PIPE,
+				close_fds=True
 			)
 			p4.stdout.close()  # Allow p4 to receive a SIGPIPE if p5 exits.
 			(output, stderrors) = p5.communicate()
+			p3.stdout.close()  # Allow p4 to receive a SIGPIPE when p5 exits.
+			p2.stdout.close()  # Allow p4 to receive a SIGPIPE when p5 exits.
+			p1.stdout.close()  # Allow p4 to receive a SIGPIPE when p5 exits.
 			if (isinstance(output, bytes)):
 				output = output.decode('utf8')
 			if (output is not None) and (len(output) > 0):
@@ -250,7 +290,6 @@ def get_system_work_status_raw(user_name=None):
 def get_w_cmd_args():
 	"""Either -his or -wnh depending on system."""
 	try:
-		import sys
 		if (str(sys.platform).lower().startswith(str("""darwin""")) is True):
 			return str("""-hi""")
 		else:
@@ -287,7 +326,8 @@ def get_user_work_status_raw(user_name=None):
 				],
 				shell=False,
 				stdin=p1.stdout,
-				stdout=subprocess.PIPE
+				stdout=subprocess.PIPE,
+				close_fds=True
 			)
 			p1.stdout.close()  # Allow p1 to receive a SIGPIPE if p2 exits.
 			(output, stderrors) = p2.communicate()
@@ -354,7 +394,7 @@ def get_user_list():
 			theResult = [x for x in theResult if utils.xstr(reserved_lines) not in utils.xstr(x)]
 	except Exception as parseErr:
 		logs.log(
-			str("user_check_status.get_user_list: ERROR: ACTION will not be completed! ABORT!"),
+			str("{}.get_user_list: ERROR: ACTION will not be completed! ABORT!").fromat(__file__),
 			"Error"
 		)
 		logs.log(str(type(parseErr)), "Error")
@@ -362,6 +402,37 @@ def get_user_list():
 		logs.log(str((parseErr.args)), "Error")
 		theResult = []
 	return theResult
+
+
+def getKnownProcessesTable():
+	"""The list of known PiAP related processes to report"""
+	return dict({
+		u'/usr/sbin/cron': u'SYSTEM AUTOMATION',
+		u'/usr/bin/dbus-daemon': u'SYSTEM',
+		u'ntpd': u'TIMEKEEPING SERVICES',
+		u'syslogd': u'LOGGING SERVICES',
+		u'wlan1': u'NETWORK SERVICES',
+		u'usb0': u'NETWORK SERVICES',
+		u'eth0': u'NETWORK SERVICES',
+		u'wlan0': u'NETWORK SERVICES',
+		u'wlan2': u'NETWORK SERVICES',
+		u'lan0': u'NETWORK SERVICES',
+		u'lan1': u'NETWORK SERVICES',
+		u'avahi-daemon:': u'mDNS-SERVER SERVICES',
+		u'wpa_supplicant': u'WPA SERVICES',
+		u'/usr/sbin/hostapd': u'AP SERVICES',
+		u'/sbin/dhcpcd': u'DHCP-CLIENT SERVICES',
+		u'/usr/sbin/dnsmasq': u'DNS-DHCP-SERVER SERVICES',
+		u'/lib/systemd/systemd-resolved': u'DNS-SERVER SERVICES',
+		u'/usr/bin/freshclam': u'SYSTEM DEFENSE',
+		u'denyhosts.py': u'SYSTEM DEFENSE',
+		u'/usr/bin/rkhunter': u'SYSTEM DEFENSE',
+		u'/usr/bin/nmap': u'COUNTER OFFENSE',
+		u'pester_site': u'COUNTER OFFENSE',
+		u'piaplib': u'PiAP SERVICES',
+		u'nginx: ': u'WEB SERVICES',
+		u'php-fpm': u'WEB SERVICES'
+	})
 
 
 def get_user_status(user_name=None, use_html=False):  # noqa C901
@@ -391,31 +462,7 @@ def get_user_status(user_name=None, use_html=False):  # noqa C901
 						str(x).split(u' ', 1)[1:]
 					) for x in status_txt.split("""\n""") if (x is not None) and (len(x) > 0)]
 				)
-				known_work_cases = dict({
-					u'/usr/sbin/cron': u'SYSTEM AUTOMATION',
-					u'ntpd': u'TIMEKEEPING SERVICES',
-					u'syslogd': u'LOGGING SERVICES',
-					u'wlan1': u'NETWORK SERVICES',
-					u'usb0': u'NETWORK SERVICES',
-					u'eth0': u'NETWORK SERVICES',
-					u'wlan0': u'NETWORK SERVICES',
-					u'wlan2': u'NETWORK SERVICES',
-					u'lan0': u'NETWORK SERVICES',
-					u'lan1': u'NETWORK SERVICES',
-					u'avahi-daemon:': u'mDNS-SERVER SERVICES',
-					u'wpa_supplicant': u'WPA SERVICES',
-					u'/usr/sbin/hostapd': u'AP SERVICES',
-					u'/sbin/dhcpcd': u'DHCP-CLIENT SERVICES',
-					u'/usr/sbin/dnsmasq': u'DNS-DHCP-SERVER SERVICES',
-					u'/lib/systemd/systemd-resolved': u'DNS-SERVER SERVICES',
-					u'/usr/bin/freshclam': u'SYSTEM DEFENSE',
-					u'/usr/bin/denyhosts.py': u'SYSTEM DEFENSE',
-					u'/usr/bin/rkhunter': u'SYSTEM DEFENSE',
-					u'/usr/bin/nmap': u'COUNTER OFFENSE',
-					u'piaplib': u'PiAP SERVICES',
-					u'nginx: ': u'WEB SERVICES',
-					u'php-fpm': u'WEB SERVICES'
-				})
+				known_work_cases = getKnownProcessesTable()
 				for theWork in theWorks:
 					temp_txt = "UNKNOWN"
 					if ("SYSTEM" in theWork):

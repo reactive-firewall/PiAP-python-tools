@@ -72,7 +72,7 @@ __prog__ = """piaplib.keyring.clarify"""
 """The name of this PiAPLib tool is clarify"""
 
 
-DEFAULT_BETA_FILE_PATH = str("""/var/opt/PiAP/.beta_W1AsYRUDzyZx""")
+DEFAULT_BETA_FILE_PATH = str("""/opt/PiAP/.beta_W1AsYRUDzyZx""")
 """THIS IS A PLACEHOLDER. WILL move this to a config file."""
 
 
@@ -205,7 +205,8 @@ def packForRest(message=None, keyStore=None):
 			universal_newlines=True,
 			stdin=subprocess.PIPE,
 			stdout=subprocess.PIPE,
-			stderr=subprocess.PIPE
+			stderr=subprocess.PIPE,
+			close_fds=True
 		)
 		(ciphertext, stderrdata) = p1.communicate(utils.literal_code(message))
 		p1.wait()
@@ -243,7 +244,8 @@ def unpackFromRest(ciphertext=None, keyStore=None):
 			universal_newlines=True,
 			stdin=subprocess.PIPE,
 			stdout=subprocess.PIPE,
-			stderr=subprocess.PIPE
+			stderr=subprocess.PIPE,
+			close_fds=True
 		)
 		(cleartext, stderrdata) = p2.communicate(utils.literal_code(
 			str("{}{}").format(utils.literal_code(ciphertext), EOFNEWLINE))

@@ -102,7 +102,7 @@ def parseConfigParser(config_data=dict({}), theConfig=None, overwrite=True):
 	return config_data
 
 
-def loadMainConfigFile(confFile='/var/opt/PiAP/PiAP.conf'):
+def loadMainConfigFile(confFile='/opt/PiAP/PiAP.conf'):
 	try:
 		mainConfig = configparser.ConfigParser(allow_no_value=True)
 		result_config = getDefaultMainConfigFile()

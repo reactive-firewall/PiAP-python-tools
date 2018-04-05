@@ -295,7 +295,7 @@ def hasMainConfigOptionFor(mainSectionKey=None):
 
 
 @remediation.error_handling
-def writeDefaultMainConfigFile(confFile=str('/var/opt/PiAP/PiAP.conf')):
+def writeDefaultMainConfigFile(confFile=str('/opt/PiAP/PiAP.conf')):
 	theResult = False
 	if writeMainConfigFile(confFile, getDefaultMainConfigFile()):
 		theResult = True
@@ -343,7 +343,7 @@ def parseConfigParser(config_data=dict({}), theConfig=None, overwrite=True):
 
 
 @remediation.error_handling
-def writeMainConfigFile(confFile=str('/var/opt/PiAP/PiAP.conf'), config_data=None):
+def writeMainConfigFile(confFile=str('/opt/PiAP/PiAP.conf'), config_data=None):
 	"""Generates the Main Configuration file for PiAPlib"""
 	try:
 		mainConfig = dictParser(allow_no_value=True)
@@ -383,7 +383,7 @@ def readIniFile(filename, theparser=None):
 
 
 @remediation.error_handling
-def loadMainConfigFile(confFile='/var/opt/PiAP/PiAP.conf'):
+def loadMainConfigFile(confFile='/opt/PiAP/PiAP.conf'):
 	try:
 		emptyConfig = dictParser(allow_no_value=True)
 		result_config = getDefaultMainConfigFile()
