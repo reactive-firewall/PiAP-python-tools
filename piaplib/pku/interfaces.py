@@ -44,12 +44,19 @@ except Exception:
 __prog__ = """piaplib.pku.interfaces"""
 """The name of this PiAPLib tool is Pocket Knife Interfaces Unit"""
 
+if (str(sys.platform).lower().startswith(str("""darwin""")) is True):
+	IFACE_PREFIXES = [
+		str("lan"), str("vlan"), str("wlan"), str("eth"), str("en"),
+		str("usb"), str("br"), str("mon"), str("enp0s")
+	]
+	"""whitelist of valid iface prefixes"""
+else:
+	IFACE_PREFIXES = [
+		str("lan"), str("wlan"), str("eth"), str("usb"),
+		str("br"), str("mon"), str("enp0s")
+	]
+	"""whitelist of valid iface prefixes"""
 
-IFACE_PREFIXES = [
-	str("lan"), str("wlan"), str("eth"), str("usb"),
-	str("br"), str("mon"), str("enp0s")
-]
-"""whitelist of valid iface prefixes"""
 
 
 INTERFACE_CHOICES = [str('{}{}').format(str(x), str(y)) for x in IFACE_PREFIXES for y in range(5)]
@@ -100,11 +107,12 @@ def parseargs(arguments=None):
 @remediation.error_handling
 def taint_name(rawtxt):
 	"""Checks the interface arguments."""
+	theResult = None
 	tainted_input = str(rawtxt).lower()
 	for test_iface in INTERFACE_CHOICES:
 		if tainted_input in test_iface:
-			return test_iface
-	return None
+			theResult = test_iface
+	return theResult
 
 
 @remediation.error_handling
