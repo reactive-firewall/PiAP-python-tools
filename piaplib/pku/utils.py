@@ -216,8 +216,8 @@ def extractIfaceNames(theInputStr):
 	"""Extracts the expected iface names."""
 	return extractRegexPattern(
 		theInputStr,
-		"""(?:(?:[[:print:]]*){0,1}""" +
-		"""(?P<iface_name>[br|mon|usb|lan|wan|wla|eth|enp0s|lo]{2,5}[n]?[0-9]+){1}""" +
+		"""(?:(?:[[:print:]]*){0,1}(?:[^v]*){0,1}""" +
+		"""(?P<iface_name>[br|mon|usb|lan|wan|wla|eth|enp0s|lo|en]{2,5}[n]?[0-9]+){1}""" +
 		"""(?:[[:print:]]*){0,1})+"""
 	)
 

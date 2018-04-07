@@ -22,6 +22,7 @@
 try:
 	import os
 	import sys
+	import subprocess
 	sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 	try:
 		import piaplib as piaplib
@@ -145,45 +146,62 @@ def get_iface_name(iface_name=None, use_html=False):
 
 
 @remediation.error_handling
+@utils.memoize
+def get_iface_status_raw_cmd_args():
+	"""Either ip addr or ifconfig depending on system."""
+	theResult = [str("ip"), str("addr"), str("show")]
+	try:
+		if (str(sys.platform).lower().startswith(str("""darwin""")) is True):
+			theResult = [str("ifconfig")]
+	except Exception as someErr:
+		logs.log(str(type(someErr)), "Error")
+		logs.log(str(someErr), "Error")
+		logs.log(str((someErr.args)), "Error")
+	return theResult
+
+
+@remediation.error_passing
 def get_iface_status_raw(interface=None):
 	"""list the raw status of interfaces."""
-	arguments = [str("ip"), str("addr"), str("show")]
+	cli_args = [x for x in get_iface_status_raw_cmd_args()]
 	theRawIfaceState = None
 	tainted_name = None
 	if interface is not None:
 		tainted_name = taint_name(interface)
-	if tainted_name is not None:
-		arguments = [str("ip"), str("addr"), str("show"), str(tainted_name)]
-		import subprocess
-		try:
-			theRawIfaceState = subprocess.check_output(arguments, stderr=subprocess.STDOUT)
-		except subprocess.CalledProcessError as subErr:
-			logs.log(str("ERROR"), "Error")
-			logs.log(str(type(subErr)), "Error")
-			logs.log(str(subErr), "Error")
-			logs.log(str(subErr.args), "Error")
-			logs.log(str(""), "Error")
-			subErr = None
-			del subErr
-			theRawIfaceState = None
-		except Exception as cmdErr:
-			logs.log(str(cmdErr), "Error")
-			logs.log(str(cmdErr.args), "Error")
-			cmdErr = None
-			del cmdErr
-			theRawIfaceState = None
+	if tainted_name is not None and tainted_name not in cli_args:
+		cli_args.append(str(tainted_name))
+	try:
+		theRawIfaceState = subprocess.check_output(cli_args, stderr=subprocess.STDOUT, shell=False)
+	except subprocess.CalledProcessError as subErr:
+		logs.log(str("ERROR"), "Error")
+		logs.log(str(type(subErr)), "Error")
+		logs.log(str(subErr), "Error")
+		logs.log(str(subErr.args), "Error")
+		logs.log(str(""), "Error")
+		cli_args = None
+		del cli_args
+		subErr = None
+		del subErr
+		theRawIfaceState = None
+	except Exception as cmdErr:
+		logs.log(str(cmdErr), "Error")
+		logs.log(str(cmdErr.args), "Error")
+		cmdErr = None
+		del cmdErr
+		theRawIfaceState = None
 	return theRawIfaceState
 
 
-@remediation.error_handling
+@remediation.error_passing
+@utils.memoize
 def get_iface_list():
 	"""list the available interfaces."""
 	theResult = []
 	theRawIfaceState = get_iface_status_raw(None)
 	for x in utils.extractIfaceNames(theRawIfaceState):
-		if x in interfaces.INTERFACE_CHOICES:
+		if utils.isWhiteListed(x, interfaces.INTERFACE_CHOICES):
 			theResult.append(x)
-	theResult = utils.compactList([x for x in theResult])
+	theResult = utils.compactList([y for y in theResult])
 	"""while regex would probably work well here, best to whitelist. """
 	return theResult
 
@@ -193,6 +211,8 @@ def get_iface_status(iface=u'lo', use_html=False):
 	"""Generate the status"""
 	theResult = None
 	status_txt = get_iface_status_raw(iface)
+	if iface not in get_iface_list():
+		return theResult
 	if use_html is False:
 		theResult = str("UNKNOWN")
 		if status_txt is not None:
@@ -200,11 +220,15 @@ def get_iface_status(iface=u'lo', use_html=False):
 				theResult = str("DOWN")
 			elif (str(" UP") in str(status_txt)):
 				theResult = str("UP")
+			elif (str(sys.platform).lower().startswith(str("""darwin""")) is True):
+				if (str("UP") in str(status_txt)):
+					theResult = str("UP")
 	else:
 		theResult = generate_iface_status_html(iface, status_txt)
 	return theResult
 
 
+@remediation.error_passing
 def generate_iface_status_html(iface=u'lo', status_txt="UNKNOWN"):
 	"""Generates the html for interface of given status. Status is UNKNOWN by default."""
 	status = "UNKNOWN"
@@ -219,6 +243,7 @@ def generate_iface_status_html(iface=u'lo', status_txt="UNKNOWN"):
 	return generate_iface_status_html_raw(iface, status, valid_status)
 
 
+@remediation.error_passing
 def generate_iface_status_html_raw(iface=u'lo', status="UNKNOWN", lable=None):
 	"""Generates the raw html for interface of given status with the given lable"""
 	if lable in html_generator.HTML_LABEL_ROLES:
@@ -233,7 +258,7 @@ def generate_iface_status_html_raw(iface=u'lo', status="UNKNOWN", lable=None):
 	return theResult
 
 
-@remediation.error_handling
+@remediation.error_passing
 def get_iface_mac(iface=u'lo', use_html=False):
 	"""Generate output of the iface mac."""
 	theResult = None
@@ -257,7 +282,7 @@ def get_iface_mac(iface=u'lo', use_html=False):
 	return theResult
 
 
-@remediation.error_handling
+@remediation.error_passing
 def get_iface_ip_list(iface=u'lo', use_html=False):
 	"""Generate output of the iface IP."""
 	theResult = None
@@ -281,7 +306,7 @@ def get_iface_ip_list(iface=u'lo', use_html=False):
 	return theResult
 
 
-@remediation.error_handling
+@remediation.error_passing
 def showAlliFace(verbose_mode, output_html):
 	"""Used by main to show all. Not intended to be called directly"""
 	if output_html:
