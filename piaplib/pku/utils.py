@@ -50,6 +50,14 @@ except Exception as err:
 	exit(3)
 
 try:
+	import re
+	if re.__name__ is None:
+		raise ImportError("OMG! we could not import regex. ABORT.")
+except Exception as err:
+	raise ImportError(err)
+	exit(3)
+
+try:
 	import piaplib as piaplib
 except Exception:
 	from . import piaplib as piaplib
@@ -164,7 +172,6 @@ def extractRegexPattern(theInput_Str, theInputPattern):
 	Param theInput_Str - a String to extract from.
 	Param theInputPattern - the pattern to extract
 	"""
-	import re
 	sourceStr = literal_str(theInput_Str)
 	prog = re.compile(theInputPattern)
 	theList = prog.findall(sourceStr)
