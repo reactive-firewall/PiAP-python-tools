@@ -170,25 +170,27 @@ def get_iface_status_raw(interface=None):
 		tainted_name = taint_name(interface)
 	if tainted_name is not None and tainted_name not in cli_args:
 		cli_args.append(str(tainted_name))
-	try:
-		theRawIfaceState = subprocess.check_output(cli_args, stderr=subprocess.STDOUT, shell=False)
-	except subprocess.CalledProcessError as subErr:
-		logs.log(str("ERROR"), "Error")
-		logs.log(str(type(subErr)), "Error")
-		logs.log(str(subErr), "Error")
-		logs.log(str(subErr.args), "Error")
-		logs.log(str(""), "Error")
-		cli_args = None
-		del cli_args
-		subErr = None
-		del subErr
-		theRawIfaceState = None
-	except Exception as cmdErr:
-		logs.log(str(cmdErr), "Error")
-		logs.log(str(cmdErr.args), "Error")
-		cmdErr = None
-		del cmdErr
-		theRawIfaceState = None
+		try:
+			theRawIfaceState = subprocess.check_output(
+				cli_args, stderr=subprocess.STDOUT, shell=False
+			)
+		except subprocess.CalledProcessError as subErr:
+			logs.log(str("ERROR"), "Error")
+			logs.log(str(type(subErr)), "Error")
+			logs.log(str(subErr), "Error")
+			logs.log(str(subErr.args), "Error")
+			logs.log(str(""), "Error")
+			cli_args = None
+			del cli_args
+			subErr = None
+			del subErr
+			theRawIfaceState = None
+		except Exception as cmdErr:
+			logs.log(str(cmdErr), "Error")
+			logs.log(str(cmdErr.args), "Error")
+			cmdErr = None
+			del cmdErr
+			theRawIfaceState = None
 	return theRawIfaceState
 
 
@@ -201,7 +203,7 @@ def get_iface_list():
 	for x in utils.extractIfaceNames(theRawIfaceState):
 		if utils.isWhiteListed(x, interfaces.INTERFACE_CHOICES):
 			theResult.append(x)
-	theResult = utils.compactList([y for y in theResult])
+	theResult = utils.compactList(theResult)
 	"""while regex would probably work well here, best to whitelist. """
 	return theResult
 

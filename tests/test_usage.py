@@ -75,8 +75,11 @@ def checkPythonCommand(args=[None], stderr=None):
 					args.insert(2, str("-p"))
 					args.insert(2, str("--source=piaplib,piaplib/lint,piaplib/keyring,piaplib/pku,piaplib/book"))
 			theOutput = subprocess.check_output(args, stderr=stderr)
-	except Exception:
-		theOutput = None
+	except Exception as err:
+		if isinstance(err, subprocess.SubprocessError):
+			theOutput = err.output
+		else:
+			theOutput = None
 	try:
 		if isinstance(theOutput, bytes):
 			theOutput = theOutput.decode('utf8')

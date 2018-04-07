@@ -133,7 +133,8 @@ class LintiFaceTestSuite(unittest.TestCase):
 					theOutput = iface_check_status.get_iface_ip_list(test_iface, False)
 					if theResult is True:
 						continue
-					elif test_iface in theOutput:
+					elif len(theOutput) > 0:
+						self.assertIsNotNone(theOutput[0])
 						theResult = True
 			except Exception as err:
 				print(str(""))

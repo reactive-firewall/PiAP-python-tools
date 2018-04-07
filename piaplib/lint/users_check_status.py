@@ -371,12 +371,22 @@ def taint_name(rawtxt):
 	return None
 
 
-# TODO: memoize this function
+@remediation.error_passing
 def get_user_list():
 	"""list the available users."""
 	theResult = None
+	theRawuserState = get_system_work_status_raw(None)
+	if theRawuserState is not None:
+		theResult = format_raw_user_list(theRawuserState)
+	return theResult
+
+
+@remediation.error_passing
+@utils.memoize
+def format_raw_user_list(theRawuserState=None):
+	"""formate raw list of the available users."""
+	theResult = None
 	try:
-		theRawuserState = get_system_work_status_raw(None)
 		if theRawuserState is None:
 			theResult = []
 			return theResult
