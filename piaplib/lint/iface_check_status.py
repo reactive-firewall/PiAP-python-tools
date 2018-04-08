@@ -23,6 +23,7 @@ try:
 	import os
 	import sys
 	import subprocess
+	import argparse
 	sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 	try:
 		import piaplib as piaplib
@@ -64,7 +65,6 @@ __prog__ = str("""iface_check_status""")
 
 def parseargs(arguments=None):
 	"""Parse the arguments"""
-	import argparse
 	try:
 		parser = argparse.ArgumentParser(
 			prog=__prog__,
