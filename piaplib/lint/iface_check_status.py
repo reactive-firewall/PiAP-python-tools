@@ -208,23 +208,33 @@ def get_iface_list():
 	return theResult
 
 
+def _isMacOS():
+	"""Simply returns a boolean stating if sys.platform is darwin."""
+	return (str(sys.platform).lower().startswith(str("""darwin""")) is True)
+
+
+def _extractIFaceStatus(status_txt=None):
+	"""Simply returns a boolean stating if sys.platform is darwin."""
+	theResult = str("UNKNOWN")
+	if status_txt is not None:
+		stat_checks = dict({str("DOWN"): str(" DOWN"), str("UP"): str(" UP")})
+		if _isMacOS():
+			stat_checks["UP"] = str("<UP")
+		for check_string in stat_checks.keys():
+			if (str(stat_checks[check_string]) in str(status_txt)):
+				theResult = str(check_string)
+	return theResult
+
+
 @remediation.error_handling
 def get_iface_status(iface=u'lo', use_html=False):
 	"""Generate the status"""
 	theResult = None
-	status_txt = get_iface_status_raw(iface)
 	if iface not in get_iface_list():
 		return theResult
+	status_txt = get_iface_status_raw(iface)
 	if use_html is False:
-		theResult = str("UNKNOWN")
-		if status_txt is not None:
-			if (str(" DOWN") in str(status_txt)):
-				theResult = str("DOWN")
-			elif (str(" UP") in str(status_txt)):
-				theResult = str("UP")
-			elif (str(sys.platform).lower().startswith(str("""darwin""")) is True):
-				if (str("UP") in str(status_txt)):
-					theResult = str("UP")
+		theResult = _extractIFaceStatus(status_txt)
 	else:
 		theResult = generate_iface_status_html(iface, status_txt)
 	return theResult

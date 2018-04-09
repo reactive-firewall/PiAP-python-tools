@@ -119,7 +119,7 @@ class LintiFaceTestSuite(unittest.TestCase):
 				theResult = False
 		assert theResult
 
-	@unittest.skipUnless(sys.platform.startswith("linux"), "Requires linux")
+	@unittest.skipUnless(sys.platform.startswith("linux"), "Requires linux tools")
 	def test_case_iface_list_output(self):
 		"""Tests the normal state for iface list given values"""
 		theResult = False
@@ -129,12 +129,12 @@ class LintiFaceTestSuite(unittest.TestCase):
 			import lint.iface_check_status as iface_check_status
 		if iface_check_status.__name__ is not None:
 			try:
-				for test_iface in [str("eth0"), str("en0"), str("lo")]:
+				for test_iface in [str("eth0"), str("en0"), str("enp0s0")]:
 					theOutput = iface_check_status.get_iface_ip_list(test_iface, False)
 					if theResult is True:
 						continue
-					elif len(theOutput) > 0:
-						self.assertIsNotNone(theOutput[0])
+					elif (theOutput is not None) and (len(theOutput) > 0):
+						self.assertIsNotNone(theOutput)
 						theResult = True
 			except Exception as err:
 				print(str(""))
