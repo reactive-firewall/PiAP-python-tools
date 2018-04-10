@@ -196,7 +196,7 @@ def get_iface_list():
 	theRawIfaceState = get_iface_status_raw(None)
 	if theRawIfaceState is None:
 		return theResult
-	for x in utils.extractIfaceNames(theRawIfaceState):
+	for x in utils.extractIfaceNames(str(theRawIfaceState)):
 		if utils.isWhiteListed(x, interfaces.INTERFACE_CHOICES):
 			theResult.append(x)
 	theResult = utils.compactList(theResult)
@@ -332,14 +332,19 @@ def showAlliFace(verbose_mode, output_html):
 		)
 	if (get_iface_list() is not None):
 		for iface_name in get_iface_list():
-			theText = str("{}{}").format(
+			theText = str("{}{}\n").format(
 				theText, str(show_iface(iface_name, verbose_mode, output_html))
 			)
+	elif output_html:
+		theText = str("{}{}").format(
+			theText,
+			str("""<tr><td colspan="4"><span class=\"label label-danger\">\2<\/span></td></tr>""")
+		)
 	if output_html:
 		theText = str("{}{}").format(
 			theText, str("</tbody></table>")
 		)
-	print(str(theText))
+	print(str(theText).rstrip("\n"))
 
 
 def main(argv=None):
