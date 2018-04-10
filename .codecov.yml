@@ -37,7 +37,7 @@ coverage:
         paths:
           - piaplib/keyring
       tests:
-        target: 10%
+        target: 25%
         flags: tests
         base: auto
         paths:
