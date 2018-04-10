@@ -119,7 +119,6 @@ class LintiFaceTestSuite(unittest.TestCase):
 				theResult = False
 		assert theResult
 
-	@unittest.skipUnless(sys.platform.startswith("linux"), "Requires linux tools")
 	def test_case_iface_list_output(self):
 		"""Tests the normal state for iface list given values"""
 		theResult = False

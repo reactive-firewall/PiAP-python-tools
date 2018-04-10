@@ -1186,7 +1186,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 						str("iface"),
 						str("--all"),
 						str("--html")
-					], stderr=subprocess.STDOUT)
+					], stderr=subprocess.STDERR)
 					if (str("eth0") in str(theOutputtext)):
 						theResult = True
 					elif (str("enp0s") in str(theOutputtext)):

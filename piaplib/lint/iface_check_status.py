@@ -170,36 +170,32 @@ def get_iface_status_raw(interface=None):
 		tainted_name = taint_name(interface)
 	if tainted_name is not None and tainted_name not in cli_args:
 		cli_args.append(str(tainted_name))
-		try:
-			theRawIfaceState = subprocess.check_output(
-				cli_args, stderr=subprocess.STDOUT, shell=False
-			)
-		except subprocess.CalledProcessError as subErr:
-			logs.log(str("ERROR"), "Error")
-			logs.log(str(type(subErr)), "Error")
-			logs.log(str(subErr), "Error")
-			logs.log(str(subErr.args), "Error")
-			logs.log(str(""), "Error")
-			cli_args = None
-			del cli_args
-			subErr = None
-			del subErr
-			theRawIfaceState = None
-		except Exception as cmdErr:
-			logs.log(str(cmdErr), "Error")
-			logs.log(str(cmdErr.args), "Error")
-			cmdErr = None
-			del cmdErr
-			theRawIfaceState = None
+	try:
+		theRawIfaceState = subprocess.check_output(
+			cli_args, stderr=subprocess.STDOUT, shell=False
+		)
+	except subprocess.CalledProcessError as subErr:
+		cli_args = None
+		del cli_args
+		subErr = None
+		del subErr
+		theRawIfaceState = None
+	except Exception as cmdErr:
+		logs.log(str(cmdErr), "Error")
+		logs.log(str(cmdErr.args), "Error")
+		cmdErr = None
+		del cmdErr
+		theRawIfaceState = None
 	return theRawIfaceState
 
 
 @remediation.error_passing
-@utils.memoize
 def get_iface_list():
 	"""list the available interfaces."""
 	theResult = []
 	theRawIfaceState = get_iface_status_raw(None)
+	if theRawIfaceState is None:
+		return theResult
 	for x in utils.extractIfaceNames(theRawIfaceState):
 		if utils.isWhiteListed(x, interfaces.INTERFACE_CHOICES):
 			theResult.append(x)
@@ -298,7 +294,14 @@ def get_iface_mac(iface=u'lo', use_html=False):
 def get_iface_ip_list(iface=u'lo', use_html=False):
 	"""Generate output of the iface IP."""
 	theResult = None
-	ip_list_txt = utils.extractIPAddr(get_iface_status_raw(iface))
+	temp_buffer = get_iface_status_raw(iface)
+	if temp_buffer is None:
+		theResult = None
+		ip_list_txt = None
+	else:
+		ip_list_txt_raw = utils.extractIPAddr(get_iface_status_raw(iface))
+		ip_list_txt = [x for x in ip_list_txt_raw if not x.endswith(".255")]
+		del ip_list_txt_raw
 	if use_html is False:
 		if ip_list_txt is not None and len(ip_list_txt) > 0:
 			theResult = str(ip_list_txt)
@@ -318,18 +321,21 @@ def get_iface_ip_list(iface=u'lo', use_html=False):
 	return theResult
 
 
-@remediation.error_passing
+@remediation.error_handling
 def showAlliFace(verbose_mode, output_html):
 	"""Used by main to show all. Not intended to be called directly"""
+	theText = str("")
 	if output_html:
-		print(
+		theText = str(
 			"<table class=\"table table-striped\">" +
 			"<thead><th>Interface</th><th>MAC</th><th>IP</th><th>State</th></thead><tbody>"
 		)
-	for iface_name in get_iface_list():
-		print(show_iface(iface_name, verbose_mode, output_html))
+	if (get_iface_list() is not None):
+		for iface_name in get_iface_list():
+			theText = theText.join(str(show_iface(iface_name, verbose_mode, output_html)))
 	if output_html:
-		print("</tbody></table>")
+		theText = theText.join(str("</tbody></table>"))
+	print(str(theText))
 
 
 def main(argv=None):
@@ -345,8 +351,11 @@ def main(argv=None):
 		if args.show_all is True:
 			showAlliFace(verbose, output_html)
 		elif args.list is True:
-			for iface_name in get_iface_list():
-				print(str(iface_name))
+			try:
+				for iface_name in get_iface_list():
+					print(str(iface_name))
+			except Exception as err:
+				remediation.error_breakpoint(err)
 		else:
 			interface = args.interface
 			print(show_iface(interface, verbose, output_html))
