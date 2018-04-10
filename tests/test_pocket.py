@@ -152,6 +152,8 @@ class PocketUsageTestSuite(unittest.TestCase):
 				theResult = True
 			elif (str("coverage") in str(thepython)) or (sys.version_info <= (3, 2)):
 				theResult = True
+			elif (str("python") in str(thepython)) or (sys.version_info >= (3, 2)):
+				theResult = True
 		except Exception:
 			theResult = False
 			try:
