@@ -332,9 +332,13 @@ def showAlliFace(verbose_mode, output_html):
 		)
 	if (get_iface_list() is not None):
 		for iface_name in get_iface_list():
-			theText = theText.join(str(show_iface(iface_name, verbose_mode, output_html)))
+			theText = str("{}{}").format(
+				theText, str(show_iface(iface_name, verbose_mode, output_html))
+			)
 	if output_html:
-		theText = theText.join(str("</tbody></table>"))
+		theText = str("{}{}").format(
+			theText, str("</tbody></table>")
+		)
 	print(str(theText))
 
 
