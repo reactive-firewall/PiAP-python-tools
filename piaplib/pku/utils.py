@@ -555,7 +555,7 @@ def _python2urlretrieve(url, filename):
 			tempfile = urllib.FancyURLopener()
 			tempfile.addheader('DNT', '1')
 			tempfile.addheader('Connection', 'close')
-			tempfile.addheader('user-agent', 'mozilla/5.0')
+			tempfile.addheader('user-agent', getUserAgent())
 		except Exception:
 			import urllib.request
 			return urllib.request.urlretrieve(url, filename)
