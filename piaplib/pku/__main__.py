@@ -175,34 +175,35 @@ def parseArgs(arguments=None):
 
 def usePKUTool(tool, arguments=[None]):
 	"""Handler for launching pocket-tools."""
+	theExitCode = 1
 	if tool is None:
-		return 0
-	if tool in PKU_UNITS.keys():
+		theExitCode = 0
+	elif tool in PKU_UNITS.keys():
 		try:
 			try:
 				logs.log(str("pku launching: {}").format(str(tool)), "DEBUG")
 				PKU_UNITS[tool].main(arguments)
+				theExitCode = 0
 			except Exception:
 				logs.log(str("An error occurred while handling the PKU tool. "), "WARNING")
 				logs.log(str("Cascading failure."), "Error")
-				return 3
+				theExitCode = 3
 		except Exception:
 			logs.log(str("An error occurred while handling the cascading failure."), "CRITICAL")
-			return 3
-		return 0
-	else:
-		return 1
+			theExitCode = 3
+	return theExitCode
 
 
 @remediation.bug_handling
 def main(argv=None):
 	"""The main event"""
 	# logs.log(str(__prog__), "DEBUG")
+	theExitCode = 0
 	try:
 		try:
 			args, extra = parseArgs(argv)
 			pku_cmd = args.pku_unit
-			usePKUTool(pku_cmd, extra)
+			theExitCode = usePKUTool(pku_cmd, extra)
 		except Exception as cerr:
 			logs.log(str(cerr), "Error")
 			logs.log(str(cerr.args), "Error")
@@ -210,14 +211,14 @@ def main(argv=None):
 				str(" UNKNOWN - An error occurred while handling the arguments. Command failure."),
 				"Error"
 			)
-			return 2
+			theExitCode = 2
 	except Exception:
 		logs.log(
 			str(" UNKNOWN - An error occurred while handling the failure. Cascading failure."),
 			"Error"
 		)
-		return 2
-	return 3
+		theExitCode = 2
+	return theExitCode
 
 
 if __name__ in u'__main__':
