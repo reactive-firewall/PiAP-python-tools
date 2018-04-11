@@ -182,8 +182,8 @@ def usePKUTool(tool, arguments=[None]):
 		try:
 			try:
 				logs.log(str("pku launching: {}").format(str(tool)), "DEBUG")
-				PKU_UNITS[tool].main(arguments)
 				theExitCode = 0
+				PKU_UNITS[tool].main(arguments)
 			except Exception:
 				logs.log(str("An error occurred while handling the PKU tool. "), "WARNING")
 				logs.log(str("Cascading failure."), "Error")
