@@ -19,8 +19,10 @@
 # limitations under the License.
 # ......................................................................
 
+
 try:
-	from . import pocket as pocket
+	if 'piaplib.pocket' not in sys.modules:
+		from . import pocket as pocket
 except Exception as importErr:
 	del importErr
 	import pocket as pocket
