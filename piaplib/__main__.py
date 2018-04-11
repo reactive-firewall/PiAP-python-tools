@@ -21,6 +21,7 @@
 
 
 try:
+	import sys
 	if 'piaplib.pocket' not in sys.modules:
 		from . import pocket as pocket
 except Exception as importErr:
@@ -29,6 +30,5 @@ except Exception as importErr:
 
 
 if __name__ in u'__main__':
-	import sys
 	pocket.main(sys.argv[1:])
 	sys.exit(0)
