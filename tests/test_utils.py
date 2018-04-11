@@ -976,8 +976,8 @@ and this will test reads.""")
 			from pku import utils as utils
 			if utils.__name__ is None:
 				raise ImportError("Failed to import utils")
-			self.assertIsNone(utils.xisfile(somefile=None))
-			theResult = (utils.xisfile(somefile=None) is None)
+			self.assertIsFalse(utils.xisfile(somefile=None))
+			theResult = (utils.xisfile(somefile=None) is False)
 		except Exception as err:
 			print(str(""))
 			print(str(type(err)))
