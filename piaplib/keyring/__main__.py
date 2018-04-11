@@ -53,6 +53,11 @@ try:
 except Exception:
 	import piaplib.pku.remediation as remediation
 
+try:
+	from . import clarify as clarify
+except Exception:
+	import piaplib.keyring.clarify as clarify
+
 
 __prog__ = """piaplib.keyring"""
 """The name of this PiAPLib tool is keyring"""
