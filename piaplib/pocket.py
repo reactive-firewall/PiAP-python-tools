@@ -162,7 +162,6 @@ def useTool(tool, arguments=[None]):
 	if tool in POCKET_UNITS.keys():
 		try:
 			try:
-				# print(str("PiAP launching: "+tool))
 				POCKET_UNITS[tool].main(arguments)
 			except Exception as error:
 				logs.log(str(type(error)), "Warning")
@@ -171,6 +170,8 @@ def useTool(tool, arguments=[None]):
 				logs.log(str(
 					" - WARNING - An error occurred while handling the shell. Cascading failure."
 				), "Warning")
+				error = None
+				del error
 		except Exception:
 			logs.log(
 				str("CRITICAL - An error occurred while handling the cascading failure."),

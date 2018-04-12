@@ -3,7 +3,7 @@
 
 # Pocket PiAP
 # ......................................................................
-# Copyright (c) 2017, Kendrick Walls
+# Copyright (c) 2017-2018, Kendrick Walls
 # ......................................................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
@@ -26,11 +26,6 @@ THERE MAY BE REGULATIONS GOVERNING USE OF WIFI SETTINGS IN MANY AREAS.
 
 """ THIS CODE IS NOT IN A USEABLE STATE """
 
-try:
-	import piaplib as piaplib
-except Exception:
-	from . import piaplib as piaplib
-
 
 try:
 	from . import remediation as remediation
@@ -39,6 +34,15 @@ except Exception:
 		import remediation as remediation
 	except Exception:
 		raise ImportError("Error Importing remediation")
+
+
+try:
+	from . import utils as utils
+except Exception:
+	try:
+		import utils as utils
+	except Exception:
+		raise ImportError("Error Importing utils")
 
 
 try:
@@ -265,14 +269,7 @@ def parseArgs(args=None):
 		parser.add_argument('-n', '--netmask', default=None, help='STATIC - Netmask')
 		parser.add_argument('-g', '--gw', default=None, help='STATIC - the gw IP')
 		parser.add_argument('-v', '--vlanid', dest='vlanid', default=None, help='the vlan')
-		parser.add_argument(
-			'-V',
-			'--version',
-			action='version',
-			version=str(
-				"%(prog)s {}"
-			).format(str(piaplib.__version__))
-		)
+		parser = utils._handleVersionArgs(parser)
 		parser = addWiFiArgs(parser)
 	except Exception as err:
 		print(str(type(err)))
@@ -281,46 +278,6 @@ def parseArgs(args=None):
 		parser.error("parser tool bug")
 		return None
 	return parser.parse_args(args)
-
-
-def readFile(somefile):
-	read_data = None
-	theReadPath = str(somefile)
-	with open(theReadPath, 'r', encoding='utf-8') as f:
-		read_data = f.read()
-	f.close()
-	return read_data
-
-
-def extractRegexPattern(theInput_Str, theInputPattern):
-	import re
-	sourceStr = str(theInput_Str)
-	prog = re.compile(theInputPattern)
-	theList = prog.findall(sourceStr)
-	return theList
-
-
-def extractMACAddr(theInputStr):
-	return extractRegexPattern(
-		theInputStr,
-		"""(?:(?:[[:print:]]*){0,1}(?P<Mac>(?:(?:[0-9a-fA-F]{1,2}[\:]{1}){5}""" +
-		"""(?:[0-9a-fA-F]{1,2}){1}){1})+(?:[[:print:]]*){0,1})+"""
-	)
-
-
-def compactList(list, intern_func=None):
-	if intern_func is None:
-		def intern_func(x):
-			return x
-	seen = {}
-	result = []
-	for item in list:
-		marker = intern_func(item)
-		if marker in seen:
-			continue
-		seen[marker] = 1
-		result.append(item)
-	return result
 
 
 def compile_iface_name(media_type='eth', index=0, vlanID=None):
@@ -434,10 +391,11 @@ def main(argv=None):
 if __name__ in u'__main__':
 	try:
 		import sys
-		main(sys.argv[1:])
-	except Exception as err:
-		print(str(err))
-		print(str((err.args)))
-		exit(1)
+		if (sys.argv is not None and (sys.argv is not []) and (len(sys.argv) > 1)):
+			exit(main(sys.argv[1:]))
+		else:
+			exit(main(["--help"]))
+	except Exception:
+		raise ImportError("Error running main")
 	exit(0)
 

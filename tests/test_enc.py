@@ -39,7 +39,37 @@ except Exception:
 	raise ImportError("Failed to import test context")
 
 
+try:
+	from hypothesis import given
+	from hypothesis import note
+	from hypothesis import assume
+	from hypothesis.strategies import text
+except Exception as ImportErr:
+	def given(*given_arguments, **given_kwargs):
+		"""Helpful if you don't have a hypothisis!"""
+		return unittest.skip(str("Missing a hypothisis"))
+
+	def text(*args, **kwargs):
+		"""Helpful if you don't have a hypothisis!"""
+		return str("""This is a test Message.""")
+
+	def note(*args, **kwargs):
+		"""Helpful if you don't have a hypothisis!"""
+		print(str(*args, **kwargs))
+
+	def assume(condition):
+		"""Helpful if you don't have a hypothisis!"""
+		if not condition:
+			raise unittest.SkipTest(str("Failed test assumption: {}").format(repr(condition)))
+		return True
+
+
 import unittest
+
+
+sub_proc_bug_message = str(
+	"hypothisis ignores bug https://bugs.python.org/issue2320 which has no fix before python 3.2"
+)
 
 
 class CryptoTestSuite(unittest.TestCase):
@@ -286,10 +316,12 @@ class CryptoTestSuite(unittest.TestCase):
 					str("-K=testkeyneedstobelong")
 				]
 			else:
-				temp_msg = str("U2FsdGVkX18cNPUnfix9LYLebBgwP6BdT7ReAJvL1+ZHJWN96sNB5IvV/u+fRL6D")
+				temp_msg = str(
+					"""U2FsdGVkX1/SnW+eQS63MQH1Lp8V7/0yVK5bfJ+j44FXOeWIPZSRn4cTzg+5tJkm"""
+				)
 				args = [
 					str("--unpack"),
-					str("--msg=\"{}\"").format(temp_msg),
+					str("--msg={}").format(temp_msg),
 					str("-K=testkeyneedstobelong")
 				]
 			from piaplib.keyring import clarify as clarify
@@ -324,10 +356,10 @@ class CryptoTestSuite(unittest.TestCase):
 				raise unittest.SkipTest("BETA. Experemental feature not ready yet.")
 		assert theResult
 
-
-	def test_case_clarify_read_write(self):  # noqa C901
-		"""Tests the helper function pack to file of keyring.clarify and then unpack"""
+	def test_case_clarify_write_inverts_read_example(self):
+		"""Tests the write then read workflow of keyring.clarify."""
 		theResult = False
+		someMessageText = str("This is a test Message")
 		try:
 			from piaplib.keyring import clarify as clarify
 			if clarify.__name__ is None:
@@ -342,10 +374,11 @@ class CryptoTestSuite(unittest.TestCase):
 				str("testkeyneedstobelong"),
 				str("./.weak_test_key_{}").format(rand.randInt(1, 10, 99))
 			)
+			assume((theteststore is not None))
 			self.assertIsNotNone(theteststore)
 			test_write = clarify.packToFile(
 				sometestfile,
-				str("This is a test Message"),
+				str(someMessageText),
 				theteststore
 			)
 			self.assertTrue(test_write)
@@ -357,7 +390,7 @@ class CryptoTestSuite(unittest.TestCase):
 				except UnicodeDecodeError:
 					test_read = str(repr(bytes(test_read)))
 				self.assertIsNotNone(test_read)
-				if (str("This is a test Message") in str(test_read)):
+				if (str(someMessageText) in str(test_read)):
 					theResult = True
 				else:
 					if sys.platform.startswith("linux"):
@@ -365,6 +398,67 @@ class CryptoTestSuite(unittest.TestCase):
 						theResult = False
 					else:
 						raise unittest.SkipTest("BETA. Experemental feature not ready yet.")
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			err = None
+			del err
+			if sys.platform.startswith("linux"):
+				theResult = False
+			else:
+				raise unittest.SkipTest("BETA. Experemental feature not ready yet.")
+		assert theResult
+
+	@unittest.skipUnless((sys.version_info < (3, 2)), sub_proc_bug_message)
+	@given(text())
+	def test_case_clarify_write_inverts_read(self, someInput):  # noqa C901
+		"""Tests the write then read workflow of keyring.clarify with fuzzing."""
+		theResult = False
+		assume(isinstance(someInput, str))
+		assume(len(str(someInput)) > 3)
+		assume(repr(str(someInput)) not in repr(str(repr(someInput))))
+		assume(str(someInput) in someInput)
+		assume(someInput in str(someInput))
+		someMessageText = str(repr(someInput))
+		try:
+			from piaplib.keyring import clarify as clarify
+			if clarify.__name__ is None:
+				raise ImportError("Failed to import clarify")
+			elif (clarify.hasBackendCommand() is not True):
+				raise unittest.SkipTest("Requires backend tool")
+			from piaplib.keyring import rand as rand
+			if rand.__name__ is None:
+				raise ImportError("Failed to import rand")
+			sometestfile = str("./the_test_file.enc")
+			theteststore = clarify.makeKeystoreFile(
+				str("testkeyneedstobelong"),
+				str("./.weak_test_key_{}").format(rand.randInt(1, 10, 99))
+			)
+			assume((theteststore is not None))
+			self.assertIsNotNone(theteststore)
+			test_write = clarify.packToFile(
+				sometestfile,
+				str(someMessageText),
+				theteststore
+			)
+			self.assertTrue(test_write)
+			note(str("encoded: \"{}\"").format(repr(someMessageText)))
+			if (test_write is True):
+				test_read = clarify.unpackFromFile(sometestfile, theteststore)
+				try:
+					if isinstance(test_read, bytes):
+						test_read = test_read.decode('utf8')
+				except UnicodeDecodeError:
+					test_read = str(repr(bytes(test_read)))
+				self.assertIsNotNone(test_read)
+				if (str(someMessageText) in str(test_read)):
+					theResult = True
+				else:
+					note(str("decoded: \"{}\"").format(repr(test_read)))
+					theResult = False
 		except Exception as err:
 			print(str(""))
 			print(str(type(err)))

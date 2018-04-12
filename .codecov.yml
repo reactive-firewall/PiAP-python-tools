@@ -36,12 +36,12 @@ coverage:
         base: auto
         paths:
           - piaplib/keyring
-      tests:
-        target: 10%
-        flags: tests
-        base: auto
-        paths:
-          - tests
+    tests:
+      default: off
+      flags: tests
+      base: auto
+      paths:
+        - tests
   notify:
     slack:
       default:
@@ -51,14 +51,12 @@ coverage:
         branches: null
         flags:
           - piaplib
-          - tests
         paths:
           - piaplib/
           - piaplib/lint
           - piaplib/pku
           - piaplib/keyring
           - piaplib/book
-          - tests/
 flags:
   piaplib:
     paths:

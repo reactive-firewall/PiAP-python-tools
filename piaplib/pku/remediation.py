@@ -3,7 +3,7 @@
 
 # Pocket PiAP
 # ......................................................................
-# Copyright (c) 2017, Kendrick Walls
+# Copyright (c) 2017-2018, Kendrick Walls
 # ......................................................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
@@ -79,6 +79,11 @@ class PiAPError(RuntimeError):
 		if msg is not None and isinstance(msg, str):
 			self.msg = str(msg)
 
+	def __del__(self):
+		del self.msg
+		del self.cause
+		del self
+
 
 def getTimeStamp():
 	"""Returns the time stamp."""
@@ -105,7 +110,6 @@ def error_passing(func):
 			logs.log(str("An error occurred at {}").format(timestamp), "Error")
 			logs.log(str(func), "Debug")
 			baton = PiAPError(err, str("An error occurred in {}.").format(str(func)))
-			# sys.exc_clear()
 			err = None
 			del err
 			theOutput = None
@@ -142,7 +146,6 @@ def error_handling(func):
 			theOutput = func(*args, **kwargs)
 		except Exception as err:
 			theOutput = error_breakpoint(error=err, context=func)
-			# sys.exc_clear()
 			err = None
 			del err
 		return theOutput
@@ -160,17 +163,10 @@ def bug_handling(func):
 		try:
 			theOutput = func(*args, **kwargs)
 		except Exception as err:
-			timestamp = getTimeStamp()
-			logs.log(str("An error occurred at {}").format(timestamp), "CRITICAL")
-			logs.log(str(func), "Debug")
-			logs.log(str(type(err)), "Debug")
-			logs.log(str(err), "CRITICAL")
-			logs.log(str((err.args)), "CRITICAL")
-			logs.log(str(""), "CRITICAL")
+			error_breakpoint(error=err, context=func)
 			logs.log(str("Action will not be completed! ABORT!"), "CRITICAL")
 			logs.log(str("You found a bug. Please report this to my creator."), "CRITICAL")
 			logs.log(str(""), "CRITICAL")
-			# sys.exc_clear()
 			err = None
 			del err
 			theOutput = 3
@@ -217,7 +213,6 @@ def main(argv=None):
 
 if __name__ in u'__main__':
 	try:
-		import sys
 		exit(main(sys.argv[1:]))
 	except Exception:
 		exit(3)

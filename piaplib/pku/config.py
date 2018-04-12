@@ -3,7 +3,7 @@
 
 # Pocket PiAP
 # ......................................................................
-# Copyright (c) 2017, Kendrick Walls
+# Copyright (c) 2017-2018, Kendrick Walls
 # ......................................................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
@@ -54,6 +54,9 @@ except Exception:
 		import baseconfig as baseconfig
 	except Exception:
 		raise ImportError("Error Importing baseconfig for config")
+
+
+_MAIN_CONFIG_DATA = None
 
 
 def hasJsonSupport():
@@ -234,8 +237,65 @@ def getDefaultMainConfigFile():
 	return baseconfig.mergeDicts(baseconfig.getDefaultMainConfigFile(), default_config)
 
 
+def _raw_getMainConfig():
+	"""returns raw global _MAIN_CONFIG_DATA"""
+	global _MAIN_CONFIG_DATA
+	if _MAIN_CONFIG_DATA is not None:
+		return _MAIN_CONFIG_DATA
+	else:
+		return None
+
+
+def _raw_setMainConfig(newValue):
+	"""sets raw global _MAIN_CONFIG_DATA"""
+	global _MAIN_CONFIG_DATA
+	if newValue is None:
+		newValue = _raw_getMainConfig()
+	_MAIN_CONFIG_DATA = newValue
+
+
 @remediation.error_handling
-def writeDefaultMainConfigFile(confFile=str('/var/opt/PiAP/PiAP.conf')):
+def getMainConfig():
+	if _raw_getMainConfig() is None:
+		tempValue = loadMainConfigFile()
+		tempValue['PiAP-piaplib']['loaded'] = True
+		_raw_setMainConfig(newValue=tempValue)
+	return _raw_getMainConfig()
+
+
+@remediation.error_handling
+def isLoaded():
+	"""True if config is loaded."""
+	return getMainConfig() is not None and getMainConfig()['PiAP-piaplib']['loaded']
+
+
+@remediation.error_handling
+def hasMainConfigOptionsFor(somekey=None):
+	"""Returns True if the main configurtion has the given key, otherwise False."""
+	hasValue = False
+	if somekey is not None and isLoaded() and (getMainConfig().has_section(somekey)):
+		hasValue = True
+	return hasValue
+
+
+@remediation.error_handling
+def hasMainConfigOptionFor(mainSectionKey=None):
+	"""True if config key maps to value."""
+	hasValue = False
+	if mainSectionKey is None or not isLoaded():
+		hasValue = False
+	if str(""".""") not in str(mainSectionKey):
+		hasValue = hasMainConfigOptionsFor(mainSectionKey)
+	else:
+		kp = str(mainSectionKey).split(""".""")
+		main_config = getMainConfig()
+		if (main_config.has_section(kp[0]) and (main_config[kp[0]].has_option[kp[1]])):
+			hasValue = True
+	return hasValue
+
+
+@remediation.error_handling
+def writeDefaultMainConfigFile(confFile=str('/opt/PiAP/PiAP.conf')):
 	theResult = False
 	if writeMainConfigFile(confFile, getDefaultMainConfigFile()):
 		theResult = True
@@ -283,7 +343,7 @@ def parseConfigParser(config_data=dict({}), theConfig=None, overwrite=True):
 
 
 @remediation.error_handling
-def writeMainConfigFile(confFile=str('/var/opt/PiAP/PiAP.conf'), config_data=None):
+def writeMainConfigFile(confFile=str('/opt/PiAP/PiAP.conf'), config_data=None):
 	"""Generates the Main Configuration file for PiAPlib"""
 	try:
 		mainConfig = dictParser(allow_no_value=True)
@@ -323,7 +383,7 @@ def readIniFile(filename, theparser=None):
 
 
 @remediation.error_handling
-def loadMainConfigFile(confFile='/var/opt/PiAP/PiAP.conf'):
+def loadMainConfigFile(confFile='/opt/PiAP/PiAP.conf'):
 	try:
 		emptyConfig = dictParser(allow_no_value=True)
 		result_config = getDefaultMainConfigFile()

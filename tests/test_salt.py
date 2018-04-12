@@ -161,10 +161,18 @@ class SaltTestSuite(unittest.TestCase):
 			randomSalt_shift3 = randomSalt_shift2 + space
 			randomSalt_shift4 = randomSalt_shift3 + space
 			randomSalt_shift5 = randomSalt_shift4 + space
+			randomSalt_shift6 = randomSalt_shift5 + space
+			randomSalt_shift7 = randomSalt_shift6 + space
+			randomSalt_shift8 = randomSalt_shift7 + space
+			randomSalt_shift9 = randomSalt_shift8 + space
+			randomSalt_shiftX = randomSalt_shift9 + space
 			salt_list = [
 				randomSalt, randomSalt_shift1,
 				randomSalt_shift2, randomSalt_shift3,
-				randomSalt_shift4, randomSalt_shift5
+				randomSalt_shift4, randomSalt_shift5,
+				randomSalt_shift6, randomSalt_shift7,
+				randomSalt_shift8, randomSalt_shift9,
+				randomSalt_shiftX
 			]
 			if theResult is not True:
 				self.assertTrue(theResult)

@@ -152,6 +152,8 @@ class PocketUsageTestSuite(unittest.TestCase):
 				theResult = True
 			elif (str("coverage") in str(thepython)) or (sys.version_info <= (3, 2)):
 				theResult = True
+			elif (str("python") in str(thepython)) or (sys.version_info >= (3, 2)):
+				theResult = True
 		except Exception:
 			theResult = False
 			try:
@@ -429,6 +431,48 @@ class PocketUsageTestSuite(unittest.TestCase):
 						str("execve"),
 						str("""--cmd={}""").format(str(sys.executable)),
 						str("""--args={}""").format(str("piaplib.pocket"))
+					], stderr=subprocess.STDOUT))
+					theResult = True
+				except Exception as othererr:
+					print(str(""))
+					print(str(type(othererr)))
+					print(str(othererr))
+					print(str((othererr.args)))
+					print(str(""))
+					othererr = None
+					del othererr
+					theResult = False
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			othererr = None
+			del othererr
+			theResult = False
+		assert theResult
+
+	def test_o_exec_command_io(self):
+		"""Test case for piaplib.pocket.lint do_execve calls."""
+		theResult = False
+		try:
+			import sys
+			if sys.__name__ is None:
+				raise ImportError("Failed to import system. WTF?!!")
+			thepython = getPythonCommand()
+			if (thepython is not None):
+				try:
+					self.assertIsNotNone(checkPythonCommand([
+						str(thepython),
+						str("-m"),
+						str("piaplib.pocket"),
+						str("lint"),
+						str("execve"),
+						str("""--out""").format(str(sys.executable)),
+						str("""--cmd={}""").format(str(sys.executable)),
+						str("""--args={}""").format(str("piaplib.pocket")),
+						str("""--args={}""").format(str("--help"))
 					], stderr=subprocess.STDOUT))
 					theResult = True
 				except Exception as othererr:

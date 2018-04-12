@@ -3,7 +3,7 @@
 
 # Pocket PiAP
 # ......................................................................
-# Copyright (c) 2017, Kendrick Walls
+# Copyright (c) 2017-2018, Kendrick Walls
 # ......................................................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,17 +25,20 @@ except Exception:
 	raise ImportError("WTF, no system?!?!")
 
 try:
-	import piaplib as piaplib
-except Exception:
-	from . import piaplib as piaplib
-
-try:
 	from . import remediation as remediation
 except Exception:
 	try:
 		import remediation as remediation
 	except Exception:
 		raise ImportError("Error Importing remediation")
+
+try:
+	from . import utils as utils
+except Exception:
+	try:
+		import utils as utils
+	except Exception:
+		raise ImportError("Error Importing utils")
 
 
 __prog__ = """piaplib.pku.interfaces"""
@@ -44,7 +47,7 @@ __prog__ = """piaplib.pku.interfaces"""
 
 IFACE_PREFIXES = [
 	str("lan"), str("wlan"), str("eth"), str("usb"),
-	str("br"), str("mon"), str("enp0s")
+	str("br"), str("mon"), str("enp0s"), str("en")
 ]
 """whitelist of valid iface prefixes"""
 
@@ -66,48 +69,24 @@ def parseargs(arguments=None):
 			epilog='Basicly a python wrapper for iface.'
 		)
 		parser.add_argument(
-			'-i',
-			'--interface',
-			default=INTERFACE_CHOICES[0],
-			choices=INTERFACE_CHOICES,
+			'-i', '--interface', default=INTERFACE_CHOICES[0], choices=INTERFACE_CHOICES,
 			help='The interface to use.'
 		)
 		the_action = parser.add_mutually_exclusive_group()
 		the_action.add_argument(
-			'-u',
-			'--up',
-			'--enable',
-			dest='enable_action',
-			default=False,
-			action='store_true',
+			'-u', '--up', '--enable', dest='enable_action', default=False, action='store_true',
 			help='Enable the given interface.'
 		)
 		the_action.add_argument(
-			'-d',
-			'--down',
-			'--disable',
-			dest='disable_action',
-			default=False,
-			action='store_true',
+			'-d', '--down', '--disable', dest='disable_action', default=False, action='store_true',
 			help='Disable the given interface.'
 		)
 		the_action.add_argument(
-			'-r',
-			'--down-up',
-			'--restart',
-			dest='restart_action',
-			default=True,
+			'-r', '--down-up', '--restart', dest='restart_action', default=True,
 			action='store_true',
 			help='Disable and then re-enable the given interface. (default)'
 		)
-		parser.add_argument(
-			'-V',
-			'--version',
-			action='version',
-			version=str(
-				"%(prog)s {}"
-			).format(str(piaplib.__version__))
-		)
+		parser = utils._handleVersionArgs(parser)
 		(theResult, extras) = parser.parse_known_args(arguments)
 	except Exception as err:
 		print(str(type(err)))
@@ -121,11 +100,11 @@ def parseargs(arguments=None):
 @remediation.error_handling
 def taint_name(rawtxt):
 	"""Checks the interface arguments."""
-	tainted_input = str(rawtxt).lower()
-	for test_iface in INTERFACE_CHOICES:
-		if tainted_input in test_iface:
-			return test_iface
-	return None
+	theResult = None
+	tainted_input = utils.literal_str(rawtxt).lower()
+	if utils.isWhiteListed(tainted_input, INTERFACE_CHOICES):
+		theResult = tainted_input
+	return theResult
 
 
 @remediation.error_handling
@@ -174,21 +153,22 @@ def restart_iface(iface_name="lo"):
 @remediation.bug_handling
 def main(argv=None):
 	try:
+		theResult = 1
 		args = None
 		if (argv is not None and (argv is not []) and (len(argv) >= 1)):
 			(args, extras) = parseargs(argv)
 		if args is None:
-			return 3
+			theResult = 3
 		interface = args.interface
 		if args.enable_action is True:
 			enable_iface(interface)
-			return 0
+			theResult = 0
 		elif args.disable_action is True:
 			disable_iface(interface, False)
-			return 0
+			theResult = 0
 		elif args.restart_action is True:
 			restart_iface(interface)
-			return 0
+			theResult = 0
 	except Exception as err:
 		print(str("interfaces: REALLY BAD ERROR: ACTION will not be completed! ABORT!"))
 		print(str(type(err)))
@@ -196,10 +176,16 @@ def main(argv=None):
 		print(str(err.args))
 		err = None
 		del(err)
-	return 0
+	return theResult
 
 
-if __name__ == u'__main__':
-	if (sys.argv is not None and (sys.argv is not []) and (len(sys.argv) > 1)):
-		exit(main(sys.argv[1:]))
+if __name__ in u'__main__':
+	try:
+		if (sys.argv is not None and (sys.argv is not []) and (len(sys.argv) > 1)):
+			exit(main(sys.argv[1:]))
+		else:
+			exit(main(["--help"]))
+	except Exception:
+		raise ImportError("Error running main")
+	exit(0)
 

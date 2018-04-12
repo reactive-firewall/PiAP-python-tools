@@ -53,15 +53,21 @@ try:
 except Exception:
 	import piaplib.pku.remediation as remediation
 
+try:
+	from . import clarify as clarify
+except Exception:
+	import piaplib.keyring.clarify as clarify
+
 
 __prog__ = """piaplib.keyring"""
 """The name of this PiAPLib tool is keyring"""
 
 
-KEYRING_UNITS = {u'saltify': saltify, u'rand': rand, u'keys': None}
+KEYRING_UNITS = {u'saltify': saltify, u'rand': rand, u'clarify': clarify, u'keys': None}
 """ The Pocket Knife Unit actions.
 	saltify - HMAC salt functions.
 	rand - convenience random functions.
+	clarify - convenience file encryption functions.
 	keys -  (FUTURE/RESERVED)
 	"""
 
@@ -85,26 +91,16 @@ def parseArgs(arguments=None):
 @remediation.error_handling
 def useKeyTool(tool, arguments=[None]):
 	"""Handler for launching pocket-tools."""
-	if tool is None:
-		return None
-	if tool in KEYRING_UNITS.keys():
-		theResult = None
+	theResult = None
+	if tool is not None and tool in KEYRING_UNITS.keys():
 		try:
-			try:
-				# print(str("keyring launching: "+tool))
-				theResult = KEYRING_UNITS[tool].main(arguments)
-			except Exception:
-				timestamp = remediation.getTimeStamp()
-				theResult = str(
-					timestamp +
-					" - WARNING - An error occurred while handling the keyring tool." +
-					"Cascading failure."
-				)
-		except Exception:
-			theResult = str("CRITICAL - An error occurred while handling the cascading failure.")
-		return theResult
-	else:
-		return None
+			theResult = KEYRING_UNITS[tool].main(arguments)
+		except Exception as err:
+			remediation.error_breakpoint(err, u'piaplib.keyring.__MAIN__.useKeyTool')
+			err = None
+			del err
+			theResult = None
+	return theResult
 
 
 @remediation.error_handling
@@ -116,14 +112,20 @@ def main(argv=None):
 		keyring_cmd = args.keyring_unit
 		useKeyTool(keyring_cmd, extra)
 	except Exception as cerr:
-		print(str(cerr))
-		print(str(cerr.args))
-		print(str(" UNKNOWN - An error occurred while handling the arguments. Command failure."))
+		remediation.error_breakpoint(cerr, str(u'piaplib.keyring.__MAIN__.main()'))
 		exit(3)
 	exit(0)
 
 
 if __name__ in u'__main__':
-	main(sys.argv[1:])
+	try:
+		error_code = main(sys.argv[1:])
+		exit(error_code)
+	except Exception as err:
+		remediation.error_breakpoint(err, str(u'piaplib.keyring.__MAIN__'))
+		del err
+		exit(255)
+	finally:
+		exit(0)
 
 

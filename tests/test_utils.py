@@ -607,8 +607,15 @@ and this will test reads.""")
 			else:
 				theResult = False
 			if (theResult is False):
-				print(str("fetch failed"))
-				print(str(""))
+				if sys.platform.startswith("linux"):
+					print(str("fetch failed"))
+					print(str(""))
+				else:
+					raise unittest.SkipTest("BETA. Experemental feature not ready yet.")
+		except unittest.SkipTest as skiper:
+			skiper = None
+			del skiper
+			raise unittest.SkipTest("BETA. Experemental feature not ready yet.")
 		except Exception as err:
 			print(str(""))
 			print(str(type(err)))
@@ -900,6 +907,77 @@ and this will test reads.""")
 					bool
 				)
 				self.assertFalse(utils.isWhiteListed(test_value, junk_list))
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			err = None
+			del err
+			theResult = False
+		assert theResult
+
+	def test_case_utils_miss_arg_verbose(self):
+		"""Tests the utils._handleVerbosityArgs with an invalid value as input"""
+		theResult = False
+		try:
+			from piaplib import pku as pku
+			if pku.__name__ is None:
+				raise ImportError("Failed to import pku")
+			from pku import utils as utils
+			if utils.__name__ is None:
+				raise ImportError("Failed to import utils")
+			with self.assertRaises(RuntimeError):
+				utils._handleVerbosityArgs(argParser=None, default=True)
+			theResult = True
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			err = None
+			del err
+			theResult = False
+		assert theResult
+
+	def test_case_utils_miss_arg_version(self):
+		"""Tests the utils._handleVersionArgs with an invalid value as input"""
+		theResult = False
+		try:
+			from piaplib import pku as pku
+			if pku.__name__ is None:
+				raise ImportError("Failed to import pku")
+			from pku import utils as utils
+			if utils.__name__ is None:
+				raise ImportError("Failed to import utils")
+			with self.assertRaises(RuntimeError):
+				utils._handleVersionArgs(argParser=None)
+			theResult = True
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			err = None
+			del err
+			theResult = False
+		assert theResult
+
+	def test_case_utils_miss_xifile_func(self):
+		"""Tests the utils.xisfile(None) with an invalid value as input"""
+		theResult = False
+		try:
+			from piaplib import pku as pku
+			if pku.__name__ is None:
+				raise ImportError("Failed to import pku")
+			from pku import utils as utils
+			if utils.__name__ is None:
+				raise ImportError("Failed to import utils")
+			self.assertFalse(utils.xisfile(somefile=None))
+			theResult = (utils.xisfile(somefile=None) is False)
 		except Exception as err:
 			print(str(""))
 			print(str(type(err)))

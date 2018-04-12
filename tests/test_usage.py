@@ -75,8 +75,11 @@ def checkPythonCommand(args=[None], stderr=None):
 					args.insert(2, str("-p"))
 					args.insert(2, str("--source=piaplib,piaplib/lint,piaplib/keyring,piaplib/pku,piaplib/book"))
 			theOutput = subprocess.check_output(args, stderr=stderr)
-	except Exception:
-		theOutput = None
+	except Exception as err:
+		if isinstance(err, subprocess.SubprocessError):
+			theOutput = err.output
+		else:
+			theOutput = None
 	try:
 		if isinstance(theOutput, bytes):
 			theOutput = theOutput.decode('utf8')
@@ -143,6 +146,7 @@ def debugBlob(blob=None):
 
 def debugtestError(someError=None):
 	print(str(""))
+	print(str("ERROR:"))
 	print(str(type(someError)))
 	print(str(someError))
 	print(str((someError.args)))
@@ -189,11 +193,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 				if depends.__name__ is None:
 					theResult = False
 		except Exception as impErr:
-			print(str(""))
-			print(str(type(impErr)))
-			print(str(impErr))
-			print(str((impErr.args)))
-			print(str(""))
+			debugtestError(impErr)
 			theResult = False
 		assert theResult
 
@@ -206,20 +206,12 @@ class BasicUsageTestSuite(unittest.TestCase):
 				if (str("/which") in str(theOutputtext)):
 					theResult = True
 			except Exception as err:
-				print(str(""))
-				print(str(type(err)))
-				print(str(err))
-				print(str((err.args)))
-				print(str(""))
+				debugtestError(err)
 				err = None
 				del err
 				theResult = False
 		except Exception as othererr:
-			print(str(""))
-			print(str(type(othererr)))
-			print(str(othererr))
-			print(str((othererr.args)))
-			print(str(""))
+			debugtestError(othererr)
 			othererr = None
 			del othererr
 			theResult = False
@@ -326,36 +318,6 @@ class BasicUsageTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
-	def test_e_python_command_pocket_units(self):
-		"""Test case for piaplib.* --version."""
-		theResult = False
-		try:
-			import sys
-			if sys.__name__ is None:
-				raise ImportError("Failed to import system. WTF?!!")
-			thepython = getPythonCommand()
-			from .context import piaplib as piaplib
-			if piaplib.__version__ is not None:
-				theResult = False
-			if (thepython is not None):
-				for unit in ["pocket", "book.version"]:
-					theOutputtext = checkPythonCommand([
-						str(thepython),
-						str("-m"),
-						str("piaplib.{}").format(str(unit)),
-						str("--version")
-					], stderr=subprocess.STDOUT)
-					if (str(piaplib.__version__) in str(theOutputtext)):
-						theResult = True
-					else:
-						theResult = False
-		except Exception as err:
-			debugtestError(err)
-			err = None
-			del err
-			theResult = False
-		assert theResult
-
 	def test_c_python_command_pku_units(self):
 		"""Test case for piaplib.pku.* --help."""
 		theResult = False
@@ -408,7 +370,11 @@ class BasicUsageTestSuite(unittest.TestCase):
 			if piaplib.__version__ is not None:
 				theResult = False
 			if (thepython is not None):
-				for unit in ["pku.interfaces", "pku.compile_interface", "pku.upgrade"]:
+				test_units = [
+					"pocket", "book.version", "pku.interfaces",
+					"pku.compile_interface", "pku.upgrade"
+				]
+				for unit in test_units:
 					theOutputtext = checkPythonCommand([
 						str(thepython),
 						str("-m"),
@@ -421,7 +387,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 						theResult = False
 						print(str(""))
 						print(str("python cmd is {}").format(str(thepython)))
-						print(str("pku unit is {}").format(str(unit)))
+						print(str("{} unit is {}").format(str(unit).split(".")[0], str(unit)))
 						print(str(""))
 						print(str("actual version was..."))
 						print(str(""))
@@ -967,7 +933,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
-	def test_d_python_command_check_clientss_html(self):
+	def test_d_python_command_check_clients_html(self):
 		"""Test case for piaplib.pocket.lint check users."""
 		theResult = False
 		try:
@@ -1167,6 +1133,59 @@ class BasicUsageTestSuite(unittest.TestCase):
 						str("check"),
 						str("iface"),
 						str("--all")
+					], stderr=subprocess.STDOUT)
+					if (str("eth0") in str(theOutputtext)):
+						theResult = True
+					elif (str("enp0s") in str(theOutputtext)):
+						raise unittest.SkipTest("function ok, but not a compatible Test network")
+					elif (str("en0") in str(theOutputtext)):
+						raise unittest.SkipTest("function ok, but not a compatible Test network")
+					else:
+						theResult = False
+						print(str(""))
+						print(str("python cmd is {}").format(str(thepython)))
+						print(str(""))
+						print(str("actual output was..."))
+						print(str(""))
+						print(str("{}").format(str(theOutputtext)))
+						print(str(""))
+				except unittest.SkipTest:
+					raise unittest.SkipTest("function ok, but not a compatible Test network")
+				except Exception as othererr:
+					print(str(""))
+					print(str(type(othererr)))
+					print(str(othererr))
+					print(str((othererr.args)))
+					print(str(""))
+					othererr = None
+					del othererr
+					theResult = False
+		except unittest.SkipTest:
+			raise unittest.SkipTest("function ok, but not a compatible Test network")
+		except Exception as err:
+			debugtestError(err)
+			err = None
+			del err
+			theResult = False
+		assert theResult
+
+	@unittest.skipUnless(sys.platform.startswith("linux"), "Requires linux")
+	def test_d_python_command_check_iface_html(self):
+		"""Test case for piaplib.pocket.lint check iface with html."""
+		theResult = False
+		try:
+			thepython = getPythonCommand()
+			if (thepython is not None):
+				try:
+					theOutputtext = checkPythonCommand([
+						str(thepython),
+						str("-m"),
+						str("piaplib.pocket"),
+						str("lint"),
+						str("check"),
+						str("iface"),
+						str("--all"),
+						str("--html")
 					], stderr=subprocess.STDOUT)
 					if (str("eth0") in str(theOutputtext)):
 						theResult = True

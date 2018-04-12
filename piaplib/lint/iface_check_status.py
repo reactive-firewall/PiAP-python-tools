@@ -22,6 +22,8 @@
 try:
 	import os
 	import sys
+	import subprocess
+	import argparse
 	sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 	try:
 		import piaplib as piaplib
@@ -45,7 +47,7 @@ try:
 		from . import html_generator as html_generator
 	except Exception:
 		import html_generator as html_generator
-	for depend in [utils, remediation, interfaces, html_generator]:
+	for depend in [piaplib, utils, remediation, interfaces, html_generator]:
 		if depend.__name__ is None:
 			raise ImportError("Failed to import piaplib components.")
 except Exception as importErr:
@@ -63,7 +65,6 @@ __prog__ = str("""iface_check_status""")
 
 def parseargs(arguments=None):
 	"""Parse the arguments"""
-	import argparse
 	try:
 		parser = argparse.ArgumentParser(
 			prog=__prog__,
@@ -90,22 +91,8 @@ def parseargs(arguments=None):
 			dest='show_all', default=False,
 			action='store_true', help='show all interfaces.'
 		)
-		the_action = parser.add_mutually_exclusive_group(required=False)
-		the_action.add_argument(
-			'-v', '--verbose',
-			dest='verbose_mode', default=False,
-			action='store_true', help='Enable verbose mode.'
-		)
-		the_action.add_argument(
-			'-q', '--quiet',
-			dest='verbose_mode', default=False,
-			action='store_false', help='Disable the given interface.'
-		)
-		parser.add_argument(
-			'-V', '--version',
-			action='version', version=str(
-				"%(prog)s {}"
-			).format(str(piaplib.__version__)))
+		parser = utils._handleVerbosityArgs(parser, default=False)
+		parser = utils._handleVersionArgs(parser)
 		theResult = parser.parse_args(arguments)
 	except Exception as parseErr:
 		parser.error(str(parseErr))
@@ -159,22 +146,37 @@ def get_iface_name(iface_name=None, use_html=False):
 
 
 @remediation.error_handling
+@utils.memoize
+def get_iface_status_raw_cmd_args():
+	"""Either ip addr or ifconfig depending on system."""
+	theResult = [str("ip"), str("addr"), str("show")]
+	try:
+		if (str(sys.platform).lower().startswith(str("""darwin""")) is True):
+			theResult = [str("ifconfig")]
+	except Exception as someErr:
+		logs.log(str(type(someErr)), "Error")
+		logs.log(str(someErr), "Error")
+		logs.log(str((someErr.args)), "Error")
+	return theResult
+
+
+@remediation.error_passing
 def get_iface_status_raw(interface=None):
 	"""list the raw status of interfaces."""
-	arguments = [str("ip"), str("addr"), str("show")]
+	cli_args = [x for x in get_iface_status_raw_cmd_args()]
+	theRawIfaceState = None
+	tainted_name = None
 	if interface is not None:
 		tainted_name = taint_name(interface)
-		arguments = [str("ip"), str("addr"), str("show"), str(tainted_name)]
-	theRawIfaceState = None
-	import subprocess
+	if tainted_name is not None and tainted_name not in cli_args:
+		cli_args.append(str(tainted_name))
 	try:
-		theRawIfaceState = subprocess.check_output(arguments, stderr=subprocess.STDOUT)
+		theRawIfaceState = subprocess.check_output(
+			cli_args, stderr=subprocess.STDOUT, shell=False
+		)
 	except subprocess.CalledProcessError as subErr:
-		logs.log(str("ERROR"), "Error")
-		logs.log(str(type(subErr)), "Error")
-		logs.log(str(subErr), "Error")
-		logs.log(str(subErr.args), "Error")
-		logs.log(str(""), "Error")
+		cli_args = None
+		del cli_args
 		subErr = None
 		del subErr
 		theRawIfaceState = None
@@ -187,16 +189,36 @@ def get_iface_status_raw(interface=None):
 	return theRawIfaceState
 
 
-@remediation.error_handling
+@remediation.error_passing
 def get_iface_list():
 	"""list the available interfaces."""
 	theResult = []
 	theRawIfaceState = get_iface_status_raw(None)
-	for x in utils.extractIfaceNames(theRawIfaceState):
-		if x in interfaces.INTERFACE_CHOICES:
+	if theRawIfaceState is None:
+		return theResult
+	for x in utils.extractIfaceNames(str(theRawIfaceState)):
+		if utils.isWhiteListed(x, interfaces.INTERFACE_CHOICES):
 			theResult.append(x)
-	theResult = utils.compactList([x for x in theResult])
+	theResult = utils.compactList(theResult)
 	"""while regex would probably work well here, best to whitelist. """
+	return theResult
+
+
+def _isMacOS():
+	"""Simply returns a boolean stating if sys.platform is darwin."""
+	return (str(sys.platform).lower().startswith(str("""darwin""")) is True)
+
+
+def _extractIFaceStatus(status_txt=None):
+	"""Simply returns a boolean stating if sys.platform is darwin."""
+	theResult = str("UNKNOWN")
+	if status_txt is not None:
+		stat_checks = dict({str("DOWN"): str(" DOWN"), str("UP"): str(" UP")})
+		if _isMacOS():
+			stat_checks["UP"] = str("<UP")
+		for check_string in stat_checks.keys():
+			if (str(stat_checks[check_string]) in str(status_txt)):
+				theResult = str(check_string)
 	return theResult
 
 
@@ -204,19 +226,17 @@ def get_iface_list():
 def get_iface_status(iface=u'lo', use_html=False):
 	"""Generate the status"""
 	theResult = None
+	if iface not in get_iface_list():
+		return theResult
 	status_txt = get_iface_status_raw(iface)
 	if use_html is False:
-		theResult = str("UNKNOWN")
-		if status_txt is not None:
-			if (str(" DOWN") in str(status_txt)):
-				theResult = str("DOWN")
-			elif (str(" UP") in str(status_txt)):
-				theResult = str("UP")
+		theResult = _extractIFaceStatus(status_txt)
 	else:
 		theResult = generate_iface_status_html(iface, status_txt)
 	return theResult
 
 
+@remediation.error_passing
 def generate_iface_status_html(iface=u'lo', status_txt="UNKNOWN"):
 	"""Generates the html for interface of given status. Status is UNKNOWN by default."""
 	status = "UNKNOWN"
@@ -231,6 +251,7 @@ def generate_iface_status_html(iface=u'lo', status_txt="UNKNOWN"):
 	return generate_iface_status_html_raw(iface, status, valid_status)
 
 
+@remediation.error_passing
 def generate_iface_status_html_raw(iface=u'lo', status="UNKNOWN", lable=None):
 	"""Generates the raw html for interface of given status with the given lable"""
 	if lable in html_generator.HTML_LABEL_ROLES:
@@ -245,7 +266,7 @@ def generate_iface_status_html_raw(iface=u'lo', status="UNKNOWN", lable=None):
 	return theResult
 
 
-@remediation.error_handling
+@remediation.error_passing
 def get_iface_mac(iface=u'lo', use_html=False):
 	"""Generate output of the iface mac."""
 	theResult = None
@@ -269,11 +290,18 @@ def get_iface_mac(iface=u'lo', use_html=False):
 	return theResult
 
 
-@remediation.error_handling
+@remediation.error_passing
 def get_iface_ip_list(iface=u'lo', use_html=False):
 	"""Generate output of the iface IP."""
 	theResult = None
-	ip_list_txt = utils.extractIPAddr(get_iface_status_raw(iface))
+	temp_buffer = get_iface_status_raw(iface)
+	if temp_buffer is None:
+		theResult = None
+		ip_list_txt = None
+	else:
+		ip_list_txt_raw = utils.extractIPAddr(get_iface_status_raw(iface))
+		ip_list_txt = [x for x in ip_list_txt_raw if not x.endswith(".255")]
+		del ip_list_txt_raw
 	if use_html is False:
 		if ip_list_txt is not None and len(ip_list_txt) > 0:
 			theResult = str(ip_list_txt)
@@ -296,15 +324,27 @@ def get_iface_ip_list(iface=u'lo', use_html=False):
 @remediation.error_handling
 def showAlliFace(verbose_mode, output_html):
 	"""Used by main to show all. Not intended to be called directly"""
+	theText = str("")
 	if output_html:
-		print(
+		theText = str(
 			"<table class=\"table table-striped\">" +
 			"<thead><th>Interface</th><th>MAC</th><th>IP</th><th>State</th></thead><tbody>"
 		)
-	for iface_name in get_iface_list():
-		print(show_iface(iface_name, verbose_mode, output_html))
+	if (get_iface_list() is not None):
+		for iface_name in get_iface_list():
+			theText = str("{}{}\n").format(
+				theText, str(show_iface(iface_name, verbose_mode, output_html))
+			)
+	elif output_html:
+		theText = str("{}{}").format(
+			theText,
+			str("""<tr><td colspan="4"><span class=\"label label-danger\">\2<\/span></td></tr>""")
+		)
 	if output_html:
-		print("</tbody></table>")
+		theText = str("{}{}").format(
+			theText, str("</tbody></table>")
+		)
+	print(str(theText).rstrip("\n"))
 
 
 def main(argv=None):
@@ -320,8 +360,11 @@ def main(argv=None):
 		if args.show_all is True:
 			showAlliFace(verbose, output_html)
 		elif args.list is True:
-			for iface_name in get_iface_list():
-				print(str(iface_name))
+			try:
+				for iface_name in get_iface_list():
+					print(str(iface_name))
+			except Exception as err:
+				remediation.error_breakpoint(err)
 		else:
 			interface = args.interface
 			print(show_iface(interface, verbose, output_html))

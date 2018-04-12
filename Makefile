@@ -104,7 +104,7 @@ purge: clean uninstall
 	$(QUIET)$(ECHO) "$@: Done."
 
 test: cleanup
-	$(QUIET)coverage run -p --source=piaplib,piaplib/lint,piaplib/keyring,piaplib/pku,piaplib/book -m unittest discover --verbose -s ./tests -t ./ || python3 -m unittest discover --verbose -s ./tests -t ./ || python -m unittest discover --verbose -s ./tests -t ./ || DO_FAIL=exit 2 ;
+	$(QUIET)coverage run -p --source=piaplib,piaplib/lint,piaplib/keyring,piaplib/pku,piaplib/book -m unittest discover -b --verbose -s ./tests -t ./ || python3 -m unittest discover -b --verbose -s ./tests -t ./ || python -m unittest discover -b --verbose -s ./tests -t ./ || DO_FAIL=exit 2 ;
 	$(QUIET)coverage combine 2>/dev/null || true
 	$(QUIET)coverage report --include=piaplib* 2>/dev/null || true
 	$(QUIET)$(DO_FAIL);
@@ -121,7 +121,7 @@ test-tox: cleanup
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-style: cleanup
-	$(QUIET)flake8 --ignore=W191,W391 --max-line-length=100 --verbose --count --config=.flake8.ini
+	$(QUIET)flake8 --ignore=W191,W391 --max-line-length=100 --show-source --statistics --count --config=.flake8.ini
 	$(QUIET)tests/check_spelling 2>/dev/null || true
 	$(QUIET)tests/check_codecov_config 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
@@ -160,6 +160,7 @@ cleanup:
 	$(QUIET)rm -f ./test.secret || true
 	$(QUIET)rm -f ../test.secret || true
 	$(QUIET)rm -f ./example*.log || true
+	$(QUIET)rm -Rf ./.hypothesis/ 2>/dev/null || true
 	$(QUIET)rm -f ./the_test_url_file*.txt 2>/dev/null || true
 	$(QUIET)rm -f /tmp/.beta_PiAP_weak_key 2>/dev/null || true
 

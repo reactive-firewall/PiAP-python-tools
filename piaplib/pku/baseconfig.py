@@ -3,7 +3,7 @@
 
 # Pocket PiAP
 # ......................................................................
-# Copyright (c) 2017, Kendrick Walls
+# Copyright (c) 2017-2018, Kendrick Walls
 # ......................................................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
@@ -59,6 +59,11 @@ def getDefaultMainConfigFile():
 	return default_config
 
 
+def isLoaded():
+	"""returns False. Overloaded by config class."""
+	return getDefaultMainConfigFile()['PiAP-piaplib']['loaded']
+
+
 def mergeDicts(*dict_args):
 	"""
 	Given any number of dicts, shallow copy and merge into a new dict,
@@ -97,7 +102,7 @@ def parseConfigParser(config_data=dict({}), theConfig=None, overwrite=True):
 	return config_data
 
 
-def loadMainConfigFile(confFile='/var/opt/PiAP/PiAP.conf'):
+def loadMainConfigFile(confFile='/opt/PiAP/PiAP.conf'):
 	try:
 		mainConfig = configparser.ConfigParser(allow_no_value=True)
 		result_config = getDefaultMainConfigFile()

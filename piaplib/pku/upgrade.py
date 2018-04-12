@@ -3,7 +3,7 @@
 
 # Pocket PiAP
 # ......................................................................
-# Copyright (c) 2017, Kendrick Walls
+# Copyright (c) 2017-2018, Kendrick Walls
 # ......................................................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
@@ -38,12 +38,6 @@ try:
 	import sys
 except Exception:
 	raise ImportError("Error Importing system tools")
-
-
-try:
-	import piaplib as piaplib
-except Exception:
-	from . import piaplib as piaplib
 
 
 try:
@@ -127,55 +121,40 @@ __prog__ = """piaplib.pku.upgrade"""
 """The name of this PiAPLib tool is Pocket Knife Upgrade Unit"""
 
 
+__description__ = """Run piaplib upgrade functions."""
+"""The description of this PiAPLib tool is 'Run piaplib upgrade functions.'"""
+
+
+__epilog__ = """basically a python wrapper for pip install --upgrade."""
+"""...basically a python wrapper for pip install --upgrade."""
+
+
 @remediation.error_passing
 def parseargs(arguments=None):
 	"""Parse the arguments"""
-	parser = argparse.ArgumentParser(
-		prog=__prog__,
-		description='Run piaplib upgrade functions.',
-		epilog='basically a python wrapper for pip install --upgrade.'
-	)
+	parser = argparse.ArgumentParser(prog=__prog__, description=__description__, epilog=__epilog__)
 	the_action = parser.add_mutually_exclusive_group()
 	the_action.add_argument(
-		'-u',
-		'--upgrade',
-		dest='upgrade_core',
-		default=True,
-		action='store_false',
-		help='Upgrade the piaplib. This is the default.'
+		'-u', '--upgrade', dest='upgrade_action', default='core', action='store_const',
+		const='core', help='Upgrade the piaplib. This is the default.'
 	)
 	the_action.add_argument(
-		'-P',
-		'--upgrade-pip',
-		dest='upgrade_pip',
-		default=False,
-		action='store_true',
-		help='Upgrade the pip module. This is needed for piaplib dependencies. BETA FEATURE.'
+		'-P', '--upgrade-pip', dest='upgrade_action', action='store_const',
+		const='pip', help='Upgrade the pip module. This is needed for piaplib dependencies.'
 	)
 	the_action.add_argument(
-		'-W',
-		'--upgrade-webroot',
-		dest='upgrade_web',
-		default=False,
-		action='store_true',
-		help='Upgrade the piaplib webroot module. EXPERIMENTAL.'
+		'-W', '--upgrade-webroot', dest='upgrade_action', action='store_const',
+		const='webroot', help='Upgrade the piaplib webroot module. EXPERIMENTAL.'
 	)
 	the_action.add_argument(
-		'-A',
-		'--upgrade-all',
-		dest='upgrade_all',
-		default=False,
-		action='store_true',
-		help='Upgrade all of the piaplib.'
+		'-S', '--upgrade-system', dest='upgrade_action', action='store_const',
+		const='apt', help='Upgrade the underlying system. EXPERIMENTAL.'
 	)
-	parser.add_argument(
-		'-V',
-		'--version',
-		action='version',
-		version=str(
-			"%(prog)s {}"
-		).format(str(piaplib.__version__))
+	the_action.add_argument(
+		'-A', '--upgrade-all', dest='upgrade_action', action='store_const',
+		const='all', help='Upgrade all of the piaplib.'
 	)
+	parser = utils._handleVersionArgs(parser)
 	theResult = parser.parse_known_args(arguments)
 	return theResult
 
@@ -205,6 +184,7 @@ def upgradeAPT():
 		cache.open(None)
 		for pkg in cache.get_changes():
 			logs.log((pkg.sourcePackageName, pkg.isUpgradeable), "Info")
+		raise NotImplementedError("CRITICAL - Pocket upgrade upgradeAPT() not implemented. Yet.")
 	except Exception as permErr:
 		remediation.error_breakpoint(permErr, "upgradeAPT")
 		permErr = None
@@ -324,35 +304,34 @@ def upgradeAll():
 	return None
 
 
+_UPGRADE_ACTIONS = dict({
+	'core': upgradePiAPlib,
+	'pip': upgradepip,
+	'webroot': upgradePiAPlib_webui,
+	'apt': upgradeAPT,
+	'all': upgradeAll
+})
+"""Posible upgrade actions."""
+
+
 @remediation.bug_handling
 def main(argv=None):
 	"""The Main Event. Upgrade Time."""
 	(args, extras) = parseargs(argv)
-	if args.upgrade_core is True:
-		upgradePiAPlib()
-		return 0
-	elif args.upgrade_pip is True:
-		upgradepip()
-		return 0
-	elif args.upgrade_web is True:
-		upgradePiAPlib_webui()
-		return 0
-	elif args.upgrade_all is True:
-		upgradeAll()
-		return 0
-	return 3
+	theResult = 1
+	if args.upgrade_action is not None:
+		_UPGRADE_ACTIONS[args.upgrade_action]()
+		theResult = 0
+	return theResult
 
 
-if __name__ == u'__main__':
+if __name__ in u'__main__':
 	try:
 		if (sys.argv is not None and (sys.argv is not []) and (len(sys.argv) > 1)):
-			main(sys.argv[1:])
-	except Exception as main_err:
-		print(str("upgrade: REALLY BAD ERROR: PiAPLib Refused to upgrade! ABORT!"))
-		print(str(type(main_err)))
-		print(str(main_err))
-		print(str(main_err.args[0]))
-		main_err = None
-		del(main_err)
-		exit(3)
+			exit(main(sys.argv[1:]))
+		else:
+			exit(main(["--help"]))
+	except Exception:
+		raise ImportError("Error running main")
+	exit(3)
 

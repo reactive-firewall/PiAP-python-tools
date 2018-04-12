@@ -90,10 +90,7 @@ def randStr(count=None):
 		choices = [randInt(1, 1, 99) for x in range(x_count)]
 		return str("").join([string.printable[m] for m in choices if m is not int(69)])
 	except Exception as err:
-		print(str(u'FAILED DURING RAND-STR. ABORT.'))
-		print(str(type(err)))
-		print(str(err))
-		print(str(err.args))
+		remediation.error_breakpoint(err, str(u'FAILED DURING RAND-STR. ABORT.'))
 		err = None
 		del err
 	raise AssertionError("BUG: BAD STATE REACHED IN RAND-STR. ABORT.")
@@ -108,10 +105,7 @@ def randPW(count=None):
 		choices = [randInt(1, 1, 95) for x in range(x_count)]
 		return str(str("").join([string.printable[m] for m in choices if m is not int(69)]))
 	except Exception as err:
-		print(str(u'FAILED DURING RAND-PW. ABORT.'))
-		print(str(type(err)))
-		print(str(err))
-		print(str(err.args))
+		remediation.error_breakpoint(err, str(u'FAILED DURING RAND-PW. ABORT.'))
 		err = None
 		del err
 	raise AssertionError("BUG: BAD STATE REACHED IN RAND-PW. ABORT.")
@@ -137,10 +131,7 @@ def randSSID(count=None):
 				theResult = theResult.join(nextChar)
 			return theResult
 	except Exception as err:
-		print(str(u'FAILED DURING RAND-SSID. ABORT.'))
-		print(str(type(err)))
-		print(str(err))
-		print(str(err.args))
+		remediation.error_breakpoint(err, str(u'FAILED DURING RAND-SSID. ABORT.'))
 		err = None
 		del err
 	raise AssertionError("IMPOSSIBLE STATE REACHED IN RAND-SSID. ABORT.")
@@ -172,10 +163,7 @@ def randIP(count=None, min=0, max=256):
 				theResult.append(randIP(1, min, max))
 			return theResult
 	except Exception as err:
-		print(str(u'FAILED DURING RAND-IIP. ABORT.'))
-		print(str(type(err)))
-		print(str(err))
-		print(str(err.args))
+		remediation.error_breakpoint(err, str(u'FAILED DURING RAND-IIP. ABORT.'))
 		err = None
 		del err
 	raise AssertionError("IMPOSSIBLE STATE REACHED IN RAND-IP. ABORT.")
@@ -207,10 +195,7 @@ def fastrandInt(count=None, max=512):
 		else:
 			return [fastrandInt(1, max) for someInt in range(x_count)]
 	except Exception as err:
-		print(str(u'FAILED DURING RAND-INT. ABORT.'))
-		print(str(type(err)))
-		print(str(err))
-		print(str(err.args))
+		remediation.error_breakpoint(err, str(u'FAILED DURING RAND-INT. ABORT.'))
 		err = None
 		del err
 	raise AssertionError("IMPOSSIBLE STATE REACHED IN RAND-INT. ABORT.")
@@ -240,10 +225,7 @@ def randInt(count=None, min=0, max=512):
 		else:
 			return [randInt(1, min, max) for someInt in range(x_count)]
 	except Exception as err:
-		print(str(u'FAILED DURING RAND-INT. ABORT.'))
-		print(str(type(err)))
-		print(str(err))
-		print(str(err.args))
+		remediation.error_breakpoint(err, str(u'FAILED DURING RAND-INT. ABORT.'))
 		err = None
 		del err
 	raise AssertionError("IMPOSSIBLE STATE REACHED IN RAND-INT. ABORT.")
@@ -262,10 +244,7 @@ def randBool(count=None):
 				theResult.append(randBool(1))
 			return theResult
 	except Exception as err:
-		print(str(u'FAILED DURING RAND-BOOL. ABORT.'))
-		print(str(type(err)))
-		print(str(err))
-		print(str(err.args))
+		remediation.error_breakpoint(err, str(u'FAILED DURING RAND-BOOL. ABORT.'))
 		err = None
 		del err
 	raise AssertionError("IMPOSSIBLE STATE REACHED IN RAND-BOOL. ABORT.")
@@ -286,10 +265,7 @@ def randChar(count=None):
 			theRandomResult = str("{0}{1}").format(theRandomResult, str(char_rand_seed))
 		return theRandomResult
 	except Exception as err:
-		print(str(u'FAILED DURING RAND-CHAR. ABORT.'))
-		print(str(type(err)))
-		print(str(err))
-		print(str(err.args))
+		remediation.error_breakpoint(err, str(u'FAILED DURING RAND-CHAR. ABORT.'))
 		print(str(RAND_CHARS))
 		print(str(len(RAND_CHARS)))
 		err = None
@@ -297,6 +273,7 @@ def randChar(count=None):
 	raise AssertionError("IMPOSSIBLE STATE REACHED IN RAND-CHAR. ABORT.")
 
 
+@remediation.error_passing
 def ensurePositiveCount(count=None):
 	"""Ensures the given count is an integer with value greater than or equal tozero."""
 	if count is None or (isinstance(count, int) is False) or count <= 1:
@@ -401,10 +378,7 @@ if __name__ in u'__main__':
 		error_code = main(sys.argv[1:])
 		exit(error_code)
 	except Exception as err:
-		print(str(u'MAIN FAILED DURING RAND. ABORT.'))
-		print(str(type(err)))
-		print(str(err))
-		print(str(err.args))
+		remediation.error_breakpoint(err, str(u'MAIN FAILED DURING RAND. ABORT.'))
 		del err
 		exit(255)
 	finally:

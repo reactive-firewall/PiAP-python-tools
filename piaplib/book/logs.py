@@ -53,6 +53,7 @@ except Exception as err:
 try:
 	import sys
 	import os
+	import os.path
 	if str("book") in __file__:
 		__sys_path__ = os.path.abspath(os.path.join(os.path.dirname(__file__), '.'))
 		if __sys_path__ not in sys.path:
@@ -127,7 +128,6 @@ class logs(object):
 				raise ImportError(err)
 				exit(3)
 		if baseconfig.loadMainConfigFile()['PiAP-logging-outputs']['file']:
-			import os.path
 			prefix_path = baseconfig.loadMainConfigFile()['PiAP-logging']['dir']
 			file_path = os.path.join(prefix_path, str("piaplib.log"))
 		else:
@@ -177,12 +177,18 @@ class logs(object):
 			raise ValueError(str("Invalid log level"))
 		if (loglevel.lower() not in logs.logging_level.keys()):
 			raise ValueError(str("Invalid log level"))
+		if (sys.stdout.isatty()):
+			colorPrefix = logs.logging_color[loglevel.lower()]
+			endColor = ANSIColors.ENDC
+		else:
+			colorPrefix = str("")
+			endColor = colorPrefix
 		logger.log(
 			logs.logging_level[loglevel.lower()],
 			str("{name} -- {prefix}{message}{suffix}").format(
 				name=str(myName),
-				prefix=logs.logging_color[loglevel.lower()],
-				message=msg, suffix=ANSIColors.ENDC
+				prefix=colorPrefix,
+				message=msg, suffix=endColor
 			)
 		)
 

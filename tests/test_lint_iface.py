@@ -88,6 +88,92 @@ class LintiFaceTestSuite(unittest.TestCase):
 				theResult = False
 		assert theResult
 
+	def test_case_iface_name_insane_none(self):
+		"""Tests the imposible state for iface name given None values"""
+		theResult = True
+		try:
+			from lint import iface_check_status as iface_check_status
+		except Exception:
+			import lint.iface_check_status as iface_check_status
+		if iface_check_status.__name__ is None:
+			theResult = False
+		else:
+			try:
+				self.assertIsNone(
+					iface_check_status.get_iface_name(None, False)
+				)
+				self.assertIsNone(
+					iface_check_status.get_iface_name(None, True)
+				)
+				self.assertIsNotNone(
+					iface_check_status.get_iface_name("junk", True)
+				)
+			except Exception as err:
+				print(str(""))
+				print(str(type(err)))
+				print(str(err))
+				print(str((err.args)))
+				print(str(""))
+				err = None
+				del err
+				theResult = False
+		assert theResult
+
+	def test_case_iface_list_output(self):
+		"""Tests the normal state for iface list given values"""
+		theResult = False
+		try:
+			from lint import iface_check_status as iface_check_status
+		except Exception:
+			import lint.iface_check_status as iface_check_status
+		if iface_check_status.__name__ is not None:
+			try:
+				for test_iface in [str("eth0"), str("en0"), str("enp0s0")]:
+					theOutput = iface_check_status.get_iface_ip_list(test_iface, False)
+					if theResult is True:
+						continue
+					elif (theOutput is not None) and (len(theOutput) > 0):
+						self.assertIsNotNone(theOutput)
+						theResult = True
+			except Exception as err:
+				print(str(""))
+				print(str(type(err)))
+				print(str(err))
+				print(str((err.args)))
+				print(str(""))
+				err = None
+				del err
+				theResult = False
+		assert theResult
+
+	def test_case_iface_list_insane_none(self):
+		"""Tests the imposible state for iface list given None values"""
+		theResult = True
+		try:
+			from lint import iface_check_status as iface_check_status
+		except Exception:
+			import lint.iface_check_status as iface_check_status
+		if iface_check_status.__name__ is None:
+			theResult = False
+		else:
+			try:
+				self.assertIsNotNone(
+					iface_check_status.get_iface_ip_list(None, True)
+				)
+				self.assertIsNotNone(
+					iface_check_status.get_iface_ip_list("junk", True)
+				)
+			except Exception as err:
+				print(str(""))
+				print(str(type(err)))
+				print(str(err))
+				print(str((err.args)))
+				print(str(""))
+				err = None
+				del err
+				theResult = False
+		assert theResult
+
 
 if __name__ == u'__main__':
 	unittest.main()

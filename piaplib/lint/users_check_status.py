@@ -3,7 +3,7 @@
 
 # Pocket PiAP
 # ......................................................................
-# Copyright (c) 2017, Kendrick Walls
+# Copyright (c) 2017-2018, Kendrick Walls
 # ......................................................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
@@ -26,13 +26,13 @@ try:
 	import argparse
 	sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 	try:
-		import piaplib as piaplib
-	except Exception:
-		from . import piaplib as piaplib
-	try:
 		from .. import utils as utils
 	except Exception:
 		import pku.utils as utils
+	try:
+		from .. import remediation as remediation
+	except Exception:
+		import pku.remediation as remediation
 	try:
 		from . import html_generator as html_generator
 	except Exception as ImpErr:
@@ -68,6 +68,7 @@ __prog__ = """users_check_status"""
 """The Program's name"""
 
 
+@remediation.error_handling
 def parseargs(arguments=None):
 	"""Parse the arguments"""
 	try:
@@ -76,10 +77,7 @@ def parseargs(arguments=None):
 			description='Report the state of a given user.',
 			epilog='Basically ps wrapper.'
 		)
-		parser.add_argument(
-			'-u', '--user',
-			default=None, help='The user to show.'
-		)
+		parser.add_argument('-u', '--user', default=None, help='The user to show.')
 		parser.add_argument(
 			'-l', '--list',
 			default=False, action='store_true',
@@ -95,37 +93,15 @@ def parseargs(arguments=None):
 			dest='show_all', default=False,
 			action='store_true', help='show all users.'
 		)
-		the_action = parser.add_mutually_exclusive_group(required=False)
-		the_action.add_argument(
-			'-v', '--verbose',
-			dest='verbose_mode', default=False,
-			action='store_true', help='Enable verbose mode.'
-		)
-		the_action.add_argument(
-			'-q', '--quiet',
-			dest='verbose_mode', default=False,
-			action='store_false', help='Disable the given interface.'
-		)
-		parser.add_argument(
-			'-V', '--version',
-			action='version', version=str(
-				"%(prog)s {}"
-			).format(str(piaplib.__version__)))
+		parser = utils._handleVerbosityArgs(parser, default=False)
+		parser = utils._handleVersionArgs(parser)
 		theResult = parser.parse_args(arguments)
 	except Exception as parseErr:
 		parser.error(str(parseErr))
 	return theResult
 
 
-def taint_name(rawtxt):
-	"""check the interface arguments"""
-	tainted_input = str(rawtxt).lower()
-	for test_username in get_user_list():
-		if tainted_input in test_username:
-			return test_username
-	return None
-
-
+@remediation.error_handling
 def show_user(user_name=None, is_verbose=False, use_html=False):
 	"""show the given user."""
 	theResult = None
@@ -155,6 +131,7 @@ def show_user(user_name=None, is_verbose=False, use_html=False):
 	return theResult
 
 
+@remediation.error_passing
 def get_user_name(user_name=None, use_html=False):
 	if user_name is None:
 		return None
@@ -173,6 +150,7 @@ def get_user_name(user_name=None, use_html=False):
 		return html_generator.gen_html_td(user, str(u'user_name_{}').format(user))
 
 
+@remediation.error_passing
 def isLineForUser(someLine=None, username=None):
 	"""determins if a raw output line is for a user"""
 	doesMatch = False
@@ -188,6 +166,39 @@ def isLineForUser(someLine=None, username=None):
 	return doesMatch
 
 
+@remediation.error_handling
+@utils.memoize
+def get_ps_cmd_path():
+	"""Either /bin/ps or ps depending on system."""
+	try:
+		if (str(sys.platform).lower().startswith(str("""darwin""")) is True):
+			return str("""/bin/ps""")
+		else:
+			return str("""ps""")
+	except Exception as someErr:
+		logs.log(str(type(someErr)), "Error")
+		logs.log(str(someErr), "Error")
+		logs.log(str((someErr.args)), "Error")
+	return str("""ps""")
+
+
+@remediation.error_handling
+@utils.memoize
+def get_sort_cmd_path():
+	"""Either /usr/bin/sort or sort depending on system."""
+	try:
+		if (str(sys.platform).lower().startswith(str("""darwin""")) is True):
+			return str("""/usr/bin/sort""")
+		else:
+			return str("""sort""")
+	except Exception as someErr:
+		logs.log(str(type(someErr)), "Error")
+		logs.log(str(someErr), "Error")
+		logs.log(str((someErr.args)), "Error")
+	return str("""sort""")
+
+
+@remediation.error_handling
 def get_system_work_status_raw(user_name=None):
 	"""list the raw status of system work."""
 	theuserState = None
@@ -196,10 +207,11 @@ def get_system_work_status_raw(user_name=None):
 		try:
 			# hard-coded white-list cmds
 			p1 = subprocess.Popen(
-				[str("ps"), str("-eo"), str("user,command")],
+				[utils.literal_str(get_ps_cmd_path()), str("-eo"), str("user,command")],
 				shell=False,
 				stdout=subprocess.PIPE,
-				stderr=None
+				stderr=None,
+				close_fds=True
 			)
 			p2 = subprocess.Popen(
 				[
@@ -210,7 +222,8 @@ def get_system_work_status_raw(user_name=None):
 				],
 				shell=False,
 				stdin=p1.stdout,
-				stdout=subprocess.PIPE
+				stdout=subprocess.PIPE,
+				close_fds=True
 			)
 			p3 = subprocess.Popen(
 				[
@@ -221,22 +234,28 @@ def get_system_work_status_raw(user_name=None):
 				],
 				shell=False,
 				stdin=p2.stdout,
-				stdout=subprocess.PIPE
+				stdout=subprocess.PIPE,
+				close_fds=True
 			)
 			p4 = subprocess.Popen(
-				[utils.literal_str("""sort""")],
+				[utils.literal_str(get_sort_cmd_path())],
 				shell=False,
 				stdin=p3.stdout,
-				stdout=subprocess.PIPE
+				stdout=subprocess.PIPE,
+				close_fds=True
 			)
 			p5 = subprocess.Popen(
 				[utils.literal_str("""uniq""")],
 				shell=False,
 				stdin=p4.stdout,
-				stdout=subprocess.PIPE
+				stdout=subprocess.PIPE,
+				close_fds=True
 			)
 			p4.stdout.close()  # Allow p4 to receive a SIGPIPE if p5 exits.
 			(output, stderrors) = p5.communicate()
+			p3.stdout.close()  # Allow p4 to receive a SIGPIPE when p5 exits.
+			p2.stdout.close()  # Allow p4 to receive a SIGPIPE when p5 exits.
+			p1.stdout.close()  # Allow p4 to receive a SIGPIPE when p5 exits.
 			if (isinstance(output, bytes)):
 				output = output.decode('utf8')
 			if (output is not None) and (len(output) > 0):
@@ -266,11 +285,11 @@ def get_system_work_status_raw(user_name=None):
 	return theuserState
 
 
+@remediation.error_handling
 @utils.memoize
 def get_w_cmd_args():
 	"""Either -his or -wnh depending on system."""
 	try:
-		import sys
 		if (str(sys.platform).lower().startswith(str("""darwin""")) is True):
 			return str("""-hi""")
 		else:
@@ -283,6 +302,7 @@ def get_w_cmd_args():
 
 
 # TODO: memoize this function
+@remediation.error_passing
 def get_user_work_status_raw(user_name=None):
 	"""list the raw status of user work."""
 	theRawOutput = None
@@ -306,7 +326,8 @@ def get_user_work_status_raw(user_name=None):
 				],
 				shell=False,
 				stdin=p1.stdout,
-				stdout=subprocess.PIPE
+				stdout=subprocess.PIPE,
+				close_fds=True
 			)
 			p1.stdout.close()  # Allow p1 to receive a SIGPIPE if p2 exits.
 			(output, stderrors) = p2.communicate()
@@ -340,12 +361,32 @@ def get_user_work_status_raw(user_name=None):
 	return theRawOutput
 
 
-# TODO: memoize this function
+@remediation.error_handling
+def taint_name(rawtxt):
+	"""check the interface arguments"""
+	tainted_input = str(rawtxt).lower()
+	for test_username in get_user_list():
+		if tainted_input in test_username:
+			return test_username
+	return None
+
+
+@remediation.error_passing
 def get_user_list():
 	"""list the available users."""
 	theResult = None
+	theRawuserState = get_system_work_status_raw(None)
+	if theRawuserState is not None:
+		theResult = format_raw_user_list(theRawuserState)
+	return theResult
+
+
+@remediation.error_passing
+@utils.memoize
+def format_raw_user_list(theRawuserState=None):
+	"""formate raw list of the available users."""
+	theResult = None
 	try:
-		theRawuserState = get_system_work_status_raw(None)
 		if theRawuserState is None:
 			theResult = []
 			return theResult
@@ -363,7 +404,7 @@ def get_user_list():
 			theResult = [x for x in theResult if utils.xstr(reserved_lines) not in utils.xstr(x)]
 	except Exception as parseErr:
 		logs.log(
-			str("user_check_status.get_user_list: ERROR: ACTION will not be completed! ABORT!"),
+			str("{}.get_user_list: ERROR: ACTION will not be completed! ABORT!").fromat(__file__),
 			"Error"
 		)
 		logs.log(str(type(parseErr)), "Error")
@@ -373,17 +414,49 @@ def get_user_list():
 	return theResult
 
 
+def getKnownProcessesTable():
+	"""The list of known PiAP related processes to report"""
+	return dict({
+		u'/usr/sbin/cron': u'SYSTEM AUTOMATION',
+		u'/usr/bin/dbus-daemon': u'SYSTEM',
+		u'ntpd': u'TIMEKEEPING SERVICES',
+		u'syslogd': u'LOGGING SERVICES',
+		u'wlan1': u'NETWORK SERVICES',
+		u'usb0': u'NETWORK SERVICES',
+		u'eth0': u'NETWORK SERVICES',
+		u'wlan0': u'NETWORK SERVICES',
+		u'wlan2': u'NETWORK SERVICES',
+		u'lan0': u'NETWORK SERVICES',
+		u'lan1': u'NETWORK SERVICES',
+		u'avahi-daemon:': u'mDNS-SERVER SERVICES',
+		u'wpa_supplicant': u'WPA SERVICES',
+		u'/usr/sbin/hostapd': u'AP SERVICES',
+		u'/sbin/dhcpcd': u'DHCP-CLIENT SERVICES',
+		u'/usr/sbin/dnsmasq': u'DNS-DHCP-SERVER SERVICES',
+		u'/lib/systemd/systemd-resolved': u'DNS-SERVER SERVICES',
+		u'/usr/bin/freshclam': u'SYSTEM DEFENSE',
+		u'denyhosts.py': u'SYSTEM DEFENSE',
+		u'/usr/bin/rkhunter': u'SYSTEM DEFENSE',
+		u'/usr/bin/nmap': u'COUNTER OFFENSE',
+		u'pester_site': u'COUNTER OFFENSE',
+		u'piaplib': u'PiAP SERVICES',
+		u'nginx: ': u'WEB SERVICES',
+		u'php-fpm': u'WEB SERVICES'
+	})
+
+
 def get_user_status(user_name=None, use_html=False):  # noqa C901
 	"""Generate the status"""
 	theResult = None
 	try:
 		user_tty = None
 		status_list = []
-		if user_name is not None:
-			user_tty = get_user_ttys(user_name, False)
-		status_txt = get_system_work_status_raw(user_name)
+		t_user_name = taint_name(user_name)
+		if taint_name(user_name) is not None:
+			user_tty = get_user_ttys(t_user_name, False)
+		status_txt = get_system_work_status_raw(t_user_name)
 		if (user_tty is not None) and (str(user_tty).lower() not in str("console")):
-			status_txt = get_user_work_status_raw(user_name)
+			status_txt = get_user_work_status_raw(t_user_name)
 			if status_txt is None:
 				status_list = ["UNKNOWN"]
 			else:
@@ -399,31 +472,7 @@ def get_user_status(user_name=None, use_html=False):  # noqa C901
 						str(x).split(u' ', 1)[1:]
 					) for x in status_txt.split("""\n""") if (x is not None) and (len(x) > 0)]
 				)
-				known_work_cases = dict({
-					u'/usr/sbin/cron': u'SYSTEM AUTOMATION',
-					u'ntpd': u'TIMEKEEPING SERVICES',
-					u'syslogd': u'LOGGING SERVICES',
-					u'wlan1': u'NETWORK SERVICES',
-					u'usb0': u'NETWORK SERVICES',
-					u'eth0': u'NETWORK SERVICES',
-					u'wlan0': u'NETWORK SERVICES',
-					u'wlan2': u'NETWORK SERVICES',
-					u'lan0': u'NETWORK SERVICES',
-					u'lan1': u'NETWORK SERVICES',
-					u'avahi-daemon:': u'mDNS-SERVER SERVICES',
-					u'wpa_supplicant': u'WPA SERVICES',
-					u'/usr/sbin/hostapd': u'AP SERVICES',
-					u'/sbin/dhcpcd': u'DHCP-CLIENT SERVICES',
-					u'/usr/sbin/dnsmasq': u'DNS-DHCP-SERVER SERVICES',
-					u'/lib/systemd/systemd-resolved': u'DNS-SERVER SERVICES',
-					u'/usr/bin/freshclam': u'SYSTEM DEFENSE',
-					u'/usr/bin/denyhosts.py': u'SYSTEM DEFENSE',
-					u'/usr/bin/rkhunter': u'SYSTEM DEFENSE',
-					u'/usr/bin/nmap': u'COUNTER OFFENSE',
-					u'piaplib': u'PiAP SERVICES',
-					u'nginx: ': u'WEB SERVICES',
-					u'php-fpm': u'WEB SERVICES'
-				})
+				known_work_cases = getKnownProcessesTable()
 				for theWork in theWorks:
 					temp_txt = "UNKNOWN"
 					if ("SYSTEM" in theWork):
@@ -467,7 +516,7 @@ def get_user_status(user_name=None, use_html=False):  # noqa C901
 		else:
 			theResult = html_generator.gen_html_td(
 				html_generator.gen_html_ul(status_list),
-				str(u'user_status_what_{}').format(user_name)
+				str(u'user_status_what_{}').format(t_user_name)
 			)
 		status_list = None
 		del status_list
@@ -569,6 +618,7 @@ def get_user_ip(user=None, use_html=False):
 	return theResult
 
 
+@remediation.bug_handling
 def main(argv=None):  # noqa C901
 	"""The main function."""
 	args = parseargs(argv)

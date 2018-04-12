@@ -21,6 +21,18 @@
 
 import unittest
 
+try:
+	try:
+		import context
+	except Exception as ImportErr:
+		ImportErr = None
+		del ImportErr
+		from . import context
+	if context.__name__ is None:
+		raise ImportError("Failed to import context")
+except Exception:
+	raise ImportError("Failed to import test context")
+
 
 class BasicTestSuite(unittest.TestCase):
 	"""Basic test cases."""

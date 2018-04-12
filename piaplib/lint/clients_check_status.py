@@ -3,7 +3,7 @@
 
 # Pocket PiAP
 # ......................................................................
-# Copyright (c) 2017, Kendrick Walls
+# Copyright (c) 2017-2018, Kendrick Walls
 # ......................................................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ try:
 		from .. import interfaces as interfaces
 	except Exception:
 		import pku.interfaces as interfaces
-	for depends in [interfaces, html_generator, remediation, utils]:
+	for depends in [piaplib, interfaces, html_generator, remediation, utils]:
 		if depends.__name__ is None:
 			raise ImportError("Failed to import depends.")
 except Exception as importErr:
@@ -93,20 +93,8 @@ def parseargs(arguments=None):
 			dest='show_all', default=False,
 			action='store_true', help='show all clients.'
 		)
-		the_action = parser.add_mutually_exclusive_group(required=False)
-		the_action.add_argument(
-			'-v', '--verbose',
-			dest='verbose_mode', default=False,
-			action='store_true', help='Enable verbose mode.'
-		)
-		the_action.add_argument(
-			'-q', '--quiet',
-			dest='verbose_mode', default=False,
-			action='store_false', help='Disable the given interface.'
-		)
-		parser.add_argument('-V', '--version', action='version', version=str(
-			"%(prog)s {}"
-		).format(str(piaplib.__version__)))
+		parser = utils._handleVerbosityArgs(parser, default=False)
+		parser = utils._handleVersionArgs(parser)
 		(theResult, junk) = parser.parse_known_args(arguments)
 	except Exception as parseErr:
 		parser.error(str("ERROR: parseargs"))

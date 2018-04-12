@@ -90,6 +90,7 @@ except Exception as importErr:
 	raise ImportError("Failed to import " + str(__file__))
 	exit(255)
 
+
 __prog__ = """piaplib.version"""
 """The name of this PiAPLib tool is pocket version"""
 
@@ -212,17 +213,8 @@ def parseArgs(arguments=None):
 		default=u'all',
 		help='The pocket version option.'
 	)
-	parser.add_argument(
-		'-v',
-		'--verbose',
-		dest='verbose_mode',
-		default=False,
-		action='store_true',
-		help='verbose reporting mode.'
-	)
-	parser.add_argument('-V', '--version', action='version', version=str(
-		"%(prog)s {}"
-	).format(str(piaplib.__version__)))
+	parser = utils._handleVerbosityArgs(parser, default=False)
+	parser = utils._handleVersionArgs(parser)
 	return parser.parse_known_args(arguments)
 
 
@@ -253,4 +245,4 @@ if __name__ in u'__main__':
 		exitcode = 3
 	exit(exitcode)
 
-
+# vcgencmd get_config int

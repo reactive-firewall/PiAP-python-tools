@@ -3,7 +3,7 @@
 
 # Pocket PiAP
 # ......................................................................
-# Copyright (c) 2017, Kendrick Walls
+# Copyright (c) 2017-2018, Kendrick Walls
 # ......................................................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
@@ -62,10 +62,15 @@ except Exception as importErr:
 
 
 try:
-	import piaplib as piaplib
-except Exception:
-	from . import piaplib as piaplib
-
+	try:
+		import piaplib as piaplib
+	except Exception:
+		from . import piaplib as piaplib
+	if piaplib.__name__ is None:
+		raise ImportError("OMG! we could not import argparse. We're in need of a fix! ABORT.")
+except Exception as err:
+	raise ImportError(err)
+	exit(3)
 
 try:
 	import piaplib.pku.upgrade as upgrade
@@ -164,42 +169,41 @@ def parseArgs(arguments=None):
 		choices=PKU_UNITS.keys(),
 		help='the pocket pku service option.'
 	)
-	parser.add_argument('-V', '--version', action='version', version=str(
-		"%(prog)s {}"
-	).format(str(piaplib.__version__)))
+	parser = utils._handleVersionArgs(parser)
 	return parser.parse_known_args(arguments)
 
 
 def usePKUTool(tool, arguments=[None]):
 	"""Handler for launching pocket-tools."""
+	theExitCode = 1
 	if tool is None:
-		return 0
-	if tool in PKU_UNITS.keys():
+		theExitCode = 0
+	elif tool in PKU_UNITS.keys():
 		try:
 			try:
 				logs.log(str("pku launching: {}").format(str(tool)), "DEBUG")
+				theExitCode = 0
 				PKU_UNITS[tool].main(arguments)
 			except Exception:
 				logs.log(str("An error occurred while handling the PKU tool. "), "WARNING")
 				logs.log(str("Cascading failure."), "Error")
-				return 3
+				theExitCode = 3
 		except Exception:
 			logs.log(str("An error occurred while handling the cascading failure."), "CRITICAL")
-			return 3
-		return 0
-	else:
-		return 1
+			theExitCode = 3
+	return theExitCode
 
 
 @remediation.bug_handling
 def main(argv=None):
 	"""The main event"""
 	# logs.log(str(__prog__), "DEBUG")
+	theExitCode = 0
 	try:
 		try:
 			args, extra = parseArgs(argv)
 			pku_cmd = args.pku_unit
-			usePKUTool(pku_cmd, extra)
+			theExitCode = usePKUTool(pku_cmd, extra)
 		except Exception as cerr:
 			logs.log(str(cerr), "Error")
 			logs.log(str(cerr.args), "Error")
@@ -207,32 +211,21 @@ def main(argv=None):
 				str(" UNKNOWN - An error occurred while handling the arguments. Command failure."),
 				"Error"
 			)
-			return 2
+			theExitCode = 2
 	except Exception:
 		logs.log(
 			str(" UNKNOWN - An error occurred while handling the failure. Cascading failure."),
 			"Error"
 		)
-		return 2
-	return 3
+		theExitCode = 2
+	return theExitCode
 
 
 if __name__ in u'__main__':
-	if utils.__name__ is None:
-		raise ImportError("Error Importing utils")
-	if config.__name__ is None:
-		raise ImportError("Error Importing config")
-	if interfaces.__name__ is None:
-		raise ImportError("Error Importing interfaces")
-	if upgrade.__name__ is None:
-		raise ImportError("Error Importing upgrade")
-	if remediation.__name__ is None:
-		raise ImportError("Error Importing remediation")
-	if logs.__name__ is None:
-		raise ImportError("Error Importing logs")
-	exit_code = 3
+	for unit_test in [utils, config, interfaces, upgrade, remediation, logs]:
+		if unit_test.__name__ is None:
+			raise ImportError(str("Error Importing {}}").format(str(unit_test)))
 	try:
-		import sys
 		if (sys.argv is not None and (sys.argv is not []) and (len(sys.argv) > 1)):
 			exit_code = main(sys.argv[1:])
 		else:
