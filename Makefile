@@ -139,7 +139,9 @@ cleanup:
 	$(QUIET)rm -f piaplib/*/*.pyc 2>/dev/null || true
 	$(QUIET)rm -f piaplib/*/*~ 2>/dev/null || true
 	$(QUIET)rm -f *.DS_Store 2>/dev/null || true
+	$(QUIET)rm -f .DS_Store 2>/dev/null || true
 	$(QUIET)rm -f piaplib/*.DS_Store 2>/dev/null || true
+	$(QUIET)rm -f piaplib/*/.DS_Store 2>/dev/null || true
 	$(QUIET)rm -f piaplib/*/*.DS_Store 2>/dev/null || true
 	$(QUIET)rm -f piaplib.egg-info/* 2>/dev/null || true
 	$(QUIET)rmdir piaplib.egg-info 2>/dev/null || true
