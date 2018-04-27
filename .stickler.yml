@@ -8,6 +8,6 @@ linters:
         exclude: ['.git', '__pycache__', 'docs', '.tox', 'build']
         format: default
     yamllint:
-       	config: ./.yamllint.conf
+        config: ./.yamllint.conf
 files:
     ignore: ['*/*.pyc', '.tox/*', '*.pyc', '*~', '.git', '__pycache__', '*/__pycache__/*']
