@@ -3,7 +3,7 @@
 
 # Pocket PiAP
 # ......................................................................
-# Copyright (c) 2017, Kendrick Walls
+# Copyright (c) 2017-2018, Kendrick Walls
 # ......................................................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
@@ -211,8 +211,8 @@ def packForRest(message=None, keyStore=None):
 		(ciphertext, stderrdata) = p1.communicate(utils.literal_code(message))
 		p1.wait()
 		if isinstance(ciphertext, bytes):
-			ciphertext = ciphertext.decode(u'utf-8')
-		# ciphertext = str(ciphertext).replace(str("\\n"), str(""))
+			ciphertext = ciphertext.decode(encoding=u'utf-8', errors=u'surrogateescape')
+			# ciphertext = str(ciphertext).replace(str("\\n"), str(""))
 		return ciphertext
 	else:
 		raise NotImplementedError("No Implemented Backend - BUG")
@@ -252,7 +252,7 @@ def unpackFromRest(ciphertext=None, keyStore=None):
 		)
 		p2.wait()
 		if isinstance(cleartext, bytes):
-			cleartext = cleartext.decode(u'utf-8')
+			cleartext = cleartext.decode(encoding=u'utf-8', errors=u'surrogateescape')
 		return utils.literal_str(cleartext)
 	else:
 		raise NotImplementedError("No Implemented Backend - BUG")
@@ -263,7 +263,7 @@ def unpackFromFile(somefile, keyStore=None):
 	"""Reads the raw encrypted file and decrypts it."""
 	read_data = None
 	try:
-		someFilePath = utils.addExtension(somefile, str('enc'))
+		someFilePath = utils.addExtension(somefile, str("""enc"""))
 		with utils.open_func(someFilePath, mode=u'r', encoding=u'utf-8') as enc_data_file:
 			read_enc_data = enc_data_file.read()
 			read_data = unpackFromRest(read_enc_data, keyStore)
