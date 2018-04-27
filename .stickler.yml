@@ -7,5 +7,7 @@ linters:
         ignore: 'W191,W391'
         exclude: ['.git', '__pycache__', 'docs', '.tox', 'build']
         format: default
+    yamllint:
+       	config: ./.yamllint.conf
 files:
     ignore: ['*/*.pyc', '.tox/*', '*.pyc', '*~', '.git', '__pycache__', '*/__pycache__/*']
