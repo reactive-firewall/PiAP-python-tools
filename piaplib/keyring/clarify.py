@@ -128,12 +128,27 @@ def hasBackendCommand():
 @remediation.error_passing
 @utils.memoize
 def getAlgoForOS():
-	"""returns cbc for darwin and ctr for linux"""
+	"""returns blowfish (old) for darwin and AES-ctr (sane) for linux"""
 	import sys
 	if sys.platform.startswith("linux"):
 		return str("-aes-256-ctr")
 	else:
-		return str("-aes-256-cbc")
+		return str("-blowfish")
+
+
+@remediation.error_passing
+@utils.memoize
+def getCTLModeForPY():
+	"""returns replace for python and surrogateescape for python3"""
+	import sys
+	theResult = str("replace")
+	try:
+		if (sys.version_info >= (3, 2)):
+			return str("surrogateescape")
+		else:
+			theResult = str("replace")
+	finally:
+		return theResult
 
 
 @remediation.error_handling
@@ -211,7 +226,7 @@ def packForRest(message=None, keyStore=None):
 		(ciphertext, stderrdata) = p1.communicate(utils.literal_code(message))
 		p1.wait()
 		if isinstance(ciphertext, bytes):
-			ciphertext = ciphertext.decode(encoding=u'utf-8', errors=u'surrogateescape')
+			ciphertext = ciphertext.decode(encoding=u'utf-8', errors=getCTLModeForPY())
 			# ciphertext = str(ciphertext).replace(str("\\n"), str(""))
 		return ciphertext
 	else:
@@ -252,7 +267,7 @@ def unpackFromRest(ciphertext=None, keyStore=None):
 		)
 		p2.wait()
 		if isinstance(cleartext, bytes):
-			cleartext = cleartext.decode(encoding=u'utf-8', errors=u'surrogateescape')
+			cleartext = cleartext.decode(encoding=u'utf-8', errors=getCTLModeForPY())
 		return utils.literal_str(cleartext)
 	else:
 		raise NotImplementedError("No Implemented Backend - BUG")
