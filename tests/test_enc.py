@@ -317,7 +317,7 @@ class CryptoTestSuite(unittest.TestCase):
 				]
 			else:
 				temp_msg = str(
-					"""U2FsdGVkX1/SnW+eQS63MQH1Lp8V7/0yVK5bfJ+j44FXOeWIPZSRn4cTzg+5tJkm"""
+					"""U2FsdGVkX1/beHoH2ziXWcMFpb3fzzPxQqdeU1tO5UVoBUEnow8T9g=="""
 				)
 				args = [
 					str("--unpack"),
