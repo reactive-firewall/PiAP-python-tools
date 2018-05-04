@@ -317,7 +317,7 @@ class CryptoTestSuite(unittest.TestCase):
 				]
 			else:
 				temp_msg = str(
-					"""U2FsdGVkX1/SnW+eQS63MQH1Lp8V7/0yVK5bfJ+j44FXOeWIPZSRn4cTzg+5tJkm"""
+					"""U2FsdGVkX1/beHoH2ziXWcMFpb3fzzPxQqdeU1tO5UVoBUEnow8T9g=="""
 				)
 				args = [
 					str("--unpack"),
@@ -412,7 +412,7 @@ class CryptoTestSuite(unittest.TestCase):
 				raise unittest.SkipTest("BETA. Experemental feature not ready yet.")
 		assert theResult
 
-	@unittest.skipUnless((sys.version_info < (3, 2)), sub_proc_bug_message)
+	@unittest.skipUnless((sys.version_info > (3, 2)), sub_proc_bug_message)
 	@given(text())
 	def test_case_clarify_write_inverts_read(self, someInput):  # noqa C901
 		"""Tests the write then read workflow of keyring.clarify with fuzzing."""
