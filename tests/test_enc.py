@@ -127,6 +127,7 @@ class CryptoTestSuite(unittest.TestCase):
 			if clarify.__name__ is None:
 				raise ImportError("Failed to import clarify")
 			self.assertIsNotNone(clarify.getKeyFilePath())
+			self.assertIsNotNone(os.path.abspath(clarify.getKeyFilePath()))
 		except Exception as err:
 			print(str(""))
 			print(str(type(err)))
