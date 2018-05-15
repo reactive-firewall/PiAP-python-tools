@@ -990,7 +990,7 @@ and this will test reads.""")
 		assert theResult
 
 	def test_case_utils_miss_xisdir_func(self):
-	"""Tests the utils.xisdir(None) with an invalid value as input"""
+		"""Tests the utils.xisdir(None) with an invalid value as input"""
 		theResult = False
 		try:
 			from piaplib import pku as pku
@@ -1013,7 +1013,7 @@ and this will test reads.""")
 		assert theResult
 
 	def test_case_utils_miss_ensuredir_func(self):
-	"""Tests the utils.xisdir(None) with an invalid value as input"""
+		"""Tests the utils.xisdir(None) with an invalid value as input"""
 		theResult = False
 		try:
 			from piaplib import pku as pku
