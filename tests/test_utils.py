@@ -1001,13 +1001,13 @@ and this will test reads.""")
 				raise ImportError("Failed to import utils")
 			theResult = (utils.xisdir(someDir=None) is False)
 			self.assertTrue(theResult)
-	except Exception as err:
-		print(str(""))
-		print(str(type(err)))
-		print(str(err))
-		print(str((err.args)))
-		print(str(""))
-		err = None
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			err = None
 			del err
 			theResult = False
 		assert theResult
@@ -1022,15 +1022,15 @@ and this will test reads.""")
 			from pku import utils as utils
 			if utils.__name__ is None:
 				raise ImportError("Failed to import utils")
-			theResult = (utils.ensureDir(someDir=None) is False)
+			theResult = (utils.ensureDir(None) is False)
 			self.assertTrue(theResult)
-	except Exception as err:
-		print(str(""))
-		print(str(type(err)))
-		print(str(err))
-		print(str((err.args)))
-		print(str(""))
-		err = None
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			err = None
 			del err
 			theResult = False
 		assert theResult
