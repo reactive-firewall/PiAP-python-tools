@@ -414,10 +414,10 @@ def xisdir(somedir):
 @remediation.error_handling
 def ensureDir(somedir):
 	"""Ensures the given directory is available for use."""
-	if (xisdir(somedir)):
-		return True
 	if somedir is None:
 		return False	
+	if (xisdir(somedir)):
+		return True
 	import os.path
 	if os.path.isabs(somedir) and (os.path.islink(somedir) or os.path.ismount(somedir)):
 		return True
