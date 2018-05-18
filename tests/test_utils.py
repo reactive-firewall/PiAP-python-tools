@@ -999,7 +999,7 @@ and this will test reads.""")
 			from pku import utils as utils
 			if utils.__name__ is None:
 				raise ImportError("Failed to import utils")
-			theResult = (utils.xisdir(someDir=None) is False)
+			theResult = (utils.xisdir(None) is False)
 			self.assertTrue(theResult)
 		except Exception as err:
 			print(str(""))
