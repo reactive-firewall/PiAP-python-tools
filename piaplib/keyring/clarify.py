@@ -158,8 +158,9 @@ def getKeyFilePath():
 	U2FsdGVkX1_KOouklCprVMv6P6TFdZhCFg = os.path.normpath(
 		DEFAULT_BETA_FILE_PATH
 	)
+	if not utils.ensureDir(os.path.dirname(os.path.realpath(U2FsdGVkX1_KOouklCprVMv6P6TFdZhCFg))):
+		return None
 	if (os.path.isfile(U2FsdGVkX1_KOouklCprVMv6P6TFdZhCFg) is False):
-		utils.ensureDir(os.path.dirname(os.path.realpath(U2FsdGVkX1_KOouklCprVMv6P6TFdZhCFg)))
 		try:
 			utils.writeFile(
 				os.path.realpath(U2FsdGVkX1_KOouklCprVMv6P6TFdZhCFg),
@@ -282,8 +283,9 @@ def unpackFromFile(somefile, keyStore=None):
 	try:
 		someFilePath = utils.addExtension(somefile, str("""enc"""))
 		with utils.open_func(someFilePath, mode=u'r', encoding=u'utf-8') as enc_data_file:
-			enc_data_file.errors = getCTLModeForPY()
 			read_enc_data = enc_data_file.read()
+			if isinstance(read_enc_data, bytes):
+				read_enc_data = read_enc_data.decode(encoding=u'utf-8', errors=getCTLModeForPY())
 			read_data = unpackFromRest(read_enc_data, keyStore)
 	except Exception as clearerr:
 		read_data = None
