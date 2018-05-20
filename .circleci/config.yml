@@ -29,6 +29,11 @@ jobs:
             python3 -m pip install --user flake8 || true
       - run:
           shell: /bin/bash
+          name: "prep dir for test"
+          command: |
+            mkdir -m 775 /opt/PiAP/ || true
+      - run:
+          shell: /bin/bash
           name: "clean up for test"
           command: |
             make clean
