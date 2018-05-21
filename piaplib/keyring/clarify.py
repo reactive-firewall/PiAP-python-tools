@@ -158,7 +158,7 @@ def getKeyFilePath():
 	U2FsdGVkX1_KOouklCprVMv6P6TFdZhCFg = os.path.normpath(
 		DEFAULT_BETA_FILE_PATH
 	)
-	if not utils.ensureDir(os.path.dirname(os.path.realpath(U2FsdGVkX1_KOouklCprVMv6P6TFdZhCFg))):
+	if not utils.ensureDir(os.path.dirname(os.path.abspath(U2FsdGVkX1_KOouklCprVMv6P6TFdZhCFg))):
 		return None
 	if (os.path.isfile(U2FsdGVkX1_KOouklCprVMv6P6TFdZhCFg) is False):
 		try:
