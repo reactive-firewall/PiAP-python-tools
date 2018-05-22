@@ -36,7 +36,7 @@ jobs:
           shell: /bin/bash
           name: "prep dir for test part 2"
           command: |
-            sudo chown -v ${CIRCLE_USERNAME} "/opt/PiAP/" || true
+            sudo chown -v ${LOGNAME} "/opt/PiAP/"
       - run:
           shell: /bin/bash
           name: "prep dir for test"
