@@ -394,7 +394,7 @@ def xisfile(somefile):
 		return False
 	import os.path
 	if os.path.isabs(somefile) and os.path.isfile(somefile):
-		return os.access(somedir, os.F_OK^os.R_OK)
+		return os.access(somefile, os.F_OK ^ os.R_OK)
 	else:
 		return os.path.isfile(os.path.abspath(somefile))
 
@@ -406,7 +406,7 @@ def xisdir(somedir):
 		return False
 	import os.path
 	if os.path.isabs(somedir) and os.path.isdir(somedir):
-		return os.access(somedir, os.X_OK^os.F_OK^os.R_OK)
+		return os.access(somedir, os.X_OK ^ os.F_OK ^ os.R_OK)
 	else:
 		return os.path.isdir(os.path.abspath(somedir))
 
@@ -415,7 +415,7 @@ def xisdir(somedir):
 def ensureDir(somedir):
 	"""Ensures the given directory is available for use."""
 	if somedir is None:
-		return False	
+		return False
 	if (xisdir(somedir)):
 		return True
 	import os.path
@@ -426,7 +426,7 @@ def ensureDir(somedir):
 		oldmask = os.umask(2)
 		os.mkdir(os.path.abspath(somedir))
 		os.umask(oldmask)
-		return os.access(somedir, os.X_OK^os.F_OK^os.R_OK)
+		return os.access(somedir, os.X_OK ^ os.F_OK ^ os.R_OK)
 
 
 @remediation.error_passing
