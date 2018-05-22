@@ -29,9 +29,14 @@ jobs:
             python3 -m pip install --user flake8 || true
       - run:
           shell: /bin/bash
-          name: "prep dir for test"
+          name: "prep dir for test part 1"
           command: |
-            sudo mkdir -p -m 755 "/opt/PiAP/"
+            sudo mkdir -p -m 755 "/opt/PiAP/" || true
+      - run:
+          shell: /bin/bash
+          name: "prep dir for test part 2"
+          command: |
+            sudo chown -v ${CIRCLE_USERNAME} "/opt/PiAP/" || true
       - run:
           shell: /bin/bash
           name: "prep dir for test"
