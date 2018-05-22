@@ -31,7 +31,12 @@ jobs:
           shell: /bin/bash
           name: "prep dir for test"
           command: |
-            mkdir -p -m 755 "/opt/PiAP/hostapd_actions/" || true
+            sudo mkdir -p -m 755 "/opt/PiAP/"
+      - run:
+          shell: /bin/bash
+          name: "prep dir for test"
+          command: |
+            mkdir -p -m 755 "/opt/PiAP/hostapd_actions/"
       - run:
           shell: /bin/bash
           name: "install mocking cmd for test"
