@@ -156,7 +156,7 @@ before_script:
   - if [ $TRAVIS_OS_NAME == osx ] ; then echo "SKIP code climate" ; else curl -L --url https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 -o ./cc-test-reporter 3>/dev/null 2>/dev/null || true ; fi ;
   - if [ $TRAVIS_OS_NAME == osx ] ; then echo "SKIP code climate" ; else chmod +x ./cc-test-reporter || true ; fi ;
   - if [ $TRAVIS_OS_NAME == osx ] ; then echo "SKIP code climate" ; else ./cc-test-reporter before-build || true ; fi ;
-  - if [ $TRAVIS_OS_NAME == osx ] ; then export __CF_USER_TEXT_ENCODING=$( echo -n $( echo -n ${__CF_USER_TEXT_ENCODING} | cut -d : -f 1 ):0x08000100:0x0 ) || true ; fi ;
+  - if [ $TRAVIS_OS_NAME == osx ] ; then `export __CF_USER_TEXT_ENCODING=$( echo -n $( echo -n ${__CF_USER_TEXT_ENCODING} | cut -d : -f 1 ):0x08000100:0x0 )` || true ; fi ;
 
 script:
   - make clean ;
