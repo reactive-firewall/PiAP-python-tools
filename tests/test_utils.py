@@ -966,7 +966,7 @@ and this will test reads.""")
 			theResult = False
 		assert theResult
 
-	def test_case_utils_miss_xifile_func(self):
+	def test_case_utils_miss_xisfile_func(self):
 		"""Tests the utils.xisfile(None) with an invalid value as input"""
 		theResult = False
 		try:
@@ -976,8 +976,54 @@ and this will test reads.""")
 			from pku import utils as utils
 			if utils.__name__ is None:
 				raise ImportError("Failed to import utils")
-			self.assertFalse(utils.xisfile(somefile=None))
 			theResult = (utils.xisfile(somefile=None) is False)
+			self.assertTrue(theResult)
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			err = None
+			del err
+			theResult = False
+		assert theResult
+
+	def test_case_utils_miss_xisdir_func(self):
+		"""Tests the utils.xisdir(None) with an invalid value as input"""
+		theResult = False
+		try:
+			from piaplib import pku as pku
+			if pku.__name__ is None:
+				raise ImportError("Failed to import pku")
+			from pku import utils as utils
+			if utils.__name__ is None:
+				raise ImportError("Failed to import utils")
+			theResult = (utils.xisdir(None) is False)
+			self.assertTrue(theResult)
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			err = None
+			del err
+			theResult = False
+		assert theResult
+
+	def test_case_utils_miss_ensuredir_func(self):
+		"""Tests the utils.xisdir(None) with an invalid value as input"""
+		theResult = False
+		try:
+			from piaplib import pku as pku
+			if pku.__name__ is None:
+				raise ImportError("Failed to import pku")
+			from pku import utils as utils
+			if utils.__name__ is None:
+				raise ImportError("Failed to import utils")
+			theResult = (utils.ensureDir(None) is False)
+			self.assertTrue(theResult)
 		except Exception as err:
 			print(str(""))
 			print(str(type(err)))

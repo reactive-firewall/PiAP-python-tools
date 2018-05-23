@@ -158,16 +158,18 @@ def getKeyFilePath():
 	U2FsdGVkX1_KOouklCprVMv6P6TFdZhCFg = os.path.normpath(
 		DEFAULT_BETA_FILE_PATH
 	)
+	if not utils.ensureDir(os.path.dirname(os.path.abspath(U2FsdGVkX1_KOouklCprVMv6P6TFdZhCFg))):
+		return None
 	if (os.path.isfile(U2FsdGVkX1_KOouklCprVMv6P6TFdZhCFg) is False):
 		try:
 			utils.writeFile(
 				os.path.realpath(U2FsdGVkX1_KOouklCprVMv6P6TFdZhCFg),
-				str(bytes(os.urandom(32)).decode('utf8'))
+				str(bytes(os.urandom(32)).decode(encoding=u'utf-8', errors=getCTLModeForPY()))
 			)
 		except Exception:
 			utils.writeFile(
 				os.path.realpath(U2FsdGVkX1_KOouklCprVMv6P6TFdZhCFg),
-				str(rand.randStr(32))
+				str(str(rand.randPW(32)).replace("%", "%%"))
 			)
 	return os.path.realpath(U2FsdGVkX1_KOouklCprVMv6P6TFdZhCFg)
 
@@ -185,6 +187,7 @@ def makeKeystoreFile(theKey=str(str(rand.randPW(16)).replace("%", "%%")), somePa
 			str(somePath)
 		)
 	try:
+		utils.ensureDir(os.path.dirname(os.path.realpath(U2FsdGVkX1_KOouklCprVMv6P6TFdZhCFg)))
 		utils.writeFile(
 			os.path.realpath(U2FsdGVkX1_KOouklCprVMv6P6TFdZhCFg),
 			str(theKey)
@@ -281,6 +284,8 @@ def unpackFromFile(somefile, keyStore=None):
 		someFilePath = utils.addExtension(somefile, str("""enc"""))
 		with utils.open_func(someFilePath, mode=u'r', encoding=u'utf-8') as enc_data_file:
 			read_enc_data = enc_data_file.read()
+			if isinstance(read_enc_data, bytes):
+				read_enc_data = read_enc_data.decode(encoding=u'utf-8', errors=getCTLModeForPY())
 			read_data = unpackFromRest(read_enc_data, keyStore)
 	except Exception as clearerr:
 		read_data = None

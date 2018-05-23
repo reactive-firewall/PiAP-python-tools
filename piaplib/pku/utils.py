@@ -389,14 +389,44 @@ def addExtension(somefile, extension):
 
 @remediation.error_handling
 def xisfile(somefile):
-	"""Ensures the given file is available for reading."""
+	"""tests the given file is available for reading."""
 	if (somefile is None):
 		return False
 	import os.path
 	if os.path.isabs(somefile) and os.path.isfile(somefile):
-		return True
+		return os.access(somefile, os.F_OK ^ os.R_OK)
 	else:
 		return os.path.isfile(os.path.abspath(somefile))
+
+
+@remediation.error_handling
+def xisdir(somedir):
+	"""tests the given directory is available for use."""
+	if (somedir is None):
+		return False
+	import os.path
+	if os.path.isabs(somedir) and os.path.isdir(somedir):
+		return os.access(somedir, os.X_OK ^ os.F_OK ^ os.R_OK)
+	else:
+		return os.path.isdir(os.path.abspath(somedir))
+
+
+@remediation.error_handling
+def ensureDir(somedir):
+	"""Ensures the given directory is available for use."""
+	if somedir is None:
+		return False
+	if (xisdir(somedir)):
+		return True
+	import os.path
+	if os.path.isabs(somedir) and (os.path.islink(somedir) or os.path.ismount(somedir)):
+		return True
+	else:
+		ensureDir(os.path.dirname(os.path.abspath(somedir)))
+		oldmask = os.umask(2)
+		os.mkdir(os.path.abspath(somedir))
+		os.umask(oldmask)
+		return os.access(somedir, os.X_OK ^ os.F_OK ^ os.R_OK)
 
 
 @remediation.error_passing

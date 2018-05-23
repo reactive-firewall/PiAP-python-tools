@@ -22,5 +22,5 @@ Standards checklist:
 	ECC - by default
 	aes-256-ctr
 	- ??
-	aes-256-cbc
+	blowfish
 	- ??

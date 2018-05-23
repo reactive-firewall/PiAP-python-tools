@@ -29,6 +29,26 @@ jobs:
             python3 -m pip install --user flake8 || true
       - run:
           shell: /bin/bash
+          name: "prep dir for test part 1"
+          command: |
+            sudo mkdir -p -m 755 "/opt/PiAP/" || true
+      - run:
+          shell: /bin/bash
+          name: "prep dir for test part 2"
+          command: |
+            sudo chown -v circleci "/opt/PiAP/"
+      - run:
+          shell: /bin/bash
+          name: "prep dir for test"
+          command: |
+            mkdir -p -m 755 "/opt/PiAP/hostapd_actions/"
+      - run:
+          shell: /bin/bash
+          name: "install mocking cmd for test"
+          command: |
+            cp -vf ./tests/mock/clients /opt/PiAP/hostapd_actions/clients
+      - run:
+          shell: /bin/bash
           name: "clean up for test"
           command: |
             make clean
