@@ -90,6 +90,9 @@ class CryptoTestSuite(unittest.TestCase):
 			from piaplib import keyring
 			if keyring.__name__ is None:
 				theResult = False
+			from piaplib import pku
+			if pku.__name__ is None:
+				theResult = False
 			theResult = True
 		except Exception as impErr:
 			print(str(type(impErr)))
@@ -331,7 +334,7 @@ class CryptoTestSuite(unittest.TestCase):
 			test_out = clarify.main(args)
 			try:
 				if isinstance(test_out, bytes):
-					test_out = test_out.decode('utf8')
+					test_out = test_out.decode('utf8', errors=clarify.getCTLModeForPY())
 			except UnicodeDecodeError:
 				test_out = str(repr(bytes(test_out)))
 			self.assertIsNotNone(test_out)
@@ -375,7 +378,6 @@ class CryptoTestSuite(unittest.TestCase):
 				str("testkeyneedstobelong"),
 				str("./.weak_test_key_{}").format(rand.randInt(1, 10, 99))
 			)
-			assume((theteststore is not None))
 			self.assertIsNotNone(theteststore)
 			test_write = clarify.packToFile(
 				sometestfile,
@@ -387,15 +389,15 @@ class CryptoTestSuite(unittest.TestCase):
 				test_read = clarify.unpackFromFile(sometestfile, theteststore)
 				try:
 					if isinstance(test_read, bytes):
-						test_read = test_read.decode('utf8')
+						test_read = test_read.decode('utf8', errors=clarify.getCTLModeForPY())
 				except UnicodeDecodeError:
-					test_read = str(repr(bytes(test_read)))
+					test_read = str(repr(bytes(test_read, 'utf8')))
 				self.assertIsNotNone(test_read)
 				if (str(someMessageText) in str(test_read)):
 					theResult = True
 				else:
 					if sys.platform.startswith("linux"):
-						print(str(repr(bytes(test_read))))
+						print(str(repr(bytes(test_read, 'utf8'))))
 						theResult = False
 					else:
 						raise unittest.SkipTest("BETA. Experemental feature not ready yet.")
@@ -421,7 +423,10 @@ class CryptoTestSuite(unittest.TestCase):
 		assume(isinstance(someInput, str))
 		assume(len(str(someInput)) > 3)
 		assume(repr(str(someInput)) not in repr(str(repr(someInput))))
-		assume(str(someInput) in someInput)
+		from piaplib.pku import utils as utils
+		if utils.__name__ is None:
+			raise ImportError("Failed to import utils")
+		assume(str(someInput) in utils.literal_str(someInput))
 		assume(someInput in str(someInput))
 		someMessageText = str(repr(someInput))
 		try:
@@ -446,19 +451,19 @@ class CryptoTestSuite(unittest.TestCase):
 				theteststore
 			)
 			self.assertTrue(test_write)
-			note(str("encoded: \"{}\"").format(repr(someMessageText)))
+			note(str("encoded: \"{}\"").format(utils.literal_str(someMessageText)))
 			if (test_write is True):
 				test_read = clarify.unpackFromFile(sometestfile, theteststore)
 				try:
 					if isinstance(test_read, bytes):
-						test_read = test_read.decode('utf8')
+						test_read = test_read.decode('utf8', errors=clarify.getCTLModeForPY())
 				except UnicodeDecodeError:
-					test_read = str(repr(bytes(test_read)))
+					test_read = str(repr(bytes(test_read, 'utf8')))
 				self.assertIsNotNone(test_read)
 				if (str(someMessageText) in str(test_read)):
 					theResult = True
 				else:
-					note(str("decoded: \"{}\"").format(repr(test_read)))
+					note(str("decoded: \"{}\"").format(utils.literal_str(test_read)))
 					theResult = False
 		except Exception as err:
 			print(str(""))

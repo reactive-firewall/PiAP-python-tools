@@ -1,6 +1,7 @@
 Standards checklist:
 	Code Style:
 	 - [x] PEP8 for python files
+     - [x] PEP263 (UTF-8) for python files
 	saltify.py:
 	 - [x] RFC 2104 HMAC class.
 	 - [x] Also complies with RFC 4231.

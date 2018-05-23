@@ -760,6 +760,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 	def test_d_python_command_check_users(self):
 		"""Test case for piaplib.pocket.lint check users."""
 		theResult = False
+		import os
 		try:
 			thepython = getPythonCommand()
 			if (thepython is not None):
@@ -779,6 +780,9 @@ class BasicUsageTestSuite(unittest.TestCase):
 						theResult = True
 					elif (str("circleci UNKNOWN UNKNOWN") in str(theOutputtext)):
 						theResult = True
+					elif (str(os.getlogin()) in str(theOutputtext)):
+						theResult = True
+						raise unittest.SkipTest("function ok, but not a compatible Test ENV")
 					else:
 						theResult = False
 						print(str(""))
@@ -788,11 +792,15 @@ class BasicUsageTestSuite(unittest.TestCase):
 						print(str(""))
 						print(str("{}").format(str(theOutputtext)))
 						print(str(""))
+				except unittest.SkipTest:
+					raise unittest.SkipTest("function ok, but not a compatible Test ENV")
 				except Exception as othererr:
 					debugtestError(othererr)
 					othererr = None
 					del othererr
 					theResult = False
+		except unittest.SkipTest:
+			raise unittest.SkipTest("function ok, but not a compatible Test ENV")
 		except Exception as err:
 			debugtestError(err)
 			err = None
@@ -985,10 +993,11 @@ class BasicUsageTestSuite(unittest.TestCase):
 		"""Test case for piaplib.pocket.lint check users."""
 		theResult = False
 		try:
+			import os
 			thepython = getPythonCommand()
 			if (thepython is not None):
 				try:
-					for some_test_user in [str("root"), str("circleci")]:
+					for some_test_user in [str("root"), str("circleci"), str(os.getlogin())]:
 						theOutputtext = checkPythonCommand([
 							str(thepython),
 							str("-m"),
@@ -1031,6 +1040,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 		"""Test case for piaplib.pocket.lint check users."""
 		theResult = False
 		try:
+			import os
 			thepython = getPythonCommand()
 			if (thepython is not None):
 				try:
@@ -1047,6 +1057,9 @@ class BasicUsageTestSuite(unittest.TestCase):
 						theResult = True
 					elif (str("circleci") in str(theOutputtext)):
 						theResult = True
+					elif (str(os.getlogin()) in str(theOutputtext)):
+						theResult = True
+						raise unittest.SkipTest("function ok, but not a compatible Test ENV")
 					else:
 						theResult = False
 						print(str(""))
@@ -1056,6 +1069,8 @@ class BasicUsageTestSuite(unittest.TestCase):
 						print(str(""))
 						print(str("{}").format(str(theOutputtext)))
 						print(str(""))
+				except unittest.SkipTest:
+					raise unittest.SkipTest("function ok, but not a compatible Test ENV")
 				except Exception as othererr:
 					print(str(""))
 					print(str(type(othererr)))
@@ -1065,6 +1080,8 @@ class BasicUsageTestSuite(unittest.TestCase):
 					othererr = None
 					del othererr
 					theResult = False
+		except unittest.SkipTest:
+			raise unittest.SkipTest("function ok, but not a compatible Test ENV")
 		except Exception as err:
 			debugtestError(err)
 			err = None
@@ -1076,6 +1093,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 		"""Test case for piaplib.pocket.lint check users."""
 		theResult = False
 		try:
+			import os
 			thepython = getPythonCommand()
 			if (thepython is not None):
 				try:
@@ -1092,6 +1110,9 @@ class BasicUsageTestSuite(unittest.TestCase):
 						theResult = True
 					elif (str("circleci") in str(theOutputtext)):
 						theResult = True
+					elif (str(os.getlogin()) in str(theOutputtext)):
+						theResult = True
+						raise unittest.SkipTest("function ok, but not a compatible Test ENV")
 					else:
 						theResult = False
 						print(str(""))
@@ -1101,6 +1122,8 @@ class BasicUsageTestSuite(unittest.TestCase):
 						print(str(""))
 						print(str("{}").format(str(theOutputtext)))
 						print(str(""))
+				except unittest.SkipTest:
+					raise unittest.SkipTest("function ok, but not a compatible Test ENV")
 				except Exception as othererr:
 					print(str(""))
 					print(str(type(othererr)))
@@ -1110,6 +1133,8 @@ class BasicUsageTestSuite(unittest.TestCase):
 					othererr = None
 					del othererr
 					theResult = False
+		except unittest.SkipTest:
+			raise unittest.SkipTest("function ok, but not a compatible Test ENV")
 		except Exception as err:
 			debugtestError(err)
 			err = None
