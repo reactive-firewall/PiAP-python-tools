@@ -140,15 +140,7 @@ def getAlgoForOS():
 @utils.memoize
 def getCTLModeForPY():
 	"""returns replace for python and surrogateescape for python3"""
-	import sys
-	theResult = str("replace")
-	try:
-		if (sys.version_info >= (3, 2)):
-			return str("surrogateescape")
-		else:
-			theResult = str("replace")
-	finally:
-		return theResult
+	return utils.getCodeTextModeForPY()
 
 
 @remediation.error_handling
@@ -336,8 +328,8 @@ def parseArgs(arguments=None):
 	try:
 		parser = argparse.ArgumentParser(
 			prog=__prog__,
-			description='Handles PiAP keyring tools',
-			epilog="PiAP Controller for cryptographic tools."
+			description=str("Handles PiAP keyring tools"),
+			epilog=str("PiAP Controller for cryptographic tools.")
 		)
 		parser.add_argument(
 			'-m',
@@ -345,7 +337,7 @@ def parseArgs(arguments=None):
 			dest='msg',
 			required=True,
 			type=str,
-			help='The Message data. A cleartext or cyphertext message.'
+			help=str("The Message data. A cleartext or cyphertext message.")
 		)
 		parser.add_argument(
 			'-S',
@@ -376,7 +368,7 @@ def parseArgs(arguments=None):
 			'--keystore',
 			dest='keystore',
 			required=False,
-			help='The file with the cryptographic Key String.'
+			help=str("The file with the cryptographic Key String.")
 		)
 		parser = utils._handleVersionArgs(parser)
 		thegroup = parser.add_mutually_exclusive_group(required=True)
@@ -386,7 +378,7 @@ def parseArgs(arguments=None):
 				dest='clear_action',
 				const=theaction,
 				action='store_const',
-				help='The clarify service option.'
+				help=str("The clarify service option.")
 			)
 		theArgs = parser.parse_args(arguments)
 	except Exception as err:
@@ -409,7 +401,7 @@ def main(argv=None):
 	theFile = None
 	output = None
 	if args.keystore is not None:
-		theFile = args.keystore
+		theFile = str(args.keystore)
 	else:
 		theFile = str("""/tmp/.beta_PiAP_weak_key""")
 	if args.key is not None:
@@ -421,7 +413,7 @@ def main(argv=None):
 		else:
 			return output
 	except Exception as err:
-		print(str("FAILED DURING clarify. ABORT."))
+		print(str("FAILED DURING piaplib.keyring.clarify.main() - ABORT."))
 		print(str(type(err)))
 		print(str(err))
 		print(str(err.args))
@@ -438,7 +430,7 @@ if __name__ in u'__main__':
 		import sys
 		exitcode = main(sys.argv[1:])
 	except Exception as err:
-		print(str("MAIN FAILED DURING clarify. ABORT."))
+		print(str("MAIN FAILED DURING piaplib.keyring.clarify.__main__ - ABORT."))
 		print(str(type(err)))
 		print(str(err))
 		print(str(err.args))

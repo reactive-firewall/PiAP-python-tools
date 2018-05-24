@@ -98,6 +98,20 @@ __prog__ = str("""piaplib.pku.utils""")
 """The name of this program is piaplib.pku.utils"""
 
 
+@remediation.error_passing
+def getCodeTextModeForPY():
+	"""returns replace for python and surrogateescape for python3"""
+	import sys
+	theResult = str("replace")
+	try:
+		if (sys.version_info >= (3, 2)):
+			theResult = str("surrogateescape")
+		else:
+			theResult = str("replace")
+	finally:
+		return theResult
+
+
 @remediation.error_handling
 def literal_code(raw_input=None):
 	"""A simple attempt at validating raw python unicode. Always expect CWE-20.
@@ -128,11 +142,11 @@ def literal_str(raw_input=None):
 	"""
 	try:
 		if isinstance(raw_input, bytes):
-			return raw_input.decode("utf-8")
+			return raw_input.decode("utf-8", getCodeTextModeForPY())
 		elif isinstance(raw_input, str) or isinstance(raw_input, unicode):
-			return raw_input.encode("utf-8").decode("utf-8")
+			return raw_input.encode("utf-8").decode("utf-8", getCodeTextModeForPY())
 		else:
-			raise UnicodeDecodeError("Malformed Raw String")
+			raise UnicodeDecodeError("CWE-135 Malformed Raw String")
 	except Exception as malformErr:
 		logs.log(str("[CWE-20] Possible malformed string attack occurred."), "info")
 		malformErr = None
