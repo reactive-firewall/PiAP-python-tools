@@ -306,6 +306,7 @@ class CryptoTestSuite(unittest.TestCase):
 				raise unittest.SkipTest("BETA. Experemental feature not ready yet.")
 		assert theResult
 
+	@unittest.skipUnless((sys.getdefaultencoding() in 'utf-8'), "wrong encoding for test")
 	def test_case_clarify_main_b(self):
 		"""Tests the helper function main unpack of keyring.clarify"""
 		theResult = True
@@ -360,6 +361,7 @@ class CryptoTestSuite(unittest.TestCase):
 				raise unittest.SkipTest("BETA. Experemental feature not ready yet.")
 		assert theResult
 
+	@unittest.skipUnless((sys.getdefaultencoding() in 'utf-8'), "wrong encoding for test")
 	def test_case_clarify_write_inverts_read_example(self):
 		"""Tests the write then read workflow of keyring.clarify."""
 		theResult = False
@@ -415,7 +417,12 @@ class CryptoTestSuite(unittest.TestCase):
 				raise unittest.SkipTest("BETA. Experemental feature not ready yet.")
 		assert theResult
 
-	@unittest.skipUnless((sys.version_info > (3, 2)), sub_proc_bug_message)
+	@unittest.skipUnless(
+		(
+			(sys.version_info > (3, 2)) and (sys.getdefaultencoding() in 'utf-8')
+		),
+		sub_proc_bug_message
+	)
 	@given(text())
 	def test_case_clarify_write_inverts_read(self, someInput):  # noqa C901
 		"""Tests the write then read workflow of keyring.clarify with fuzzing."""
