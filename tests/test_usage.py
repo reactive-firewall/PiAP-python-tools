@@ -997,8 +997,8 @@ class BasicUsageTestSuite(unittest.TestCase):
 			thepython = getPythonCommand()
 			if (thepython is not None):
 				try:
-					testUser = str(os.getlogin())
-					for some_test_user in [str("root"), str("circleci"), testUser]:
+					localtestUser = str(os.getlogin())
+					for some_test_user in [str("root"), str("circleci"), localtestUser]:
 						theOutputtext = checkPythonCommand([
 							str(thepython),
 							str("-m"),
@@ -1011,6 +1011,10 @@ class BasicUsageTestSuite(unittest.TestCase):
 						], stderr=subprocess.STDOUT)
 						if (some_test_user in str(theOutputtext)):
 							theResult = True
+							print(str(""))
+							print(str("MATCHED").format(str(thepython)))
+							print(str("expected user {}").format(some_test_user))
+							print(str(""))
 						else:
 							theResult = (False or theResult)
 							print(str(""))
