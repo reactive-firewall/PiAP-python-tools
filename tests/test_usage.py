@@ -993,12 +993,10 @@ class BasicUsageTestSuite(unittest.TestCase):
 		"""Test case for piaplib.pocket.lint check users."""
 		theResult = False
 		try:
-			import os
 			thepython = getPythonCommand()
 			if (thepython is not None):
 				try:
-					localtestUser = str(os.getlogin())
-					for some_test_user in [str("root"), str("circleci"), localtestUser]:
+					for some_test_user in [str("root"), str("circleci")]:
 						theOutputtext = checkPythonCommand([
 							str(thepython),
 							str("-m"),
@@ -1007,7 +1005,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 							str("check"),
 							str("users"),
 							str("--user"),
-							some_test_user
+							str(some_test_user)
 						], stderr=subprocess.STDOUT)
 						if (some_test_user in str(theOutputtext)):
 							theResult = True
