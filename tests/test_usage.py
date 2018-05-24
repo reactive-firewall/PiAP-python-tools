@@ -997,7 +997,8 @@ class BasicUsageTestSuite(unittest.TestCase):
 			thepython = getPythonCommand()
 			if (thepython is not None):
 				try:
-					for some_test_user in [str("root"), str("circleci"), str(os.getlogin())]:
+					testUser = str(os.getlogin())
+					for some_test_user in [str("root"), str("circleci"), testUser]:
 						theOutputtext = checkPythonCommand([
 							str(thepython),
 							str("-m"),

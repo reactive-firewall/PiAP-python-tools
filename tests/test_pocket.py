@@ -116,6 +116,44 @@ def checkPythonFuzzing(args=[None], stderr=None):
 	return theOutput
 
 
+def check_exec_command_has_output(test_case, someArgs):
+	"""Test case for command output != None.
+		returns True if has output and False otherwise."""
+	theResult = False
+	try:
+		import sys
+		if sys.__name__ is None:
+			raise ImportError("Failed to import system. WTF?!!")
+		import piaplib.pku.utils as utils
+		if utils.__name__ is None:
+			raise ImportError("Failed to import system. WTF?!!")
+		thepython = getPythonCommand()
+		if (thepython is not None):
+			try:
+				theArgs = [thepython] + someArgs
+				test_case.assertIsNotNone(checkPythonCommand(theArgs, stderr=subprocess.STDOUT))
+				theResult = True
+			except Exception as othererr:
+				print(str(""))
+				print(str(type(othererr)))
+				print(str(othererr))
+				print(str((othererr.args)))
+				print(str(""))
+				othererr = None
+				del othererr
+				theResult = False
+	except Exception as err:
+		print(str(""))
+		print(str(type(err)))
+		print(str(err))
+		print(str((err.args)))
+		print(str(""))
+		othererr = None
+		del othererr
+		theResult = False
+	return theResult
+
+
 class PocketUsageTestSuite(unittest.TestCase):
 	"""Basic functional test cases."""
 
@@ -457,33 +495,16 @@ class PocketUsageTestSuite(unittest.TestCase):
 		"""Test case for piaplib.pocket.lint do_execve calls."""
 		theResult = False
 		try:
-			import sys
-			if sys.__name__ is None:
-				raise ImportError("Failed to import system. WTF?!!")
-			thepython = getPythonCommand()
-			if (thepython is not None):
-				try:
-					self.assertIsNotNone(checkPythonCommand([
-						str(thepython),
-						str("-m"),
-						str("piaplib.pocket"),
-						str("lint"),
-						str("execve"),
-						str("""--out""").format(str(sys.executable)),
-						str("""--cmd={}""").format(str(sys.executable)),
-						str("""--args={}""").format(str("piaplib.pocket")),
-						str("""--args={}""").format(str("--help"))
-					], stderr=subprocess.STDOUT))
-					theResult = True
-				except Exception as othererr:
-					print(str(""))
-					print(str(type(othererr)))
-					print(str(othererr))
-					print(str((othererr.args)))
-					print(str(""))
-					othererr = None
-					del othererr
-					theResult = False
+			theResult = check_exec_command_has_output(self, [
+				str("-m"),
+				str("piaplib.pocket"),
+				str("lint"),
+				str("execve"),
+				str("""--out""").format(str(sys.executable)),
+				str("""--cmd={}""").format(str(sys.executable)),
+				str("""--args={}""").format(str("piaplib.pocket")),
+				str("""--args={}""").format(str("--help"))
+			])
 		except Exception as err:
 			print(str(""))
 			print(str(type(err)))
