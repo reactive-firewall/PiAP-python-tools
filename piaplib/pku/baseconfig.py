@@ -116,12 +116,12 @@ def loadMainConfigFile(confFile='/opt/PiAP/PiAP.conf'):
 		try:
 			import six
 			if six.PY2:
-				mainConfig = python2ReadFile(configfile, mainConfig)
+				mainConfig = python2ReadFile(confFile, mainConfig)
 			else:
 				with open(confFile, 'r') as configfile:
 					mainConfig.read(configfile)
 		except Exception:
-			mainConfig = python2ReadFile(configfile, mainConfig)
+			mainConfig = python2ReadFile(confFile, mainConfig)
 		result_config = parseConfigParser(result_config, mainConfig, True)
 	except IOError as ioErr:
 		ioErr = None
