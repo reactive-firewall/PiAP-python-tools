@@ -25,3 +25,5 @@ Standards checklist:
 	- ??
 	blowfish
 	- ??
+	TLS:
+	- https://tools.ietf.org/html/rfc5246
