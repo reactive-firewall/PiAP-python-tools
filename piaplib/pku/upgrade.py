@@ -21,23 +21,17 @@
 
 
 try:
-	import argparse
-except Exception:
-	raise ImportError("Error Importing argparse tools")
-
-
-try:
-	import subprocess
-	import threading
-except Exception:
-	raise ImportError("Error Importing threading tools")
-
-
-try:
 	import os
 	import sys
-except Exception:
-	raise ImportError("Error Importing system tools")
+	import argparse
+	import subprocess
+	import threading
+	for someModule in [os, sys, argparse, subprocess, threading]:
+		if someModule.__name__ is None:
+			raise ImportError(str("OMG! we could not import {}. ABORT. ABORT.").format(someModule))
+except Exception as err:
+	raise ImportError(err)
+	exit(3)
 
 
 try:

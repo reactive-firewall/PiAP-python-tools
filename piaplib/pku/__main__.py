@@ -21,27 +21,12 @@
 
 
 try:
-	import sys
-	if sys.__name__ is None:
-		raise ImportError("OMG! we could not import os. We're like in the matrix! ABORT. ABORT.")
-except Exception as err:
-	raise ImportError(err)
-	exit(3)
-
-
-try:
 	import os
-	if os.__name__ is None:
-		raise ImportError("OMG! we could not import os. We're like in the matrix! ABORT. ABORT.")
-except Exception as err:
-	raise ImportError(err)
-	exit(3)
-
-
-try:
+	import sys
 	import argparse
-	if argparse.__name__ is None:
-		raise ImportError("OMG! we could not import argparse. We're in need of a fix! ABORT.")
+	for someModule in [os, sys, argparse]:
+		if someModule.__name__ is None:
+			raise ImportError(str("OMG! we could not import {}. ABORT. ABORT.").format(someModule))
 except Exception as err:
 	raise ImportError(err)
 	exit(3)
@@ -128,12 +113,6 @@ except Exception:
 		from ..book.logs import logs as logs
 	except Exception:
 		raise ImportError("Error Importing logs")
-
-
-try:
-	import argparse
-except Exception:
-	raise ImportError("Error Importing argparse tools")
 
 
 __prog__ = """piaplib.pku.pku"""

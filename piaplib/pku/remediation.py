@@ -28,24 +28,11 @@
 
 try:
 	import os
-	if os.__name__ is None:
-		raise NotImplementedError("OMG! We could not import the os. We're like in the matrix!")
-except Exception as err:
-	raise ImportError(err)
-	exit(3)
-
-try:
 	import sys
-	if sys.__name__ is None:
-		raise NotImplementedError("OMG! We could not import the sys. We're like in the matrix!")
-except Exception as err:
-	raise ImportError(err)
-	exit(3)
-
-try:
 	import functools
-	if functools.__name__ is None:
-		raise NotImplementedError("OMG! We could not import the functools. We're blind to Errors!")
+	for someModule in [os, sys, functools]:
+		if someModule.__name__ is None:
+			raise ImportError(str("OMG! we could not import {}. ABORT. ABORT.").format(someModule))
 except Exception as err:
 	raise ImportError(err)
 	exit(3)
