@@ -102,6 +102,13 @@ def parseConfigParser(config_data=dict({}), theConfig=None, overwrite=True):
 	return config_data
 
 
+def python2ReadFile(confFile, mainConfig):
+	import io
+	with io.open(file=confFile, mode='r', buffering=-1, encoding='utf-8') as configfile:
+		mainConfig.read(configfile)
+	return mainConfig
+
+
 def loadMainConfigFile(confFile='/opt/PiAP/PiAP.conf'):
 	try:
 		mainConfig = configparser.ConfigParser(allow_no_value=True)
@@ -109,30 +116,26 @@ def loadMainConfigFile(confFile='/opt/PiAP/PiAP.conf'):
 		try:
 			import six
 			if six.PY2:
-				import io
-				with io.open(file=confFile, mode='r', buffering=-1, encoding='utf-8') as configfile:
-					mainConfig.read(configfile)
+				mainConfig = python2ReadFile(confFile, mainConfig)
 			else:
 				with open(confFile, 'r') as configfile:
 					mainConfig.read(configfile)
 		except Exception:
-			import io
-			with io.open(file=confFile, mode='r', buffering=-1, encoding='utf-8') as configfile:
-				mainConfig.read(configfile)
+			mainConfig = python2ReadFile(confFile, mainConfig)
 		result_config = parseConfigParser(result_config, mainConfig, True)
 	except IOError as ioErr:
 		ioErr = None
 		del(ioErr)
-		return getDefaultMainConfigFile()
+		result_config = getDefaultMainConfigFile()
 	except OSError as nonerr:
 		nonerr = None
 		del(nonerr)
-		return getDefaultMainConfigFile()
+		result_config = getDefaultMainConfigFile()
 	except Exception as err:
 		print(str(err))
 		print(str(type(err)))
 		print(str((err.args)))
-		return getDefaultMainConfigFile()
+		result_config = getDefaultMainConfigFile()
 	return result_config
 
 

@@ -27,32 +27,14 @@
 
 try:
 	import os
-	if os.__name__ is None:
-		raise ImportError("OMG! we could not import os. We're like in the matrix! ABORT. ABORT.")
-except Exception as err:
-	raise ImportError(err)
-	exit(3)
-
-try:
 	import sys
-	if sys.__name__ is None:
-		raise ImportError("OMG! we could not import sys. We're like in the matrix! ABORT. ABORT.")
-except Exception as err:
-	raise ImportError(err)
-	exit(3)
-
-try:
 	import argparse
-	if argparse.__name__ is None:
-		raise ImportError("OMG! we could not import argparse. ABORT.")
-except Exception as err:
-	raise ImportError(err)
-	exit(3)
-
-try:
 	import re
-	if re.__name__ is None:
-		raise ImportError("OMG! we could not import regex. ABORT.")
+	import os.path
+	import functools
+	for someModule in [os, sys, argparse, re, os.path, functools]:
+		if someModule.__name__ is None:
+			raise ImportError(str("OMG! we could not import {}. ABORT. ABORT.").format(someModule))
 except Exception as err:
 	raise ImportError(err)
 	exit(3)
@@ -101,7 +83,6 @@ __prog__ = str("""piaplib.pku.utils""")
 @remediation.error_passing
 def getCodeTextModeForPY():
 	"""returns replace for python and surrogateescape for python3"""
-	import sys
 	theResult = str("replace")
 	try:
 		if (sys.version_info >= (3, 2)):
@@ -157,7 +138,6 @@ def literal_str(raw_input=None):
 def memoize(func):
 	"""memoize wrapper"""
 	cache = func.cache = {}
-	import functools
 
 	@functools.wraps(func)
 	def memoized_func(*args, **kwargs):
@@ -406,7 +386,6 @@ def xisfile(somefile):
 	"""tests the given file is available for reading."""
 	if (somefile is None):
 		return False
-	import os.path
 	if os.path.isabs(somefile) and os.path.isfile(somefile):
 		return os.access(somefile, os.F_OK ^ os.R_OK)
 	else:
@@ -418,7 +397,6 @@ def xisdir(somedir):
 	"""tests the given directory is available for use."""
 	if (somedir is None):
 		return False
-	import os.path
 	if os.path.isabs(somedir) and os.path.isdir(somedir):
 		return os.access(somedir, os.X_OK ^ os.F_OK ^ os.R_OK)
 	else:
@@ -432,7 +410,6 @@ def ensureDir(somedir):
 		return False
 	if (xisdir(somedir)):
 		return True
-	import os.path
 	if os.path.isabs(somedir) and (os.path.islink(somedir) or os.path.ismount(somedir)):
 		return True
 	else:
