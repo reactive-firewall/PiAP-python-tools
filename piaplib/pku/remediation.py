@@ -104,7 +104,7 @@ def error_breakpoint(error, context=None):
 
 def error_passing(func):
 	"""Runs a function in try-except"""
-	
+
 	@functools.wraps(func)
 	def safety_func(*args, **kwargs):
 			"""Wraps a function in try-except"""
@@ -118,7 +118,7 @@ def error_passing(func):
 				del err
 				raise baton
 			return theOutput
-	
+
 	return safety_func
 
 
