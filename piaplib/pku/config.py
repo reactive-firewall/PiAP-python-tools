@@ -19,6 +19,19 @@
 # limitations under the License.
 # ......................................................................
 
+try:
+	import os
+	import sys
+	import argparse
+	import ast
+	import functools
+	for someModule in [os, sys, argparse, ast, functools]:
+		if someModule.__name__ is None:
+			raise ImportError(str("OMG! we could not import {}. ABORT. ABORT.").format(someModule))
+except Exception as err:
+	raise ImportError(err)
+	exit(3)
+
 
 try:
 	import json as json
@@ -48,12 +61,37 @@ except Exception:
 
 
 try:
+	from piaplib.book.logs import ANSIColors as ANSIColors
+except Exception:
+	try:
+		from book.logs import ANSIColors as ANSIColors
+	except Exception as err:
+		print(str(type(err)))
+		print(str(err))
+		print(str(err.args))
+		print("")
+		raise ImportError("Error Importing ANSIColors")
+
+
+try:
 	from . import baseconfig as baseconfig
 except Exception:
 	try:
 		import baseconfig as baseconfig
 	except Exception:
 		raise ImportError("Error Importing baseconfig for config")
+
+
+__prog__ = """piaplib.pku.upgrade"""
+"""The name of this PiAPLib tool is Pocket Knife Configuration Unit"""
+
+
+__description__ = """Runs piaplib configuration functions."""
+"""The description of this PiAPLib tool is 'Runs piaplib configuration functions.'"""
+
+
+__epilog__ = """basically a python wrapper for configuration I/O."""
+"""...basically a python wrapper for pip install --upgrade."""
 
 
 _MAIN_CONFIG_DATA = None
@@ -208,6 +246,63 @@ class dictParser(configparser.ConfigParser):
 			theResult[somekey].pop('__name__', None)
 		return theResult
 
+	def __getitem__(self, key):
+		try:
+			import six
+			if six.PY2:
+				if key == 'sections':
+					return self.sections
+				elif not (str(key).upper() == str("DEFAULT")):
+					return self.as_dict()[key]
+				else:
+					return super(dictParser, self)._getitem__(self, key)
+			else:
+				return super(dictParser, self)._getitem__(self, key)
+		except Exception:
+			if key == 'sections':
+				return self.sections
+			elif not (str(key).upper() == str("DEFAULT")):
+				return self.as_dict()[key]
+			else:
+				return super(dictParser, self)._getitem__(self, key)
+
+	def read_dict(self, dictionary, source='<dict>'):
+		try:
+			import six
+			if six.PY2:
+				for someSection in dictionary.keys():
+					if not self.has_section(someSection) and str(someSection) not in str("DEFAULT"):
+						self.add_section(someSection)
+					for someOption in dictionary[someSection].keys():
+						try:
+							self.set(
+								someSection, someOption,
+								dictionary[someSection][someOption]
+							)
+						except Exception as err:
+							self.set(
+								someSection, someOption,
+								repr(dictionary[someSection][someOption])
+							)
+			else:
+				return super(dictParser, self).read_dict(self, dictionary)
+		except Exception:
+			for someSection in dictionary.keys():
+				if not self.has_section(someSection) and str(someSection) not in str("DEFAULT"):
+					self.add_section(someSection)
+				for someOption in dictionary[someSection].keys():
+					try:
+						self.set(
+							someSection, someOption,
+							dictionary[someSection][someOption]
+						)
+					except Exception as err:
+						self.set(
+							someSection, someOption,
+							repr(dictionary[someSection][someOption])
+						)
+
+
 
 @remediation.error_handling
 def getDefaultMainConfigFile():
@@ -251,7 +346,13 @@ def _raw_setMainConfig(newValue):
 	global _MAIN_CONFIG_DATA
 	if newValue is None:
 		newValue = _raw_getMainConfig()
-	_MAIN_CONFIG_DATA = newValue
+	if isinstance(newValue, dict):
+		_MAIN_CONFIG_DATA = dictParser(allow_no_value=True)
+		_MAIN_CONFIG_DATA.read_dict(newValue)
+	elif isinstance(newValue, dictParser):
+		_MAIN_CONFIG_DATA = newValue
+	else:
+		_MAIN_CONFIG_DATA = None
 
 
 @remediation.error_handling
@@ -263,10 +364,26 @@ def getMainConfig():
 	return _raw_getMainConfig()
 
 
+@remediation.error_passing
+def reloadConfigCache():
+	tempValue = loadMainConfigFile()
+	tempValue['PiAP-piaplib']['loaded'] = True
+	_raw_setMainConfig(newValue=tempValue)
+	return
+
+
 @remediation.error_handling
 def isLoaded():
 	"""True if config is loaded."""
-	return getMainConfig() is not None and getMainConfig()['PiAP-piaplib']['loaded']
+	return ((getMainConfig() is not None) and (getMainConfig()['PiAP-piaplib']['loaded'] is True))
+
+
+@remediation.error_passing
+def invalidateConfigCache():
+	"""if config is loaded marks as not loaded."""
+	tempValue = getMainConfig()
+	tempValue['PiAP-piaplib']['loaded'] = False
+	_raw_setMainConfig(newValue=tempValue)
 
 
 @remediation.error_handling
@@ -289,7 +406,7 @@ def hasMainConfigOptionFor(mainSectionKey=None):
 	else:
 		kp = str(mainSectionKey).split(""".""")
 		main_config = getMainConfig()
-		if (main_config.has_section(kp[0]) and (main_config[kp[0]].has_option[kp[1]])):
+		if (main_config.has_section(kp[0]) and (main_config.has_option(kp[0], kp[1]))):
 			hasValue = True
 	return hasValue
 
@@ -303,29 +420,42 @@ def writeDefaultMainConfigFile(confFile=str('/opt/PiAP/PiAP.conf')):
 
 
 @remediation.error_passing
-def mergeConfigParser(theConfig=None, config_data=dict({}), overwrite=False):
+def mergeConfigParser(theConfig=None, config_data=None, overwrite=False):
 	"""
 	Merges the Configuration Dictionary into a configparser.
 	param theConfig - configparser.ConfigParser the ConfigParser.
 	param config_data - dict the configuration to merge.
 	param overwrite - boolean determining if the dict is record of truth or if theConfig is.
 	"""
+	
+	def helper_func(parser, section, option, value):
+		try:
+			parser.set(section, option, value)
+		except Exception as verr:
+			parser.set(section, option, repr(value))
+	
 	if theConfig is None:
 		theConfig = dictParser(allow_no_value=True)
-	if config_data is not None:
-		for someSection in config_data.keys():
-			if not theConfig.has_section(someSection):
-				theConfig.add_section(someSection)
-			for someOption in config_data[someSection].keys():
-				if not theConfig.has_option(someSection, someOption) or (overwrite is True):
-					theConfig.set(someSection, someOption, config_data[someSection][someOption])
+	if config_data is None:
+		config_data = dict({})
+	for someSection in config_data.keys():
+		if not theConfig.has_section(someSection) and str(someSection) not in str("DEFAULT"):
+			theConfig.add_section(someSection)
+		if config_data[someSection] is None:
+			raise AssertionError("Logic bomb detected (0=1)")
+		for someOption in config_data[someSection].keys():
+			if not theConfig.has_option(someSection, someOption) or (overwrite is True):
+				helper_func(
+					theConfig, someSection, someOption,
+					config_data[someSection][someOption]
+				)
 	return theConfig
 
 
 @remediation.error_handling
 def parseConfigParser(config_data=dict({}), theConfig=None, overwrite=True):
 	"""
-	Merges the Configuration Dictionary into a configparser.
+	Merges the configparser into the Configuration Dictionary.
 	param config_data - dict the configuration to merge.
 	param theConfig - configparser.ConfigParser the ConfigParser.
 	param overwrite - boolean determining if the dict is record of truth or if theConfig is.
@@ -387,8 +517,9 @@ def loadMainConfigFile(confFile='/opt/PiAP/PiAP.conf'):
 	try:
 		emptyConfig = dictParser(allow_no_value=True)
 		result_config = getDefaultMainConfigFile()
-		mainConfig = readIniFile(str(confFile), emptyConfig)
-		result_config = parseConfigParser(result_config, mainConfig, True)
+		if utils.xisfile(str(confFile)):
+			mainConfig = readIniFile(str(confFile), emptyConfig)
+			result_config = parseConfigParser(result_config, mainConfig, True)
 	except Exception as err:
 		print(str(err))
 		print(str(type(err)))
@@ -397,6 +528,290 @@ def loadMainConfigFile(confFile='/opt/PiAP/PiAP.conf'):
 	return result_config
 
 
-if __name__ in u'__main__':
-	raise NotImplementedError("ERROR: Can not run config as main. Yet?")
+def getHandle(handler):
+	for someFunc in locals().copy().keys():
+		if handler == locals()[someFunc]:
+			handle = someFunc
+	for theFunc in globals().copy().keys():
+		if handler == globals()[theFunc]:
+			handle = theFunc
+	return handle
 
+
+def getHandler(handle):
+	possibles = globals().copy()
+	# possibles.update(globals()['__builtins__'].__dict__)
+	possibles.update(locals())
+	handler = possibles.get(handle)
+	if handler is None:
+		raise NotImplementedError(str("Function {} not implemented").format(str(handle)))
+	return handler
+
+
+def prepforStore(rawValue):
+	"""pack value for storage"""
+	taint_value = str(rawValue)
+	if str('"') in taint_value[0] or str("""'""") in taint_value[0]:
+		taint_value = repr(taint_value)
+	elif str("""(""") in taint_value[0] or str("""[""") in taint_value[0]:
+		taint_value = repr(rawValue)
+	elif str("""{""") in taint_value[0]:
+		taint_value = repr(rawValue)
+	elif str("""<function""") in taint_value[0:9]:
+		taint_value = getHandle(str(rawValue))
+	return taint_value
+
+
+_PIAP_KVP_GET_KEY = str("""PiAP-piaplib.config_accessors""")
+
+
+_PIAP_KVP_GET_DEFAULT = str("""defaultGetter""")
+
+
+_PIAP_KVP_SET_KEY = str("""PiAP-piaplib.config_modifiers""")
+
+
+_PIAP_KVP_SET_DEFAULT = str("""defaultSetter""")
+
+
+def _empty_kvp_getters():
+	"""returns an empty get-set kvp encoded dict for get (THIS DOC COULD BE IMPROVED)"""
+	return dict({
+				_PIAP_KVP_GET_KEY: _PIAP_KVP_GET_DEFAULT,
+				_PIAP_KVP_SET_KEY: _PIAP_KVP_GET_DEFAULT
+	})
+
+
+def _empty_kvp_setters():
+	"""returns an empty get-set kvp encoded dict for get (THIS DOC COULD BE IMPROVED)"""
+	return dict({
+				_PIAP_KVP_GET_KEY: _PIAP_KVP_SET_DEFAULT,
+				_PIAP_KVP_SET_KEY: _PIAP_KVP_SET_DEFAULT
+	})
+
+
+@remediation.error_passing
+def defaultGetter(key, defaultValue=None, initIfEmpty=False):
+	"""the default configuration getter for most keys."""
+	import ast
+	theValue = defaultValue
+	if hasMainConfigOptionFor(key):
+		main_config = getMainConfig().as_dict()
+		default_config_data = baseconfig.__config_data_from_kvp(key, defaultValue)
+		if initIfEmpty is True:
+			full_config_data = baseconfig.mergeDicts(main_config, default_config_data)
+		else:
+			full_config_data = baseconfig.mergeDicts(default_config_data, main_config)
+		if str(""".""") not in str(key):
+			theValue = full_config_data[key]
+		else:
+			kp = str(key).split(""".""")
+			theValue = full_config_data[kp[0]][kp[1]]
+	try:
+		if str("[") in str(theValue)[0]:
+			theValue = ast.literal_eval(repr('"'*3)[1:4] + repr(theValue) + repr('"'*3)[1:4])
+		elif str("{") in str(theValue)[0]:
+			if str("{}") in str(theValue) and str(theValue) in str("{}"):
+				theValue = dict({})
+			else:
+				theValue = ast.literal_eval(repr(theValue))
+				if not isinstance(theValue, dict):
+					theValue = ast.literal_eval(theValue)
+		# elif str("(") in str(theValue)[0]:
+		#	theValue = ast.literal_eval(repr('"'*3)[1:4] + repr(theValue) + repr('"'*3)[1:4])
+	except Exception as err:
+		remediation.error_breakpoint(err, context=dict)
+	return theValue
+
+
+def defaultSetter(key, newValue=None):
+	"""the default configuration setter for most keys."""
+	if newValue is None:
+		theValue = repr(None)
+	else:
+		theValue = newValue
+	if not isLoaded():
+		reloadConfigCache()
+	main_config = getMainConfig().as_dict()
+	new_config_data = baseconfig.__config_data_from_kvp(key, repr(theValue))
+	full_config_data = baseconfig.mergeDicts(main_config, new_config_data)
+	writeMainConfigFile(config_data=full_config_data)
+	invalidateConfigCache()
+
+
+def getConfigValue(*args, **kwargs):
+	"""API accessor function for configs"""
+	config_getters = defaultGetter(key=_PIAP_KVP_GET_KEY, defaultValue=_empty_kvp_getters())
+	try:
+		if (str(kwargs['key']) in config_getters.keys()):
+			return getHandler(config_getters[str(kwargs['key'])])(*args, **kwargs)
+		else:
+			return defaultGetter(*args, **kwargs)
+	except Exception as err:
+		remediation.error_breakpoint(err, context=getConfigValue)
+		# print(repr(args))
+		# print(repr(kwargs))
+		print(repr(config_getters))
+		print(str(type(config_getters)))
+		return None
+
+
+def setConfigValue(*args, **kwargs):
+	"""API Modifier function for configs"""
+	config_setters = defaultGetter(key=_PIAP_KVP_SET_KEY, defaultValue=_empty_kvp_setters())
+	try:
+		if (str(kwargs['key']) in config_setters.keys()):
+			return getHandler(config_setters[str(kwargs['key'])])(*args, **kwargs)
+		else:
+			return defaultSetter(*args, **kwargs)
+	except Exception as err:
+		remediation.error_breakpoint(err, getConfigValue)
+		print(repr(config_getters))
+		print(str(config_getters))
+		print(str(type(config_getters)))
+		return None
+
+
+def configRegisterKeyValueFactory(*args, **kwargs):
+	"""used to register configs"""
+	config_getters = defaultGetter(
+		key=_PIAP_KVP_GET_KEY,
+		defaultValue=_empty_kvp_getters()
+	)
+	new_KeyValueFactory_data = baseconfig.mergeDicts(config_getters, dict({kwargs['key']: getHandle(kwargs['getter'])}))
+	new_KeyValueFactory_data = baseconfig.mergeDicts(config_getters, dict({kwargs['key']: getHandle(kwargs['getter'])}))
+	defaultSetter(key=str("""PiAP-piaplib.config_accessors"""), newValue=new_KeyValueFactory_data)
+	if str('setter') in kwargs.keys():
+		config_setters = defaultGetter(
+			_PIAP_KVP_SET_KEY,
+			_empty_kvp_setters()
+		)
+		new_KeyValueFactory_data = baseconfig.mergeDicts(config_setters, dict({kwargs['key']: getHandle(kwargs['setter'])}))
+		defaultSetter(
+			key=str("""PiAP-piaplib.config_modifiers"""), newValue=new_KeyValueFactory_data
+		)
+
+
+def configKeyValueGETFactory(*kvpargs, **kvpkwargs):
+	def decorator(fn):
+		@functools.wraps(fn)
+		def decorated(*args,**kwargs):
+			if kvpkwargs['getter'] is None:
+				kvpkwargs['getter'] = fn
+			configRegisterKeyValueFactory(*kvpargs, **kvpkwargs)
+			return fn(*args,**kwargs)
+		return decorated
+	return decorator
+
+
+def configKeyValueSETFactory(*kvpargs, **kvpkwargs):
+	def decorator(fn):
+		@functools.wraps(fn)
+		def decorated(*args,**kwargs):
+			if kvpkwargs['setter'] is None:
+				kvpkwargs['setter'] = fn
+			configRegisterKeyValueFactory(*kvpargs, **kvpkwargs)
+			return fn(*args,**kwargs)
+		return decorated
+	return decorator
+
+
+@configKeyValueGETFactory(key="PiAP-piaplib.loaded")
+def __builtin_isLoaded(*args, **kwargs):
+	return isLoaded()
+
+
+def printMainConfig():
+	temp_config = getMainConfig()
+	temp = temp_config.as_dict()
+	for section in temp.keys():
+		for thekey in temp[section].keys():
+			if getConfigValue(key=str("{}.{}").format(str(section), str(thekey))) is None:
+				configRegisterKeyValueFactory(key=str("{}.{}").format(str(section), str(thekey)), getter=defaultGetter)
+	temp_config = getMainConfig()
+	temp = temp_config.as_dict()
+	for section in temp.keys():
+		print(str("[{}{}{}]").format(ANSIColors.BLUE, str(section), ANSIColors.ENDC));
+		for thekey in temp[section].keys():
+			print(
+				str("\t{}{}{}: {}{}{}").format(
+					ANSIColors.WHITE,
+					thekey,
+					ANSIColors.ENDC,
+					ANSIColors.AMBER,
+					getConfigValue(key=str("{}.{}").format(str(section), str(thekey))),
+					ANSIColors.ENDC
+				)
+			)
+			# print(str("\t{}: {} (should be {})").format(thekey, getConfigValue(key=str("{}.{}").format(str(section), str(thekey))), str(temp[section][thekey])))
+
+
+@remediation.error_passing
+def parseargs(arguments=None):
+	"""Parse the arguments"""
+	parser = argparse.ArgumentParser(prog=__prog__, description=__description__, epilog=__epilog__)
+	the_action = parser.add_mutually_exclusive_group()
+	the_action.add_argument(
+		'-r', '--read', dest='config_action', default='dump', action='store_const',
+		const='read', help='Read the Configuration. This is the default.'
+	)
+	the_action.add_argument(
+		'-w', '--write', dest='config_action', action='store_const',
+		const='write', help='Modify the Configuration.'
+	)
+	the_action.add_argument(
+		'-T', '--test', dest='config_action', action='store_const',
+		const='test', help='Load and test the configuration.'
+	)
+	parser.add_argument(
+		'-f', '--file', dest='config_path', default=str('/opt/PiAP/PiAP.conf'),
+		help='Path to PiAPLib configuration file. EXPERIMENTAL.'
+	)
+	parser.add_argument(
+		'-s', '--setting', dest='config_key', default=str('ALL'),
+		help='Upgrade the piaplib webroot module. EXPERIMENTAL.'
+	)
+	parser.add_argument(
+		'-x', '--value', dest='config_value', default=None,
+		help='The value to modify (see -w). EXPERIMENTAL.'
+	)
+	parser = utils._handleVersionArgs(parser)
+	theResult = parser.parse_known_args(arguments)
+	return theResult
+
+
+def noOp(*args, **kwargs):
+	"""Does nothing. PLACEHOLDER."""
+	raise NotImplementedError("CRITICAL - PKU Configuration main() not implemented. yet?")
+
+
+_CONFIG_CLI_ACTIONS = dict({
+						'dump': printMainConfig,
+						'read': noOp,
+						'write': noOp,
+						'test': noOp,
+						'reload': reloadConfigCache
+						})
+"""Posible upgrade actions."""
+
+
+@remediation.bug_handling
+def main(argv=None):
+	"""The Main Event. Upgrade Time."""
+	(args, extras) = parseargs(argv)
+	theResult = 1
+	if args.config_action is not None:
+		_CONFIG_CLI_ACTIONS[args.config_action]()
+		theResult = 0
+	return theResult
+
+
+if __name__ in u'__main__':
+	try:
+		if (sys.argv is not None and (sys.argv is not []) and (len(sys.argv) > 1)):
+			exit(main(sys.argv[1:]))
+		else:
+			exit(main([]))
+	except Exception:
+		raise ImportError("Error running main")
+	exit(3)
