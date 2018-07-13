@@ -21,11 +21,12 @@
 
 try:
 	import os
+	import os.path
 	import sys
 	import argparse
 	import ast
 	import functools
-	for someModule in [os, sys, argparse, ast, functools]:
+	for someModule in [os, os.path, sys, argparse, ast, functools]:
 		if someModule.__name__ is None:
 			raise ImportError(str("OMG! we could not import {}. ABORT. ABORT.").format(someModule))
 except Exception as err:
@@ -96,6 +97,8 @@ __epilog__ = """basically a python wrapper for configuration I/O."""
 
 _MAIN_CONFIG_DATA = None
 
+
+__ALL_KEYS_SETTING__ = str("""all""")
 
 def hasJsonSupport():
 	support_json = False
@@ -356,9 +359,11 @@ def _raw_setMainConfig(newValue):
 
 
 @remediation.error_handling
-def getMainConfig():
+def getMainConfig(confFile=None):
+	if confFile is None:
+                confFile = str('/opt/PiAP/PiAP.conf')
 	if _raw_getMainConfig() is None:
-		tempValue = loadMainConfigFile()
+		tempValue = loadMainConfigFile(confFile)
 		tempValue['PiAP-piaplib']['loaded'] = True
 		_raw_setMainConfig(newValue=tempValue)
 	return _raw_getMainConfig()
@@ -412,7 +417,9 @@ def hasMainConfigOptionFor(mainSectionKey=None):
 
 
 @remediation.error_handling
-def writeDefaultMainConfigFile(confFile=str('/opt/PiAP/PiAP.conf')):
+def writeDefaultMainConfigFile(confFile=None):
+	if confFile is None:
+		confFile = str('/opt/PiAP/PiAP.conf')
 	theResult = False
 	if writeMainConfigFile(confFile, getDefaultMainConfigFile()):
 		theResult = True
@@ -513,7 +520,9 @@ def readIniFile(filename, theparser=None):
 
 
 @remediation.error_handling
-def loadMainConfigFile(confFile='/opt/PiAP/PiAP.conf'):
+def loadMainConfigFile(confFile=None):
+	if confFile is None:
+		confFile = str('/opt/PiAP/PiAP.conf')
 	try:
 		emptyConfig = dictParser(allow_no_value=True)
 		result_config = getDefaultMainConfigFile()
@@ -721,29 +730,100 @@ def __builtin_isLoaded(*args, **kwargs):
 	return isLoaded()
 
 
-def printMainConfig():
-	temp_config = getMainConfig()
+def getMainConfigWithArgs(*args, **kwargs):
+	if kwargs is not None and (str("""file""") in kwargs.keys()):
+		config_path = kwargs[str("""file""")]
+		cache_config = getMainConfig(confFile=config_path)
+	else:
+		cache_config = getMainConfig()
+	return cache_config
+
+
+def printMainConfig(*args, **kwargs):
+	temp_config = getMainConfigWithArgs(*args, **kwargs)
 	temp = temp_config.as_dict()
 	for section in temp.keys():
 		for thekey in temp[section].keys():
 			if getConfigValue(key=str("{}.{}").format(str(section), str(thekey))) is None:
 				configRegisterKeyValueFactory(key=str("{}.{}").format(str(section), str(thekey)), getter=defaultGetter)
-	temp_config = getMainConfig()
+	temp_config = getMainConfigWithArgs(*args, **kwargs)
 	temp = temp_config.as_dict()
+	section_color = str("")
+	end_color = str("")
+	label_color = str("")
+	value_color = str("")
+	if kwargs is not None and (str("""color""") in kwargs.keys()):
+		if kwargs[str("""color""")]:
+			section_color = ANSIColors.BLUE
+			end_color = ANSIColors.ENDC
+			label_color = ANSIColors.WHITE
+			value_color = ANSIColors.AMBER
 	for section in temp.keys():
-		print(str("[{}{}{}]").format(ANSIColors.BLUE, str(section), ANSIColors.ENDC));
+		print(str("[{}{}{}]").format(section_color, str(section), end_color));
 		for thekey in temp[section].keys():
 			print(
 				str("\t{}{}{}: {}{}{}").format(
-					ANSIColors.WHITE,
+					label_color,
 					thekey,
-					ANSIColors.ENDC,
-					ANSIColors.AMBER,
+					end_color,
+					value_color,
 					getConfigValue(key=str("{}.{}").format(str(section), str(thekey))),
-					ANSIColors.ENDC
+					end_color
 				)
 			)
 			# print(str("\t{}: {} (should be {})").format(thekey, getConfigValue(key=str("{}.{}").format(str(section), str(thekey))), str(temp[section][thekey])))
+
+
+def readMainConfig(*args, **kwargs):
+	temp_config = getMainConfigWithArgs(*args, **kwargs)
+	temp = temp_config.as_dict()
+	if kwargs is not None and (str("""setting""") in kwargs.keys()) and str(__ALL_KEYS_SETTING__) not in kwargs[str("""setting""")]:
+		config_setting = kwargs[str("""setting""")]
+		if getConfigValue(key=config_setting) is None:
+			configRegisterKeyValueFactory(key=config_setting, getter=defaultGetter)
+		cache_setting = getConfigValue(key=config_setting)
+		temp_config = getMainConfigWithArgs(*args, **kwargs)
+		temp = temp_config.as_dict()
+		section_color = str("")
+		end_color = str("")
+		label_color = str("")
+		value_color = str("")
+		if kwargs is not None and (str("""color""") in kwargs.keys()):
+			if kwargs[str("""color""")]:
+				section_color = ANSIColors.BLUE
+				end_color = ANSIColors.ENDC
+				label_color = ANSIColors.WHITE
+				value_color = ANSIColors.AMBER
+		# for section in temp.keys():
+		# 	print(str("[{}{}{}]").format(section_color, str(section), end_color));
+		if str(""".""") not in str(config_setting):
+			section = str(config_setting)
+			print(str("[{}{}{}]").format(section_color, str(section), end_color));
+			for thekey in temp[section].keys():
+				print(
+					str("\t{}{}{}: {}{}{}").format(
+						label_color,
+						thekey,
+						end_color,
+						value_color,
+						getConfigValue(key=str("{}.{}").format(str(section), str(thekey))),
+						end_color
+					)
+				)
+		else:
+			# if verbose
+			# section = str(key).split(""".""")[0]
+			# print(str("[{}{}{}]").format(section_color, str(section), end_color));
+			print(
+	  			str("{}{}{}: {}{}{}").format(
+					label_color,
+					str(config_setting),
+					end_color,
+					value_color,
+					getConfigValue(key=str(config_setting)),
+					end_color
+				)
+	  		)
 
 
 @remediation.error_passing
@@ -767,9 +847,18 @@ def parseargs(arguments=None):
 		'-f', '--file', dest='config_path', default=str('/opt/PiAP/PiAP.conf'),
 		help='Path to PiAPLib configuration file. EXPERIMENTAL.'
 	)
-	parser.add_argument(
-		'-s', '--setting', dest='config_key', default=str('ALL'),
-		help='Upgrade the piaplib webroot module. EXPERIMENTAL.'
+	the_setting = parser.add_mutually_exclusive_group()
+	the_setting.add_argument(
+		'-s', '--setting', nargs=1, dest='config_key', default=str(__ALL_KEYS_SETTING__),
+		help=str(
+			'the setting key value (i.e. lable). or {} for ALL settings. EXPERIMENTAL.'
+		).format(__ALL_KEYS_SETTING__)
+	)
+	the_setting.add_argument(
+		'--all', dest='config_key', action='store_const', const=str(__ALL_KEYS_SETTING__),
+		help=str(
+			'ALL settings. EXPERIMENTAL.'
+		).format(__ALL_KEYS_SETTING__)
 	)
 	parser.add_argument(
 		'-x', '--value', dest='config_value', default=None,
@@ -787,7 +876,7 @@ def noOp(*args, **kwargs):
 
 _CONFIG_CLI_ACTIONS = dict({
 						'dump': printMainConfig,
-						'read': noOp,
+						'read': readMainConfig,
 						'write': noOp,
 						'test': noOp,
 						'reload': reloadConfigCache
@@ -800,8 +889,15 @@ def main(argv=None):
 	"""The Main Event. Upgrade Time."""
 	(args, extras) = parseargs(argv)
 	theResult = 1
+	config_path = os.path.abspath(str('/opt/PiAP/PiAP.conf'))
+	if args.config_path is not None:
+		config_path = os.path.abspath(str(args.config_path))
+	config_key = None
+	if args.config_key is not None and str(__ALL_KEYS_SETTING__) not in str(args.config_key):
+		config_key = args.config_key[0]
 	if args.config_action is not None:
-		_CONFIG_CLI_ACTIONS[args.config_action]()
+		kwargs = dict({'file': config_path, 'color': True, 'setting': config_key})
+		_CONFIG_CLI_ACTIONS[args.config_action](**kwargs)
 		theResult = 0
 	return theResult
 
