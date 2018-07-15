@@ -283,7 +283,7 @@ class dictParser(configparser.ConfigParser):
 								someSection, someOption,
 								dictionary[someSection][someOption]
 							)
-						except Exception as err:
+						except Exception:
 							self.set(
 								someSection, someOption,
 								repr(dictionary[someSection][someOption])
@@ -592,23 +592,22 @@ _PIAP_KVP_SET_DEFAULT = str("""defaultSetter""")
 def _empty_kvp_getters():
 	"""returns an empty get-set kvp encoded dict for get (THIS DOC COULD BE IMPROVED)"""
 	return dict({
-				_PIAP_KVP_GET_KEY: _PIAP_KVP_GET_DEFAULT,
-				_PIAP_KVP_SET_KEY: _PIAP_KVP_GET_DEFAULT
+		_PIAP_KVP_GET_KEY: _PIAP_KVP_GET_DEFAULT,
+		_PIAP_KVP_SET_KEY: _PIAP_KVP_GET_DEFAULT
 	})
 
 
 def _empty_kvp_setters():
 	"""returns an empty get-set kvp encoded dict for get (THIS DOC COULD BE IMPROVED)"""
 	return dict({
-				_PIAP_KVP_GET_KEY: _PIAP_KVP_SET_DEFAULT,
-				_PIAP_KVP_SET_KEY: _PIAP_KVP_SET_DEFAULT
+		_PIAP_KVP_GET_KEY: _PIAP_KVP_SET_DEFAULT,
+		_PIAP_KVP_SET_KEY: _PIAP_KVP_SET_DEFAULT
 	})
 
 
 @remediation.error_passing
 def defaultGetter(key, defaultValue=None, initIfEmpty=False):
 	"""the default configuration getter for most keys."""
-	import ast
 	theValue = defaultValue
 	if hasMainConfigOptionFor(key):
 		main_config = getMainConfig().as_dict()
@@ -623,8 +622,8 @@ def defaultGetter(key, defaultValue=None, initIfEmpty=False):
 			kp = str(key).split(""".""")
 			theValue = full_config_data[kp[0]][kp[1]]
 	try:
-		if str("[") in str(theValue)[0]:
-			theValue = ast.literal_eval(repr('"'*3)[1:4] + repr(theValue) + repr('"'*3)[1:4])
+		if str("[") in str(theValue)[0] or str("(") in str(theValue)[0]:
+			theValue = ast.literal_eval(repr('"' * 3)[1:4] + repr(theValue) + repr('"' * 3)[1:4])
 		elif str("{") in str(theValue)[0]:
 			if str("{}") in str(theValue) and str(theValue) in str("{}"):
 				theValue = dict({})
@@ -632,8 +631,6 @@ def defaultGetter(key, defaultValue=None, initIfEmpty=False):
 				theValue = ast.literal_eval(repr(theValue))
 				if not isinstance(theValue, dict):
 					theValue = ast.literal_eval(theValue)
-		# elif str("(") in str(theValue)[0]:
-		#	theValue = ast.literal_eval(repr('"'*3)[1:4] + repr(theValue) + repr('"'*3)[1:4])
 	except Exception as err:
 		remediation.error_breakpoint(err, context=dict)
 	return theValue
@@ -693,15 +690,16 @@ def configRegisterKeyValueFactory(*args, **kwargs):
 		key=_PIAP_KVP_GET_KEY,
 		defaultValue=_empty_kvp_getters()
 	)
-	new_KeyValueFactory_data = baseconfig.mergeDicts(config_getters, dict({kwargs['key']: getHandle(kwargs['getter'])}))
-	new_KeyValueFactory_data = baseconfig.mergeDicts(config_getters, dict({kwargs['key']: getHandle(kwargs['getter'])}))
+	newValue = dict({kwargs['key']: getHandle(kwargs['getter'])})
+	new_KeyValueFactory_data = baseconfig.mergeDicts(config_getters, newValue)
 	defaultSetter(key=str("""PiAP-piaplib.config_accessors"""), newValue=new_KeyValueFactory_data)
 	if str('setter') in kwargs.keys():
 		config_setters = defaultGetter(
 			_PIAP_KVP_SET_KEY,
 			_empty_kvp_setters()
 		)
-		new_KeyValueFactory_data = baseconfig.mergeDicts(config_setters, dict({kwargs['key']: getHandle(kwargs['setter'])}))
+		newValue = dict({kwargs['key']: getHandle(kwargs['setter'])})
+		new_KeyValueFactory_data = baseconfig.mergeDicts(config_setters, newValue)
 		defaultSetter(
 			key=str("""PiAP-piaplib.config_modifiers"""), newValue=new_KeyValueFactory_data
 		)
@@ -710,11 +708,11 @@ def configRegisterKeyValueFactory(*args, **kwargs):
 def configKeyValueGETFactory(*kvpargs, **kvpkwargs):
 	def decorator(fn):
 		@functools.wraps(fn)
-		def decorated(*args,**kwargs):
+		def decorated(*args, **kwargs):
 			if kvpkwargs['getter'] is None:
 				kvpkwargs['getter'] = fn
 			configRegisterKeyValueFactory(*kvpargs, **kvpkwargs)
-			return fn(*args,**kwargs)
+			return fn(*args, **kwargs)
 		return decorated
 	return decorator
 
@@ -722,11 +720,11 @@ def configKeyValueGETFactory(*kvpargs, **kvpkwargs):
 def configKeyValueSETFactory(*kvpargs, **kvpkwargs):
 	def decorator(fn):
 		@functools.wraps(fn)
-		def decorated(*args,**kwargs):
+		def decorated(*args, **kwargs):
 			if kvpkwargs['setter'] is None:
 				kvpkwargs['setter'] = fn
 			configRegisterKeyValueFactory(*kvpargs, **kvpkwargs)
-			return fn(*args,**kwargs)
+			return fn(*args, **kwargs)
 		return decorated
 	return decorator
 
@@ -747,11 +745,13 @@ def getMainConfigWithArgs(*args, **kwargs):
 
 def printMainConfig(*args, **kwargs):
 	temp_config = getMainConfigWithArgs(*args, **kwargs)
-	temp = temp_config.as_dict()	
+	temp = temp_config.as_dict()
 	for section in temp.keys():
 		for thekey in temp[section].keys():
 			if getConfigValue(key=str("{}.{}").format(str(section), str(thekey))) is None:
-				configRegisterKeyValueFactory(key=str("{}.{}").format(str(section), str(thekey)), getter=defaultGetter)
+				configRegisterKeyValueFactory(
+					key=str("{}.{}").format(str(section), str(thekey)), getter=defaultGetter
+				)
 	temp_config = getMainConfigWithArgs(*args, **kwargs)
 	temp = temp_config.as_dict()
 	section_color = str("")
@@ -765,7 +765,7 @@ def printMainConfig(*args, **kwargs):
 			label_color = ANSIColors.WHITE
 			value_color = ANSIColors.AMBER
 	for section in temp.keys():
-		print(str("[{}{}{}]").format(section_color, str(section), end_color));
+		print(str("[{}{}{}]").format(section_color, str(section), end_color))
 		for thekey in temp[section].keys():
 			print(
 				str("\t{}{}{}: {}{}{}").format(
@@ -781,10 +781,13 @@ def printMainConfig(*args, **kwargs):
 
 
 def readMainConfig(*args, **kwargs):
+	"""reads a given setting from the configuration"""
 	temp_config = getMainConfigWithArgs(*args, **kwargs)
 	temp = temp_config.as_dict()
-	if kwargs is not None and (str("""setting""") in kwargs.keys()) and str(__ALL_KEYS_SETTING__) not in kwargs[str("""setting""")]:
-		config_setting = kwargs[str("""setting""")]
+	__sKey = str("""setting""")
+	__aKey = str(__ALL_KEYS_SETTING__)
+	if kwargs is not None and (__sKey in kwargs.keys()) and __aKey not in kwargs[__sKey]:
+		config_setting = kwargs[__sKey]
 		if getConfigValue(key=config_setting) is None:
 			configRegisterKeyValueFactory(key=config_setting, getter=defaultGetter)
 		cache_setting = getConfigValue(key=config_setting)
@@ -800,8 +803,6 @@ def readMainConfig(*args, **kwargs):
 				end_color = ANSIColors.ENDC
 				label_color = ANSIColors.WHITE
 				value_color = ANSIColors.AMBER
-		# for section in temp.keys():
-		# 	print(str("[{}{}{}]").format(section_color, str(section), end_color));
 		if str(""".""") not in str(config_setting):
 			section = str(config_setting)
 			print(str("[{}{}{}]").format(section_color, str(section), end_color));
@@ -817,11 +818,8 @@ def readMainConfig(*args, **kwargs):
 					)
 				)
 		else:
-			# if verbose
-			# section = str(key).split(""".""")[0]
-			# print(str("[{}{}{}]").format(section_color, str(section), end_color));
 			print(
-	  			str("{}{}{}: {}{}{}").format(
+				str("{}{}{}: {}{}{}").format(
 					label_color,
 					str(config_setting),
 					end_color,
@@ -829,7 +827,7 @@ def readMainConfig(*args, **kwargs):
 					getConfigValue(key=str(config_setting)),
 					end_color
 				)
-	  		)
+			)
 
 
 @remediation.error_passing
@@ -906,6 +904,7 @@ def main(argv=None):
 		_CONFIG_CLI_ACTIONS[args.config_action](**kwargs)
 		theResult = 0
 	return theResult
+
 
 if __name__ in u'__main__':
 	try:
