@@ -156,6 +156,8 @@ cleanup:
 	$(QUIET)rm -f ./the_test_file*.txt 2>/dev/null || true
 	$(QUIET)rm -f ./the_test_file*.json 2>/dev/null || true
 	$(QUIET)rm -f ./the_test_file*.yml 2>/dev/null || true
+	$(QUIET)rm -f ./config_*_temp_file.cnf 2>/dev/null || true
+	$(QUIET)rm -f ./**/config_*_temp_file.cnf 2>/dev/null || true
 	$(QUIET)rm -f ./the_test_file*.yaml 2>/dev/null || true
 	$(QUIET)rm -f ./the_test_file*.enc 2>/dev/null || true
 	$(QUIET)rm -f ./.weak_test_key_* || true

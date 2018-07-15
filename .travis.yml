@@ -151,6 +151,7 @@ before_install:
   - mkdir -p -m 755 "/opt/PiAP/hostapd_actions/" || true
   - chmod -v 775 "/opt/PiAP/" || true
   - cp -vf ./tests/mock/clients /opt/PiAP/hostapd_actions/clients || true
+  - cp -vf ./tests/mock/dnsmasq.leases /var/lib/misc/dnsmasq.leases || true
   - echo "Dependencies should be sane now."
 
 before_script:
