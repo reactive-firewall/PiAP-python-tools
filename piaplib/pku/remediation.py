@@ -86,7 +86,7 @@ def getTimeStamp():
 def error_breakpoint(error, context=None):
 	"""Just logs the error and returns None"""
 	timestamp = getTimeStamp()
-	logs.log(str("=" * 40 ), "Warning")
+	logs.log(str("=" * 40), "Warning")
 	logs.log(str("An error occurred at {}").format(timestamp), "Error")
 	logs.log(str(context), "Debug")
 	logs.log(str(type(error)), "Debug")

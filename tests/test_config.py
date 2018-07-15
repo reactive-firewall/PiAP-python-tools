@@ -53,17 +53,24 @@ def debugtestError(someError=None):
 
 def random_file_path():
 	from .context import piaplib as piaplib
+	if piaplib.__name__ is None:
+		raise ImportError("Failed to import piaplib")
 	from piaplib import keyring as keyring
+	if keyring.__name__ is None:
+		raise ImportError("Failed to import keyring")
 	from piaplib.keyring import rand as rand
 	return str("""config_{someInt}_temp_file.tmp""").format(someInt=rand.randInt())
 
 
 def clean_temp_file(someFile):
 	from .context import piaplib as piaplib
+	if piaplib.__name__ is None:
+		raise ImportError("Failed to import piaplib")
 	from piaplib import pku as pku
+	if pku.__name__ is None:
+		raise ImportError("Failed to import pku")
 	from piaplib.pku import utils as utils
 	return utils.cleanFileResource(someFile)
-
 
 
 class ConfigTestSuite(unittest.TestCase):

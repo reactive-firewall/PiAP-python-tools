@@ -777,7 +777,6 @@ def printMainConfig(*args, **kwargs):
 					end_color
 				)
 			)
-			# print(str("\t{}: {} (should be {})").format(thekey, getConfigValue(key=str("{}.{}").format(str(section), str(thekey))), str(temp[section][thekey])))
 
 
 def readMainConfig(*args, **kwargs):
@@ -805,7 +804,7 @@ def readMainConfig(*args, **kwargs):
 				value_color = ANSIColors.AMBER
 		if str(""".""") not in str(config_setting):
 			section = str(config_setting)
-			print(str("[{}{}{}]").format(section_color, str(section), end_color));
+			print(str("[{}{}{}]").format(section_color, str(section), end_color))
 			for thekey in temp[section].keys():
 				print(
 					str("\t{}{}{}: {}{}{}").format(
@@ -824,7 +823,7 @@ def readMainConfig(*args, **kwargs):
 					str(config_setting),
 					end_color,
 					value_color,
-					getConfigValue(key=str(config_setting)),
+					cache_setting,
 					end_color
 				)
 			)
@@ -879,12 +878,12 @@ def noOp(*args, **kwargs):
 
 
 _CONFIG_CLI_ACTIONS = dict({
-						'dump': printMainConfig,
-						'read': readMainConfig,
-						'write': noOp,
-						'test': noOp,
-						'reload': reloadConfigCache
-						})
+	'dump': printMainConfig,
+	'read': readMainConfig,
+	'write': noOp,
+	'test': noOp,
+	'reload': reloadConfigCache
+})
 """Posible upgrade actions."""
 
 
