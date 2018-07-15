@@ -100,6 +100,7 @@ _MAIN_CONFIG_DATA = None
 
 __ALL_KEYS_SETTING__ = str("""all""")
 
+
 def hasJsonSupport():
 	support_json = False
 	try:
@@ -299,12 +300,11 @@ class dictParser(configparser.ConfigParser):
 							someSection, someOption,
 							dictionary[someSection][someOption]
 						)
-					except Exception as err:
+					except Exception:
 						self.set(
 							someSection, someOption,
 							repr(dictionary[someSection][someOption])
 						)
-
 
 
 @remediation.error_handling
@@ -361,7 +361,7 @@ def _raw_setMainConfig(newValue):
 @remediation.error_handling
 def getMainConfig(confFile=None):
 	if confFile is None:
-                confFile = str('/opt/PiAP/PiAP.conf')
+		confFile = str('/opt/PiAP/PiAP.conf')
 	if _raw_getMainConfig() is None:
 		tempValue = loadMainConfigFile(confFile)
 		tempValue['PiAP-piaplib']['loaded'] = True
@@ -370,23 +370,27 @@ def getMainConfig(confFile=None):
 
 
 @remediation.error_passing
-def reloadConfigCache():
-	tempValue = loadMainConfigFile()
+def reloadConfigCache(confFile=None):
+	tempValue = loadMainConfigFile(confFile)
 	tempValue['PiAP-piaplib']['loaded'] = True
 	_raw_setMainConfig(newValue=tempValue)
 	return
 
 
-@remediation.error_handling
+@remediation.error_passing
 def isLoaded():
 	"""True if config is loaded."""
-	return ((getMainConfig() is not None) and (getMainConfig()['PiAP-piaplib']['loaded'] is True))
+	if (getMainConfig() is not None):
+		isLoadable = True
+	if (getMainConfig()['PiAP-piaplib']['loaded'] is not False):
+		isCached = True
+	return ((isLoadable and isCached) is True)
 
 
 @remediation.error_passing
 def invalidateConfigCache():
 	"""if config is loaded marks as not loaded."""
-	tempValue = getMainConfig()
+	tempValue = getMainConfig().deep_copy()
 	tempValue['PiAP-piaplib']['loaded'] = False
 	_raw_setMainConfig(newValue=tempValue)
 
@@ -434,13 +438,13 @@ def mergeConfigParser(theConfig=None, config_data=None, overwrite=False):
 	param config_data - dict the configuration to merge.
 	param overwrite - boolean determining if the dict is record of truth or if theConfig is.
 	"""
-	
+
 	def helper_func(parser, section, option, value):
 		try:
 			parser.set(section, option, value)
-		except Exception as verr:
+		except Exception:
 			parser.set(section, option, repr(value))
-	
+
 	if theConfig is None:
 		theConfig = dictParser(allow_no_value=True)
 	if config_data is None:
@@ -460,7 +464,7 @@ def mergeConfigParser(theConfig=None, config_data=None, overwrite=False):
 
 
 @remediation.error_handling
-def parseConfigParser(config_data=dict({}), theConfig=None, overwrite=True):
+def parseConfigParser(config_data=None, theConfig=None, overwrite=True):
 	"""
 	Merges the configparser into the Configuration Dictionary.
 	param config_data - dict the configuration to merge.
@@ -480,10 +484,12 @@ def parseConfigParser(config_data=dict({}), theConfig=None, overwrite=True):
 
 
 @remediation.error_handling
-def writeMainConfigFile(confFile=str('/opt/PiAP/PiAP.conf'), config_data=None):
+def writeMainConfigFile(confFile=None, config_data=None):
 	"""Generates the Main Configuration file for PiAPlib"""
 	try:
 		mainConfig = dictParser(allow_no_value=True)
+		if confFile is None:
+			confFile = str('/opt/PiAP/PiAP.conf')
 		default_config = loadMainConfigFile(confFile)
 		mainConfig = mergeConfigParser(mainConfig, config_data, True)
 		mainConfig = mergeConfigParser(mainConfig, default_config, False)
@@ -675,9 +681,9 @@ def setConfigValue(*args, **kwargs):
 			return defaultSetter(*args, **kwargs)
 	except Exception as err:
 		remediation.error_breakpoint(err, getConfigValue)
-		print(repr(config_getters))
-		print(str(config_getters))
-		print(str(type(config_getters)))
+		print(repr(config_setters))
+		print(str(config_setters))
+		print(str(type(config_setters)))
 		return None
 
 
@@ -741,7 +747,7 @@ def getMainConfigWithArgs(*args, **kwargs):
 
 def printMainConfig(*args, **kwargs):
 	temp_config = getMainConfigWithArgs(*args, **kwargs)
-	temp = temp_config.as_dict()
+	temp = temp_config.as_dict()	
 	for section in temp.keys():
 		for thekey in temp[section].keys():
 			if getConfigValue(key=str("{}.{}").format(str(section), str(thekey))) is None:
@@ -901,7 +907,6 @@ def main(argv=None):
 		theResult = 0
 	return theResult
 
-
 if __name__ in u'__main__':
 	try:
 		if (sys.argv is not None and (sys.argv is not []) and (len(sys.argv) > 1)):
@@ -911,3 +916,6 @@ if __name__ in u'__main__':
 	except Exception:
 		raise ImportError("Error running main")
 	exit(3)
+else:
+	if isLoaded() is False:
+		reloadConfigCache()

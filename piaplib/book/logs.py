@@ -102,7 +102,7 @@ class logs(object):
 	"""Class for Pocket PKU logs"""
 
 	logging_level = {
-	'debug': logging.DEBUG, 'info': logging.INFO, 'warn': logging.WARNING,
+		'debug': logging.DEBUG, 'info': logging.INFO, 'warn': logging.WARNING,
 		'warning': logging.WARNING, 'error': logging.ERROR, 'crit': logging.CRITICAL,
 		'critical': logging.CRITICAL
 	}
@@ -120,17 +120,26 @@ class logs(object):
 		if baseconfig.loadMainConfigFile()['PiAP-logging-outputs']['file']:
 			prefix_path = baseconfig.loadMainConfigFile()['PiAP-logging']['dir']
 			log_lvl = logging_level[str(baseconfig.loadMainConfigFile()['PiAP-logging']['level'])]
-			file_path = os.path.join(prefix_path, str("piaplib.log"))
+			file_path = os.path.join(str(prefix_path), str("piaplib.log"))
 		else:
 			log_lvl = logging.INFO
 			file_path = sys.stdout
-		logging.basicConfig(
-			filename=file_path,
-			level=log_lvl,
-			format=str("%(asctime)s [piaplib] %(message)s"),
-			datefmt=str("%a %b %d %H:%M:%S %Z %Y")
-		)
-	except Exception:
+		log_settings = dict({
+			"""level""": log_lvl,
+			"""format""": str("%(asctime)s [piaplib] %(message)s"),
+			"""datefmt""": str("%a %b %d %H:%M:%S %Z %Y")
+		})
+		try:
+			if os.access(file_path, os.F_OK ^ os.R_OK):
+				log_settings["""filename"""] = file_path
+		except Exception:
+			log_settings["""filename"""] = None
+			log_settings["""stream"""] = sys.stdout
+		logging.basicConfig(**log_settings)
+	except Exception as err:
+		print(str("Error:"))
+		print(str(err))
+		print(str(type(err)))
 		logging.basicConfig(
 			level=logging.DEBUG,
 			format=str("%(asctime)s [piaplib] %(message)s"),

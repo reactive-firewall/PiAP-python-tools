@@ -42,8 +42,32 @@ def dict_compare(d1, d2):
 	return (len(same) is len(d1) and len(d1) is len(d2))
 
 
+def debugtestError(someError=None):
+	print(str(""))
+	print(str("ERROR:"))
+	print(str(type(someError)))
+	print(str(someError))
+	print(str((someError.args)))
+	print(str(""))
+
+
+def random_file_path():
+	from .context import piaplib as piaplib
+	from piaplib import keyring as keyring
+	from piaplib.keyring import rand as rand
+	return str("""config_{someInt}_temp_file.tmp""").format(someInt=rand.randInt())
+
+
+def clean_temp_file(someFile):
+	from .context import piaplib as piaplib
+	from piaplib import pku as pku
+	from piaplib.pku import utils as utils
+	return utils.cleanFileResource(someFile)
+
+
+
 class ConfigTestSuite(unittest.TestCase):
-	"""Basic config test cases."""
+	"""Basic piaplib.pku.config (configuration) test cases."""
 
 	def setUp(self):
 		"""sets up the configuration tests."""
@@ -56,22 +80,23 @@ class ConfigTestSuite(unittest.TestCase):
 		from piaplib import pku as pku
 		if pku.__name__ is None:
 			raise ImportError("Failed to import pku")
-		from pku import config as config
+		from piaplib.pku import config as config
 		if config.__name__ is None:
 			raise ImportError("Failed to import config")
 		assert config.isLoaded()
 
 	def test_absolute_truth_and_meaning(self):
-		"""Insanitty Test."""
+		"""Test case: Insanity Test (True is True)."""
 		assert True
 
 	def test_dict_compare(self):
-		"""Meta dict-Test."""
+		"""Meta dict-Test; Tests the utility function for comparing python dict type values."""
 		test_control = dict({"test": "this", "for": "match"})
 		test_control_b = dict({"test": "this", "for": "match"})
 		test_match = dict(test_control)
 		test_diff = dict({"test": "this", "for": "bad match"})
 		self.assertTrue(dict_compare(test_control, test_control_b))
+		self.assertDictEqual(test_control, test_control_b)
 		self.assertTrue(dict_compare(test_control, test_match))
 		self.assertTrue(dict_compare(test_match, test_control_b))
 		self.assertTrue(dict_compare(test_match, test_control))
@@ -79,25 +104,24 @@ class ConfigTestSuite(unittest.TestCase):
 		self.assertFalse(dict_compare(test_control_b, test_diff))
 		self.assertFalse(dict_compare(test_match, test_diff))
 
-	def test_syntax(self):
-		"""Test case importing code."""
+	def test_config_import_syntax(self):
+		"""Test case: importing piaplib.pku.config code."""
 		theResult = True
 		try:
 			from .context import piaplib as piaplib
 			if piaplib.__name__ is None:
-				raise ImportError("Failed to import pku")
+				raise ImportError("Failed to import test context")
 			from piaplib import pocket as pocket
 			if pocket.__name__ is None:
-				raise ImportError("Failed to import utils")
+				raise ImportError("Failed to import pocket piaplib")
 			from piaplib import pku as pku
 			if pku.__name__ is None:
-				raise ImportError("Failed to import pku")
+				raise ImportError("Failed to import pku module")
 			from pku import config as config
 			if config.__name__ is None:
 				raise ImportError("Failed to import config")
 		except Exception as impErr:
-			print(str(type(impErr)))
-			print(str(impErr))
+			debugtestError(impErr)
 			theResult = False
 		assert theResult
 
@@ -121,11 +145,7 @@ class ConfigTestSuite(unittest.TestCase):
 			theResult = (config.hasJsonSupport() is True)
 			theResult = (theResult or (config.hasJsonSupport() is False))
 		except Exception as err:
-			print(str(""))
-			print(str(type(err)))
-			print(str(err))
-			print(str((err.args)))
-			print(str(""))
+			debugtestError(err)
 			err = None
 			del err
 			theResult = False
@@ -147,12 +167,7 @@ class ConfigTestSuite(unittest.TestCase):
 			else:
 				theResult = False
 		except Exception as err:
-			print(str(""))
-			print(str("Error in test of json write-read"))
-			print(str(type(err)))
-			print(str(err))
-			print(str((err.args)))
-			print(str(""))
+			debugtestError(err)
 			err = None
 			del err
 			theResult = False
@@ -204,19 +219,16 @@ class ConfigTestSuite(unittest.TestCase):
 				print(str(theBlob))
 				print(str(""))
 		except Exception as err:
-			print(str(""))
-			print(str("Error in test of json write-read"))
-			print(str(type(err)))
-			print(str(err))
-			print(str((err.args)))
-			print(str(""))
+			debugtestError(err)
 			err = None
 			del err
 			theResult = False
 		assert theResult
 
 	def test_case_default_baseconfig(self):
-		"""Tests the default base configuration functions"""
+		""" Tests the default base configuration function
+			piaplib.pku.baseconfig.getDefaultMainConfigFile() != None
+		"""
 		theResult = False
 		try:
 			from piaplib import pku as pku
@@ -228,19 +240,16 @@ class ConfigTestSuite(unittest.TestCase):
 			self.assertIsNotNone(baseconfig.getDefaultMainConfigFile())
 			theResult = True
 		except Exception as err:
-			print(str(""))
-			print(str("Error in test of default config"))
-			print(str(type(err)))
-			print(str(err))
-			print(str((err.args)))
-			print(str(""))
+			debugtestError(err)
 			err = None
 			del err
 			theResult = False
 		assert theResult
 
 	def test_case_default_config(self):
-		"""Tests the default configuration functions"""
+		""" Tests the default configuration function
+			piaplib.pku.config.getDefaultMainConfigFile() != None
+		"""
 		theResult = False
 		try:
 			from piaplib import pku as pku
@@ -252,19 +261,16 @@ class ConfigTestSuite(unittest.TestCase):
 			self.assertIsNotNone(config.getDefaultMainConfigFile())
 			theResult = True
 		except Exception as err:
-			print(str(""))
-			print(str("Error in test of default config"))
-			print(str(type(err)))
-			print(str(err))
-			print(str((err.args)))
-			print(str(""))
+			debugtestError(err)
 			err = None
 			del err
 			theResult = False
 		assert theResult
 
-	def test_case_write_default_config(self):
-		"""Tests the write default configuration functions"""
+	def test_case_main_config(self):
+		""" Tests the default configuration function
+			piaplib.pku.config.getMainConfig() != None
+		"""
 		theResult = False
 		try:
 			from piaplib import pku as pku
@@ -273,7 +279,28 @@ class ConfigTestSuite(unittest.TestCase):
 			from pku import config as config
 			if config.__name__ is None:
 				raise ImportError("Failed to import config")
-			test_path = str("/tmp/test_config.cnf")
+			self.assertIsNotNone(config.getMainConfig())
+			theResult = True
+		except Exception as err:
+			debugtestError(err)
+			err = None
+			del err
+			theResult = False
+		assert theResult
+
+	def test_case_write_default_config(self):
+		""" Tests the default configuration file write (save) functions.
+			config.writeMainConfigFile(test_path) == config.loadMainConfigFile(test_path)
+		"""
+		theResult = False
+		test_path = str("{}.cnf").format(str(random_file_path()))
+		try:
+			from piaplib import pku as pku
+			if pku.__name__ is None:
+				raise ImportError("Failed to import pku")
+			from pku import config as config
+			if config.__name__ is None:
+				raise ImportError("Failed to import config")
 			self.assertTrue(
 				config.writeMainConfigFile(test_path),
 				config.getDefaultMainConfigFile()
@@ -286,15 +313,11 @@ class ConfigTestSuite(unittest.TestCase):
 			)
 			theResult = True
 		except Exception as err:
-			print(str(""))
-			print(str("Error in test of default config"))
-			print(str(type(err)))
-			print(str(err))
-			print(str((err.args)))
-			print(str(""))
+			debugtestError(err)
 			err = None
 			del err
 			theResult = False
+		clean_temp_file(test_path)
 		assert theResult
 
 	def test_case_of_parse_empty_baseconfig(self):
@@ -316,12 +339,7 @@ class ConfigTestSuite(unittest.TestCase):
 			)
 			theResult = True
 		except Exception as err:
-			print(str(""))
-			print(str("Error in test of parsing default config"))
-			print(str(type(err)))
-			print(str(err))
-			print(str((err.args)))
-			print(str(""))
+			debugtestError(err)
 			err = None
 			del err
 			theResult = False
@@ -355,12 +373,7 @@ class ConfigTestSuite(unittest.TestCase):
 			)
 			theResult = True
 		except Exception as err:
-			print(str(""))
-			print(str("Error in test of parsing default config"))
-			print(str(type(err)))
-			print(str(err))
-			print(str((err.args)))
-			print(str(""))
+			debugtestError(err)
 			err = None
 			del err
 			theResult = False
@@ -369,6 +382,7 @@ class ConfigTestSuite(unittest.TestCase):
 	def test_case_read_default_baseconfig(self):
 		"""Tests the write default configuration functions"""
 		theResult = False
+		test_path = str("{}.cnf").format(str(random_file_path()))
 		try:
 			from piaplib import pku as pku
 			if pku.__name__ is None:
@@ -379,7 +393,6 @@ class ConfigTestSuite(unittest.TestCase):
 			from pku import config as config
 			if config.__name__ is None:
 				raise ImportError("Failed to import config")
-			test_path = str("/tmp/test_baseconfig.cnf")
 			self.assertTrue(
 				config.writeMainConfigFile(test_path),
 				baseconfig.getDefaultMainConfigFile()
@@ -391,15 +404,11 @@ class ConfigTestSuite(unittest.TestCase):
 			)
 			theResult = True
 		except Exception as err:
-			print(str(""))
-			print(str("Error in test of default config"))
-			print(str(type(err)))
-			print(str(err))
-			print(str((err.args)))
-			print(str(""))
+			debugtestError(err)
 			err = None
 			del err
 			theResult = False
+		clean_temp_file(test_path)
 		assert theResult
 
 	def test_case_yaml_read_write_file(self):
@@ -471,12 +480,7 @@ class ConfigTestSuite(unittest.TestCase):
 				theResult = (not config.writeYamlFile(somefile, None))
 				print(str("SKIPPED: no yaml support"))
 		except Exception as err:
-			print(str(""))
-			print(str("Error in test of yaml write-read"))
-			print(str(type(err)))
-			print(str(err))
-			print(str((err.args)))
-			print(str(""))
+			debugtestError(err)
 			err = None
 			del err
 			theResult = False

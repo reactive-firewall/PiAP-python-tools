@@ -37,7 +37,7 @@ def getDefaultMainConfigFile():
 		default_config = dict({
 			'PiAP-logging': dict({
 				'mode': str("stdout"),
-				'level': str("debug"),
+				'level': str("info"),
 				'dir': str("/var/log"),
 				'keyfile': repr(None),
 				'encryptlogs': repr(False)
@@ -62,7 +62,11 @@ def getDefaultMainConfigFile():
 
 def isLoaded():
 	"""returns False. Overloaded by config class."""
-	return getDefaultMainConfigFile()['PiAP-piaplib']['loaded']
+	theResult = False
+	try:
+		theResult = globals()['getMainConfig']()['PiAP-piaplib']['loaded']
+	finally:
+		return theResult
 
 
 def mergeDicts(*dict_args):
@@ -81,14 +85,14 @@ def mergeDicts(*dict_args):
 
 def __config_data_from_kvp(key, value):
 	"""given a key value pair creates a dictionary configuration."""
-	theWrap = dict({"""__dict__""":None})
+	theWrap = dict({"""__dict__""": None})
 	if str(""".""") not in str(key):
 		if value is None:
 			value = dict({})
-		theWrap = dict({key:value})
+		theWrap = dict({key: value})
 	else:
 		kp = str(key).split(""".""")
-		theWrap = dict({str(kp[0]):dict({str(kp[1]):value})})
+		theWrap = dict({str(kp[0]): dict({str(kp[1]): value})})
 	return theWrap
 
 
