@@ -22,12 +22,12 @@
 global __version__
 
 
-__version__ = """0.3.5"""
+__version__ = """0.3.7"""
 
 
 try:
 	import sys
-	import os
+	import os.path
 	try:
 		if str("piaplib") in __file__:
 			search_list = [
