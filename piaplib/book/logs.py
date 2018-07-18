@@ -149,8 +149,8 @@ class logs(object):
 	logging_color = {
 		'debug': ANSIColors.BLUE, 'info': ANSIColors.GREEN,
 		'warn': ANSIColors.AMBER, 'warning': ANSIColors.AMBER,
-		'error': ANSIColors.FAIL, 'crit': str(ANSIColors.FAIL + ANSIColors.BLINK),
-		'critical': str(str(ANSIColors.FAIL) + str(ANSIColors.BLINK))
+		'error': ANSIColors.FAIL, 'crit': str(str(ANSIColors.BLACK) + str(ANSIColors.REDBG)),
+		'critical': str(str(ANSIColors.BLACK) + str(ANSIColors.REDBG))
 	}
 	"""Mappings from different log levels to colors."""
 
@@ -192,7 +192,7 @@ class logs(object):
 def main(argv=None):
 	"""The Main Event makes no sense to logs yet."""
 	try:
-		raise NotImplementedError("CRITICAL - Pocket Book logs main() not implemented.")
+		raise NotImplementedError("[CWE-758] - Pocket Book logs main() not implemented.")
 	except Exception as err:
 		logs.log(str(type(err)), "Critical")
 		logs.log(str(err), "Critical")
