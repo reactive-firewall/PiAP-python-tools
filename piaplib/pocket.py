@@ -66,10 +66,14 @@ try:
 except Exception:
 	from . import piaplib as piaplib
 
+
 try:
-	from . import book as book
-except Exception:
+	if 'piaplib.book' not in sys.modules:
+		from . import book as book
+except Exception as importErr:
+	del importErr
 	import book as book
+
 
 try:
 	from book.logs import logs as logs
@@ -83,31 +87,42 @@ except Exception:
 		print("")
 		raise ImportError("Error Importing logs")
 
+
 try:
-	from . import pku as pku
-except Exception:
+	if 'piaplib.pku' not in sys.modules:
+		from . import pku as pku
+except Exception as importErr:
+	del importErr
 	import pku as pku
 
-try:
-	from . import keyring as keyring
-except Exception:
-	import keyring as keyring
 
 try:
-	from . import lint as lint
-except Exception:
+	if 'piaplib.keyring' not in sys.modules:
+		from . import keyring as keyring
+except Exception as importErr:
+	del importErr
+	import keyring as keyring
+
+
+try:
+	if 'piaplib.lint' not in sys.modules:
+		from . import lint as lint
+except Exception as importErr:
+	del importErr
 	import lint as lint
+
 
 __prog__ = "pocket"
 """The name of this program is pocket"""
 
+
 POCKET_UNITS = {
-	u'book': book,
-	u'pku': pku,
+	u'book': piaplib.book,
+	u'pku': piaplib.pku,
 	u'protector': None,
 	u'blade': None,
-	u'keyring': keyring,
-	u'lint': lint.lint,
+	u'keyring': piaplib.keyring,
+	u'lint': piaplib.lint.lint,
 	u'fruitsnack': None
 }
 """ The Pocket Knife Units available.
@@ -120,6 +135,7 @@ POCKET_UNITS = {
 	book - the little pocket-book for storage and the like.
 	"""
 
+
 PROTECTOR_OPTIONS = [u'fw', u'ids', u'acl']
 """ The Pocket Knife Unit actions.
 	fw - pocket firewall control.
@@ -127,12 +143,6 @@ PROTECTOR_OPTIONS = [u'fw', u'ids', u'acl']
 	acl -  (FUTURE/RESERVED)
 	"""
 
-LINT_OPTIONS = [u'check', u'nrpe', u'help']
-""" The Pocket Lint Unit actions.
-	check - pocket health checks.
-	nrpe - nagios/sensu/etc. compatible checks (FUTURE/RESERVED)
-	help -  (FUTURE/RESERVED)
-	"""
 
 # etc... (FUTURE/RESERVED)
 
@@ -155,10 +165,12 @@ def parseArgs(arguments=None):
 	return parser.parse_known_args(arguments)
 
 
-def useTool(tool, arguments=[None]):
+def useTool(tool, arguments=None):
 	"""Handler for launching pocket-tools."""
 	if tool is None:
 		return None
+	if arguments is None:
+		arguments = [None]
 	if tool in POCKET_UNITS.keys():
 		try:
 			try:
