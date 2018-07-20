@@ -239,6 +239,43 @@ except Exception:
 	pass
 
 
+def getHandle(handler):
+	for someFunc in locals().copy().keys():
+		if handler == locals()[someFunc]:
+			handle = someFunc
+	for theFunc in globals().copy().keys():
+		if handler == globals()[theFunc]:
+			handle = theFunc
+	return handle
+
+
+def getHandler(handle):
+	possibles = globals().copy()
+	# possibles.update(globals()['__builtins__'].__dict__)
+	possibles.update(locals())
+	handler = possibles.get(handle)
+	if handler is None:
+		raise NotImplementedError(str("Function {} not implemented").format(str(handle)))
+	return handler
+
+
+def prepforStore(rawValue):
+	"""pack value for storage"""
+	taint_value = str(rawValue)
+	if not (str('"') in taint_value[0] or str("""'""") in taint_value[0]):
+		if str("""(""") in taint_value[0] or str("""[""") in taint_value[0]:
+			taint_value = repr(rawValue)
+		elif str("""{""") in taint_value[0]:
+			taint_value = repr(rawValue)
+		elif str(True) in taint_value[:6]:
+			taint_value = repr(True)
+		elif str(False) in taint_value[:7]:
+			taint_value = repr(False)
+		elif str("""<function""") in taint_value[0:9]:
+			taint_value = getHandle(str(rawValue))
+	return taint_value
+
+
 class dictParser(configparser.ConfigParser):
 	"""adds as_dict() to ConfigParser"""
 	@remediation.error_handling
@@ -250,6 +287,21 @@ class dictParser(configparser.ConfigParser):
 			theResult[somekey].pop('__name__', None)
 		return theResult
 
+	@remediation.error_passing
+	def keys(self):
+		"""see dict.keys()"""
+		return self.as_dict().keys()
+
+	@remediation.error_passing
+	def allkeys(self):
+		"""see dict.keys()"""
+		theResult = []
+		for section in self.sections():
+			theResult.append(str(section))
+			for option in self.options(section):
+				theResult.append(str("""{sec}.{opt}""").format(sec=section, opt=option))
+		return theResult
+
 	def __getitem__(self, key):
 		try:
 			import six
@@ -257,7 +309,7 @@ class dictParser(configparser.ConfigParser):
 				if key == 'sections':
 					return self.sections
 				elif not (str(key).upper() == str("DEFAULT")):
-					return self.as_dict()[key]
+					return self.as_dict().__getitem__(key)
 				else:
 					return super(dictParser, self)._getitem__(self, key)
 			else:
@@ -269,6 +321,7 @@ class dictParser(configparser.ConfigParser):
 				return self.as_dict()[key]
 			else:
 				return super(dictParser, self)._getitem__(self, key)
+		raise AttributeError(str("<Class dictParser> has not attribute {}").format(str(key)))
 
 	def read_dict(self, dictionary, source='<dict>'):
 		try:
@@ -309,7 +362,6 @@ class dictParser(configparser.ConfigParser):
 
 @remediation.error_handling
 def getDefaultMainConfigFile():
-	import os
 	# logging['timefmt'] = str("""%a %b %d %H:%M:%S %Z %Y""")
 	default_config = dict({
 		'PiAP-rand': dict({
@@ -380,10 +432,14 @@ def reloadConfigCache(confFile=None):
 @remediation.error_passing
 def isLoaded():
 	"""True if config is loaded."""
+	isLoadable = False
+	isCached = False
 	if (getMainConfig() is not None):
 		isLoadable = True
-	if (getMainConfig()['PiAP-piaplib']['loaded'] is not False):
-		isCached = True
+		if (getMainConfig()['PiAP-piaplib']['loaded'] is True):
+			isCached = True
+		elif (getMainConfig()['PiAP-piaplib']['loaded'] is repr(True)):
+			isCached = True
 	return ((isLoadable and isCached) is True)
 
 
@@ -543,40 +599,6 @@ def loadMainConfigFile(confFile=None):
 	return result_config
 
 
-def getHandle(handler):
-	for someFunc in locals().copy().keys():
-		if handler == locals()[someFunc]:
-			handle = someFunc
-	for theFunc in globals().copy().keys():
-		if handler == globals()[theFunc]:
-			handle = theFunc
-	return handle
-
-
-def getHandler(handle):
-	possibles = globals().copy()
-	# possibles.update(globals()['__builtins__'].__dict__)
-	possibles.update(locals())
-	handler = possibles.get(handle)
-	if handler is None:
-		raise NotImplementedError(str("Function {} not implemented").format(str(handle)))
-	return handler
-
-
-def prepforStore(rawValue):
-	"""pack value for storage"""
-	taint_value = str(rawValue)
-	if str('"') in taint_value[0] or str("""'""") in taint_value[0]:
-		taint_value = repr(taint_value)
-	elif str("""(""") in taint_value[0] or str("""[""") in taint_value[0]:
-		taint_value = repr(rawValue)
-	elif str("""{""") in taint_value[0]:
-		taint_value = repr(rawValue)
-	elif str("""<function""") in taint_value[0:9]:
-		taint_value = getHandle(str(rawValue))
-	return taint_value
-
-
 _PIAP_KVP_GET_KEY = str("""PiAP-piaplib.config_accessors""")
 
 
@@ -622,8 +644,19 @@ def defaultGetter(key, defaultValue=None, initIfEmpty=False):
 			kp = str(key).split(""".""")
 			theValue = full_config_data[kp[0]][kp[1]]
 	try:
-		if str("[") in str(theValue)[0] or str("(") in str(theValue)[0]:
-			theValue = ast.literal_eval(repr('"' * 3)[1:4] + repr(theValue) + repr('"' * 3)[1:4])
+		if repr(True) in str(theValue)[:6]:
+			taint_value = True
+		elif repr(False) in str(theValue)[:7]:
+			taint_value = False
+		elif str("[") in str(theValue)[0] or str("(") in str(theValue)[0]:
+			if str("[]") in str(theValue) and str(theValue) in str("[]"):
+				theValue = []
+			elif str("()") in str(theValue) and str(theValue) in str("()"):
+				theValue = tuple(())
+			else:
+				theValue = ast.literal_eval(repr('"' * 3)[1:4] + str(theValue) + repr('"' * 3)[1:4])
+				if not isinstance(theValue, tuple) and not isinstance(theValue, list):
+					theValue = ast.literal_eval(theValue)
 		elif str("{") in str(theValue)[0]:
 			if str("{}") in str(theValue) and str(theValue) in str("{}"):
 				theValue = dict({})
@@ -632,16 +665,18 @@ def defaultGetter(key, defaultValue=None, initIfEmpty=False):
 				if not isinstance(theValue, dict):
 					theValue = ast.literal_eval(theValue)
 	except Exception as err:
-		remediation.error_breakpoint(err, context=dict)
+		remediation.error_breakpoint(err, context=defaultGetter)
+		print(str(type(theValue)))
+		print(repr(theValue))
 	return theValue
 
 
-def defaultSetter(key, newValue=None):
+def defaultSetter(key, value=None):
 	"""the default configuration setter for most keys."""
-	if newValue is None:
+	if value is None:
 		theValue = repr(None)
 	else:
-		theValue = newValue
+		theValue = prepforStore(value)
 	if not isLoaded():
 		reloadConfigCache()
 	main_config = getMainConfig().as_dict()
@@ -655,8 +690,8 @@ def getConfigValue(*args, **kwargs):
 	"""API accessor function for configs"""
 	config_getters = defaultGetter(key=_PIAP_KVP_GET_KEY, defaultValue=_empty_kvp_getters())
 	try:
-		if (str(kwargs['key']) in config_getters.keys()):
-			return getHandler(config_getters[str(kwargs['key'])])(*args, **kwargs)
+		if (str(kwargs["""key"""]) in config_getters.keys()):
+			return getHandler(config_getters[str(kwargs["""key"""])])(*args, **kwargs)
 		else:
 			return defaultGetter(*args, **kwargs)
 	except Exception as err:
@@ -670,18 +705,20 @@ def getConfigValue(*args, **kwargs):
 
 def setConfigValue(*args, **kwargs):
 	"""API Modifier function for configs"""
-	config_setters = defaultGetter(key=_PIAP_KVP_SET_KEY, defaultValue=_empty_kvp_setters())
 	try:
+		config_setters = defaultGetter(key=_PIAP_KVP_SET_KEY, defaultValue=_empty_kvp_setters())
 		if (str(kwargs['key']) in config_setters.keys()):
 			return getHandler(config_setters[str(kwargs['key'])])(*args, **kwargs)
 		else:
 			return defaultSetter(*args, **kwargs)
 	except Exception as err:
-		remediation.error_breakpoint(err, getConfigValue)
+		remediation.error_breakpoint(err, context=setConfigValue)
 		print(repr(config_setters))
 		print(str(config_setters))
 		print(str(type(config_setters)))
-		return None
+		raise NotImplementedError(
+			"""[CWE-758] piaplib.pku.config.setConfigValue(*args, **kwargs) not implemented."""
+		)
 
 
 def configRegisterKeyValueFactory(*args, **kwargs):
@@ -692,7 +729,7 @@ def configRegisterKeyValueFactory(*args, **kwargs):
 	)
 	newValue = dict({kwargs['key']: getHandle(kwargs['getter'])})
 	new_KeyValueFactory_data = baseconfig.mergeDicts(config_getters, newValue)
-	defaultSetter(key=str("""PiAP-piaplib.config_accessors"""), newValue=new_KeyValueFactory_data)
+	defaultSetter(key=str("""PiAP-piaplib.config_accessors"""), value=new_KeyValueFactory_data)
 	if str('setter') in kwargs.keys():
 		config_setters = defaultGetter(
 			_PIAP_KVP_SET_KEY,
@@ -701,7 +738,7 @@ def configRegisterKeyValueFactory(*args, **kwargs):
 		newValue = dict({kwargs['key']: getHandle(kwargs['setter'])})
 		new_KeyValueFactory_data = baseconfig.mergeDicts(config_setters, newValue)
 		defaultSetter(
-			key=str("""PiAP-piaplib.config_modifiers"""), newValue=new_KeyValueFactory_data
+			key=str("""PiAP-piaplib.config_modifiers"""), value=new_KeyValueFactory_data
 		)
 
 
@@ -743,15 +780,21 @@ def getMainConfigWithArgs(*args, **kwargs):
 	return cache_config
 
 
-def printMainConfig(*args, **kwargs):
+def bootstrapconfig(*args, **kwargs):
+	"""loads the config"""
 	temp_config = getMainConfigWithArgs(*args, **kwargs)
 	temp = temp_config.as_dict()
 	for section in temp.keys():
-		for thekey in temp[section].keys():
+		for thekey in temp_config.options(section):
 			if getConfigValue(key=str("{}.{}").format(str(section), str(thekey))) is None:
 				configRegisterKeyValueFactory(
 					key=str("{}.{}").format(str(section), str(thekey)), getter=defaultGetter
 				)
+	return
+
+
+def printMainConfig(*args, **kwargs):
+	bootstrapconfig(*args, **kwargs)
 	temp_config = getMainConfigWithArgs(*args, **kwargs)
 	temp = temp_config.as_dict()
 	section_color = str("")
