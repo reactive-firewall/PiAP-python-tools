@@ -59,7 +59,8 @@ def random_file_path():
 	if keyring.__name__ is None:
 		raise ImportError("Failed to import keyring")
 	from piaplib.keyring import rand as rand
-	return str("""config_{someInt}_temp_file.tmp""").format(someInt=rand.randInt())
+	rOut = str("""config_{someInt}_temp_file.tmp""").format(someInt=rand.randInt())
+	return rOut
 
 
 def clean_temp_file(someFile):
@@ -342,21 +343,17 @@ class ConfigTestSuite(unittest.TestCase):
 				raise ImportError("Failed to import config")
 			self.assertIsNotNone(config.loadMainConfigFile(test_path))
 			self.assertIsNotNone(config.isLoaded())
-			if config.getConfigValue(key=str("{}.{}").format(str('PiAP-piaplib'), str('loaded'))) is not True:
-				self.assertFalse(config.getConfigValue(key=str("{}.{}").format(str('PiAP-piaplib'), str('loaded'))))
-			else:
-				self.assertEqual(
-					config.isLoaded(),
-					config.getConfigValue(key=str("{}.{}").format(str('PiAP-piaplib'), str('loaded')))
-				)
+			test_key = str("""PiAP-piaplib.loaded""")
+			self.assertEqual(
+				config.isLoaded(),
+				config.getConfigValue(key=test_key)
+			)
 			self.maxDiff = None
 			test_key = str("""unitTests.testkey""")
-			test_key_value = str(random_file_path())
+			test_key_value = str("""{}""").format(random_file_path())
 			config.setConfigValue(key=test_key, value=test_key_value)
-			self.assertEqual(
-				str(test_key_value),
-				str(config.getConfigValue(key=test_key))
-			)
+			self.assertTrue(config.isLoaded())
+			self.assertEqual(config.getConfigValue(key=test_key), test_key_value)
 			theResult = True
 		except Exception as err:
 			debugtestError(err)

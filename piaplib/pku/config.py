@@ -273,6 +273,8 @@ def prepforStore(rawValue):
 			taint_value = repr(False)
 		elif str("""<function""") in taint_value[0:9]:
 			taint_value = getHandle(str(rawValue))
+	else:
+		taint_value = utils.literal_str(rawValue)
 	return taint_value
 
 
@@ -301,6 +303,16 @@ class dictParser(configparser.ConfigParser):
 			for option in self.options(section):
 				theResult.append(str("""{sec}.{opt}""").format(sec=section, opt=option))
 		return theResult
+	
+	def copy(self):
+		"""see obj.copy()"""
+		theCopy = dictParser()
+		for copysection in self.sections():
+			if not (str(copysection).upper() == str("DEFAULT")):
+				theCopy.add_section(copysection)
+			for copyoption in self.options(copysection):
+				theCopy.set(copysection, copyoption, self.get(copysection, copyoption))
+		return theCopy
 
 	def __getitem__(self, key):
 		try:
@@ -410,11 +422,27 @@ def _raw_setMainConfig(newValue):
 		_MAIN_CONFIG_DATA = None
 
 
+def _raw_getConfigPath():
+	"""gets raw global _MAIN_CONFIG_DATA source path"""
+	confFile = str("""/opt/PiAP/PiAP.conf""")
+	if _raw_getMainConfig() is not None:
+		if not _raw_getMainConfig().has_section("""PiAP-piaplib"""):
+			_raw_getMainConfig().add_section("""PiAP-piaplib""")
+		if _raw_getMainConfig().has_option("""PiAP-piaplib""", """config"""):
+			confFile = _raw_getMainConfig().get('PiAP-piaplib', 'config')
+		else:
+			_raw_getMainConfig().set('PiAP-piaplib', 'config', confFile)
+	return confFile
+
+
 @remediation.error_handling
 def getMainConfig(confFile=None):
 	if confFile is None:
-		confFile = str('/opt/PiAP/PiAP.conf')
-	if _raw_getMainConfig() is None:
+		confFile = _raw_getConfigPath()
+	cacheIsAMiss = True
+	if _raw_getMainConfig() is not None:
+		cacheIsAMiss = (_raw_getMainConfig().getboolean('PiAP-piaplib', 'loaded') is False)
+	if cacheIsAMiss is True:
 		tempValue = loadMainConfigFile(confFile)
 		tempValue['PiAP-piaplib']['loaded'] = True
 		_raw_setMainConfig(newValue=tempValue)
@@ -443,11 +471,16 @@ def isLoaded():
 	return ((isLoadable and isCached) is True)
 
 
+def __builtin_isLoaded(*args, **kwargs):
+	"""wrapper function for isLoaded()"""
+	return isLoaded()
+
+
 @remediation.error_passing
 def invalidateConfigCache():
 	"""if config is loaded marks as not loaded."""
-	tempValue = getMainConfig().deep_copy()
-	tempValue['PiAP-piaplib']['loaded'] = False
+	tempValue = getMainConfig().copy()
+	tempValue.set('PiAP-piaplib', 'loaded', repr(False))
 	_raw_setMainConfig(newValue=tempValue)
 
 
@@ -479,7 +512,7 @@ def hasMainConfigOptionFor(mainSectionKey=None):
 @remediation.error_handling
 def writeDefaultMainConfigFile(confFile=None):
 	if confFile is None:
-		confFile = str('/opt/PiAP/PiAP.conf')
+		confFile = _raw_getConfigPath()
 	theResult = False
 	if writeMainConfigFile(confFile, getDefaultMainConfigFile()):
 		theResult = True
@@ -545,7 +578,7 @@ def writeMainConfigFile(confFile=None, config_data=None):
 	try:
 		mainConfig = dictParser(allow_no_value=True)
 		if confFile is None:
-			confFile = str('/opt/PiAP/PiAP.conf')
+			confFile = _raw_getConfigPath()
 		default_config = loadMainConfigFile(confFile)
 		mainConfig = mergeConfigParser(mainConfig, config_data, True)
 		mainConfig = mergeConfigParser(mainConfig, default_config, False)
@@ -581,22 +614,33 @@ def readIniFile(filename, theparser=None):
 	return theparser
 
 
+_PIAP_KVP_CONF_KEY = str("""PiAP-piaplib.config""")
+
+
 @remediation.error_handling
 def loadMainConfigFile(confFile=None):
 	if confFile is None:
-		confFile = str('/opt/PiAP/PiAP.conf')
+		confFile = _raw_getConfigPath()
 	try:
 		emptyConfig = dictParser(allow_no_value=True)
 		result_config = getDefaultMainConfigFile()
 		if utils.xisfile(str(confFile)):
-			mainConfig = readIniFile(str(confFile), emptyConfig)
+			mainConfig = readIniFile(str(_PIAP_KVP_CONF_KEY), emptyConfig)
 			result_config = parseConfigParser(result_config, mainConfig, True)
+			baseconfig.__config_data_from_kvp(key, confFile)
+			full_config_data = baseconfig.mergeDicts(main_config, new_config_data)
 	except Exception as err:
 		print(str(err))
 		print(str(type(err)))
 		print(str((err.args)))
 		return getDefaultMainConfigFile()
 	return result_config
+
+
+_PIAP_KVP_LOAD_KEY = str("""PiAP-piaplib.loaded""")
+
+
+_PIAP_KVP_GET_LOAD = str("""__builtin_isLoaded""")
 
 
 _PIAP_KVP_GET_KEY = str("""PiAP-piaplib.config_accessors""")
@@ -615,7 +659,8 @@ def _empty_kvp_getters():
 	"""returns an empty get-set kvp encoded dict for get (THIS DOC COULD BE IMPROVED)"""
 	return dict({
 		_PIAP_KVP_GET_KEY: _PIAP_KVP_GET_DEFAULT,
-		_PIAP_KVP_SET_KEY: _PIAP_KVP_GET_DEFAULT
+		_PIAP_KVP_SET_KEY: _PIAP_KVP_GET_DEFAULT,
+		_PIAP_KVP_LOAD_KEY: _PIAP_KVP_GET_LOAD
 	})
 
 
@@ -623,7 +668,8 @@ def _empty_kvp_setters():
 	"""returns an empty get-set kvp encoded dict for get (THIS DOC COULD BE IMPROVED)"""
 	return dict({
 		_PIAP_KVP_GET_KEY: _PIAP_KVP_SET_DEFAULT,
-		_PIAP_KVP_SET_KEY: _PIAP_KVP_SET_DEFAULT
+		_PIAP_KVP_SET_KEY: _PIAP_KVP_SET_DEFAULT,
+		_PIAP_KVP_LOAD_KEY: _PIAP_KVP_SET_DEFAULT
 	})
 
 
@@ -632,22 +678,17 @@ def defaultGetter(key, defaultValue=None, initIfEmpty=False):
 	"""the default configuration getter for most keys."""
 	theValue = defaultValue
 	if hasMainConfigOptionFor(key):
-		main_config = getMainConfig().as_dict()
-		default_config_data = baseconfig.__config_data_from_kvp(key, defaultValue)
-		if initIfEmpty is True:
-			full_config_data = baseconfig.mergeDicts(main_config, default_config_data)
-		else:
-			full_config_data = baseconfig.mergeDicts(default_config_data, main_config)
+		main_config = getMainConfig()
 		if str(""".""") not in str(key):
-			theValue = full_config_data[key]
+			theValue = main_config.as_dict()[key]
 		else:
 			kp = str(key).split(""".""")
-			theValue = full_config_data[kp[0]][kp[1]]
+			theValue = main_config.get(kp[0], kp[1])
 	try:
 		if repr(True) in str(theValue)[:6]:
-			taint_value = True
+			theValue = True
 		elif repr(False) in str(theValue)[:7]:
-			taint_value = False
+			theValue = False
 		elif str("[") in str(theValue)[0] or str("(") in str(theValue)[0]:
 			if str("[]") in str(theValue) and str(theValue) in str("[]"):
 				theValue = []
@@ -680,7 +721,7 @@ def defaultSetter(key, value=None):
 	if not isLoaded():
 		reloadConfigCache()
 	main_config = getMainConfig().as_dict()
-	new_config_data = baseconfig.__config_data_from_kvp(key, repr(theValue))
+	new_config_data = baseconfig.__config_data_from_kvp(key, theValue)
 	full_config_data = baseconfig.mergeDicts(main_config, new_config_data)
 	writeMainConfigFile(config_data=full_config_data)
 	invalidateConfigCache()
@@ -764,11 +805,6 @@ def configKeyValueSETFactory(*kvpargs, **kvpkwargs):
 			return fn(*args, **kwargs)
 		return decorated
 	return decorator
-
-
-@configKeyValueGETFactory(key="PiAP-piaplib.loaded")
-def __builtin_isLoaded(*args, **kwargs):
-	return isLoaded()
 
 
 def getMainConfigWithArgs(*args, **kwargs):
@@ -959,4 +995,4 @@ if __name__ in u'__main__':
 	exit(3)
 else:
 	if isLoaded() is False:
-		reloadConfigCache()
+		reloadConfigCache(_raw_getConfigPath())
