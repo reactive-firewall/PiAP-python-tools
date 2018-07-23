@@ -35,6 +35,8 @@ def main(argv=None):
 	try:
 		if 'piaplib.book.__main__' not in sys.modules:
 			from piaplib.book import __main__
+			if __main__.__name__ is None:
+				raise ImportError("Failed to import piaplib.book.__main__")
 	except Exception as importErr:
 		del importErr
 		import piaplib.book.__main__

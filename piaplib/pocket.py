@@ -73,7 +73,8 @@ try:
 except Exception as importErr:
 	del importErr
 	import book as book
-
+	if book.__name__ is None:
+		raise ImportError(str(u'Failed to open Pocket Book'))
 
 try:
 	from book.logs import logs as logs
@@ -94,7 +95,8 @@ try:
 except Exception as importErr:
 	del importErr
 	import pku as pku
-
+	if pku.__name__ is None:
+		raise ImportError(str(u'Failed to open Pocket Knife Unit'))
 
 try:
 	if 'piaplib.keyring' not in sys.modules:
@@ -102,7 +104,8 @@ try:
 except Exception as importErr:
 	del importErr
 	import keyring as keyring
-
+	if keyring.__name__ is None:
+		raise ImportError(str(u'Failed to find Pocket Keyring'))
 
 try:
 	if 'piaplib.lint' not in sys.modules:
@@ -110,7 +113,8 @@ try:
 except Exception as importErr:
 	del importErr
 	import lint as lint
-
+	if lint.__name__ is None:
+		raise ImportError(str(u'Failed to gather Pocket Lint'))
 
 __prog__ = "pocket"
 """The name of this program is pocket"""

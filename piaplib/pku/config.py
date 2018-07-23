@@ -95,6 +95,31 @@ __epilog__ = """basically a python wrapper for configuration I/O."""
 """...basically a python wrapper for pip install --upgrade."""
 
 
+_PIAP_KVP_CONF_KEY = str("""PiAP-piaplib.config""")
+"""Cannonical key for PiAP-piaplib.config"""
+
+
+_PIAP_KVP_LOAD_KEY = str("""PiAP-piaplib.loaded""")
+"""Cannonical key for PiAP-piaplib.loaded"""
+
+
+_PIAP_KVP_GET_LOAD = str("""__builtin_isLoaded""")
+
+
+_PIAP_KVP_GET_KEY = str("""PiAP-piaplib.config_accessors""")
+"""Cannonical key for PiAP-piaplib.config_accessors"""
+
+
+_PIAP_KVP_GET_DEFAULT = str("""defaultGetter""")
+
+
+_PIAP_KVP_SET_KEY = str("""PiAP-piaplib.config_modifiers""")
+"""Cannonical key for PiAP-piaplib.config_modifiers"""
+
+
+_PIAP_KVP_SET_DEFAULT = str("""defaultSetter""")
+
+
 _MAIN_CONFIG_DATA = None
 
 
@@ -303,7 +328,7 @@ class dictParser(configparser.ConfigParser):
 			for option in self.options(section):
 				theResult.append(str("""{sec}.{opt}""").format(sec=section, opt=option))
 		return theResult
-	
+
 	def copy(self):
 		"""see obj.copy()"""
 		theCopy = dictParser()
@@ -614,11 +639,9 @@ def readIniFile(filename, theparser=None):
 	return theparser
 
 
-_PIAP_KVP_CONF_KEY = str("""PiAP-piaplib.config""")
-
-
 @remediation.error_handling
 def loadMainConfigFile(confFile=None):
+	"""loads the given config file into the main config cache for global use."""
 	if confFile is None:
 		confFile = _raw_getConfigPath()
 	try:
@@ -627,32 +650,14 @@ def loadMainConfigFile(confFile=None):
 		if utils.xisfile(str(confFile)):
 			mainConfig = readIniFile(str(_PIAP_KVP_CONF_KEY), emptyConfig)
 			result_config = parseConfigParser(result_config, mainConfig, True)
-			baseconfig.__config_data_from_kvp(key, confFile)
-			full_config_data = baseconfig.mergeDicts(main_config, new_config_data)
+			reflect_config_data = baseconfig.__config_data_from_kvp(_PIAP_KVP_CONF_KEY, confFile)
+			result_config = baseconfig.mergeDicts(result_config, reflect_config_data)
 	except Exception as err:
 		print(str(err))
 		print(str(type(err)))
 		print(str((err.args)))
 		return getDefaultMainConfigFile()
 	return result_config
-
-
-_PIAP_KVP_LOAD_KEY = str("""PiAP-piaplib.loaded""")
-
-
-_PIAP_KVP_GET_LOAD = str("""__builtin_isLoaded""")
-
-
-_PIAP_KVP_GET_KEY = str("""PiAP-piaplib.config_accessors""")
-
-
-_PIAP_KVP_GET_DEFAULT = str("""defaultGetter""")
-
-
-_PIAP_KVP_SET_KEY = str("""PiAP-piaplib.config_modifiers""")
-
-
-_PIAP_KVP_SET_DEFAULT = str("""defaultSetter""")
 
 
 def _empty_kvp_getters():

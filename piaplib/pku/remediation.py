@@ -140,27 +140,6 @@ def error_handling(func):
 	return safety_func
 
 
-def special_error_handling(func, errorReturnValue=None):
-	"""Runs a function in try-except"""
-	if errorReturnValue is None:
-		errorReturnValue = None
-	
-	@functools.wraps(func)
-	def safety_func(*args, **kwargs):
-		"""Wraps a function in try-except"""
-		theOutput = None
-		try:
-			theOutput = func(*args, **kwargs)
-		except Exception as err:
-			error_breakpoint(error=err, context=func)
-			theOutput = errorReturnValue
-			err = None
-			del err
-		return theOutput
-	
-	return safety_func
-
-
 def bug_handling(func):
 	"""Runs a function in try-except"""
 
