@@ -284,6 +284,7 @@ def getHandler(handle):
 	return handler
 
 
+@remediation.error_handling
 def prepforStore(rawValue):
 	"""pack value for storage"""
 	taint_value = str(rawValue)
@@ -358,13 +359,13 @@ class dictParser(configparser.ConfigParser):
 				return self.as_dict()[key]
 			else:
 				return super(dictParser, self)._getitem__(self, key)
-		raise AttributeError(str("<Class dictParser> has not attribute {}").format(str(key)))
+		raise AttributeError(str("<Class dictParser> has no attribute {}").format(str(key)))
 
 	def read_dict(self, dictionary, source='<dict>'):
 		try:
 			import six
 			if six.PY2:
-				for someSection in dictionary.keys():
+				for someSection in dictionary.keys(): 
 					if not self.has_section(someSection) and str(someSection) not in str("DEFAULT"):
 						self.add_section(someSection)
 					for someOption in dictionary[someSection].keys():
@@ -395,6 +396,7 @@ class dictParser(configparser.ConfigParser):
 							someSection, someOption,
 							repr(dictionary[someSection][someOption])
 						)
+		return self
 
 
 @remediation.error_handling
@@ -454,9 +456,9 @@ def _raw_getConfigPath():
 		if not _raw_getMainConfig().has_section("""PiAP-piaplib"""):
 			_raw_getMainConfig().add_section("""PiAP-piaplib""")
 		if _raw_getMainConfig().has_option("""PiAP-piaplib""", """config"""):
-			confFile = _raw_getMainConfig().get('PiAP-piaplib', 'config')
+			confFile = _raw_getMainConfig().get("""PiAP-piaplib""", """config""")
 		else:
-			_raw_getMainConfig().set('PiAP-piaplib', 'config', confFile)
+			_raw_getMainConfig().set("""PiAP-piaplib""", """config""", confFile)
 	return confFile
 
 
@@ -466,23 +468,27 @@ def getMainConfig(confFile=None):
 		confFile = _raw_getConfigPath()
 	cacheIsAMiss = True
 	if _raw_getMainConfig() is not None:
-		cacheIsAMiss = (_raw_getMainConfig().getboolean('PiAP-piaplib', 'loaded') is False)
+		if _raw_getMainConfig().has_option("""PiAP-piaplib""", """config"""):
+			cacheIsAMiss = (_raw_getMainConfig().getboolean('PiAP-piaplib', 'loaded') is False)
 	if cacheIsAMiss is True:
 		tempValue = loadMainConfigFile(confFile)
 		tempValue['PiAP-piaplib']['loaded'] = True
-		_raw_setMainConfig(newValue=tempValue)
+		_raw_setMainConfig(tempValue)
 	return _raw_getMainConfig()
 
 
-@remediation.error_passing
+@remediation.error_handling
 def reloadConfigCache(confFile=None):
-	tempValue = loadMainConfigFile(confFile)
-	tempValue['PiAP-piaplib']['loaded'] = True
-	_raw_setMainConfig(newValue=tempValue)
-	return
+	try:
+		tempValue = loadMainConfigFile(confFile)
+		tempValue['PiAP-piaplib']['loaded'] = True
+		_raw_setMainConfig(tempValue)
+	except Exception as err:
+		remediation.error_breakpoint(error=err, context=reloadConfigCache)
+		return False
+	return True
 
 
-@remediation.error_passing
 def isLoaded():
 	"""True if config is loaded."""
 	isLoadable = False
@@ -506,7 +512,7 @@ def invalidateConfigCache():
 	"""if config is loaded marks as not loaded."""
 	tempValue = getMainConfig().copy()
 	tempValue.set('PiAP-piaplib', 'loaded', repr(False))
-	_raw_setMainConfig(newValue=tempValue)
+	_raw_setMainConfig(tempValue)
 
 
 @remediation.error_handling
@@ -551,6 +557,7 @@ def mergeConfigParser(theConfig=None, config_data=None, overwrite=False):
 	param theConfig - configparser.ConfigParser the ConfigParser.
 	param config_data - dict the configuration to merge.
 	param overwrite - boolean determining if the dict is record of truth or if theConfig is.
+	returns dictParser
 	"""
 
 	def helper_func(parser, section, option, value):
@@ -579,22 +586,24 @@ def mergeConfigParser(theConfig=None, config_data=None, overwrite=False):
 
 @remediation.error_handling
 def parseConfigParser(config_data=None, theConfig=None, overwrite=True):
-	"""
-	Merges the configparser into the Configuration Dictionary.
-	param config_data - dict the configuration to merge.
-	param theConfig - configparser.ConfigParser the ConfigParser.
-	param overwrite - boolean determining if the dict is record of truth or if theConfig is.
-	"""
-	if config_data is None:
-		config_data = dict({})
-	if theConfig is not None:
-		for someSection in theConfig.sections():
-			if str(someSection) not in config_data.keys():
-				config_data[someSection] = dict({})
-			for someOption in theConfig.options(someSection):
-				if str(someOption) not in config_data[someSection].keys() or (overwrite is True):
-					config_data[someSection][someOption] = theConfig.get(someSection, someOption)
-	return config_data
+	return baseconfig.parseConfigParser(config_data, theConfig, overwrite)
+#	"""
+#	Merges the configparser into the Configuration Dictionary.
+#	param config_data - dict the configuration to merge.
+#	param theConfig - configparser.ConfigParser the ConfigParser.
+#	param overwrite - boolean determining if the dict is record of truth or if theConfig is.
+#	returns dict
+#	"""
+#	if config_data is None:
+#		config_data = dict({})
+#	if theConfig is not None:
+#		for someSection in theConfig.sections():
+#			if str(someSection) not in config_data.keys():
+#				config_data[someSection] = dict({})
+#			for someOption in theConfig.options(someSection):
+#				if str(someOption) not in config_data[someSection].keys() or (overwrite is True):
+#					config_data[someSection][someOption] = theConfig.get(someSection, someOption)
+#	return config_data
 
 
 @remediation.error_handling
@@ -624,6 +633,8 @@ def writeMainConfigFile(confFile=None, config_data=None):
 @remediation.error_handling
 def readIniFile(filename, theparser=None):
 	""" cross-python load function """
+	if filename is None:
+		filename = _raw_getConfigPath()
 	with utils.open_func(file=filename, mode=u'r', encoding=u'utf-8') as configfile:
 		try:
 			import six
@@ -644,19 +655,20 @@ def loadMainConfigFile(confFile=None):
 	"""loads the given config file into the main config cache for global use."""
 	if confFile is None:
 		confFile = _raw_getConfigPath()
+	result_config = None
 	try:
 		emptyConfig = dictParser(allow_no_value=True)
-		result_config = getDefaultMainConfigFile()
+		default_config = getDefaultMainConfigFile()
 		if utils.xisfile(str(confFile)):
-			mainConfig = readIniFile(str(_PIAP_KVP_CONF_KEY), emptyConfig)
-			result_config = parseConfigParser(result_config, mainConfig, True)
+			mainConfig = readIniFile(str(confFile), emptyConfig)
+			result_config = parseConfigParser(default_config, mainConfig, overwrite=True)
 			reflect_config_data = baseconfig.__config_data_from_kvp(_PIAP_KVP_CONF_KEY, confFile)
 			result_config = baseconfig.mergeDicts(result_config, reflect_config_data)
 	except Exception as err:
 		print(str(err))
 		print(str(type(err)))
 		print(str((err.args)))
-		return getDefaultMainConfigFile()
+		result_config = getDefaultMainConfigFile()
 	return result_config
 
 
@@ -724,7 +736,7 @@ def defaultSetter(key, value=None):
 	else:
 		theValue = prepforStore(value)
 	if not isLoaded():
-		reloadConfigCache()
+		reloadConfigCache(_raw_getConfigPath())
 	main_config = getMainConfig().as_dict()
 	new_config_data = baseconfig.__config_data_from_kvp(key, theValue)
 	full_config_data = baseconfig.mergeDicts(main_config, new_config_data)
@@ -973,10 +985,10 @@ _CONFIG_CLI_ACTIONS = dict({
 
 @remediation.bug_handling
 def main(argv=None):
-	"""The Main Event. Upgrade Time."""
+	"""The Main Event."""
 	(args, extras) = parseargs(argv)
 	theResult = 1
-	config_path = os.path.abspath(str('/opt/PiAP/PiAP.conf'))
+	config_path = os.path.abspath(_raw_getConfigPath())
 	if args.config_path is not None:
 		config_path = os.path.abspath(str(args.config_path))
 	config_key = None
@@ -989,6 +1001,13 @@ def main(argv=None):
 	return theResult
 
 
+@remediation.error_handling
+def __not_main(*args, **kwargs):
+	"""Not The Main Event."""
+	if isLoaded() is False:
+		reloadConfigCache(_raw_getConfigPath())
+
+
 if __name__ in u'__main__':
 	try:
 		if (sys.argv is not None and (sys.argv is not []) and (len(sys.argv) > 1)):
@@ -999,5 +1018,4 @@ if __name__ in u'__main__':
 		raise ImportError("Error running main")
 	exit(3)
 else:
-	if isLoaded() is False:
-		reloadConfigCache(_raw_getConfigPath())
+	__not_main()
