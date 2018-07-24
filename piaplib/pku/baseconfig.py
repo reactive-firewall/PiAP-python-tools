@@ -64,7 +64,18 @@ def isLoaded():
 	"""returns False. Overloaded by config class."""
 	theResult = False
 	try:
-		theResult = globals()['getMainConfig']()['PiAP-piaplib']['loaded']
+		if globals()['getMainConfig']() is not None:
+			theResult = globals()['getMainConfig']()['PiAP-piaplib']['loaded']
+	finally:
+		return theResult
+
+
+def getMainConfig():
+	"""returns False. Overloaded by config class."""
+	theResult = getDefaultMainConfigFile()
+	try:
+		if globals()['getMainConfig']() is not None:
+			theResult = globals()['getMainConfig']()
 	finally:
 		return theResult
 
@@ -114,6 +125,7 @@ def parseConfigParser(config_data=dict({}), theConfig=None, overwrite=True):
 					if (str(someOpt) not in config_data[someSection].keys()) or (overwrite is True):
 						config_data[someSection][someOpt] = theConfig.get(someSection, someOpt)
 	except Exception as err:
+		print(str("""Error in baseconfig.parseConfigParser"""))
 		print(str(err))
 		print(str(type(err)))
 		print(str((err.args)))
