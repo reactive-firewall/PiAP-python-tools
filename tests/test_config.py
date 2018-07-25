@@ -159,7 +159,7 @@ class ConfigTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
-	def test__case_json_attempt_bad_write_file(self):
+	def test_z_case_json_attempt_bad_write_file(self):
 		"""Tests the JSON write functions with no data. Should return False."""
 		theResult = False
 		try:
@@ -296,7 +296,7 @@ class ConfigTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
-	def test_case_write_default_config(self):
+	def test_a_case_write_default_config(self):
 		""" Tests the default configuration file write (save) functions.
 			config.writeMainConfigFile(test_path) == config.loadMainConfigFile(test_path)
 		"""
@@ -309,16 +309,22 @@ class ConfigTestSuite(unittest.TestCase):
 			from pku import config as config
 			if config.__name__ is None:
 				raise ImportError("Failed to import config")
+			print(str(""" init """))
 			self.assertTrue(
 				config.writeMainConfigFile(test_path),
-				config.getDefaultMainConfigFile()
+				config.getMainConfig(test_path).as_dict()
 			)
-			self.assertIsNotNone(config.loadMainConfigFile(test_path))
+			print(str(""" ... wrote """))
+			config.reloadConfigCache(test_path)
+			test_load = config.loadMainConfigFile(test_path)
+			self.assertIsNotNone(test_load)
+			print(str(""" ... loaded ... """))
 			self.maxDiff = None
 			self.assertDictEqual(
-				config.loadMainConfigFile(test_path),
-				config.getDefaultMainConfigFile()
+				test_load,
+				config.getMainConfig(test_path).as_dict()
 			)
+			print(str(""" ... checked ... """))
 			theResult = True
 		except Exception as err:
 			debugtestError(err)
@@ -341,14 +347,13 @@ class ConfigTestSuite(unittest.TestCase):
 			from pku import config as config
 			if config.__name__ is None:
 				raise ImportError("Failed to import config")
-			self.assertIsNotNone(config.loadMainConfigFile(test_path))
+			self.assertIsNone(config.loadMainConfigFile(test_path))
 			self.assertIsNotNone(config.isLoaded())
 			test_key = str("""PiAP-piaplib.loaded""")
 			self.assertEqual(
 				config.isLoaded(),
 				config.getConfigValue(key=test_key)
 			)
-			self.maxDiff = None
 			test_key = str("""unitTests.testkey""")
 			test_key_value = str("""{}""").format(random_file_path())
 			config.setConfigValue(key=test_key, value=test_key_value)
@@ -460,7 +465,7 @@ class ConfigTestSuite(unittest.TestCase):
 		assert theResult
 
 	def test_case_read_default_baseconfig(self):
-		"""Tests the write default configuration functions"""
+		"""Tests the read default configuration functions"""
 		theResult = False
 		test_path = str("{}.cnf").format(str(random_file_path()))
 		try:
