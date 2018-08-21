@@ -275,7 +275,7 @@ class ConfigTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
-	def test_case_main_config(self):
+	def test_case_default_main_config(self):
 		""" Tests the default configuration function
 			piaplib.pku.config.getMainConfig() != None
 		"""
@@ -315,14 +315,17 @@ class ConfigTestSuite(unittest.TestCase):
 				config.getMainConfig(test_path).as_dict()
 			)
 			print(str(""" ... wrote """))
-			config.reloadConfigCache(test_path)
+			self.assertTrue(config.reloadConfigCache(test_path))
 			test_load = config.loadMainConfigFile(test_path)
 			self.assertIsNotNone(test_load)
 			print(str(""" ... loaded ... """))
 			self.maxDiff = None
+			mock_value = config.getMainConfig(test_path).as_dict()
+			self.assertIsNotNone(mock_value)
+			mock_value["""PiAP-piaplib"""]["""loaded"""]
 			self.assertDictEqual(
 				test_load,
-				config.getMainConfig(test_path).as_dict()
+				mock_value
 			)
 			print(str(""" ... checked ... """))
 			theResult = True
@@ -347,7 +350,7 @@ class ConfigTestSuite(unittest.TestCase):
 			from pku import config as config
 			if config.__name__ is None:
 				raise ImportError("Failed to import config")
-			self.assertIsNone(config.loadMainConfigFile(test_path))
+			self.assertIsNotNone(config.loadMainConfigFile(test_path))
 			self.assertIsNotNone(config.isLoaded())
 			test_key = str("""PiAP-piaplib.loaded""")
 			self.assertEqual(

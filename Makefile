@@ -137,7 +137,7 @@ cleanup:
 	$(QUIET)rm -f piaplib/*~ 2>/dev/null || true
 	$(QUIET)rm -f *.pyc 2>/dev/null || true
 	$(QUIET)rm -f piaplib/*/*.pyc 2>/dev/null || true
-	$(QUIET)rm -f piaplib/*/*~ 2>/dev/null || true
+	$(QUIET)rm -f ./config_*_temp_file.tmp.cnf 2>/dev/null || true
 	$(QUIET)rm -f *.DS_Store 2>/dev/null || true
 	$(QUIET)rm -f .DS_Store 2>/dev/null || true
 	$(QUIET)rm -f piaplib/*.DS_Store 2>/dev/null || true
@@ -151,6 +151,7 @@ cleanup:
 	$(QUIET)rm -f ./.coverage 2>/dev/null || true
 	$(QUIET)rm -f ./coverage*.xml 2>/dev/null || true
 	$(QUIET)rm -f ./sitecustomize.py 2>/dev/null || true
+	$(QUIET)rm -f ./.*~ 2>/dev/null || true
 	$(QUIET)rm -f ./.*~ 2>/dev/null || true
 	$(QUIET)rm -Rf ./.tox/ 2>/dev/null || true
 	$(QUIET)rm -f ./the_test_file*.txt 2>/dev/null || true

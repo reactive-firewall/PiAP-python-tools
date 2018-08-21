@@ -70,14 +70,14 @@ def isLoaded():
 		return theResult
 
 
-def getMainConfig():
-	"""returns False. Overloaded by config class."""
-	theResult = getDefaultMainConfigFile()
-	try:
-		if globals()['getMainConfig']() is not None:
-			theResult = globals()['getMainConfig']()
-	finally:
-		return theResult
+#def getMainConfig():
+#	"""returns False. Overloaded by config class."""
+#	theResult = getDefaultMainConfigFile()
+#	try:
+#		if globals()['getMainConfig']() is not None:
+#			theResult = globals()['getMainConfig']()
+#	finally:
+#		return theResult
 
 
 def mergeDicts(*dict_args):

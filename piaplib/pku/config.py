@@ -92,7 +92,7 @@ __description__ = """Runs piaplib configuration functions."""
 
 
 __epilog__ = """basically a python wrapper for configuration I/O."""
-"""...basically a python wrapper for pip install --upgrade."""
+"""...basically a python wrapper for configuration I/O."""
 
 
 _PIAP_KVP_CONF_KEY = str("""PiAP-piaplib.config""")
@@ -265,9 +265,10 @@ except Exception:
 
 
 def getHandle(handler):
-	for someFunc in locals().copy().keys():
-		if handler == locals()[someFunc]:
-			handle = someFunc
+	if locals() is not None:
+		for someFunc in locals().copy().keys():
+			if handler == locals()[someFunc]:
+				handle = someFunc
 	for theFunc in globals().copy().keys():
 		if handler == globals()[theFunc]:
 			handle = theFunc
@@ -284,7 +285,7 @@ def getHandler(handle):
 	return handler
 
 
-@remediation.error_handling
+@remediation.error_passing
 def prepforStore(rawValue):
 	"""pack value for storage"""
 	taint_value = str(rawValue)
@@ -300,7 +301,10 @@ def prepforStore(rawValue):
 		elif str("""<function""") in taint_value[0:9]:
 			taint_value = getHandle(str(rawValue))
 	else:
-		taint_value = utils.literal_str(rawValue)
+		try:
+			taint_value = utils.literal_str(rawValue)
+		except Exception:
+			taint_value = None
 	return taint_value
 
 
@@ -340,34 +344,37 @@ class dictParser(configparser.ConfigParser):
 				theCopy.set(copysection, copyoption, self.get(copysection, copyoption))
 		return theCopy
 
-	def __getitem__(self, key):
+	def __py2getitem__(self, key):
 		try:
-			import six
-			if six.PY2:
-				if key == 'sections':
-					return self.sections
-				elif not (str(key).upper() == str("DEFAULT")):
-					return self.as_dict().__getitem__(key)
-				else:
-					return super(dictParser, self)._getitem__(self, key)
-			else:
-				return super(dictParser, self)._getitem__(self, key)
-		except Exception:
 			if key == 'sections':
 				return self.sections
 			elif not (str(key).upper() == str("DEFAULT")):
 				return self.as_dict()[key]
 			else:
-				return super(dictParser, self)._getitem__(self, key)
-		raise AttributeError(str("<Class dictParser> has no attribute {}").format(str(key)))
+				return super(dictParser, self).__getitem__(self, key)
+		except Exception:
+			raise AttributeError(str("<Class dictParser> has no attribute {}").format(str(key)))
 
-	def read_dict(self, dictionary, source='<dict>'):
+	def __getitem__(self, key):
 		try:
 			import six
 			if six.PY2:
-				for someSection in dictionary.keys(): 
-					if not self.has_section(someSection) and str(someSection) not in str("DEFAULT"):
-						self.add_section(someSection)
+				return self.__py2getitem__(key)
+			else:
+				return super(dictParser, self)._getitem__(self, key)
+		except Exception:
+			return self.__py2getitem__(key)
+		raise AttributeError(str("<Class dictParser> has no attribute {}").format(str(key)))
+
+	def __py2read_dict__(self, dictionary):
+		if (dictionary is not None) and (dictionary.keys() is not None):
+			for someSection in dictionary.keys():
+				isValidSection = (not self.has_section(someSection))
+				if (isValidSection is True) and (str(someSection) not in str("DEFAULT")):
+					self.add_section(someSection)
+				if (dictionary[someSection] is None):
+					continue
+				elif isinstance(dictionary[someSection], dict):
 					for someOption in dictionary[someSection].keys():
 						try:
 							self.set(
@@ -379,23 +386,17 @@ class dictParser(configparser.ConfigParser):
 								someSection, someOption,
 								repr(dictionary[someSection][someOption])
 							)
+		return self
+
+	def read_dict(self, dictionary, source='<dict>'):
+		try:
+			import six
+			if six.PY2:
+				return self.__py2read_dict__(dictionary)
 			else:
 				return super(dictParser, self).read_dict(self, dictionary)
 		except Exception:
-			for someSection in dictionary.keys():
-				if not self.has_section(someSection) and str(someSection) not in str("DEFAULT"):
-					self.add_section(someSection)
-				for someOption in dictionary[someSection].keys():
-					try:
-						self.set(
-							someSection, someOption,
-							dictionary[someSection][someOption]
-						)
-					except Exception:
-						self.set(
-							someSection, someOption,
-							repr(dictionary[someSection][someOption])
-						)
+			return self.__py2read_dict__(dictionary)
 		return self
 
 
@@ -442,9 +443,16 @@ def _raw_setMainConfig(newValue):
 		newValue = _raw_getMainConfig()
 	if isinstance(newValue, dict):
 		_MAIN_CONFIG_DATA = dictParser(allow_no_value=True)
-		_MAIN_CONFIG_DATA.read_dict(newValue)
+		_MAIN_CONFIG_DATA.read_dict(dictionary=newValue)
 	elif isinstance(newValue, dictParser):
 		_MAIN_CONFIG_DATA = newValue
+	elif isinstance(newValue, ConfigParser.RawConfigParser):
+		_MAIN_CONFIG_DATA = dictParser(allow_no_value=True)
+		for copysect in newValue.sections():
+			if not (str(copysect).upper() == str("DEFAULT")):
+				_MAIN_CONFIG_DATA.add_section(copysect)
+				for copyoption in newValue.options(copysect):
+					_MAIN_CONFIG_DATA.set(copysect, copyoption, self.get(copysect, copyoption))
 	else:
 		_MAIN_CONFIG_DATA = None
 
@@ -462,17 +470,27 @@ def _raw_getConfigPath():
 	return confFile
 
 
-@remediation.error_handling
+@remediation.error_passing
 def getMainConfig(confFile=None):
 	if confFile is None:
 		confFile = _raw_getConfigPath()
-	cacheIsAMiss = True
+	__cacheIsAMiss = True
 	if _raw_getMainConfig() is not None:
-		if _raw_getMainConfig().has_option("""PiAP-piaplib""", """config"""):
-			cacheIsAMiss = (_raw_getMainConfig().getboolean('PiAP-piaplib', 'loaded') is False)
-	if cacheIsAMiss is True:
+		try:
+			if _raw_getMainConfig().has_section("""PiAP-piaplib""") is not True:
+				_raw_getMainConfig().add_section("""PiAP-piaplib""")
+			if _raw_getMainConfig().has_option("""PiAP-piaplib""", """loaded"""):
+				__isLoaded_ = _raw_getMainConfig().getboolean("""PiAP-piaplib""", """loaded""")
+				if __isLoaded_ is True:
+					__cacheIsAMiss = False
+				else:
+					__cacheIsAMiss = True
+		except Exception as err:
+			remediation.error_breakpoint(error=err, context=getMainConfig)
+	if __cacheIsAMiss is True:
 		tempValue = loadMainConfigFile(confFile)
-		tempValue['PiAP-piaplib']['loaded'] = True
+		if tempValue is not None:
+			tempValue["""PiAP-piaplib"""]["""loaded"""] = True
 		_raw_setMainConfig(tempValue)
 	return _raw_getMainConfig()
 
@@ -481,7 +499,8 @@ def getMainConfig(confFile=None):
 def reloadConfigCache(confFile=None):
 	try:
 		tempValue = loadMainConfigFile(confFile)
-		tempValue['PiAP-piaplib']['loaded'] = True
+		if tempValue is not None:
+			tempValue["""PiAP-piaplib"""]["""loaded"""] = True
 		_raw_setMainConfig(tempValue)
 	except Exception as err:
 		remediation.error_breakpoint(error=err, context=reloadConfigCache)
@@ -510,16 +529,17 @@ def __builtin_isLoaded(*args, **kwargs):
 @remediation.error_passing
 def invalidateConfigCache():
 	"""if config is loaded marks as not loaded."""
-	tempValue = getMainConfig().copy()
-	tempValue.set('PiAP-piaplib', 'loaded', repr(False))
-	_raw_setMainConfig(tempValue)
+	if getMainConfig() is not None:
+		tempValue = getMainConfig().copy()
+		tempValue.set('PiAP-piaplib', 'loaded', repr(False))
+		_raw_setMainConfig(tempValue)
 
 
 @remediation.error_handling
 def hasMainConfigOptionsFor(somekey=None):
 	"""Returns True if the main configurtion has the given key, otherwise False."""
 	hasValue = False
-	if somekey is not None and isLoaded() and (getMainConfig().has_section(somekey)):
+	if (somekey is not None) and (isLoaded() is True) and (getMainConfig().has_section(somekey)):
 		hasValue = True
 	return hasValue
 
@@ -528,15 +548,16 @@ def hasMainConfigOptionsFor(somekey=None):
 def hasMainConfigOptionFor(mainSectionKey=None):
 	"""True if config key maps to value."""
 	hasValue = False
-	if mainSectionKey is None or not isLoaded():
+	if (mainSectionKey is None) or (not isLoaded()):
 		hasValue = False
-	if str(""".""") not in str(mainSectionKey):
-		hasValue = hasMainConfigOptionsFor(mainSectionKey)
 	else:
-		kp = str(mainSectionKey).split(""".""")
-		main_config = getMainConfig()
-		if (main_config.has_section(kp[0]) and (main_config.has_option(kp[0], kp[1]))):
-			hasValue = True
+		if str(""".""") not in str(mainSectionKey):
+			hasValue = hasMainConfigOptionsFor(mainSectionKey)
+		else:
+			kp = str(mainSectionKey).split(""".""")
+			main_config = getMainConfig()
+			if (main_config.has_section(kp[0]) and (main_config.has_option(kp[0], kp[1]))):
+				hasValue = True
 	return hasValue
 
 
@@ -662,8 +683,10 @@ def loadMainConfigFile(confFile=None):
 		if utils.xisfile(str(confFile)):
 			mainConfig = readIniFile(str(confFile), emptyConfig)
 			result_config = parseConfigParser(default_config, mainConfig, overwrite=True)
-			reflect_config_data = baseconfig.__config_data_from_kvp(_PIAP_KVP_CONF_KEY, confFile)
-			result_config = baseconfig.mergeDicts(result_config, reflect_config_data)
+		else:
+			result_config = getDefaultMainConfigFile()
+		reflect_config_data = baseconfig.__config_data_from_kvp(_PIAP_KVP_CONF_KEY, confFile)
+		result_config = baseconfig.mergeDicts(result_config, reflect_config_data)
 	except Exception as err:
 		print(str(err))
 		print(str(type(err)))
@@ -690,11 +713,13 @@ def _empty_kvp_setters():
 	})
 
 
-@remediation.error_passing
+@remediation.error_handling
 def defaultGetter(key, defaultValue=None, initIfEmpty=False):
 	"""the default configuration getter for most keys."""
 	theValue = defaultValue
-	if hasMainConfigOptionFor(key):
+	if key is None:
+		return theValue
+	if (getMainConfig() is not None) and hasMainConfigOptionFor(key):
 		main_config = getMainConfig()
 		if str(""".""") not in str(key):
 			theValue = main_config.as_dict()[key]
@@ -706,10 +731,10 @@ def defaultGetter(key, defaultValue=None, initIfEmpty=False):
 			theValue = True
 		elif repr(False) in str(theValue)[:7]:
 			theValue = False
-		elif str("[") in str(theValue)[0] or str("(") in str(theValue)[0]:
-			if str("[]") in str(theValue) and str(theValue) in str("[]"):
+		elif (str("[") in str(theValue)[0]) or (str("(") in str(theValue)[0]):
+			if (str("[]") in str(theValue)) and (str(theValue) in str("[]")):
 				theValue = []
-			elif str("()") in str(theValue) and str(theValue) in str("()"):
+			elif (str("()") in str(theValue)) and (str(theValue) in str("()")):
 				theValue = tuple(())
 			else:
 				theValue = ast.literal_eval(repr('"' * 3)[1:4] + str(theValue) + repr('"' * 3)[1:4])
@@ -736,8 +761,11 @@ def defaultSetter(key, value=None):
 	else:
 		theValue = prepforStore(value)
 	if not isLoaded():
-		reloadConfigCache(_raw_getConfigPath())
-	main_config = getMainConfig().as_dict()
+		res = reloadConfigCache(_raw_getConfigPath())
+	if getMainConfig() is not None:
+		main_config = getMainConfig().as_dict()
+	else:
+		main_config = getDefaultMainConfigFile()
 	new_config_data = baseconfig.__config_data_from_kvp(key, theValue)
 	full_config_data = baseconfig.mergeDicts(main_config, new_config_data)
 	writeMainConfigFile(config_data=full_config_data)
@@ -824,30 +852,41 @@ def configKeyValueSETFactory(*kvpargs, **kvpkwargs):
 	return decorator
 
 
+@remediation.error_passing
 def getMainConfigWithArgs(*args, **kwargs):
-	if kwargs is not None and (str("""file""") in kwargs.keys()):
-		config_path = kwargs[str("""file""")]
+	if (kwargs is not None) and (len(kwargs.keys()) > 0):
+		if (str("""file""") in kwargs.keys()):
+			config_path = kwargs[str("""file""")]
+		else:
+			config_path = _raw_getConfigPath()
 		cache_config = getMainConfig(confFile=config_path)
 	else:
 		cache_config = getMainConfig()
 	return cache_config
 
 
+@remediation.error_passing
 def bootstrapconfig(*args, **kwargs):
 	"""loads the config"""
 	temp_config = getMainConfigWithArgs(*args, **kwargs)
-	temp = temp_config.as_dict()
-	for section in temp.keys():
-		for thekey in temp_config.options(section):
-			if getConfigValue(key=str("{}.{}").format(str(section), str(thekey))) is None:
-				configRegisterKeyValueFactory(
-					key=str("{}.{}").format(str(section), str(thekey)), getter=defaultGetter
-				)
+	if temp_config is not None:
+		#temp = temp_config.as_dict()
+		for section in temp_config.sections():
+			for thekey in temp_config.options(section):
+				if getConfigValue(key=str("{}.{}").format(str(section), str(thekey))) is None:
+					configRegisterKeyValueFactory(
+						key=str("{}.{}").format(str(section), str(thekey)), getter=defaultGetter
+					)
 	return
 
 
 def printMainConfig(*args, **kwargs):
-	bootstrapconfig(*args, **kwargs)
+	try:
+		bootstrapconfig(*args, **kwargs)
+	except Exception as err:
+		remediation.error_breakpoint(err, context=printMainConfig)
+		print(repr(kwargs))
+		print(repr(args))
 	temp_config = getMainConfigWithArgs(*args, **kwargs)
 	temp = temp_config.as_dict()
 	section_color = str("")
@@ -996,7 +1035,7 @@ def main(argv=None):
 		config_key = args.config_key[0]
 	if args.config_action is not None:
 		kwargs = dict({'file': config_path, 'color': True, 'setting': config_key})
-		_CONFIG_CLI_ACTIONS[args.config_action](**kwargs)
+		_CONFIG_CLI_ACTIONS[args.config_action](*argv, **kwargs)
 		theResult = 0
 	return theResult
 
@@ -1005,7 +1044,7 @@ def main(argv=None):
 def __not_main(*args, **kwargs):
 	"""Not The Main Event."""
 	if isLoaded() is False:
-		reloadConfigCache(_raw_getConfigPath())
+		res = reloadConfigCache(_raw_getConfigPath())
 
 
 if __name__ in u'__main__':
