@@ -37,7 +37,7 @@ def getDefaultMainConfigFile():
 		default_config = dict({
 			'PiAP-logging': dict({
 				'mode': str("stdout"),
-				'level': str("info"),
+				'level': str("debug"),
 				'dir': str("/var/log"),
 				'keyfile': repr(None),
 				'encryptlogs': repr(False)
@@ -58,26 +58,6 @@ def getDefaultMainConfigFile():
 		print(str((err.args)))
 		default_config = dict({})
 	return default_config
-
-
-def isLoaded():
-	"""returns False. Overloaded by config class."""
-	theResult = False
-	try:
-		if globals()['getMainConfig']() is not None:
-			theResult = globals()['getMainConfig']()['PiAP-piaplib']['loaded']
-	finally:
-		return theResult
-
-
-#def getMainConfig():
-#	"""returns False. Overloaded by config class."""
-#	theResult = getDefaultMainConfigFile()
-#	try:
-#		if globals()['getMainConfig']() is not None:
-#			theResult = globals()['getMainConfig']()
-#	finally:
-#		return theResult
 
 
 def mergeDicts(*dict_args):
