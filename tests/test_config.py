@@ -91,6 +91,8 @@ class ConfigTestSuite(unittest.TestCase):
 		from piaplib.pku import config as config
 		if config.__name__ is None:
 			raise ImportError("Failed to import config")
+		if config.isLoaded() is not True:
+			config.reloadConfigCache(config._raw_getConfigPath())
 		assert config.isLoaded()
 
 	def test_absolute_truth_and_meaning(self):
@@ -321,8 +323,8 @@ class ConfigTestSuite(unittest.TestCase):
 			print(str(""" ... loaded ... """))
 			self.maxDiff = None
 			mock_value = config.getMainConfig(test_path).as_dict()
+			test_load["""PiAP-piaplib"""]["""loaded"""] = repr(True)
 			self.assertIsNotNone(mock_value)
-			mock_value["""PiAP-piaplib"""]["""loaded"""]
 			self.assertDictEqual(
 				test_load,
 				mock_value
@@ -351,15 +353,19 @@ class ConfigTestSuite(unittest.TestCase):
 			if config.__name__ is None:
 				raise ImportError("Failed to import config")
 			self.assertIsNotNone(config.loadMainConfigFile(test_path))
-			self.assertIsNotNone(config.isLoaded())
+			self.assertTrue(config.isLoaded(), str("""bug in isLoaded"""))
 			test_key = str("""PiAP-piaplib.loaded""")
+			self.assertTrue(config.getConfigValue(key=test_key), str("""bug in getConfigValue"""))
 			self.assertEqual(
 				config.isLoaded(),
-				config.getConfigValue(key=test_key)
+				config.getConfigValue(key=test_key),
+				str("""bug in isLoaded or getConfigValue""")
 			)
 			test_key = str("""unitTests.testkey""")
 			test_key_value = str("""{}""").format(random_file_path())
 			config.setConfigValue(key=test_key, value=test_key_value)
+			if config.isLoaded() is not True:
+				config.reloadConfigCache(config._raw_getConfigPath())
 			self.assertTrue(config.isLoaded())
 			self.assertEqual(config.getConfigValue(key=test_key), test_key_value)
 			theResult = True
