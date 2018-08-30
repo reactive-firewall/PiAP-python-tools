@@ -180,7 +180,7 @@ script:
   - travis_retry pip uninstall -y python-coveralls || travis_retry python3 -m pip uninstall -y python-coveralls || true
   - travis_retry pip uninstall -y PyYAML || travis_retry python3 -m pip uninstall -y PyYAML || true
   - make clean || exit $? ; 
-  - make test-tox || exit $? ;
+  - if [ $TRAVIS_PYTHON_VERSION == 3.2 ] || [ $TRAVIS_PYTHON_VERSION == 3.3 ] ; then echo "SKIP tox test" ; else make test-tox || exit $? ; fi ;
   - cp -vf .coverage ".coverall.Lasting.45678.12345" 2>/dev/null || true
   - make clean ;
   - mv -vf ".coverall.Lasting.45678.12345" .coverage 2>/dev/null || true
