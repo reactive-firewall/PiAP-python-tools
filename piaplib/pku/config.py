@@ -288,7 +288,7 @@ def getHandler(handle):
 	# possibles.update(globals()['__builtins__'].__dict__)
 	possibles.update(locals())
 	handler = possibles.get(handle)
-	if type(handler) is type(None):
+	if isinstance(handler, None):
 		raise NotImplementedError(str("Function {} not implemented").format(str(handle)))
 	return handler
 
@@ -514,7 +514,6 @@ def getMainConfig(confFile=None):
 				_raw_setMainConfig(tempValue)
 				tempValue = _raw_getMainConfig()
 				tempValue.set(_PIAP_KVP_GLOBAL_KEY, """loaded""", repr(False))
-				#tempValue["""PiAP-piaplib"""]["""loaded"""] = True
 			except BaseException as badErr:
 				remediation.error_breakpoint(error=badErr, context=_raw_setMainConfig)
 		_raw_setMainConfig(tempValue)
@@ -729,6 +728,15 @@ def _empty_kvp_setters():
 	})
 
 
+def _util_is_not_tuple_or_list(someVar):
+	"""utility function to simplify defaultGetter a little"""
+	checkRes = False
+	if isinstance(someVar, tuple) is not True:
+		if isinstance(someVar, list) is not True:
+			checkRes = True
+	return checkRes
+
+
 @remediation.error_handling
 def defaultGetter(key, defaultValue=None, initIfEmpty=False):
 	"""the default configuration getter for most keys."""
@@ -754,8 +762,7 @@ def defaultGetter(key, defaultValue=None, initIfEmpty=False):
 				theValue = tuple(())
 			else:
 				theValue = ast.literal_eval(repr('"' * 3)[1:4] + str(theValue) + repr('"' * 3)[1:4])
-				if isinstance(theValue, tuple) is not True:
-					if isinstance(theValue, list) is not True:
+				if _util_is_not_tuple_or_list(theValue):
 						theValue = ast.literal_eval(theValue)
 		elif str("{") in str(theValue)[0]:
 			if str("{}") in str(theValue) and str(theValue) in str("{}"):
