@@ -99,11 +99,11 @@ _PIAP_KVP_GLOBAL_KEY = str("""PiAP-piaplib""")
 """Cannonical key for PiAP-piaplib section"""
 
 
-_PIAP_KVP_CONF_KEY = str("""PiAP-piaplib.config""")
+_PIAP_KVP_CONF_KEY = str("""{}.{}""").format(_PIAP_KVP_GLOBAL_KEY, """config""")
 """Cannonical key for PiAP-piaplib.config"""
 
 
-_PIAP_KVP_LOAD_SUBKEY = str("""PiAP-piaplib.loaded""")
+_PIAP_KVP_LOAD_SUBKEY = str("""loaded""")
 """Sub key for PiAP-piaplib.loaded"""
 
 
@@ -114,21 +114,21 @@ _PIAP_KVP_LOAD_KEY = str("""{}.{}""").format(_PIAP_KVP_GLOBAL_KEY, _PIAP_KVP_LOA
 _PIAP_KVP_GET_LOAD = str("""__builtin_isLoaded""")
 
 
-_PIAP_KVP_GET_KEY = str("""PiAP-piaplib.config_accessors""")
+_PIAP_KVP_GET_KEY = str("""{}.{}""").format(_PIAP_KVP_GLOBAL_KEY, """config_accessors""")
 """Cannonical key for PiAP-piaplib.config_accessors"""
 
 
 _PIAP_KVP_GET_DEFAULT = str("""defaultGetter""")
 
 
-_PIAP_KVP_SET_KEY = str("""PiAP-piaplib.config_modifiers""")
+_PIAP_KVP_SET_KEY = str("""{}.{}""").format(_PIAP_KVP_GLOBAL_KEY, """config_modifiers""")
 """Cannonical key for PiAP-piaplib.config_modifiers"""
 
 
 _PIAP_KVP_SET_DEFAULT = str("""defaultSetter""")
 
 
-global _MAIN_CONFIG_DATA
+_MAIN_CONFIG_DATA = None
 
 
 __ALL_KEYS_SETTING__ = str("""all""")
@@ -154,9 +154,7 @@ def readJsonFile(somefile):
 	except Exception as jsonerr:
 		print("")
 		print("Error: Failed to load JSON file.")
-		print(str(type(jsonerr)))
-		print(str(jsonerr))
-		print(str((jsonerr.args)))
+		remediation.error_breakpoint(error=jsonerr, context=readJsonFile)
 		print("")
 		read_data = dict({u'Error': u'Failed to load JSON file.'})
 	return read_data
@@ -182,9 +180,7 @@ def writeJsonFile(somefile, data):
 	except Exception as jsonerr:
 		print("")
 		print("Error: Failed to write JSON file.")
-		print(str(type(jsonerr)))
-		print(str(jsonerr))
-		print(str((jsonerr.args)))
+		remediation.error_breakpoint(error=jsonerr, context=writeJsonFile)
 		print("")
 		did_write = False
 	return did_write
@@ -198,7 +194,7 @@ try:
 			import ruamel.yaml as yaml
 		except Exception:
 			raise ImportError("Error Importing yaml utils for config")
-except Exception:
+except ImportError:
 	pass
 
 
@@ -232,9 +228,7 @@ def readYamlFile(somefile):
 	except Exception as yamlerr:
 		print("")
 		print("Error: Failed to load YAML file.")
-		print(str(type(yamlerr)))
-		print(str(yamlerr))
-		print(str((yamlerr.args)))
+		remediation.error_breakpoint(error=yamlerr, context=readYamlFile)
 		print("")
 		read_data = None
 	return read_data
@@ -251,9 +245,7 @@ def writeYamlFile(somefile, data):
 	except Exception as yamlerr:
 		print("")
 		print("Error: Failed to save YAML file.")
-		print(str(type(yamlerr)))
-		print(str(yamlerr))
-		print(str((yamlerr.args)))
+		remediation.error_breakpoint(error=yamlerr, context=writeYamlFile)
 		print(str(somefile))
 		print("")
 		did_write = None
@@ -268,7 +260,16 @@ try:
 			import ConfigParser as configparser
 		except Exception:
 			raise ImportError("Error Importing ConfigParser utils for config")
-except Exception:
+	try:
+		if sys.version_info <= (3, 3):
+			class SaneConfigParser(configparser.SafeConfigParser):
+				pass
+		else:
+			class SaneConfigParser(configparser.ConfigParser):
+				pass
+	except Exception:
+		raise ImportError("Error Importing SaneConfigParser for config")
+except ImportError:
 	pass
 
 
@@ -288,7 +289,7 @@ def getHandler(handle):
 	# possibles.update(globals()['__builtins__'].__dict__)
 	possibles.update(locals())
 	handler = possibles.get(handle)
-	if isinstance(handler, None):
+	if isinstance(handler, type(None)):
 		raise NotImplementedError(str("Function {} not implemented").format(str(handle)))
 	return handler
 
@@ -320,7 +321,7 @@ def prepforStore(rawValue):
 	return taint_value
 
 
-class dictParser(configparser.SafeConfigParser):
+class dictParser(SaneConfigParser):
 	"""adds as_dict() to ConfigParser"""
 	@remediation.error_handling
 	def as_dict(self):
@@ -496,11 +497,11 @@ def getMainConfig(confFile=None):
 			tempValue = _raw_getMainConfig()
 			tempValue.add_section(_PIAP_KVP_GLOBAL_KEY)
 			_raw_setMainConfig(tempValue)
-		if _raw_getMainConfig().has_option(_PIAP_KVP_GLOBAL_KEY, """loaded""") is True:
+		if _raw_getMainConfig().has_option(_PIAP_KVP_GLOBAL_KEY, _PIAP_KVP_LOAD_SUBKEY) is True:
 			safeVar = _raw_getMainConfig()
 			__xLoaded_ = False
 			try:
-				__xLoaded_ = safeVar.getboolean(_PIAP_KVP_GLOBAL_KEY, """loaded""")
+				__xLoaded_ = safeVar.getboolean(_PIAP_KVP_GLOBAL_KEY, _PIAP_KVP_LOAD_SUBKEY)
 			except Exception as err:
 				remediation.error_breakpoint(error=err, context=_raw_getMainConfig)
 			if __xLoaded_ is True:
@@ -513,8 +514,8 @@ def getMainConfig(confFile=None):
 			try:
 				_raw_setMainConfig(tempValue)
 				tempValue = _raw_getMainConfig()
-				tempValue.set(_PIAP_KVP_GLOBAL_KEY, """loaded""", repr(False))
-			except BaseException as badErr:
+				tempValue.set(_PIAP_KVP_GLOBAL_KEY, _PIAP_KVP_LOAD_SUBKEY, repr(False))
+			except Exception as badErr:
 				remediation.error_breakpoint(error=badErr, context=_raw_setMainConfig)
 		_raw_setMainConfig(tempValue)
 	return _raw_getMainConfig()
@@ -525,7 +526,7 @@ def reloadConfigCache(confFile=None):
 	try:
 		tempload = loadMainConfigFile(confFile)
 		if tempload is not None:
-			tempload["""PiAP-piaplib"""]["""loaded"""] = True
+			tempload[_PIAP_KVP_GLOBAL_KEY][_PIAP_KVP_LOAD_SUBKEY] = True
 		_raw_setMainConfig(tempload)
 	except Exception as err:
 		remediation.error_breakpoint(error=err, context=reloadConfigCache)
@@ -539,22 +540,16 @@ def isLoaded():
 	isCached = False
 	if getMainConfig() is not None:
 		isLoadable = True
-		if getMainConfig()[_PIAP_KVP_GLOBAL_KEY]['loaded'] is True:
+		if getMainConfig()[_PIAP_KVP_GLOBAL_KEY][_PIAP_KVP_LOAD_SUBKEY] is True:
 			isCached = True
-		elif getMainConfig()[_PIAP_KVP_GLOBAL_KEY]['loaded'] is repr(True):
+		elif getMainConfig()[_PIAP_KVP_GLOBAL_KEY][_PIAP_KVP_LOAD_SUBKEY] is repr(True):
 			isCached = True
-	if isLoadable and isCached:
-		return True
-	else:
-		return False
+	return isLoadable and isCached
 
 
 def __builtin_isLoaded(*args, **kwargs):
 	"""wrapper function for isLoaded()"""
-	if isLoaded() is True:
-		return True
-	else:
-		return False
+	return isLoaded() is True
 
 
 @remediation.error_passing
@@ -562,7 +557,7 @@ def invalidateConfigCache():
 	"""if config is loaded marks as not loaded."""
 	if getMainConfig() is not None:
 		tempValue = getMainConfig().copy()
-		tempValue.set('PiAP-piaplib', 'loaded', repr(False))
+		tempValue.set(_PIAP_KVP_GLOBAL_KEY, _PIAP_KVP_LOAD_SUBKEY, repr(False))
 		_raw_setMainConfig(tempValue)
 
 
@@ -773,8 +768,8 @@ def defaultGetter(key, defaultValue=None, initIfEmpty=False):
 					theValue = ast.literal_eval(theValue)
 	except Exception as err:
 		remediation.error_breakpoint(err, context=defaultGetter)
-		print(str(type(theValue)))
-		print(repr(theValue))
+		# print(str(type(theValue)))
+		# print(repr(theValue))
 	return theValue
 
 
@@ -808,8 +803,10 @@ def getConfigValue(*args, **kwargs):
 		remediation.error_breakpoint(err, context=getConfigValue)
 		# print(repr(args))
 		# print(repr(kwargs))
-		print(repr(config_getters))
-		print(str(type(config_getters)))
+		# print(repr(config_getters))
+		# print(str(type(config_getters)))
+		err = None
+		del err
 		return None
 
 
@@ -872,28 +869,28 @@ def configRegisterKeyValueFactory(*args, **kwargs):
 		)
 
 
-def configKeyValueGETFactory(*kvpargs, **kvpkwargs):
-	def decorator(fn):
-		@functools.wraps(fn)
-		def decorated(*args, **kwargs):
-			if kvpkwargs['getter'] is None:
-				kvpkwargs['getter'] = fn
-			configRegisterKeyValueFactory(*kvpargs, **kvpkwargs)
-			return fn(*args, **kwargs)
-		return decorated
-	return decorator
-
-
-def configKeyValueSETFactory(*kvpargs, **kvpkwargs):
-	def decorator(fn):
-		@functools.wraps(fn)
-		def decorated(*args, **kwargs):
-			if kvpkwargs['setter'] is None:
-				kvpkwargs['setter'] = fn
-			configRegisterKeyValueFactory(*kvpargs, **kvpkwargs)
-			return fn(*args, **kwargs)
-		return decorated
-	return decorator
+# def configKeyValueGETFactory(*kvpargs, **kvpkwargs):
+#	def decorator(fn):
+#		@functools.wraps(fn)
+#		def decorated(*args, **kwargs):
+#			if kvpkwargs['getter'] is None:
+#				kvpkwargs['getter'] = fn
+#			configRegisterKeyValueFactory(*kvpargs, **kvpkwargs)
+#			return fn(*args, **kwargs)
+#		return decorated
+#	return decorator
+#
+#
+# def configKeyValueSETFactory(*kvpargs, **kvpkwargs):
+#	def decorator(fn):
+#		@functools.wraps(fn)
+#		def decorated(*args, **kwargs):
+#			if kvpkwargs['setter'] is None:
+#				kvpkwargs['setter'] = fn
+#			configRegisterKeyValueFactory(*kvpargs, **kvpkwargs)
+#			return fn(*args, **kwargs)
+#		return decorated
+#	return decorator
 
 
 @remediation.error_passing
@@ -923,15 +920,8 @@ def bootstrapconfig(*args, **kwargs):
 	return
 
 
-def printMainConfig(*args, **kwargs):
-	try:
-		bootstrapconfig(*args, **kwargs)
-	except Exception as err:
-		remediation.error_breakpoint(err, context=printMainConfig)
-		print(repr(kwargs))
-		print(repr(args))
-	temp_config = getMainConfigWithArgs(*args, **kwargs)
-	temp = temp_config.as_dict()
+def colorsFromArgs(*args, **kwargs):
+	"""retrurns the collection of colors for syntax highlighting"""
 	section_color = str("")
 	end_color = str("")
 	label_color = str("")
@@ -942,6 +932,19 @@ def printMainConfig(*args, **kwargs):
 			end_color = ANSIColors.ENDC
 			label_color = ANSIColors.WHITE
 			value_color = ANSIColors.AMBER
+	return (section_color, end_color, label_color, value_color)
+
+
+def printMainConfig(*args, **kwargs):
+	try:
+		bootstrapconfig(*args, **kwargs)
+	except Exception as err:
+		remediation.error_breakpoint(err, context=printMainConfig)
+		print(repr(kwargs))
+		print(repr(args))
+	temp_config = getMainConfigWithArgs(*args, **kwargs)
+	temp = temp_config.as_dict()
+	(section_color, end_color, label_color, value_color) = colorsFromArgs(*args, **kwargs)
 	for section in temp.keys():
 		print(str("[{}{}{}]").format(section_color, str(section), end_color))
 		for thekey in temp[section].keys():
@@ -957,30 +960,35 @@ def printMainConfig(*args, **kwargs):
 			)
 
 
+# def printMainConfigJSON(*args, **kwargs):
+#	"""dump as json data"""
+#	temp_config = getMainConfigWithArgs(*args, **kwargs)
+#	temp = temp_config.as_dict()
+#	json.dumps(temp, sort_keys=True, indent=4)
+
+
+@remediation.error_handling
 def readMainConfig(*args, **kwargs):
 	"""reads a given setting from the configuration"""
 	temp_config = getMainConfigWithArgs(*args, **kwargs)
 	temp = temp_config.as_dict()
 	__sKey = str("""setting""")
 	__aKey = str(__ALL_KEYS_SETTING__)
-	if kwargs is not None and (__sKey in kwargs.keys()) and __aKey not in kwargs[__sKey]:
+	pre_reqs = False
+	if kwargs is not None:
+		if kwargs.keys() is not None and __sKey in kwargs.keys():
+			if isinstance(kwargs.get(__sKey), type(None)) is False:
+				if __aKey not in kwargs.get(__sKey):
+					pre_reqs = True
+	if pre_reqs:
 		config_setting = kwargs[__sKey]
 		if getConfigValue(key=config_setting) is None:
 			configRegisterKeyValueFactory(key=config_setting, getter=defaultGetter)
 		cache_setting = getConfigValue(key=config_setting)
-		temp_config = getMainConfigWithArgs(*args, **kwargs)
-		temp = temp_config.as_dict()
-		section_color = str("")
-		end_color = str("")
-		label_color = str("")
-		value_color = str("")
-		if kwargs is not None and (str("""color""") in kwargs.keys()):
-			if kwargs[str("""color""")]:
-				section_color = ANSIColors.BLUE
-				end_color = ANSIColors.ENDC
-				label_color = ANSIColors.WHITE
-				value_color = ANSIColors.AMBER
+		(section_color, end_color, label_color, value_color) = colorsFromArgs(*args, **kwargs)
 		if str(""".""") not in str(config_setting):
+			temp_config = getMainConfigWithArgs(*args, **kwargs)
+			temp = temp_config.as_dict()
 			section = str(config_setting)
 			print(str("[{}{}{}]").format(section_color, str(section), end_color))
 			for thekey in temp[section].keys():
@@ -1005,6 +1013,10 @@ def readMainConfig(*args, **kwargs):
 					end_color
 				)
 			)
+	elif isinstance(kwargs.get(__sKey), type(None)) is False and __aKey in kwargs[__sKey]:
+		return printMainConfig(*args, **kwargs)
+	else:
+		raise remediation.PiAPError("Unsure what setting you are trying to access!")
 
 
 @remediation.error_passing
@@ -1042,12 +1054,16 @@ def parseargs(arguments=None):
 		).format(__ALL_KEYS_SETTING__)
 	)
 	parser.add_argument(
-		'-x', '--value', dest='config_value', default=None,
+		'-x', '--value', nargs=1, dest='config_value', default=None,
 		help='The value to modify (see -w). EXPERIMENTAL.'
+	)
+	parser.add_argument(
+		 '--no-color', dest='use_syntax_color', action='store_false', default=True,
+		help='Disables syntax color in output. Usuful for piping output.'
 	)
 	parser = utils._handleVersionArgs(parser)
 	theResult = parser.parse_known_args(arguments)
-	return theResult
+	return parser.parse_known_args(arguments)
 
 
 def noOp(*args, **kwargs):
@@ -1076,9 +1092,15 @@ def main(argv=None):
 	config_key = None
 	if args.config_key is not None and str(__ALL_KEYS_SETTING__) not in str(args.config_key):
 		config_key = args.config_key[0]
+	else:
+		config_key = args.config_key
+	if args.config_value is not None:
+		config_value = args.config_value
+	if args.use_syntax_color is not None:
+		use_syntax_color = args.use_syntax_color
 	if args.config_action is not None:
-		kwargs = dict({'file': config_path, 'color': True, 'setting': config_key})
-		_CONFIG_CLI_ACTIONS[args.config_action](*argv, **kwargs)
+		kwargs = dict({'file': config_path, 'color': use_syntax_color, 'setting': config_key})
+		_CONFIG_CLI_ACTIONS[args.config_action](*extras, **kwargs)
 		theResult = 0
 	return theResult
 
@@ -1091,13 +1113,9 @@ def __not_main(*args, **kwargs):
 
 
 if __name__ in u'__main__':
-	try:
-		if (sys.argv is not None and (sys.argv is not []) and (len(sys.argv) > 1)):
-			exit(main(sys.argv[1:]))
-		else:
-			exit(main([]))
-	except Exception:
-		raise ImportError("Error running main")
-	exit(3)
+	if (sys.argv is not None and (sys.argv is not []) and (len(sys.argv) > 1)):
+		exit(main(sys.argv[1:]))
+	else:
+		exit(main([]))
 else:
 	__not_main()
