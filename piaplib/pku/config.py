@@ -869,28 +869,28 @@ def configRegisterKeyValueFactory(*args, **kwargs):
 		)
 
 
-# def configKeyValueGETFactory(*kvpargs, **kvpkwargs):
-#	def decorator(fn):
-#		@functools.wraps(fn)
-#		def decorated(*args, **kwargs):
-#			if kvpkwargs['getter'] is None:
-#				kvpkwargs['getter'] = fn
-#			configRegisterKeyValueFactory(*kvpargs, **kvpkwargs)
-#			return fn(*args, **kwargs)
-#		return decorated
-#	return decorator
-#
-#
-# def configKeyValueSETFactory(*kvpargs, **kvpkwargs):
-#	def decorator(fn):
-#		@functools.wraps(fn)
-#		def decorated(*args, **kwargs):
-#			if kvpkwargs['setter'] is None:
-#				kvpkwargs['setter'] = fn
-#			configRegisterKeyValueFactory(*kvpargs, **kvpkwargs)
-#			return fn(*args, **kwargs)
-#		return decorated
-#	return decorator
+def configKeyValueGETFactory(*kvpargs, **kvpkwargs):
+	def decorator(fn):
+		@functools.wraps(fn)
+		def decorated(*args, **kwargs):
+			if kvpkwargs['getter'] is None:
+				kvpkwargs['getter'] = fn
+			configRegisterKeyValueFactory(*kvpargs, **kvpkwargs)
+			return fn(*args, **kwargs)
+		return decorated
+	return decorator
+
+
+def configKeyValueSETFactory(*kvpargs, **kvpkwargs):
+	def decorator(fn):
+		@functools.wraps(fn)
+		def decorated(*args, **kwargs):
+			if kvpkwargs['setter'] is None:
+				kvpkwargs['setter'] = fn
+			configRegisterKeyValueFactory(*kvpargs, **kvpkwargs)
+			return fn(*args, **kwargs)
+		return decorated
+	return decorator
 
 
 @remediation.error_passing
@@ -960,11 +960,11 @@ def printMainConfig(*args, **kwargs):
 			)
 
 
-# def printMainConfigJSON(*args, **kwargs):
-#	"""dump as json data"""
-#	temp_config = getMainConfigWithArgs(*args, **kwargs)
-#	temp = temp_config.as_dict()
-#	json.dumps(temp, sort_keys=True, indent=4)
+def printMainConfigJSON(*args, **kwargs):
+	"""dump as json data"""
+	temp_config = getMainConfigWithArgs(*args, **kwargs)
+	temp = temp_config.as_dict()
+	json.dumps(temp, sort_keys=True, indent=4)
 
 
 @remediation.error_handling
@@ -1058,12 +1058,12 @@ def parseargs(arguments=None):
 		help='The value to modify (see -w). EXPERIMENTAL.'
 	)
 	parser.add_argument(
-		 '--no-color', dest='use_syntax_color', action='store_false', default=True,
+		'--no-color', dest='use_syntax_color', action='store_false', default=True,
 		help='Disables syntax color in output. Usuful for piping output.'
 	)
 	parser = utils._handleVersionArgs(parser)
 	theResult = parser.parse_known_args(arguments)
-	return parser.parse_known_args(arguments)
+	return theResult
 
 
 def noOp(*args, **kwargs):
@@ -1099,7 +1099,10 @@ def main(argv=None):
 	if args.use_syntax_color is not None:
 		use_syntax_color = args.use_syntax_color
 	if args.config_action is not None:
-		kwargs = dict({'file': config_path, 'color': use_syntax_color, 'setting': config_key})
+		kwargs = dict({
+			'file': config_path, 'color': use_syntax_color,
+			'setting': config_key, 'value': config_value
+		})
 		_CONFIG_CLI_ACTIONS[args.config_action](*extras, **kwargs)
 		theResult = 0
 	return theResult
