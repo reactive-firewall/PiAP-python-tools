@@ -1090,6 +1090,7 @@ def main(argv=None):
 	if args.config_path is not None:
 		config_path = os.path.abspath(str(args.config_path))
 	config_key = None
+	config_value = None
 	if args.config_key is not None and str(__ALL_KEYS_SETTING__) not in str(args.config_key):
 		config_key = args.config_key[0]
 	else:
