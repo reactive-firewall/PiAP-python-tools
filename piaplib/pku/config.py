@@ -118,14 +118,14 @@ _PIAP_KVP_GET_KEY = str("""{}.{}""").format(_PIAP_KVP_GLOBAL_KEY, """config_acce
 """Cannonical key for PiAP-piaplib.config_accessors"""
 
 
-_PIAP_KVP_GET_DEFAULT = str("""config.defaultGetter""")
+_PIAP_KVP_GET_DEFAULT = str("""piaplib.pku.config.defaultGetter""")
 
 
 _PIAP_KVP_SET_KEY = str("""{}.{}""").format(_PIAP_KVP_GLOBAL_KEY, """config_modifiers""")
 """Cannonical key for PiAP-piaplib.config_modifiers"""
 
 
-_PIAP_KVP_SET_DEFAULT = str("""config.defaultSetter""")
+_PIAP_KVP_SET_DEFAULT = str("""piaplib.pku.config.defaultSetter""")
 
 
 _MAIN_CONFIG_DATA = None
@@ -291,7 +291,7 @@ def prepforStore(rawValue):
 		elif str(False) in taint_value_7:
 			taint_value = repr(False)
 		elif str("""<function""") in taint_value_9:
-			taint_value = utils.getHandle(str(rawValue))
+			taint_value = utils.getHandle(rawValue)
 	else:
 		try:
 			taint_value = utils.literal_str(rawValue)
@@ -803,7 +803,7 @@ def setConfigValue(*args, **kwargs):
 		config_setters = defaultGetter(key=_PIAP_KVP_SET_KEY, defaultValue=_empty_kvp_setters())
 		theSetFunc = defaultSetter
 		if checkKeyWordArgsHasKey(kwargs) and str(kwargs["""key"""]) in config_setters.keys():
-			theSetFunc =utils.getHandler(config_setters[str(kwargs["""key"""])])
+			theSetFunc = utils.getHandler(config_setters[str(kwargs["""key"""])])
 		return theSetFunc(*args, **kwargs)
 	except Exception as err:
 		remediation.error_breakpoint(err, context=setConfigValue)

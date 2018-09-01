@@ -30,9 +30,10 @@ try:
 	import sys
 	import argparse
 	import re
+	import fnmatch
 	import os.path
 	import functools
-	for someModule in [os, sys, argparse, re, os.path, functools]:
+	for someModule in [os, sys, argparse, re, fnmatch, os.path, functools]:
 		if someModule.__name__ is None:
 			raise ImportError(str("OMG! we could not import {}. ABORT. ABORT.").format(someModule))
 except Exception as err:
@@ -184,6 +185,7 @@ def compactSpace(theInput_Str):
 
 @memoize
 def splitDottedKeyPath(fullkey):
+	"""splits off the last dotted notation chunck from the first."""
 	kp = {}
 	if fullkey is None:
 		kp[0] = str(None)
@@ -194,31 +196,159 @@ def splitDottedKeyPath(fullkey):
 	return kp
 
 
+def metaImport(module_named_x):
+	"""Forces a meta-import
+		Idea from:
+		https://stackoverflow.com/questions/8718885/import-module-from-string-variable/28639730
+		"""
+	try:
+		# because we want to import using a variable, do it this way
+		module_obj = __import__(module_named_x)
+		# create a global object containging our module
+		globals()[module_named_x] = module_obj
+	except ImportError as impErr:
+		# logs.log(str("missing python module: {}").format(module_named_x), "Debug")
+		impErr = None
+		del impErr
+
+
+@remediation.error_handling
+@memoize
+def getRootFofOS():
+	"""returns the root system file path, hopefully."""
+	if sys.platform.startswith("Win"):
+		return str("C:\\")  # pragma: no cover
+	else:
+		return str("""/""")
+
+
+def find_files(directory, pattern):
+	"""idea from: https://stackoverflow.com/a/2186673"""
+	for root, dirs, files in os.walk(directory):
+		for basename in files:
+			if fnmatch.fnmatch(basename, pattern):
+				filename = os.path.join(root, basename)
+				yield filename
+
+
+def find_dirs(directory, pattern):
+	"""idea from: https://stackoverflow.com/a/2186673"""
+	for root, dirs, files in os.walk(directory):
+		for dirname in dirs:
+			if fnmatch.fnmatch(dirname, pattern):
+				filename = os.path.join(root, dirname)
+				yield filename
+
+
+@remediation.error_handling
+@memoize
+def search_files(pattern):
+	"""searches for the given pattern"""
+	theResult = []
+	for search_path in sys.path:
+		for searches in find_dirs(search_path, pattern):
+			if searches not in theResult:
+				theResult.append(searches)
+	return theResult
+
+
+@remediation.error_handling
+@memoize
+def getpkuPath():
+	"""returns the likly paths for piaplib.pku.
+		idea from:
+		https://stackoverflow.com/questions/10043485/python-import-every-module-from-a-folder
+	"""
+	theResult = str("")
+	if str("""pku""") not in str(os.path.abspath(os.curdir)):
+		if str("""piaplib""") not in str(os.path.abspath(os.curdir)):
+			theResult = search_files("pku")[0]
+		else:
+			theResult = os.path.abspath(os.path.join(os.path.abspath(os.curdir), "pku"))
+	else:
+		theResult = str(os.path.abspath(os.curdir))
+	return theResult
+
+
+@remediation.error_handling
+def superMetaImport():
+	"""Forces a SUPER meta-import
+		Idea from:
+		https://stackoverflow.com/questions/10043485/python-import-every-module-from-a-folder
+		"""
+	try:
+		for name in os.listdir(getpkuPath()):
+			modulename = None
+			if name.endswith(".py") and not name.startswith("_"):
+				# strip the extension
+				modulename = name[:-3]
+				# set the module name in the current global name space:
+				globals()[modulename] = __import__(str("piaplib.pku.{}").format(modulename))
+	except ImportError as err:
+		raise remediation.PiAPError(msg="Super Meta Import failed!", cause=err)
+
+
+def getFunctionListDict(someModuleHandle):
+	"""Generates a locals() like dict for the given module.
+		Idea from:
+		https://stackoverflow.com/questions/139180/how-to-list-all-functions-in-a-python-module
+	"""
+	import types
+	metaImport(someModuleHandle)
+	mod = sys.modules.get(someModuleHandle)
+	flst = [getattr(mod, a) for a in dir(mod) if isinstance(getattr(mod, a), types.FunctionType)]
+	listOfFunctions = dict({})
+	for someFunc in flst:
+		listOfFunctions[str(someFunc.__name__)] = someFunc
+	return listOfFunctions
+
+
 def getHandle(handler):
-	if locals() is not None:
-		for someFunc in locals().copy().keys():
-			if handler == locals()[someFunc]:
+	"""gets the function handle (name) for a given function"""
+	handle = getANYHandle(handler)
+	if locals() is not None and handle is None:
+		local_search = locals().copy()
+		for someFunc in local_search.keys():
+			if handler == local_search[someFunc]:
 				handle = someFunc
 	for theFunc in globals().copy().keys():
 		if handler == globals()[theFunc]:
 			handle = theFunc
+	if handle is None:
+		raise NotImplementedError(str("Function {} not implemented").format(repr(handler)))
+	return handle
+
+
+@remediation.error_handling
+def getANYHandle(handler):
+	"""gets the function handle (name) for a given function"""
+	handle = None
+	superMetaImport()
+	for mod in sys.modules.keys():
+		try:
+			if str(mod).startswith("piaplib."):
+				check_group = getFunctionListDict(mod)
+				check_prekey = str(mod)
+				for someFunc in check_group:
+					if handler == check_group[someFunc]:
+						handle = str("{}.{}").format(str(check_prekey), str(someFunc))
+		except BaseException as err:
+			err = None
+			del err
+	if handle is None:
+		raise NotImplementedError(str("Function {} not implemented").format(repr(handler)))
 	return handle
 
 
 def getHandler(handle):
-	import piaplib.pku.config
 	possibles = globals().copy()
-	# possibles.update(globals()['__builtins__'].__dict__)
 	possibles.update(locals())
 	handler = possibles.get(handle)
+	if str(".") in str(handle) and isinstance(handler, type(None)):
+		best_guess = getFunctionListDict(str(splitDottedKeyPath(handle)[0]))
+		handler = best_guess.get(str(splitDottedKeyPath(handle)[1]))
 	if isinstance(handler, type(None)):
-		for modname in sys.modules.keys():
-			if str(splitDottedKeyPath(handle)[0]) in str(modname):
-				mod = sys.modules.get(modname)
-				if getattr(mod, splitDottedKeyPath(handle)[1]) is not None:
-					handler = getattr(mod, splitDottedKeyPath(handle)[1])
-	if isinstance(handler, type(None)):
-		raise NotImplementedError(str("Function {} not implemented in {}").format(str(handle), repr(possibles)))
+		raise NotImplementedError(str("Function with name {} not implemented").format(str(handle)))
 	return handler
 
 
