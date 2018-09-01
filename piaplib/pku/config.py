@@ -111,21 +111,21 @@ _PIAP_KVP_LOAD_KEY = str("""{}.{}""").format(_PIAP_KVP_GLOBAL_KEY, _PIAP_KVP_LOA
 """Cannonical key for PiAP-piaplib.loaded"""
 
 
-_PIAP_KVP_GET_LOAD = str("""__builtin_isLoaded""")
+_PIAP_KVP_GET_LOAD = str("""piaplib.pku.config.__builtin_isLoaded""")
 
 
 _PIAP_KVP_GET_KEY = str("""{}.{}""").format(_PIAP_KVP_GLOBAL_KEY, """config_accessors""")
 """Cannonical key for PiAP-piaplib.config_accessors"""
 
 
-_PIAP_KVP_GET_DEFAULT = str("""defaultGetter""")
+_PIAP_KVP_GET_DEFAULT = str("""config.defaultGetter""")
 
 
 _PIAP_KVP_SET_KEY = str("""{}.{}""").format(_PIAP_KVP_GLOBAL_KEY, """config_modifiers""")
 """Cannonical key for PiAP-piaplib.config_modifiers"""
 
 
-_PIAP_KVP_SET_DEFAULT = str("""defaultSetter""")
+_PIAP_KVP_SET_DEFAULT = str("""config.defaultSetter""")
 
 
 _MAIN_CONFIG_DATA = None
@@ -273,27 +273,6 @@ except ImportError:
 	pass
 
 
-def getHandle(handler):
-	if locals() is not None:
-		for someFunc in locals().copy().keys():
-			if handler == locals()[someFunc]:
-				handle = someFunc
-	for theFunc in globals().copy().keys():
-		if handler == globals()[theFunc]:
-			handle = theFunc
-	return handle
-
-
-def getHandler(handle):
-	possibles = globals().copy()
-	# possibles.update(globals()['__builtins__'].__dict__)
-	possibles.update(locals())
-	handler = possibles.get(handle)
-	if isinstance(handler, type(None)):
-		raise NotImplementedError(str("Function {} not implemented").format(str(handle)))
-	return handler
-
-
 @remediation.error_passing
 def prepforStore(rawValue):
 	"""pack value for storage"""
@@ -312,7 +291,7 @@ def prepforStore(rawValue):
 		elif str(False) in taint_value_7:
 			taint_value = repr(False)
 		elif str("""<function""") in taint_value_9:
-			taint_value = getHandle(str(rawValue))
+			taint_value = utils.getHandle(str(rawValue))
 	else:
 		try:
 			taint_value = utils.literal_str(rawValue)
@@ -443,10 +422,9 @@ def getDefaultMainConfigFile():
 def _raw_getMainConfig():
 	"""returns raw global _MAIN_CONFIG_DATA"""
 	global _MAIN_CONFIG_DATA
-	if globals().get("""_MAIN_CONFIG_DATA""") is not None:
-		return _MAIN_CONFIG_DATA
-	else:
-		return None
+	if globals().get("""_MAIN_CONFIG_DATA""") is None:
+		_MAIN_CONFIG_DATA = None
+	return _MAIN_CONFIG_DATA
 
 
 def _raw_setMainConfig(newValue):
@@ -796,7 +774,7 @@ def getConfigValue(*args, **kwargs):
 	config_getters = defaultGetter(key=_PIAP_KVP_GET_KEY, defaultValue=_empty_kvp_getters())
 	try:
 		if (str(kwargs["""key"""]) in config_getters.keys()):
-			return getHandler(config_getters[str(kwargs["""key"""])])(*args, **kwargs)
+			return utils.getHandler(config_getters[str(kwargs["""key"""])])(*args, **kwargs)
 		else:
 			return defaultGetter(*args, **kwargs)
 	except Exception as err:
@@ -813,10 +791,9 @@ def getConfigValue(*args, **kwargs):
 def checkKeyWordArgsHasKey(*args, **kwargs):
 	theResult = None
 	if kwargs is not None:
-		if kwargs.keys() is not None:
-			if len(kwargs.keys()) > 0:
-				if str("""key""") in kwargs.keys():
-					theResult = True
+		if kwargs.keys() is not None and (len(kwargs.keys()) > 0):
+			if str("""key""") in kwargs.keys():
+				theResult = True
 	return theResult
 
 
@@ -824,10 +801,10 @@ def setConfigValue(*args, **kwargs):
 	"""API Modifier function for configs"""
 	try:
 		config_setters = defaultGetter(key=_PIAP_KVP_SET_KEY, defaultValue=_empty_kvp_setters())
+		theSetFunc = defaultSetter
 		if checkKeyWordArgsHasKey(kwargs) and str(kwargs["""key"""]) in config_setters.keys():
-			return getHandler(config_setters[str(kwargs["""key"""])])(*args, **kwargs)
-		else:
-			return defaultSetter(*args, **kwargs)
+			theSetFunc =utils.getHandler(config_setters[str(kwargs["""key"""])])
+		return theSetFunc(*args, **kwargs)
 	except Exception as err:
 		remediation.error_breakpoint(err, context=setConfigValue)
 		print(repr(config_setters))
@@ -854,7 +831,7 @@ def configRegisterKeyValueFactory(*args, **kwargs):
 		key=_PIAP_KVP_GET_KEY,
 		defaultValue=_empty_kvp_getters()
 	)
-	newValue = dict({kwargs['key']: getHandle(kwargs['getter'])})
+	newValue = dict({kwargs['key']: utils.getHandle(kwargs['getter'])})
 	new_KeyValueFactory_data = baseconfig.mergeDicts(config_getters, newValue)
 	defaultSetter(key=str("""PiAP-piaplib.config_accessors"""), value=new_KeyValueFactory_data)
 	if str('setter') in kwargs.keys():
@@ -862,7 +839,7 @@ def configRegisterKeyValueFactory(*args, **kwargs):
 			_PIAP_KVP_SET_KEY,
 			_empty_kvp_setters()
 		)
-		newValue = dict({kwargs['key']: getHandle(kwargs['setter'])})
+		newValue = dict({kwargs['key']: utils.getHandle(kwargs['setter'])})
 		new_KeyValueFactory_data = baseconfig.mergeDicts(config_setters, newValue)
 		defaultSetter(
 			key=str("""PiAP-piaplib.config_modifiers"""), value=new_KeyValueFactory_data

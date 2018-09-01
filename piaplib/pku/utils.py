@@ -182,6 +182,46 @@ def compactSpace(theInput_Str):
 	return theList
 
 
+@memoize
+def splitDottedKeyPath(fullkey):
+	kp = {}
+	if fullkey is None:
+		kp[0] = str(None)
+	if str(""".""") not in str(fullkey):
+		kp[0] = str(fullkey)
+	else:
+		kp = str(fullkey).rsplit(""".""", 1)
+	return kp
+
+
+def getHandle(handler):
+	if locals() is not None:
+		for someFunc in locals().copy().keys():
+			if handler == locals()[someFunc]:
+				handle = someFunc
+	for theFunc in globals().copy().keys():
+		if handler == globals()[theFunc]:
+			handle = theFunc
+	return handle
+
+
+def getHandler(handle):
+	import piaplib.pku.config
+	possibles = globals().copy()
+	# possibles.update(globals()['__builtins__'].__dict__)
+	possibles.update(locals())
+	handler = possibles.get(handle)
+	if isinstance(handler, type(None)):
+		for modname in sys.modules.keys():
+			if str(splitDottedKeyPath(handle)[0]) in str(modname):
+				mod = sys.modules.get(modname)
+				if getattr(mod, splitDottedKeyPath(handle)[1]) is not None:
+					handler = getattr(mod, splitDottedKeyPath(handle)[1])
+	if isinstance(handler, type(None)):
+		raise NotImplementedError(str("Function {} not implemented in {}").format(str(handle), repr(possibles)))
+	return handler
+
+
 @remediation.error_handling
 @memoize
 def extractMACAddr(theInputStr):
