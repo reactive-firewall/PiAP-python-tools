@@ -339,6 +339,64 @@ class ConfigTestSuite(unittest.TestCase):
 		clean_temp_file(test_path)
 		assert theResult
 
+	def test_z_case_write_mod_config(self):
+		""" Tests the default configuration file write (save) functions.
+			config.writeMainConfigFile(test_path) == config.loadMainConfigFile(test_path)
+		"""
+		theResult = False
+		test_path = str("{}.cnf").format(str(random_file_path()))
+		try:
+			from piaplib import pku as pku
+			if pku.__name__ is None:
+				raise ImportError("Failed to import pku")
+			from pku import config as config
+			if config.__name__ is None:
+				raise ImportError("Failed to import config")
+			print(str(""" init """))
+			self.assertTrue(
+				config.writeMainConfigFile(test_path),
+				config.getMainConfig(test_path).as_dict()
+			)
+			print(str(""" ... wrote """))
+			self.assertTrue(config.reloadConfigCache(test_path))
+			test_load = config.loadMainConfigFile(test_path)
+			self.assertIsNotNone(test_load)
+			print(str(""" ... loaded ... """))
+			test_config_value = str("This is a Test")
+			config.writeMainConfigAPI(
+				file=test_path, setting=str("UnitTest.modified"),
+				value=test_config_value
+			)
+			print(str(""" ... modified ... """))
+			self.assertTrue(config.reloadConfigCache(test_path))
+			test_load = config.loadMainConfigFile(test_path)
+			self.assertIsNotNone(test_load)
+			print(str(""" ... re-loaded ... """))
+			self.maxDiff = None
+			mock_value = config.getMainConfig(test_path).as_dict()
+			test_load["""PiAP-piaplib"""]["""loaded"""] = repr(True)
+			test_load["""UnitTest"""]["""modified"""] = test_config_value
+			self.assertIsNotNone(mock_value)
+			self.assertDictEqual(
+				test_load,
+				mock_value
+			)
+			print(str(""" ... checked ... """))
+			config.clearMainConfigAPI(
+				file=test_path, setting=str("UnitTest.modified")
+			)
+			print(str(""" ... reset ... """))
+			test_load = None
+			del test_load
+			theResult = True
+		except Exception as err:
+			debugtestError(err)
+			err = None
+			del err
+			theResult = False
+		clean_temp_file(test_path)
+		assert theResult
+
 	def test_case_get_set_config(self):
 		""" Tests the get/set configuration functions.
 			config.setConfigValue(key, config.getConfigValue(key)) == getConfigValue(key)
@@ -367,7 +425,10 @@ class ConfigTestSuite(unittest.TestCase):
 			if config.isLoaded() is not True:
 				config.reloadConfigCache(config._raw_getConfigPath())
 			self.assertTrue(config.isLoaded())
-			self.assertEqual(config.getConfigValue(key=test_key), test_key_value)
+			self.assertEqual(
+				config.getConfigValue(key=test_key), test_key_value,
+				str("""Bug in setConfigValue""")
+			)
 			theResult = True
 		except Exception as err:
 			debugtestError(err)
