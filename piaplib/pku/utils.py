@@ -321,7 +321,7 @@ def getHandle(handler):
 
 @remediation.error_handling
 def getANYHandle(handler):
-	"""gets the function handle (name) for a given function"""
+	"""gets the function handle (name) for a given function if able otherwise returns none"""
 	handle = None
 	superMetaImport()
 	for mod in sys.modules.keys():
@@ -335,8 +335,6 @@ def getANYHandle(handler):
 		except BaseException as err:
 			err = None
 			del err
-	if handle is None:
-		raise NotImplementedError(str("Function {} not implemented").format(repr(handler)))
 	return handle
 
 
@@ -788,6 +786,29 @@ def cleanFileResource(theFile):
 	try:
 		if theResult:
 			logs.log(str("purged file {}").format(theFile), "debug")
+	except Exception:
+		pass
+	return theResult
+
+
+@remediation.error_handling
+def moveFileResource(theSrc, theDest):
+	"""cleans up a downloaded given file."""
+	import os
+	theResult = False
+	try:
+		os.rename(str(theSrc), str(theDest))
+		theResult = True
+	except IOError:
+		theResult = False
+	except OSError:
+		theResult = False
+	except Exception:
+		logs.log(str("Error: Failed to rename file"), "Warning")
+		theResult = False
+	try:
+		if theResult:
+			logs.log(str("Moved file {} to {}").format(theSrc, theDest), "debug")
 	except Exception:
 		pass
 	return theResult
