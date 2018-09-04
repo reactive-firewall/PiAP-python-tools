@@ -292,6 +292,8 @@ def prepforStore(rawValue):
 			taint_value = repr(False)
 		elif str("""<function""") in taint_value_9:
 			taint_value = utils.getHandle(rawValue)
+		elif str("""['None']""") in taint_value_9:
+			taint_value = repr(None)
 	else:
 		try:
 			taint_value = utils.literal_str(rawValue)
@@ -751,7 +753,8 @@ def defaultGetter(key, defaultValue=None, initIfEmpty=False):
 	return theValue
 
 
-def defaultSetter(key, value=None):
+@remediation.error_handling
+def defaultSetter(key, value):
 	"""the default configuration setter for most keys."""
 	if value is None:
 		theValue = repr(None)
@@ -759,13 +762,40 @@ def defaultSetter(key, value=None):
 		theValue = prepforStore(value)
 	if isLoaded() is not True:
 		reloadConfigCache(_raw_getConfigPath())
-	if getMainConfig() is not None:
-		main_config = getMainConfig().as_dict()
+	if (getMainConfig() is not None):
+		main_config = getMainConfig()
 	else:
 		main_config = getDefaultMainConfigFile()
-	new_config_data = baseconfig.__config_data_from_kvp(key, theValue)
-	full_config_data = baseconfig.mergeDicts(main_config, new_config_data)
-	writeMainConfigFile(config_data=full_config_data)
+	if str(""".""") not in str(key):
+		main_config.as_dict()[key] = theValue
+	else:
+		kp = str(key).split(""".""")
+		if not hasMainConfigOptionFor(kp[0]):
+			main_config.add_section(kp[0])
+		main_config.set(kp[0], kp[1], theValue)
+	writeMainConfigFile(config_data=main_config)
+	invalidateConfigCache()
+
+
+@remediation.error_handling
+def defaultDeletter(key):
+	"""the default configuration un-setter for all keys. NON-ATOMIC FUNCTION"""
+	if isLoaded() is not True:
+		reloadConfigCache(_raw_getConfigPath())
+	if (getMainConfig() is not None):
+		main_config = getMainConfig()
+	else:
+		return
+	if str(""".""") not in str(key):
+		main_config.remove_section(key)
+	else:
+		kp = str(key).split(""".""")
+		main_config.remove_option(kp[0], kp[1])
+	actual_conf_file = _raw_getConfigPath()
+	swap_conf_file = str("{}.{}").format(actual_conf_file, "swap")
+	writeMainConfigFile(confFile=swap_conf_file, config_data=main_config)
+	utils.moveFileResource(swap_conf_file, actual_conf_file)
+	writeMainConfigFile(confFile=actual_conf_file, config_data=main_config)
 	invalidateConfigCache()
 
 
@@ -799,12 +829,12 @@ def checkKeyWordArgsHasKey(*args, **kwargs):
 
 def setConfigValue(*args, **kwargs):
 	"""API Modifier function for configs"""
+	config_setters = defaultGetter(key=_PIAP_KVP_SET_KEY, defaultValue=_empty_kvp_setters())
 	try:
-		config_setters = defaultGetter(key=_PIAP_KVP_SET_KEY, defaultValue=_empty_kvp_setters())
-		theSetFunc = defaultSetter
-		if checkKeyWordArgsHasKey(kwargs) and str(kwargs["""key"""]) in config_setters.keys():
-			theSetFunc = utils.getHandler(config_setters[str(kwargs["""key"""])])
-		return theSetFunc(*args, **kwargs)
+		if (str(kwargs["""key"""]) in config_setters.keys()):
+			return utils.getHandler(config_setters[str(kwargs["""key"""])])(*args, **kwargs)
+		else:
+			return defaultSetter(*args, **kwargs)
 	except Exception as err:
 		remediation.error_breakpoint(err, context=setConfigValue)
 		print(repr(config_setters))
@@ -996,6 +1026,59 @@ def readMainConfig(*args, **kwargs):
 		raise remediation.PiAPError("Unsure what setting you are trying to access!")
 
 
+@remediation.error_handling
+def writeMainConfigAPI(*args, **kwargs):
+	"""writes a given setting and value to the configuration"""
+	bootstrapconfig(*args, **kwargs)
+	__sKey = str("""setting""")
+	__vKey = str("""value""")
+	__aKey = str(__ALL_KEYS_SETTING__)
+	pre_reqs = False
+	if kwargs is not None:
+		if kwargs.keys() is not None and __sKey in kwargs.keys():
+			if kwargs.keys() is not None and __vKey in kwargs.keys():
+				if isinstance(kwargs.get(__sKey), type(None)) is False:
+					if __aKey not in kwargs.get(__sKey):
+						pre_reqs = True
+	if pre_reqs:
+		config_setting = kwargs[__sKey]
+		config_value = kwargs[__vKey]
+		if getConfigValue(key=config_setting) is None:
+			configRegisterKeyValueFactory(
+				key=config_setting,
+				getter=defaultGetter,
+				setter=defaultSetter
+			)
+		setConfigValue(key=config_setting, value=config_value)
+		# (section_color, end_color, label_color, value_color) = colorsFromArgs(*args, **kwargs)
+	elif isinstance(kwargs.get(__sKey), type(None)) is False and __aKey in kwargs[__sKey]:
+		raise remediation.PiAPError("Unsure how to set all/one settings!")
+	else:
+		raise remediation.PiAPError("Unsure what setting you are trying to access!")
+
+
+@remediation.error_handling
+def clearMainConfigAPI(*args, **kwargs):
+	"""unwrites a given setting and value to the configuration"""
+	bootstrapconfig(*args, **kwargs)
+	__sKey = str("""setting""")
+	__aKey = str(__ALL_KEYS_SETTING__)
+	pre_reqs = False
+	if kwargs is not None:
+		if kwargs.keys() is not None and __sKey in kwargs.keys():
+			if isinstance(kwargs.get(__sKey), type(None)) is False:
+				if __aKey not in kwargs.get(__sKey):
+					pre_reqs = True
+	if pre_reqs:
+		config_setting = kwargs[__sKey]
+		defaultDeletter(key=config_setting)
+	# (section_color, end_color, label_color, value_color) = colorsFromArgs(*args, **kwargs)
+	elif isinstance(kwargs.get(__sKey), type(None)) is False and __aKey in kwargs[__sKey]:
+		raise remediation.PiAPError("Unsure how to unset all/one settings!")
+	else:
+		return
+
+
 @remediation.error_passing
 def parseargs(arguments=None):
 	"""Parse the arguments"""
@@ -1007,7 +1090,11 @@ def parseargs(arguments=None):
 	)
 	the_action.add_argument(
 		'-w', '--write', dest='config_action', action='store_const',
-		const='write', help='Modify the Configuration.'
+		const='write', help='Modify (changes) the Configuration.'
+	)
+	the_action.add_argument(
+		'-d', '--delete', dest='config_action', action='store_const',
+		const='remove', help='Modify (unsets) the Configuration.'
 	)
 	the_action.add_argument(
 		'-T', '--test', dest='config_action', action='store_const',
@@ -1051,7 +1138,8 @@ def noOp(*args, **kwargs):
 _CONFIG_CLI_ACTIONS = dict({
 	'dump': printMainConfig,
 	'read': readMainConfig,
-	'write': noOp,
+	'write': writeMainConfigAPI,
+	'remove': clearMainConfigAPI,
 	'test': noOp,
 	'reload': reloadConfigCache
 })
@@ -1072,8 +1160,8 @@ def main(argv=None):
 		config_key = args.config_key[0]
 	else:
 		config_key = args.config_key
-	if args.config_value is not None:
-		config_value = args.config_value
+	if args.config_value is not None and (len(args.config_value) <= 1):
+		config_value = args.config_value[0]
 	if args.use_syntax_color is not None:
 		use_syntax_color = args.use_syntax_color
 	if args.config_action is not None:
