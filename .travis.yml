@@ -191,7 +191,7 @@ after_failure:
   - coverage combine 2>/dev/null || true
   - coverage xml 2>/dev/null || true
   - if [ $TRAVIS_OS_NAME == osx ] ; then echo "SKIP code climate" ; else ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT || true ; fi ;
-  - codecov 2>/dev/null || true
+  - if [ $TRAVIS_PYTHON_VERSION == 3.2 ] || [ $TRAVIS_PYTHON_VERSION == 3.3 ] ; then echo "SKIP codecov" ; else codecov 2>/dev/null || true ; fi
   - make clean 2>/dev/nul || true
 
 after_success:
@@ -203,7 +203,7 @@ after_success:
   - if [ $TRAVIS_PYTHON_VERSION == 3.3 ] ; then echo "SKIP coveralls" ; else coveralls 2>/dev/null || true ; fi ;
   - travis_retry python -m pip uninstall -y PyYAML || travis_retry python3 -m pip uninstall -y PyYAML || true
   - if [ $TRAVIS_OS_NAME == osx ] ; then true ; wait ; else coverage run -p -m piaplib.pocket pku upgrade --upgrade-all || true ; fi ;
-  - if [ $TRAVIS_OS_NAME == osx ] ; then echo "SKIP codecov" ; else codecov || exit $? ; fi ;
+  - if [ $TRAVIS_OS_NAME == osx ] || [ $TRAVIS_PYTHON_VERSION == 3.2 ] || [ $TRAVIS_PYTHON_VERSION == 3.3 ] ; then echo "SKIP codecov" ; else codecov || exit $? ; fi ;
   - if [ $TRAVIS_PYTHON_VERSION == 3.3 ] ; then echo "SKIP coveralls" ; else travis_retry python3 -m pip install python-coveralls || python3 -m pip install python-coveralls || true ; fi ;
   - if [ $TRAVIS_PYTHON_VERSION == 3.3 ] ; then echo "SKIP coveralls" ; else coveralls 2>/dev/null || true ; fi ;
   - travis_retry python -m pip uninstall -y PyYAML || travis_retry python3 -m pip uninstall -y PyYAML || true
