@@ -121,7 +121,7 @@ test-tox: cleanup
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-style: cleanup
-	$(QUIET)flake8 --ignore=W191,W391 --max-line-length=100 --show-source --statistics --count --config=.flake8.ini
+	$(QUIET)flake8 --ignore=W191,W391,W504,W605 --max-line-length=100 --show-source --statistics --count --config=.flake8.ini
 	$(QUIET)tests/check_spelling 2>/dev/null || true
 	$(QUIET)tests/check_codecov_config 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
