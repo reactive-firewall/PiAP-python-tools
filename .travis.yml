@@ -4,6 +4,8 @@ sudo: false
 python:
 
 dist:
+  - trusty
+  - xenial
 
 branches:
   only:
@@ -21,24 +23,22 @@ matrix:
   - os: linux
     python:  "2.7"
     env: TRAVIS_PYTHON_VERSION="2.7"
-    dist: trusty
+  - os: linux
+    python:  "3.2"
+    env: TRAVIS_PYTHON_VERSION="3.2"
   - os: linux
     python:  "3.3"
     env: TRAVIS_PYTHON_VERSION="3.3"
-    dist: trusty
   - os: linux
     python:  "3.4"
     env: TRAVIS_PYTHON_VERSION="3.4"
-    dist: trusty
   - os: linux
     python:  "3.5"
-    dist: trusty
     env: TRAVIS_PYTHON_VERSION="3.5"
   - os: linux
     python:  "3.6"
     env: TRAVIS_PYTHON_VERSION="3.6"
   - os: linux
-    dist: trusty
     python:  "3.5-dev" # 3.5 development branch
     env: TRAVIS_PYTHON_VERSION="3.5"
   - os: linux
@@ -83,6 +83,9 @@ matrix:
   - os: osx
     osx_image: xcode10
     language: generic
+  - os: osx
+    osx_image: xcode10.1
+    language: generic
   allow_failures:
   - os: linux
     python:  "nightly" # currently points to 3.7-dev
@@ -108,6 +111,7 @@ matrix:
     python:  "nightly"
   - os: linux
     python:  "3.2"
+    env: TRAVIS_PYTHON_VERSION="3.2"
   - os: linux
     python: "pypy"
   - os: linux
@@ -123,7 +127,8 @@ install:  "make init"
 before_install:
   - if [ $TRAVIS_OS_NAME == osx ] ; then travis_wait git -C "$(brew --repo homebrew/core)" fetch --unshallow || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then travis_retry brew tap homebrew/versions || true ; fi
-  - if [ $TRAVIS_OS_NAME == osx ] ; then travis_wait brew upgrade || travis_retry brew upgrade || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] && [ $TRAVIS_OSX_IMAGE == xcode8 ] ; then brew outdated | cut -d\  -f 1 | xargs -L1 -I{} travis_retry brew upgrade {} || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] && [ $TRAVIS_OSX_IMAGE != xcode8 ] ; then travis_wait brew upgrade || travis_retry brew upgrade || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python2.6 || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python26 || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then travis_wait brew install python3 || true ; fi
