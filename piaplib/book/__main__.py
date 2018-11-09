@@ -40,7 +40,7 @@ except Exception as importErr:
 try:
 	try:
 		import piaplib as piaplib
-	except Exception as err:
+	except Exception:
 		from . import piaplib as piaplib
 	try:
 		from piaplib.pku import baseconfig as baseconfig
