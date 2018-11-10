@@ -59,7 +59,7 @@ except Exception as err:
 
 try:
 	import piaplib.pku.upgrade as upgrade
-except Exception as err:
+except Exception:
 	try:
 		if 'piaplib.pku.upgrade' not in sys.modules:
 			from . import upgrade as upgrade
@@ -69,7 +69,7 @@ except Exception as err:
 
 try:
 	import piaplib.pku.config as config
-except Exception as err:
+except Exception:
 	try:
 		if 'piaplib.pku.config' not in sys.modules:
 			from . import config as config
@@ -79,7 +79,7 @@ except Exception as err:
 
 try:
 	import piaplib.pku.utils as utils
-except Exception as err:
+except Exception:
 	try:
 		if 'piaplib.pku.utils' not in sys.modules:
 			from . import utils as utils
@@ -89,7 +89,7 @@ except Exception as err:
 
 try:
 	from . import remediation as remediation
-except Exception as err:
+except Exception:
 	try:
 		if 'piaplib.pku.remediation' not in sys.modules:
 			import remediation as remediation
