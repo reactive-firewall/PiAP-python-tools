@@ -45,8 +45,6 @@ try:
 	from hypothesis import assume
 	from hypothesis.strategies import text
 except Exception as ImportErr:
-	ImportErr = None
-	del ImportErr
 	def given(*given_arguments, **given_kwargs):
 		"""Helpful if you don't have a hypothisis!"""
 		return unittest.skip(str("Missing a hypothisis"))
@@ -64,6 +62,8 @@ except Exception as ImportErr:
 		if not condition:
 			raise unittest.SkipTest(str("Failed test assumption: {}").format(repr(condition)))
 		return True
+	ImportErr = None
+	del ImportErr
 
 
 import unittest
