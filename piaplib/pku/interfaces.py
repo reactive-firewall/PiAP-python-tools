@@ -47,7 +47,7 @@ __prog__ = """piaplib.pku.interfaces"""
 
 IFACE_PREFIXES = [
 	str("lan"), str("wlan"), str("eth"), str("usb"),
-	str("br"), str("mon"), str("enp0s"), str("en")
+	str("br"), str("mon"), str("enp0s"), str("eno"), str("en")
 ]
 """whitelist of valid iface prefixes"""
 
