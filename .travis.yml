@@ -19,109 +19,109 @@ env:
 matrix:
   include:
   - os: linux
-    python:  "2.7"
+    python: "2.7"
     env: TRAVIS_PYTHON_VERSION="2.7"
     dist: trusty
   - os: linux
-    python:  "3.2"
+    python: "3.2"
     env: TRAVIS_PYTHON_VERSION="3.2"
     dist: trusty
   - os: linux
-    python:  "3.3"
+    python: "3.3"
     env: TRAVIS_PYTHON_VERSION="3.3"
     dist: trusty
   - os: linux
-    python:  "3.4"
+    python: "3.4"
     env: TRAVIS_PYTHON_VERSION="3.4"
     dist: trusty
   - os: linux
-    python:  "3.5"
+    python: "3.5"
     env: TRAVIS_PYTHON_VERSION="3.5"
     dist: trusty
   - os: linux
-    python:  "3.6"
+    python: "3.6"
     env: TRAVIS_PYTHON_VERSION="3.6"
     dist: trusty
   - os: linux
-    python:  "3.5-dev" # 3.5 development branch
+    python: "3.5-dev" # 3.5 development branch
     env: TRAVIS_PYTHON_VERSION="3.5"
     dist: trusty
   - os: linux
-    python:  "3.6-dev"
+    python: "3.6-dev"
     env: TRAVIS_PYTHON_VERSION="3.6"
     dist: trusty
   - os: linux
-    python:  "3.7-dev"
+    python: "3.7-dev"
     env: TRAVIS_PYTHON_VERSION="3.7"
     dist: trusty
   - os: linux
-    python:  "3.8-dev"
+    python: "3.8-dev"
     env: TRAVIS_PYTHON_VERSION="3.8"
     dist: trusty
   - os: linux
-    python:  "pypy"  # PyPy2 2.5.0
+    python: "pypy"  # PyPy2 2.5.0
     dist: trusty
   - os: linux
-    python:  "pypy3"
+    python: "pypy3"
     dist: trusty
   - os: linux
-    python:  "pypy-5.3.1"
+    python: "pypy-5.3.1"
     dist: trusty
   - os: linux
-    python:  "nightly" # currently points to 3.7-dev
+    python: "nightly" # currently points to 3.7-dev
     env: TRAVIS_PYTHON_VERSION="3.7-dev"
     dist: trusty
   - os: linux
-    python:  "2.7"
+    python: "2.7"
     env: TRAVIS_PYTHON_VERSION="2.7"
     dist: xenial
   - os: linux
-    python:  "3.2"
+    python: "3.2"
     env: TRAVIS_PYTHON_VERSION="3.2"
     dist: xenial
   - os: linux
-    python:  "3.3"
+    python: "3.3"
     env: TRAVIS_PYTHON_VERSION="3.3"
     dist: xenial
   - os: linux
-    python:  "3.4"
+    python: "3.4"
     env: TRAVIS_PYTHON_VERSION="3.4"
     dist: xenial
   - os: linux
-    python:  "3.5"
+    python: "3.5"
     env: TRAVIS_PYTHON_VERSION="3.5"
     dist: xenial
   - os: linux
-    python:  "3.6"
+    python: "3.6"
     env: TRAVIS_PYTHON_VERSION="3.6"
     dist: xenial
   - os: linux
-    python:  "3.5-dev" # 3.5 development branch
+    python: "3.5-dev" # 3.5 development branch
     env: TRAVIS_PYTHON_VERSION="3.5"
     dist: xenial
   - os: linux
-    python:  "3.6-dev"
+    python: "3.6-dev"
     env: TRAVIS_PYTHON_VERSION="3.6"
     dist: xenial
   - os: linux
-    python:  "3.7-dev"
+    python: "3.7-dev"
     env: TRAVIS_PYTHON_VERSION="3.7"
     dist: xenial
   - os: linux
-    python:  "3.8-dev"
+    python: "3.8-dev"
     env: TRAVIS_PYTHON_VERSION="3.8"
     dist: xenial
   - os: linux
-    python:  "pypy"  # PyPy2 2.5.0
+    python: "pypy"  # PyPy2 2.5.0
     dist: xenial
   - os: linux
-    python:  "pypy3"
+    python: "pypy3"
     dist: xenial
   - os: linux
-    python:  "pypy-5.3.1"
+    python: "pypy-5.3.1"
     dist: xenial
   - os: linux
-    python:  "nightly" # currently points to 3.7-dev
+    python: "nightly" # currently points to 3.7-dev
     env: TRAVIS_PYTHON_VERSION="3.7-dev"
     dist: xenial
   - os: osx
@@ -153,7 +153,7 @@ matrix:
     language: generic
   allow_failures:
   - os: linux
-    python:  "nightly" # currently points to 3.7-dev
+    python: "nightly" # currently points to 3.7-dev
     env: TRAVIS_PYTHON_VERSION="3.7-dev"
   - os: osx
     osx_image: xcode7.2
@@ -165,69 +165,69 @@ matrix:
     osx_image: xcode6.4
     language: generic
   - os: linux
-    python:  "2.6"
+    python: "2.6"
     dist: trusty
   - os: linux
-    python:  "3.7-dev"
+    python: "3.7-dev"
     env: TRAVIS_PYTHON_VERSION="3.7"
     dist: trusty
   - os: linux
-    python:  "3.8-dev"
+    python: "3.8-dev"
     env: TRAVIS_PYTHON_VERSION="3.8"
     dist: trusty
   - os: linux
-    python:  "nightly"
+    python: "nightly"
     dist: trusty
   - os: linux
-    python:  "3.2"
+    python: "3.2"
     env: TRAVIS_PYTHON_VERSION="3.2"
     dist: trusty
   - os: linux
     python: "pypy"
     dist: trusty
   - os: linux
-    python:  "pypy3"
+    python: "pypy3"
     dist: trusty
   - os: linux
-    python:  "pypy-5.3.1"
+    python: "pypy-5.3.1"
     dist: trusty
   - os: linux
-    python:  "nightly" # currently points to 3.7-dev
+    python: "nightly" # currently points to 3.7-dev
     env: TRAVIS_PYTHON_VERSION="3.7-dev"
     dist: trusty
   - os: linux
-    python:  "2.6"
+    python: "2.6"
     dist: xenial
   - os: linux
-    python:  "3.7-dev"
+    python: "3.7-dev"
     env: TRAVIS_PYTHON_VERSION="3.7"
     dist: xenial
   - os: linux
-    python:  "3.8-dev"
+    python: "3.8-dev"
     env: TRAVIS_PYTHON_VERSION="3.8"
     dist: xenial
   - os: linux
-    python:  "nightly"
+    python: "nightly"
     dist: xenial
   - os: linux
-    python:  "3.2"
+    python: "3.2"
     env: TRAVIS_PYTHON_VERSION="3.2"
     dist: xenial
   - os: linux
     python: "pypy"
     dist: xenial
   - os: linux
-    python:  "pypy3"
+    python: "pypy3"
     dist: xenial
   - os: linux
-    python:  "pypy-5.3.1"
+    python: "pypy-5.3.1"
     dist: xenial
   - os: linux
-    python:  "nightly" # currently points to 3.7-dev
+    python: "nightly" # currently points to 3.7-dev
     env: TRAVIS_PYTHON_VERSION="3.7-dev"
     dist: xenial
 
-install:  "make init"
+install: "make init"
 
 before_install:
   - if [ $TRAVIS_OS_NAME == osx ] ; then travis_wait git -C "$(brew --repo homebrew/core)" fetch --unshallow || true ; fi
@@ -289,7 +289,7 @@ script:
   - coveralls 2>/dev/null || true
   - travis_retry pip uninstall -y python-coveralls || travis_retry python3 -m pip uninstall -y python-coveralls || true
   - travis_retry pip uninstall -y PyYAML || travis_retry python3 -m pip uninstall -y PyYAML || true
-  - make clean || exit $? ; 
+  - make clean || exit $? ;
   - if [ $TRAVIS_PYTHON_VERSION == 3.2 ] || [ $TRAVIS_PYTHON_VERSION == 3.3 ] ; then echo "SKIP tox test" ; else make test-tox || exit $? ; fi ;
   - cp -vf .coverage ".coverall.Lasting.45678.12345" 2>/dev/null || true
   - make clean ;
