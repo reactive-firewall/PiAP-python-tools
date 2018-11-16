@@ -43,7 +43,7 @@ matrix:
     env: TRAVIS_PYTHON_VERSION="3.6"
     dist: trusty
   - os: linux
-    python: "3.5-dev" # 3.5 development branch
+    python: "3.5-dev"  # 3.5 development branch
     env: TRAVIS_PYTHON_VERSION="3.5"
     dist: trusty
   - os: linux
@@ -68,7 +68,7 @@ matrix:
     python: "pypy-5.3.1"
     dist: trusty
   - os: linux
-    python: "nightly" # currently points to 3.7-dev
+    python: "nightly"  # currently points to 3.7-dev
     env: TRAVIS_PYTHON_VERSION="3.7-dev"
     dist: trusty
   - os: linux
@@ -96,7 +96,7 @@ matrix:
     env: TRAVIS_PYTHON_VERSION="3.6"
     dist: xenial
   - os: linux
-    python: "3.5-dev" # 3.5 development branch
+    python: "3.5-dev"  # 3.5 development branch
     env: TRAVIS_PYTHON_VERSION="3.5"
     dist: xenial
   - os: linux
@@ -121,7 +121,7 @@ matrix:
     python: "pypy-5.3.1"
     dist: xenial
   - os: linux
-    python: "nightly" # currently points to 3.7-dev
+    python: "nightly"  # currently points to 3.7-dev
     env: TRAVIS_PYTHON_VERSION="3.7-dev"
     dist: xenial
   - os: osx
@@ -153,7 +153,7 @@ matrix:
     language: generic
   allow_failures:
   - os: linux
-    python: "nightly" # currently points to 3.7-dev
+    python: "nightly"  # currently points to 3.7-dev
     env: TRAVIS_PYTHON_VERSION="3.7-dev"
   - os: osx
     osx_image: xcode7.2
@@ -192,7 +192,7 @@ matrix:
     python: "pypy-5.3.1"
     dist: trusty
   - os: linux
-    python: "nightly" # currently points to 3.7-dev
+    python: "nightly"  # currently points to 3.7-dev
     env: TRAVIS_PYTHON_VERSION="3.7-dev"
     dist: trusty
   - os: linux
@@ -223,7 +223,7 @@ matrix:
     python: "pypy-5.3.1"
     dist: xenial
   - os: linux
-    python: "nightly" # currently points to 3.7-dev
+    python: "nightly"  # currently points to 3.7-dev
     env: TRAVIS_PYTHON_VERSION="3.7-dev"
     dist: xenial
 
