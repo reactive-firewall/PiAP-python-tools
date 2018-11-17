@@ -44,16 +44,23 @@ except Exception:
 __prog__ = """piaplib.pku.interfaces"""
 """The name of this PiAPLib tool is Pocket Knife Interfaces Unit"""
 
+if sys.platform.startswith("linux"):
+	try:
+		import netifaces
+	except Exception:
+		raise ImportError("WTF, no netifaces?!?!")
 
-IFACE_PREFIXES = [
-	str("lan"), str("wlan"), str("eth"), str("usb"),
-	str("br"), str("mon"), str("enp0s"), str("eno"), str("en")
-]
-"""whitelist of valid iface prefixes"""
+	INTERFACE_CHOICES = netifaces.interfaces()
+	"""whitelist of valid iface names"""
+else:
+	IFACE_PREFIXES = [
+		str("lan"), str("wlan"), str("eth"), str("usb"),
+		str("br"), str("mon"), str("enp0s"), str("eno"), str("en")
+	]
+	"""whitelist of valid iface prefixes"""
 
-
-INTERFACE_CHOICES = [str('{}{}').format(str(x), str(y)) for x in IFACE_PREFIXES for y in range(5)]
-"""whitelist of valid iface names"""
+	INTERFACE_CHOICES = [str('{}{}').format(str(x), str(y)) for x in IFACE_PREFIXES for y in range(5)]
+	"""whitelist of valid iface names"""
 
 
 @remediation.error_handling

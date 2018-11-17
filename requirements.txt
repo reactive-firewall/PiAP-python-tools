@@ -27,4 +27,5 @@ urllib3>=1.22.0
 # pyyaml - MIT
 #pyyaml>=3.12
 #-e git+https://github.com/reactive-firewall/PiAP-python-tools.git#egg=piaplib
-
+# netifaces - MIT
+netifaces>=0.10.7
