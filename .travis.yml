@@ -196,7 +196,39 @@ matrix:
     env: TRAVIS_PYTHON_VERSION="3.7-dev"
     dist: trusty
   - os: linux
+    python: "2.7"
+    env: TRAVIS_PYTHON_VERSION="2.7"
+    dist: xenial
+  - os: linux
     python: "2.6"
+    dist: xenial
+  - os: linux
+    python: "3.2"
+    env: TRAVIS_PYTHON_VERSION="3.2"
+    dist: xenial
+  - os: linux
+    python: "3.3"
+    env: TRAVIS_PYTHON_VERSION="3.3"
+    dist: xenial
+  - os: linux
+    python: "3.4"
+    env: TRAVIS_PYTHON_VERSION="3.4"
+    dist: xenial
+  - os: linux
+    python: "3.5"
+    env: TRAVIS_PYTHON_VERSION="3.5"
+    dist: xenial
+  - os: linux
+    python: "3.6"
+    env: TRAVIS_PYTHON_VERSION="3.6"
+    dist: xenial
+  - os: linux
+    python: "3.5-dev"  # 3.5 development branch
+    env: TRAVIS_PYTHON_VERSION="3.5"
+    dist: xenial
+  - os: linux
+    python: "3.6-dev"
+    env: TRAVIS_PYTHON_VERSION="3.6"
     dist: xenial
   - os: linux
     python: "3.7-dev"
@@ -207,14 +239,7 @@ matrix:
     env: TRAVIS_PYTHON_VERSION="3.8"
     dist: xenial
   - os: linux
-    python: "nightly"
-    dist: xenial
-  - os: linux
-    python: "3.2"
-    env: TRAVIS_PYTHON_VERSION="3.2"
-    dist: xenial
-  - os: linux
-    python: "pypy"
+    python: "pypy"  # PyPy2 2.5.0
     dist: xenial
   - os: linux
     python: "pypy3"
@@ -226,6 +251,10 @@ matrix:
     python: "nightly"  # currently points to 3.7-dev
     env: TRAVIS_PYTHON_VERSION="3.7-dev"
     dist: xenial
+  - os: linux
+    python: "2.6"
+    dist: xenial
+
 
 install: "make init"
 
