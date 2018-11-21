@@ -1402,7 +1402,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 		assert theResult
 
 	@unittest.skipUnless(sys.platform.startswith("linux"), "Requires linux for script")
-	def test_c_python_command_keyring_rand(self):
+	def test_x_python_command_upgrade_all(self):
 		"""Test case for piaplib.pocket pku upgrade --all."""
 		theResult = False
 		try:
@@ -1442,7 +1442,6 @@ class BasicUsageTestSuite(unittest.TestCase):
 			del err
 			theResult = False
 		assert theResult
-
 
 	def test_j_python_command_book_logs(self):
 		"""Test case for piaplib.book.logs --help."""
