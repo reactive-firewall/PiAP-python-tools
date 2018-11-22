@@ -745,10 +745,10 @@ def _python2urlretrieve(url, filename):
 			tempfile.addheader('DNT', '1')
 			tempfile.addheader('Connection', 'close')
 			tempfile.addheader('user-agent', getUserAgent())
+			return tempfile.retrieve(url, filename)
 		except Exception:
 			import urllib.request
 			return urllib.request.urlretrieve(url, filename)
-		return tempfile.retrieve(url, filename)
 	raise AssertionError("URL could not be opened - BUG")
 
 
