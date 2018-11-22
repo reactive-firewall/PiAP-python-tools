@@ -759,7 +759,7 @@ def getFileResource(someURL, outFile):
 		urlretrieve(url=someURL, filename=outFile)
 	except Exception as err:
 		logs.log(str("Failed to fetched file {}").format(someURL), "Debug")
-		remediation.remediation.error_breakpoint(error=err, context=getFileResource)
+		remediation.error_breakpoint(error=err, context=getFileResource)
 		return False
 	try:
 		logs.log(str("fetched file {}").format(someURL), "Debug")
