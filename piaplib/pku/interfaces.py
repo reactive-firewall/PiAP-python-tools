@@ -54,7 +54,7 @@ if sys.platform.startswith("linux") and (sys.version_info > (3, 3)):
 
 		INTERFACE_CHOICES = netifaces.interfaces()
 		"""whitelist of valid iface names"""
-		
+	
 		__ALTMODE = False
 	except Exception:
 		__ALTMODE = True
