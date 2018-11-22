@@ -728,7 +728,6 @@ def urlretrieve(url, filename):
 				r.encoding = "utf-8"
 				return writeFile(filename, r.content)
 	except Exception as err:
-		logs.log(str("Failed to get file {}. Trying legacy function.").format(someURL), "Debug")
 		remediation.error_breakpoint(error=err, context=urlretrieve)
 		return _python2urlretrieve(url, filename)
 	raise AssertionError("URL could not be opened - BUG")
