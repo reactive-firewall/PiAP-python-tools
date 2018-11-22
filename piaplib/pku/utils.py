@@ -715,8 +715,7 @@ def getUserAgent():
 def urlretrieve(url, filename):
 	""" cross-python urlretrive function """
 	try:
-		import six
-		if six.PY2 or (sys.version_info <= (3, 3)):
+		if (sys.version_info < (3, 4)):
 			return _python2urlretrieve(url, filename)
 		else:
 			import requests
@@ -729,7 +728,6 @@ def urlretrieve(url, filename):
 				return writeFile(filename, r.content)
 	except Exception as err:
 		remediation.error_breakpoint(err)
-		raise AssertionError("URL could not be opened - BUG is here")
 		return _python2urlretrieve(url, filename)
 	raise AssertionError("URL could not be opened - BUG")
 
