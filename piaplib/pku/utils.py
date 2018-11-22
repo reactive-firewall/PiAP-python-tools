@@ -728,7 +728,7 @@ def urlretrieve(url, filename):
 				r.encoding = "utf-8"
 				return writeFile(filename, r.content)
 	except Exception as err:
-		remediation.error_breakpoint(err)
+		remediation.error_breakpoint(error=err, context=urlretrieve)
 		return _python2urlretrieve(url, filename)
 	raise AssertionError("URL could not be opened - BUG")
 
@@ -758,8 +758,8 @@ def getFileResource(someURL, outFile):
 	try:
 		urlretrieve(url=someURL, filename=outFile)
 	except Exception as err:
-		remediation.error_breakpoint(err)
 		logs.log(str("Failed to fetched file {}").format(someURL), "Debug")
+		remediation.remediation.error_breakpoint(error=err, context=getFileResource)
 		return False
 	try:
 		logs.log(str("fetched file {}").format(someURL), "Debug")
