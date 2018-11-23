@@ -37,6 +37,7 @@ def getDefaultMainConfigFile():
 		default_config = dict({
 			'PiAP-logging': dict({
 				'mode': str("stdout"),
+				'level': str("debug"),
 				'dir': str("/var/log"),
 				'keyfile': repr(None),
 				'encryptlogs': repr(False)
@@ -59,11 +60,6 @@ def getDefaultMainConfigFile():
 	return default_config
 
 
-def isLoaded():
-	"""returns False. Overloaded by config class."""
-	return getDefaultMainConfigFile()['PiAP-piaplib']['loaded']
-
-
 def mergeDicts(*dict_args):
 	"""
 	Given any number of dicts, shallow copy and merge into a new dict,
@@ -76,6 +72,19 @@ def mergeDicts(*dict_args):
 		except Exception:
 			continue
 	return result
+
+
+def __config_data_from_kvp(key, value):
+	"""given a key value pair creates a dictionary configuration."""
+	theWrap = dict({"""__dict__""": None})
+	if str(""".""") not in str(key):
+		if value is None:
+			value = dict({})
+		theWrap = dict({key: value})
+	else:
+		kp = str(key).split(""".""")
+		theWrap = dict({str(kp[0]): dict({str(kp[1]): value})})
+	return theWrap
 
 
 def parseConfigParser(config_data=dict({}), theConfig=None, overwrite=True):
@@ -96,6 +105,7 @@ def parseConfigParser(config_data=dict({}), theConfig=None, overwrite=True):
 					if (str(someOpt) not in config_data[someSection].keys()) or (overwrite is True):
 						config_data[someSection][someOpt] = theConfig.get(someSection, someOpt)
 	except Exception as err:
+		print(str("""Error in baseconfig.parseConfigParser"""))
 		print(str(err))
 		print(str(type(err)))
 		print(str((err.args)))

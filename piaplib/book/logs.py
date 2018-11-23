@@ -3,7 +3,7 @@
 
 # Pocket PiAP
 # ......................................................................
-# Copyright (c) 2017, Kendrick Walls
+# Copyright (c) 2017-2018, Kendrick Walls
 # ......................................................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
@@ -26,31 +26,6 @@
 
 
 try:
-	import os
-	if os.__name__ is None:
-		raise NotImplementedError("OMG! We could not import the os. We're like in the matrix!")
-except Exception as err:
-	raise ImportError(err)
-	exit(3)
-
-try:
-	import sys
-	if sys.__name__ is None:
-		raise NotImplementedError("OMG! We could not import the sys. We're like in the matrix!")
-except Exception as err:
-	raise ImportError(err)
-	exit(3)
-
-try:
-	import logging as logging
-	if logging.__name__ is None:
-		raise NotImplementedError("OMG! We could not import the builtin logs!")
-except Exception as err:
-	raise ImportError(err)
-	exit(3)
-
-
-try:
 	import sys
 	import os
 	import os.path
@@ -60,6 +35,14 @@ try:
 			sys.path.insert(0, __sys_path__)
 except Exception:
 	raise ImportError("Pocket Book failed to import.")
+
+try:
+	import logging as logging
+	if logging.__name__ is None:
+		raise NotImplementedError("OMG! We could not import the builtin logs!")
+except Exception as err:
+	raise ImportError(err)
+	exit(3)
 
 
 class ANSIColors:
@@ -118,6 +101,13 @@ class ANSIColors:
 class logs(object):
 	"""Class for Pocket PKU logs"""
 
+	logging_level = {
+		'debug': logging.DEBUG, 'info': logging.INFO, 'warn': logging.WARNING,
+		'warning': logging.WARNING, 'error': logging.ERROR, 'crit': logging.CRITICAL,
+		'critical': logging.CRITICAL
+	}
+	"""Mappings to different log levels."""
+
 	try:
 		try:
 			import baseconfig as baseconfig
@@ -129,34 +119,38 @@ class logs(object):
 				exit(3)
 		if baseconfig.loadMainConfigFile()['PiAP-logging-outputs']['file']:
 			prefix_path = baseconfig.loadMainConfigFile()['PiAP-logging']['dir']
-			file_path = os.path.join(prefix_path, str("piaplib.log"))
+			log_lvl = logging_level[str(baseconfig.loadMainConfigFile()['PiAP-logging']['level'])]
+			file_path = os.path.join(str(prefix_path), str("piaplib.log"))
 		else:
+			log_lvl = logging.INFO
 			file_path = sys.stdout
+		log_settings = dict({
+			"""level""": log_lvl,
+			"""format""": str("%(asctime)s [piaplib] %(message)s"),
+			"""datefmt""": str("%a %b %d %H:%M:%S %Z %Y")
+		})
+		try:
+			if os.access(file_path, os.F_OK ^ os.R_OK):
+				log_settings["""filename"""] = file_path
+		except Exception:
+			log_settings["""filename"""] = None
+			log_settings["""stream"""] = sys.stdout
+		logging.basicConfig(**log_settings)
+	except Exception as err:
+		print(str("Error:"))
+		print(str(err))
+		print(str(type(err)))
 		logging.basicConfig(
-			filename=file_path,
-			level=logging.INFO,
+			level=logging.DEBUG,
 			format=str("%(asctime)s [piaplib] %(message)s"),
 			datefmt=str("%a %b %d %H:%M:%S %Z %Y")
 		)
-	except Exception:
-		logging.basicConfig(
-			level=logging.INFO,
-			format=str("%(asctime)s [piaplib] %(message)s"),
-			datefmt=str("%a %b %d %H:%M:%S %Z %Y")
-		)
-
-	logging_level = {
-		'debug': logging.DEBUG, 'info': logging.INFO, 'warn': logging.WARNING,
-		'warning': logging.WARNING, 'error': logging.ERROR, 'crit': logging.CRITICAL,
-		'critical': logging.CRITICAL
-	}
-	"""Mappings to different log levels."""
 
 	logging_color = {
 		'debug': ANSIColors.BLUE, 'info': ANSIColors.GREEN,
 		'warn': ANSIColors.AMBER, 'warning': ANSIColors.AMBER,
-		'error': ANSIColors.FAIL, 'crit': str(ANSIColors.FAIL + ANSIColors.BLINK),
-		'critical': str(str(ANSIColors.FAIL) + str(ANSIColors.BLINK))
+		'error': ANSIColors.FAIL, 'crit': str(str(ANSIColors.BLACK) + str(ANSIColors.REDBG)),
+		'critical': str(str(ANSIColors.BLACK) + str(ANSIColors.REDBG))
 	}
 	"""Mappings from different log levels to colors."""
 
@@ -192,13 +186,13 @@ class logs(object):
 			)
 		)
 
-	__ALL__ = [logging_level, logging_color]
+	__all__ = [logging_level, logging_color]
 
 
 def main(argv=None):
 	"""The Main Event makes no sense to logs yet."""
 	try:
-		raise NotImplementedError("CRITICAL - Pocket Book logs main() not implemented.")
+		raise NotImplementedError("[CWE-758] - Pocket Book logs main() not implemented.")
 	except Exception as err:
 		logs.log(str(type(err)), "Critical")
 		logs.log(str(err), "Critical")

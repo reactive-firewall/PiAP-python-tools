@@ -121,7 +121,7 @@ test-tox: cleanup
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-style: cleanup
-	$(QUIET)flake8 --ignore=W191,W391 --max-line-length=100 --show-source --statistics --count --config=.flake8.ini
+	$(QUIET)flake8 --ignore=W191,W391,W504,W605 --max-line-length=100 --show-source --statistics --count --config=.flake8.ini
 	$(QUIET)tests/check_spelling 2>/dev/null || true
 	$(QUIET)tests/check_codecov_config 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
@@ -137,7 +137,7 @@ cleanup:
 	$(QUIET)rm -f piaplib/*~ 2>/dev/null || true
 	$(QUIET)rm -f *.pyc 2>/dev/null || true
 	$(QUIET)rm -f piaplib/*/*.pyc 2>/dev/null || true
-	$(QUIET)rm -f piaplib/*/*~ 2>/dev/null || true
+	$(QUIET)rm -f ./config_*_temp_file.tmp.cnf 2>/dev/null || true
 	$(QUIET)rm -f *.DS_Store 2>/dev/null || true
 	$(QUIET)rm -f .DS_Store 2>/dev/null || true
 	$(QUIET)rm -f piaplib/*.DS_Store 2>/dev/null || true
@@ -152,10 +152,13 @@ cleanup:
 	$(QUIET)rm -f ./coverage*.xml 2>/dev/null || true
 	$(QUIET)rm -f ./sitecustomize.py 2>/dev/null || true
 	$(QUIET)rm -f ./.*~ 2>/dev/null || true
+	$(QUIET)rm -f ./.*~ 2>/dev/null || true
 	$(QUIET)rm -Rf ./.tox/ 2>/dev/null || true
 	$(QUIET)rm -f ./the_test_file*.txt 2>/dev/null || true
 	$(QUIET)rm -f ./the_test_file*.json 2>/dev/null || true
 	$(QUIET)rm -f ./the_test_file*.yml 2>/dev/null || true
+	$(QUIET)rm -f ./config_*_temp_file.cnf 2>/dev/null || true
+	$(QUIET)rm -f ./**/config_*_temp_file.cnf 2>/dev/null || true
 	$(QUIET)rm -f ./the_test_file*.yaml 2>/dev/null || true
 	$(QUIET)rm -f ./the_test_file*.enc 2>/dev/null || true
 	$(QUIET)rm -f ./.weak_test_key_* || true
@@ -165,6 +168,7 @@ cleanup:
 	$(QUIET)rm -Rf ./.hypothesis/ 2>/dev/null || true
 	$(QUIET)rm -f ./the_test_url_file*.txt 2>/dev/null || true
 	$(QUIET)rm -f /tmp/.beta_PiAP_weak_key 2>/dev/null || true
+	$(QUIET)rm -f /opt/PiAP/.beta_* 2>/dev/null || true
 
 clean: cleanup
 	$(QUIET)$(MAKE) -s -C ./docs/ -f Makefile clean 2>/dev/null || true

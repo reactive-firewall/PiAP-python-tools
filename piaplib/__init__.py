@@ -22,12 +22,12 @@
 global __version__
 
 
-__version__ = """0.3.5"""
+__version__ = """0.3.7"""
 
 
 try:
 	import sys
-	import os
+	import os.path
 	try:
 		if str("piaplib") in __file__:
 			search_list = [
@@ -83,8 +83,7 @@ if __name__ in u'__main__':
 	try:
 		if 'piaplib.pocket' not in sys.modules:
 			from . import pocket as pocket
-	except Exception as importErr:
-		del importErr
+	except Exception:
 		import pocket as pocket
 	if pku.__name__ is None:
 		raise ImportError(str(u'Failed to open Pocket Knife Unit'))

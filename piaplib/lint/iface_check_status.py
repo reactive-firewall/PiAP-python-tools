@@ -272,12 +272,12 @@ def get_iface_mac(iface=u'lo', use_html=False):
 	theResult = None
 	mac_list_txt = utils.extractMACAddr(get_iface_status_raw(iface))
 	if use_html is False:
-		if mac_list_txt is not None and len(mac_list_txt) > 0:
+		if mac_list_txt is not None and (len(mac_list_txt) > 0):
 			theResult = str(mac_list_txt[0])
 		else:
 			theResult = None
 	else:
-		if mac_list_txt is not None and len(mac_list_txt) > 0:
+		if mac_list_txt is not None and (len(mac_list_txt) > 0):
 			theResult = html_generator.gen_html_td(
 				str(mac_list_txt[0]),
 				str(u'iface_status_mac_{}').format(iface)

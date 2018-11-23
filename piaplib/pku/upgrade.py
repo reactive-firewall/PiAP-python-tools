@@ -175,9 +175,8 @@ def upgradeAPT():
 		cache.update()
 		cache.open(None)
 		cache.upgrade()
-		cache.open(None)
 		for pkg in cache.get_changes():
-			logs.log((pkg.sourcePackageName, pkg.isUpgradeable), "Info")
+			logs.log(str((pkg.name, pkg.isupgradeable)), "Info")
 		raise NotImplementedError("CRITICAL - Pocket upgrade upgradeAPT() not implemented. Yet.")
 	except Exception as permErr:
 		remediation.error_breakpoint(permErr, "upgradeAPT")

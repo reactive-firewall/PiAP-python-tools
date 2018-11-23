@@ -30,9 +30,10 @@ try:
 	import sys
 	import argparse
 	import re
+	import fnmatch
 	import os.path
 	import functools
-	for someModule in [os, sys, argparse, re, os.path, functools]:
+	for someModule in [os, sys, argparse, re, fnmatch, os.path, functools]:
 		if someModule.__name__ is None:
 			raise ImportError(str("OMG! we could not import {}. ABORT. ABORT.").format(someModule))
 except Exception as err:
@@ -182,6 +183,173 @@ def compactSpace(theInput_Str):
 	return theList
 
 
+@memoize
+def splitDottedKeyPath(fullkey):
+	"""splits off the last dotted notation chunck from the first."""
+	kp = {}
+	if fullkey is None:
+		kp[0] = str(None)
+	if str(""".""") not in str(fullkey):
+		kp[0] = str(fullkey)
+	else:
+		kp = str(fullkey).rsplit(""".""", 1)
+	return kp
+
+
+def metaImport(module_named_x):
+	"""Forces a meta-import
+		Idea from:
+		https://stackoverflow.com/questions/8718885/import-module-from-string-variable/28639730
+		"""
+	try:
+		# because we want to import using a variable, do it this way
+		module_obj = __import__(module_named_x)
+		# create a global object containging our module
+		globals()[module_named_x] = module_obj
+	except ImportError as impErr:
+		# logs.log(str("missing python module: {}").format(module_named_x), "Debug")
+		impErr = None
+		del impErr
+
+
+@remediation.error_handling
+@memoize
+def getRootFofOS():
+	"""returns the root system file path, hopefully."""
+	if sys.platform.startswith("Win"):
+		return str("C:\\")  # pragma: no cover
+	else:
+		return str("""/""")
+
+
+def find_files(directory, pattern):
+	"""idea from: https://stackoverflow.com/a/2186673"""
+	for root, dirs, files in os.walk(directory):
+		for basename in files:
+			if fnmatch.fnmatch(basename, pattern):
+				filename = os.path.join(root, basename)
+				yield filename
+
+
+def find_dirs(directory, pattern):
+	"""idea from: https://stackoverflow.com/a/2186673"""
+	for root, dirs, files in os.walk(directory):
+		for dirname in dirs:
+			if fnmatch.fnmatch(dirname, pattern):
+				filename = os.path.join(root, dirname)
+				yield filename
+
+
+@remediation.error_handling
+@memoize
+def search_files(pattern):
+	"""searches for the given pattern"""
+	theResult = []
+	for search_path in sys.path:
+		for searches in find_dirs(search_path, pattern):
+			if searches not in theResult:
+				theResult.append(searches)
+	return theResult
+
+
+@remediation.error_handling
+@memoize
+def getpkuPath():
+	"""returns the likly paths for piaplib.pku.
+		idea from:
+		https://stackoverflow.com/questions/10043485/python-import-every-module-from-a-folder
+	"""
+	theResult = str("")
+	if str("""pku""") not in str(os.path.abspath(os.curdir)):
+		if str("""piaplib""") not in str(os.path.abspath(os.curdir)):
+			theResult = search_files("pku")[0]
+		else:
+			theResult = os.path.abspath(os.path.join(os.path.abspath(os.curdir), "pku"))
+	else:
+		theResult = str(os.path.abspath(os.curdir))
+	return theResult
+
+
+@remediation.error_handling
+def superMetaImport():
+	"""Forces a SUPER meta-import
+		Idea from:
+		https://stackoverflow.com/questions/10043485/python-import-every-module-from-a-folder
+		"""
+	try:
+		for name in os.listdir(getpkuPath()):
+			modulename = None
+			if name.endswith(".py") and not name.startswith("_"):
+				# strip the extension
+				modulename = name[:-3]
+				# set the module name in the current global name space:
+				globals()[modulename] = __import__(str("piaplib.pku.{}").format(modulename))
+	except ImportError as err:
+		raise remediation.PiAPError(msg="Super Meta Import failed!", cause=err)
+
+
+def getFunctionListDict(someModuleHandle):
+	"""Generates a locals() like dict for the given module.
+		Idea from:
+		https://stackoverflow.com/questions/139180/how-to-list-all-functions-in-a-python-module
+	"""
+	import types
+	metaImport(someModuleHandle)
+	mod = sys.modules.get(someModuleHandle)
+	flst = [getattr(mod, a) for a in dir(mod) if isinstance(getattr(mod, a), types.FunctionType)]
+	listOfFunctions = dict({})
+	for someFunc in flst:
+		listOfFunctions[str(someFunc.__name__)] = someFunc
+	return listOfFunctions
+
+
+def getHandle(handler):
+	"""gets the function handle (name) for a given function"""
+	handle = getANYHandle(handler)
+	if locals() is not None and handle is None:
+		local_search = locals().copy()
+		for someFunc in local_search.keys():
+			if handler == local_search[someFunc]:
+				handle = someFunc
+	for theFunc in globals().copy().keys():
+		if handler == globals()[theFunc]:
+			handle = theFunc
+	if handle is None:
+		raise NotImplementedError(str("Function {} not implemented").format(repr(handler)))
+	return handle
+
+
+@remediation.error_handling
+def getANYHandle(handler):
+	"""gets the function handle (name) for a given function if able otherwise returns none"""
+	handle = None
+	superMetaImport()
+	for mod in sys.modules.keys():
+		try:
+			if str(mod).startswith("piaplib."):
+				check_group = getFunctionListDict(mod)
+				check_prekey = str(mod)
+				for someFunc in check_group:
+					if handler == check_group[someFunc]:
+						handle = str("{}.{}").format(str(check_prekey), str(someFunc))
+		except BaseException as err:
+			err = None
+			del err
+	return handle
+
+
+def getHandler(handle):
+	possibles = globals().copy()
+	possibles.update(locals())
+	handler = possibles.get(handle)
+	if str(".") in str(handle) and isinstance(handler, type(None)):
+		best_guess = getFunctionListDict(str(splitDottedKeyPath(handle)[0]))
+		handler = best_guess.get(str(splitDottedKeyPath(handle)[1]))
+	if isinstance(handler, type(None)):
+		raise NotImplementedError(str("Function with name {} not implemented").format(str(handle)))
+	return handler
+
+
 @remediation.error_handling
 @memoize
 def extractMACAddr(theInputStr):
@@ -189,7 +357,7 @@ def extractMACAddr(theInputStr):
 	theResult = []
 	theResult = extractRegexPattern(
 		theInputStr,
-		"""(?:(?:[[:print:]]*){0,1}(?P<Mac>(?:(?:[0-9a-fA-F]{1,2}[\:]{1}){5}""" +
+		"""(?:(?:[[:print:]]*){0,1}(?P<Mac>(?:(?:[0-9a-fA-F]{1,2}[:]{1}){5}""" +
 		"""(?:[0-9a-fA-F]{1,2}){1}){1})+(?:[[:print:]]*){0,1})+"""
 	)
 	return theResult
@@ -231,7 +399,7 @@ def extractTTYs(theInputStr):
 	theResult = extractRegexPattern(
 		theInputStr,
 		"""(?:(?:[[:print:]]*){0,1}(?P<TTYs>(?:(?:pts|tty|console|ptty)""" +
-		"""{1}[\/]?[0-9]+){1})+(?:[[:print:]]*){0,1})+"""
+		"""{1}[/]?[0-9]+){1})+(?:[[:print:]]*){0,1})+"""
 	)
 	return theResult
 
@@ -244,8 +412,8 @@ def extractIPv4(theInputStr):
 	theResult = extractRegexPattern(
 		theInputStr,
 		"""(?:(?:(?:^|[^0-9]{1}){1}(?P<IP>(?:(?:[12]{1}[0-9]{1}[0-9]{1}|[1-9]{1}[0-9]{1}|""" +
-		"""[0-9]{1}){1}[\.]{1}){3}(?:[12]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[0-9]{1}){1}){1}""" +
-		"""(?:[^0-9\.]?|$){1}){1})"""
+		"""[0-9]{1}){1}[.]{1}){3}(?:[12]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[0-9]{1}){1}){1}""" +
+		"""(?:[^0-9.]?|$){1}){1})"""
 	)
 	return theResult
 
@@ -258,8 +426,8 @@ def extractIPAddr(theInputStr):
 	theResult = extractRegexPattern(
 		theInputStr,
 		"""(?:(?:(?:^|[^0-9]{1}){1}(?P<IP>(?:(?:[12]{1}[0-9]{1}[0-9]{1}|[1-9]{1}[0-9]{1}|""" +
-		"""[0-9]{1}){1}[\.]{1}){3}(?:[12]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[0-9]{1}){1}){1}""" +
-		"""(?:[/]{1}(?:[^0-9\.]?|$){1})?){1})"""
+		"""[0-9]{1}){1}[.]{1}){3}(?:[12]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[0-9]{1}){1}){1}""" +
+		"""(?:[/]{1}(?:[^0-9.]?|$){1})?){1})"""
 	)
 	return theResult
 
@@ -547,8 +715,7 @@ def getUserAgent():
 def urlretrieve(url, filename):
 	""" cross-python urlretrive function """
 	try:
-		import six
-		if six.PY2:
+		if (sys.version_info < (3, 4)):
 			return _python2urlretrieve(url, filename)
 		else:
 			import requests
@@ -577,10 +744,10 @@ def _python2urlretrieve(url, filename):
 			tempfile.addheader('DNT', '1')
 			tempfile.addheader('Connection', 'close')
 			tempfile.addheader('user-agent', getUserAgent())
+			return tempfile.retrieve(url, filename)
 		except Exception:
 			import urllib.request
 			return urllib.request.urlretrieve(url, filename)
-		return tempfile.retrieve(url, filename)
 	raise AssertionError("URL could not be opened - BUG")
 
 
@@ -590,8 +757,8 @@ def getFileResource(someURL, outFile):
 	try:
 		urlretrieve(url=someURL, filename=outFile)
 	except Exception as err:
-		remediation.error_breakpoint(err)
-		logs.log(str("Failed to fetched file {}").format(someURL), "Debug")
+		logs.log(str("Failed to fetched file {}").format(str(someURL)), "Debug")
+		remediation.error_breakpoint(error=err, contex=getFileResource)
 		return False
 	try:
 		logs.log(str("fetched file {}").format(someURL), "Debug")
@@ -618,6 +785,29 @@ def cleanFileResource(theFile):
 	try:
 		if theResult:
 			logs.log(str("purged file {}").format(theFile), "debug")
+	except Exception:
+		pass
+	return theResult
+
+
+@remediation.error_handling
+def moveFileResource(theSrc, theDest):
+	"""cleans up a downloaded given file."""
+	import os
+	theResult = False
+	try:
+		os.rename(str(theSrc), str(theDest))
+		theResult = True
+	except IOError:
+		theResult = False
+	except OSError:
+		theResult = False
+	except Exception:
+		logs.log(str("Error: Failed to rename file"), "Warning")
+		theResult = False
+	try:
+		if theResult:
+			logs.log(str("Moved file {} to {}").format(theSrc, theDest), "debug")
 	except Exception:
 		pass
 	return theResult

@@ -224,7 +224,7 @@ def isLineForSTA(someLine=None, staname=None):
 
 
 @utils.memoize
-def get_client_arp_status_raw(client_ip=None, lan_interface=interfaces.INTERFACE_CHOICES[0]):
+def get_client_arp_status_raw(client_ip=None, lan_interface=None):
 	"""list the raw status of client sta."""
 	if lan_interface not in interfaces.INTERFACE_CHOICES:
 		lan_interface = interfaces.INTERFACE_CHOICES[0]

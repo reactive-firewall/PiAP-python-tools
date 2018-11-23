@@ -1401,6 +1401,48 @@ class BasicUsageTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
+	@unittest.skipUnless(sys.platform.startswith("linux"), "Requires linux for script")
+	def test_x_python_command_upgrade_all(self):
+		"""Test case for piaplib.pocket pku upgrade --all."""
+		theResult = False
+		try:
+			thepython = getPythonCommand()
+			if (thepython is not None):
+				try:
+					theOutputtext = timePythonCommand([
+						str(thepython),
+						str("-m"),
+						str("piaplib.pocket"),
+						str("pku"),
+						str("upgrade"),
+						str("--all")
+					], stderr=subprocess.STDOUT)
+					if (theOutputtext is not None and len(theOutputtext) > 0):
+						theResult = True
+					else:
+						theResult = False
+						print(str(""))
+						print(str("python cmd is {}").format(str(thepython)))
+						print(str(""))
+						print(str("actual output was..."))
+						print(str(""))
+						print(str("{}").format(str(theOutputtext)))
+						print(str("{}").format(repr(theOutputtext)))
+						print(str("{}").format(str(type(theOutputtext))))
+						print(str("{}").format(str(len(theOutputtext))))
+						print(str(""))
+				except Exception as othererr:
+					debugtestError(othererr)
+					othererr = None
+					del othererr
+					theResult = False
+		except Exception as err:
+			debugtestError(err)
+			err = None
+			del err
+			theResult = False
+		assert theResult
+
 	def test_j_python_command_book_logs(self):
 		"""Test case for piaplib.book.logs --help."""
 		theResult = False

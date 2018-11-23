@@ -3,7 +3,7 @@
 
 # Pocket PiAP
 # ......................................................................
-# Copyright (c) 2017, Kendrick Walls
+# Copyright (c) 2017-2018, Kendrick Walls
 # ......................................................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ try:
 	import argparse
 	if str("book") in __file__:
 		__sys_path__ = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-		if str(__sys_path__) not in sys.path:
+		if __sys_path__ not in sys.path:
 			sys.path.insert(0, __sys_path__)
 except Exception as importErr:
 	print(str(importErr))
@@ -40,7 +40,7 @@ except Exception as importErr:
 try:
 	try:
 		import piaplib as piaplib
-	except Exception as err:
+	except Exception:
 		from . import piaplib as piaplib
 	try:
 		from piaplib.pku import baseconfig as baseconfig

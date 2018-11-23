@@ -657,6 +657,31 @@ and this will test reads.""")
 			theResult = False
 		assert theResult
 
+	def test_case_utils_get_set_handler(self):
+		"""Tests the get/set handler with a string as input"""
+		theResult = True
+		try:
+			from piaplib import pku as pku
+			if pku.__name__ is None:
+				raise ImportError("Failed to import pku")
+			from pku import utils as utils
+			if utils.__name__ is None:
+				raise ImportError("Failed to import utils")
+			validHandler = utils.xisfile
+			self.assertIsNotNone(utils.getHandle(validHandler), str("utils.xisfile"))
+			self.assertIsNotNone(utils.getHandler(utils.getHandle(validHandler)))
+			self.assertEqual(utils.getHandler(utils.getHandle(validHandler)), utils.xisfile)
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			err = None
+			del err
+			theResult = False
+		assert theResult
+
 	def test_case_utils_str_lit(self):
 		"""Tests the literal string with a string as input"""
 		theResult = True

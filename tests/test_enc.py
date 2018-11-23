@@ -62,6 +62,8 @@ except Exception as ImportErr:
 		if not condition:
 			raise unittest.SkipTest(str("Failed test assumption: {}").format(repr(condition)))
 		return True
+	ImportErr = None
+	del ImportErr
 
 
 import unittest

@@ -83,43 +83,43 @@ def getTimeStamp():
 	return str(theDate)
 
 
-def error_passing(func):
-	"""Runs a function in try-except-raise"""
-
-	@functools.wraps(func)
-	def helper_func(*args, **kwargs):
-		"""Wraps a function in try-except"""
-		theOutput = None
-		try:
-			theOutput = func(*args, **kwargs)
-		except Exception as err:
-			timestamp = getTimeStamp()
-			logs.log(str("An error occurred at {}").format(timestamp), "Error")
-			logs.log(str(func), "Debug")
-			baton = PiAPError(err, str("An error occurred in {}.").format(str(func)))
-			err = None
-			del err
-			theOutput = None
-			raise baton
-		return theOutput
-
-	return helper_func
-
-
 def error_breakpoint(error, context=None):
 	"""Just logs the error and returns None"""
 	timestamp = getTimeStamp()
+	logs.log(str("=" * 40), "Warning")
 	logs.log(str("An error occurred at {}").format(timestamp), "Error")
 	logs.log(str(context), "Debug")
 	logs.log(str(type(error)), "Debug")
 	logs.log(str(error), "Error")
 	if isinstance(error, PiAPError):
+		logs.log(str("=" * 40), "Warning")
+		logs.log(str("Caused by:"), "Warning")
 		logs.log(str(error.cause), "Error")
 		logs.log(str(type(error.cause)), "Debug")
 		logs.log(str((error.args)), "Error")
 	else:
 		logs.log(str((error.args)), "Error")
 	return None
+
+
+def error_passing(func):
+	"""Runs a function in try-except"""
+
+	@functools.wraps(func)
+	def safety_func(*args, **kwargs):
+			"""Wraps a function in try-except"""
+			theOutput = None
+			try:
+				theOutput = func(*args, **kwargs)
+			except Exception as err:
+				theOutput = error_breakpoint(err, context=func)
+				baton = PiAPError(err, str("An error occurred in {}.").format(str(func)))
+				err = None
+				del err
+				raise baton
+			return theOutput
+
+	return safety_func
 
 
 def error_handling(func):

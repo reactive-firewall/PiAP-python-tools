@@ -2,7 +2,7 @@
 
 # Pocket PiAP
 # ......................................................................
-# Copyright (c) 2017, Kendrick Walls
+# Copyright (c) 2017-2018, Kendrick Walls
 # ......................................................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
@@ -32,7 +32,14 @@ except Exception:
 
 def main(argv=None):
 	"""The main event"""
-	import piaplib.book.__main__
+	try:
+		if 'piaplib.book.__main__' not in sys.modules:
+			from piaplib.book import __main__
+			if __main__.__name__ is None:
+				raise ImportError("Failed to import piaplib.book.__main__")
+	except Exception as importErr:
+		del importErr
+		import piaplib.book.__main__
 	return piaplib.book.__main__.main(argv)
 
 
