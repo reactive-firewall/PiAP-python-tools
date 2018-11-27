@@ -596,8 +596,7 @@ def open_func(file, mode='r', buffering=-1, encoding=None):
 			logs.log(str("[CWE-73] File expected, but not found. Redacted filename."), "Info")
 			file = None
 	try:
-		import six
-		if six.PY2:
+		if (sys.version_info < (3, 2)):
 			import io
 			return io.open(file, mode, buffering, encoding)
 		else:
@@ -612,8 +611,7 @@ def open_func(file, mode='r', buffering=-1, encoding=None):
 def write_func(someFile, the_data=None):
 	""" cross-python write function """
 	try:
-		import six
-		if six.PY2:
+		if (sys.version_info < (3, 2)):
 			return someFile.write(literal_code(the_data))
 		else:
 			return someFile.write(the_data)
@@ -723,12 +721,13 @@ def urlretrieve(url, filename):
 			r = requests.get(url, headers=piaplib_headers)
 			if r is None:
 				raise AssertionError("URL could not be opened - BUG")
-			if r.status_code is not None:
+			if (r.status_code is not None) and (r.status_code > 200) and (r.status_code < 400):
 				r.encoding = "utf-8"
 				return writeFile(filename, r.content)
-	except Exception as err:
-		remediation.error_breakpoint(err)
-		return _python2urlretrieve(url, filename)
+	except Exception:
+		theurl = url
+		thefile = filename
+		return _python2urlretrieve(theurl, thefile)
 	raise AssertionError("URL could not be opened - BUG")
 
 
@@ -747,7 +746,9 @@ def _python2urlretrieve(url, filename):
 			return tempfile.retrieve(url, filename)
 		except Exception:
 			import urllib.request
-			return urllib.request.urlretrieve(url, filename)
+			import ssl
+			sslContext = ssl.create_default_context()
+			return urllib.request.urlretrieve(url, filename, context=sslContext)
 	raise AssertionError("URL could not be opened - BUG")
 
 
