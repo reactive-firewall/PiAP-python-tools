@@ -720,8 +720,8 @@ def urlretrieve(url, filename):
 			piaplib_headers = {'DNT': '1', 'Connection': 'close', 'user-agent': getUserAgent()}
 			r = requests.get(url, headers=piaplib_headers)
 			if r is None:
-				raise AssertionError("URL could not be opened - BUG")
-			if (r.status_code is not None) and (r.status_code > 200) and (r.status_code < 400):
+				raise AssertionError("URL could not be opened - ERROR")
+			if (r.status_code is not None) and (r.status_code >= 200) and (r.status_code < 400):
 				r.encoding = "utf-8"
 				return writeFile(filename, r.content)
 	except Exception:
