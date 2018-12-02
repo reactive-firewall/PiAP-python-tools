@@ -753,9 +753,9 @@ def _python2urlretrieve(url, filename):
 			except Exception:
 				sslContext = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
 			try:
-				return  urllib.request.urlretrieve(url, filename, context=sslContext)
+				return urllib.request.urlretrieve(url, filename, context=sslContext)
 			except TypeError:
-				return  urllib.request.urlretrieve(url, filename)
+				return urllib.request.urlretrieve(url, filename)
 	raise AssertionError("URL could not be opened securely - UNSUPPORTED")
 
 
