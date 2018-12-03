@@ -419,6 +419,7 @@ def getKnownProcessesTable():
 	return dict({
 		u'/usr/sbin/cron': u'SYSTEM AUTOMATION',
 		u'/usr/bin/dbus-daemon': u'SYSTEM',
+		u'SYSTEM': u'SYSTEM',
 		u'ntpd': u'TIMEKEEPING SERVICES',
 		u'syslogd': u'LOGGING SERVICES',
 		u'wlan1': u'NETWORK SERVICES',
@@ -450,6 +451,7 @@ def getKnownProcessesTable():
 
 
 @remediation.error_passing
+@utils.memoize
 def _util_generate_user_status_lable(input_txt, use_html=False):
 	_LABEL_KEYS = {
 		u'[priv]': html_generator.gen_html_label(u'Admin Task', u'danger'),
@@ -471,10 +473,10 @@ def _util_generate_user_status_lable(input_txt, use_html=False):
 				found_match = True
 				input_txt = _LABEL_KEYS[somekey]
 		if found_match is False:
-			if u'DNS' in temp_txt and u'SERVICES' in temp_txt:
+			if u'DNS' in input_txt and u'SERVICES' in input_txt:
 				input_txt = html_generator.gen_html_label(u'Local Domain', u'info')
 			else:
-				input_txt = html_generator.gen_html_label(temp_txt, u'disabled')
+				input_txt = html_generator.gen_html_label(input_txt, u'disabled')
 	return input_txt
 
 
@@ -535,19 +537,20 @@ def get_user_status(user_name=None, use_html=False):  # noqa C901
 		user_tty = None
 		del user_tty
 	except Exception as errcrit:
-		logs.log(
-			str("user_check_status.get_user_status: ERROR: ACTION will not be completed! ABORT!"),
-			"Error"
-		)
-		logs.log(str(type(errcrit)), "Error")
-		logs.log(str(errcrit), "Error")
-		logs.log(str((errcrit.args)), "Error")
+		if not use_html:
+			logs.log(
+				str("user_check_status.get_user_status: ERROR: ACTION will not be completed! ABORT!"),
+				"Error"
+			)
+			logs.log(str(type(errcrit)), "Error")
+			logs.log(str(errcrit), "Error")
+			logs.log(str((errcrit.args)), "Error")
 		theResult = None
 	return theResult
 
 
 def get_user_ttys(user=None, use_html=False):
-	"""Generate output of the user mac."""
+	"""Generate output of the user ttys."""
 	if (user is None) and (use_html is not True):
 		return None
 	elif (user is None) and (use_html is True):
@@ -595,12 +598,12 @@ def get_user_ip(user=None, use_html=False):
 		if raw_data is not None:
 			ip_list_txt = utils.extractIPv4(raw_data)
 			if use_html is not True:
-				if ip_list_txt is not None and len(ip_list_txt) > 0:
+				if (ip_list_txt is not None) and (len(ip_list_txt) > 0):
 					theResult = str(ip_list_txt[0])
 				else:
 					theResult = getLocalhostName()
 			else:
-				if ip_list_txt is not None and len(ip_list_txt) > 0:
+				if (ip_list_txt is not None) and (len(ip_list_txt) > 0):
 					theResult = html_generator.gen_html_td(
 						html_generator.gen_html_ul(ip_list_txt),
 						str(u'user_status_ips_{}').format(user)
