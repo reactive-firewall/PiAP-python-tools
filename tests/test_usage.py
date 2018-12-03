@@ -1164,6 +1164,8 @@ class BasicUsageTestSuite(unittest.TestCase):
 					], stderr=subprocess.STDOUT)
 					if (str("eth0") in str(theOutputtext)):
 						theResult = True
+					elif (str("ens") in str(theOutputtext)):
+						raise unittest.SkipTest("function probably ok, but not a compatible Test network")
 					elif (str("enp0s") in str(theOutputtext)):
 						raise unittest.SkipTest("function ok, but not a compatible Test network")
 					elif (str("en0") in str(theOutputtext)):
@@ -1217,6 +1219,8 @@ class BasicUsageTestSuite(unittest.TestCase):
 					], stderr=subprocess.STDOUT)
 					if (str("eth0") in str(theOutputtext)):
 						theResult = True
+					elif (str("ens") in str(theOutputtext)):
+						raise unittest.SkipTest("function probably ok, but not a compatible Test network")
 					elif (str("enp0s") in str(theOutputtext)):
 						raise unittest.SkipTest("function ok, but not a compatible Test network")
 					elif (str("en0") in str(theOutputtext)):
