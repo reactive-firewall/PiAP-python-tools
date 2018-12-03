@@ -140,7 +140,7 @@ class BasicHTMLTestSuite(unittest.TestCase):
 			try:
 				output_gen = html_generator.gen_html_tr(
 					content="this is a test",
-					id="test_id",
+					tagid="test_id",
 					name="test_tr"
 				)
 				if (str("<tr") in output_gen and str("</tr>") in output_gen):
@@ -171,7 +171,7 @@ class BasicHTMLTestSuite(unittest.TestCase):
 			try:
 				output_gen = html_generator.gen_html_tr(
 					content="this is a test",
-					id=None,
+					tagid=None,
 					name="test_tr"
 				)
 				if (str("<tr") in output_gen and str("</tr>") in output_gen):
@@ -262,7 +262,7 @@ class BasicHTMLTestSuite(unittest.TestCase):
 			try:
 				output_gen = html_generator.gen_html_td(
 					content="this is a test",
-					id="test_id",
+					tagid="test_id",
 					name="test_td"
 				)
 				if (str("<td") in output_gen and str("</td>") in output_gen):
@@ -293,7 +293,7 @@ class BasicHTMLTestSuite(unittest.TestCase):
 			try:
 				output_gen = html_generator.gen_html_td(
 					content="this is a test",
-					id=None,
+					tagid=None,
 					name="test_td"
 				)
 				if (str("<td") in output_gen and str("</td>") in output_gen):
@@ -353,7 +353,7 @@ class BasicHTMLTestSuite(unittest.TestCase):
 			try:
 				output_gen = html_generator.gen_html_ul(
 					["this is a test"],
-					id="test_id",
+					tagid="test_id",
 					name="test_ul"
 				)
 				if (str("<ul") in output_gen and str("</ul>") in output_gen):
@@ -443,7 +443,7 @@ class BasicHTMLTestSuite(unittest.TestCase):
 		else:
 			try:
 				output_gen = html_generator.gen_html_ul(
-					["this is a test"], id="test_id", name=None
+					["this is a test"], tagid="test_id", name=None
 				)
 				if (str("<ul") in output_gen and str("""name=\"test_id\"""") in output_gen):
 					theResult = True
@@ -576,7 +576,7 @@ class BasicHTMLTestSuite(unittest.TestCase):
 					output_gen = html_generator.gen_html_label(
 						"this is a test",
 						html_generator.HTML_LABEL_ROLES[role_label],
-						id=None,
+						tagid=None,
 						name=str("test_name")
 					)
 					theResult = False
