@@ -90,26 +90,26 @@ def has_special_html_chars(raw_str=None):
 	return False
 
 
-def gen_html_tag(tag="div", content=None, id=None, name=None):
+def gen_html_tag(tag="div", content=None, tagid=None, name=None):
 	"""
 	Generates a table row html tr taglet.
 	param tag -- The type of taglet.
 	param content -- The content of the taglet.
 	param name -- The optional name of the taglet.
-	param id -- The optional id of the taglet.
+	param tagid -- The optional tagid of the taglet.
 	Returns:
 	str -- the html string of the taglet.
 	"""
 	if tag is None or (isinstance(tag, str) is False):
 		return content
-	if id is not None and has_special_html_chars(id) is not True:
+	if tagid is not None and has_special_html_chars(tagid) is not True:
 		if name is not None and has_special_html_chars(name) is not True:
 			return str(
 				u'<{thetag} name=\"{thename}\" id=\"{theid}\">{thecontent}</{thetag}>'
 			).format(
 				thetag=utils.literal_str(tag),
 				thename=utils.literal_str(name),
-				theid=utils.literal_str(id),
+				theid=utils.literal_str(tagid),
 				thecontent=utils.literal_str(content)
 			)
 		else:
@@ -117,7 +117,7 @@ def gen_html_tag(tag="div", content=None, id=None, name=None):
 				u'<{thetag} id=\"{theid}\">{thecontent}</{thetag}>'
 			).format(
 				thetag=utils.literal_str(tag),
-				theid=utils.literal_str(id),
+				theid=utils.literal_str(tagid),
 				thecontent=utils.literal_str(content)
 			)
 	elif name is not None and has_special_html_chars(name) is not True:
@@ -137,36 +137,36 @@ def gen_html_tag(tag="div", content=None, id=None, name=None):
 		)
 
 
-def gen_html_tr(content=None, id=None, name=None):
+def gen_html_tr(content=None, tagid=None, name=None):
 	"""
 	Generates a table row html tr taglet.
 	param content -- The content of the tr taglet.
 	param name -- The optional name of the tr taglet.
-	param id -- The optional id of the tr taglet.
+	param tagid -- The optional tagid of the tr taglet.
 	Returns:
 	str -- the html string of the tr taglet.
 	"""
-	return gen_html_tag("tr", content, id, name)
+	return gen_html_tag("tr", content, tagid, name)
 
 
-def gen_html_td(content=None, id=None, name=None):
+def gen_html_td(content=None, tagid=None, name=None):
 	"""
 	Generates a table data html td taglet.
 	param content -- The content of the td taglet.
 	param name -- The optional name of the td taglet.
-	param id -- The optional id of the td taglet.
+	param tagid -- The optional tagid of the td taglet.
 	Returns:
 	str -- the html string of the td taglet.
 	"""
-	return gen_html_tag("td", content, id, name)
+	return gen_html_tag("td", content, tagid, name)
 
 
-def gen_html_ul(somelist=None, id=None, name=None):
+def gen_html_ul(somelist=None, tagid=None, name=None):
 	"""
 	Generates a list html ul taglet.
 	param somelist -- The content of the ul taglet.
 	param name -- The optional name of the li taglet.
-	param id -- The optional id of the li taglet.
+	param tagid -- The optional tagid of the li taglet.
 	Returns:
 	str -- the html string of the li taglet.
 	"""
@@ -174,12 +174,12 @@ def gen_html_ul(somelist=None, id=None, name=None):
 		return None
 	items = [gen_html_li(x) for x in somelist]
 	theresult = None
-	if id is not None and has_special_html_chars(id) is not True:
+	if tagid is not None and has_special_html_chars(tagid) is not True:
 		if name is None or has_special_html_chars(name) is True:
-			name = utils.literal_str(id)
+			name = utils.literal_str(tagid)
 		theresult = str(u'<ul name=\"{}\" id=\"{}\">').format(
 			utils.literal_str(name),
-			utils.literal_str(id)
+			utils.literal_str(tagid)
 		)
 		for item in items:
 			theresult = str(theresult + item)
@@ -195,45 +195,45 @@ def gen_html_ul(somelist=None, id=None, name=None):
 	return theresult
 
 
-def gen_html_li(item=None, id=None, name=None):
+def gen_html_li(item=None, tagid=None, name=None):
 	"""
 	Generates a list item html li taglet.
 	param item -- The content of the li taglet.
 	param name -- The optional name of the li taglet.
-	param id -- The optional id of the li taglet.
+	param tagid -- The optional tagid of the li taglet.
 	Returns:
 	str -- the html string of the li taglet.
 	"""
-	return gen_html_tag("li", item, id, name)
+	return gen_html_tag("li", item, tagid, name)
 
 
-def gen_html_label(content=None, role=HTML_LABEL_ROLES[0], id=None, name=None):
+def gen_html_label(content=None, role=HTML_LABEL_ROLES[0], tagid=None, name=None):
 	"""
 	Generates a table data html label taglet.
 	param content -- The content of the td taglet.
 	param role -- The label class of the span taglet.
 	param name -- The optional name of the td taglet.
-	param id -- The optional id of the td taglet.
+	param tagid -- The optional tagid of the td taglet.
 	Returns:
 	str -- the html string of the td taglet.
 	"""
 	# WARN: not ready for prod - check types, errors, etc,
 	# security auditors: if you are reading this you found something
 	# I forgot to make ready for prod. patches welcome. CWE-20 BUG
-	if id is not None and has_special_html_chars(id) is not True:
+	if tagid is not None and has_special_html_chars(tagid) is not True:
 		if name is not None and has_special_html_chars(name) is not True:
 			return str(
 				u'<span class=\"label label-{}\" name=\"{}\" id=\"{}\">{}</span>'
 			).format(
 				role,
 				utils.literal_str(name),
-				utils.literal_str(id),
+				utils.literal_str(tagid),
 				utils.literal_str(content)
 			)
 		else:
 			return str(
 				u'<span class=\"label label-{}\" id=\"{}\">{}</span>'
-			).format(role, has_special_html_chars(id), utils.literal_str(content))
+			).format(role, has_special_html_chars(tagid), utils.literal_str(content))
 	elif name is not None and has_special_html_chars(name) is not True:
 		return str(
 			u'<span class=\"label label-{}\" name=\"{}\">{}</span>'
