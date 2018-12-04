@@ -128,7 +128,11 @@ class LintiFaceTestSuite(unittest.TestCase):
 			import lint.iface_check_status as iface_check_status
 		if iface_check_status.__name__ is not None:
 			try:
-				for test_iface in [str("eth0"), str("en0"), str("enp0s0")]:
+				iface_list = [
+					str("eth0"), str("en0"), str("enp0s0"), str("ens0"), str("en1"),
+					str("ens1"), str("ens2"), str("ens3"), str("ens4"), str("ens5")
+				]
+				for test_iface in iface_list:
 					theOutput = iface_check_status.get_iface_ip_list(test_iface, False)
 					if theResult is True:
 						continue

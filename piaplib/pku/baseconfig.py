@@ -37,7 +37,7 @@ def getDefaultMainConfigFile():
 		default_config = dict({
 			'PiAP-logging': dict({
 				'mode': str("stdout"),
-				'level': str("debug"),
+				'level': str("info"),
 				'dir': str("/var/log"),
 				'keyfile': repr(None),
 				'encryptlogs': repr(False)

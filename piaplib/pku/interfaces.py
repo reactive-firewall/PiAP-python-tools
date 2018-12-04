@@ -172,7 +172,7 @@ def main(argv=None):
 	try:
 		theResult = 1
 		args = None
-		if (argv is not None and (argv is not []) and (len(argv) >= 1)):
+		if (argv is not None and (argv != []) and (len(argv) >= 1)):
 			(args, extras) = parseargs(argv)
 		if args is None:
 			theResult = 3

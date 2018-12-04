@@ -419,6 +419,7 @@ def getKnownProcessesTable():
 	return dict({
 		u'/usr/sbin/cron': u'SYSTEM AUTOMATION',
 		u'/usr/bin/dbus-daemon': u'SYSTEM',
+		u'SYSTEM': u'SYSTEM',
 		u'ntpd': u'TIMEKEEPING SERVICES',
 		u'syslogd': u'LOGGING SERVICES',
 		u'wlan1': u'NETWORK SERVICES',
@@ -431,6 +432,10 @@ def getKnownProcessesTable():
 		u'avahi-daemon:': u'mDNS-SERVER SERVICES',
 		u'wpa_supplicant': u'WPA SERVICES',
 		u'/usr/sbin/hostapd': u'AP SERVICES',
+		u'/usr/sbin/afpd': u'STORAGE SERVICES',
+		u'/usr/sbin/cnid_metad': u'STORAGE SERVICES',
+		u'sshd:': u'CLI SERVICES',
+		u'-bash:': u'CLI SERVICES',
 		u'/sbin/dhcpcd': u'DHCP-CLIENT SERVICES',
 		u'/usr/sbin/dnsmasq': u'DNS-DHCP-SERVER SERVICES',
 		u'/lib/systemd/systemd-resolved': u'DNS-SERVER SERVICES',
@@ -443,6 +448,36 @@ def getKnownProcessesTable():
 		u'nginx: ': u'WEB SERVICES',
 		u'php-fpm': u'WEB SERVICES'
 	})
+
+
+@remediation.error_passing
+@utils.memoize
+def _util_generate_user_status_lable(input_txt, use_html=False):
+	_LABEL_KEYS = {
+		u'[priv]': html_generator.gen_html_label(u'Admin Task', u'danger'),
+		u'AUTOMATION': html_generator.gen_html_label(u'Automation', u'info'),
+		u'DEFENSE': html_generator.gen_html_label(u'Defense', u'success'),
+		u'OFFENSE': html_generator.gen_html_label(u'Offense', u'primary'),
+		u'NETWORK SERVICES': html_generator.gen_html_label(u'Network', u'info'),
+		u'LOGGING SERVICES': html_generator.gen_html_label(u'Logging', u'info'),
+		u'TIMEKEEPING SERVICES': html_generator.gen_html_label(u'Clock', u'info'),
+		u'SYSTEM': html_generator.gen_html_label(u'System', u'info'),
+		u'UNKNOWN': html_generator.gen_html_label(u'UNKNOWN', u'warning')
+	}
+	found_match = False
+	if use_html is True:
+		for somekey in _LABEL_KEYS.keys():
+			if found_match is True:
+				continue
+			elif (somekey in input_txt):
+				found_match = True
+				input_txt = _LABEL_KEYS[somekey]
+		if found_match is False:
+			if u'DNS' in input_txt and u'SERVICES' in input_txt:
+				input_txt = html_generator.gen_html_label(u'Local Domain', u'info')
+			else:
+				input_txt = html_generator.gen_html_label(input_txt, u'disabled')
+	return input_txt
 
 
 def get_user_status(user_name=None, use_html=False):  # noqa C901
@@ -481,30 +516,7 @@ def get_user_status(user_name=None, use_html=False):  # noqa C901
 						for known_case in known_work_cases.keys():
 							if (known_case in theWork):
 								temp_txt = known_work_cases[known_case]
-					if use_html is True:
-						if (u'[priv]' in temp_txt):
-							temp_txt = html_generator.gen_html_label(u'Admin Task', u'danger')
-						elif (u'AUTOMATION' in temp_txt):
-							temp_txt = html_generator.gen_html_label(u'Automation', u'info')
-						elif (u'DEFENSE' in temp_txt):
-							temp_txt = html_generator.gen_html_label(u'Defense', u'success')
-						elif (u'OFFENSE' in temp_txt):
-							temp_txt = html_generator.gen_html_label(u'Offense', u'primary')
-						elif (u'NETWORK SERVICES' in temp_txt):
-							temp_txt = html_generator.gen_html_label(u'Network', u'info')
-						elif (u'LOGGING SERVICES' in temp_txt):
-							temp_txt = html_generator.gen_html_label(u'Logging', u'info')
-						elif (u'TIMEKEEPING SERVICES' in temp_txt):
-							temp_txt = html_generator.gen_html_label(u'Clock', u'info')
-						elif (u'DNS' in temp_txt and u'SERVICES' in temp_txt):
-							temp_txt = html_generator.gen_html_label(u'Local Domain', u'info')
-						elif (u'SYSTEM' in temp_txt):
-							temp_txt = html_generator.gen_html_label(u'System', u'info')
-						elif (u'UNKNOWN' in temp_txt):
-							temp_txt = html_generator.gen_html_label(u'UNKNOWN', u'warning')
-						else:
-							temp_txt = html_generator.gen_html_label(temp_txt, u'disabled')
-					status_list.append(str(temp_txt))
+					status_list.append(str(_util_generate_user_status_lable(temp_txt, use_html)))
 				status_list = utils.compactList(status_list)
 			else:
 				if use_html is True:
@@ -525,19 +537,20 @@ def get_user_status(user_name=None, use_html=False):  # noqa C901
 		user_tty = None
 		del user_tty
 	except Exception as errcrit:
-		logs.log(
-			str("user_check_status.get_user_status: ERROR: ACTION will not be completed! ABORT!"),
-			"Error"
-		)
-		logs.log(str(type(errcrit)), "Error")
-		logs.log(str(errcrit), "Error")
-		logs.log(str((errcrit.args)), "Error")
+		if not use_html:
+			logs.log(
+				str("user_check_status.get_user_status: ERROR: ACTION will not be completed! ABORT!"),
+				"Error"
+			)
+			logs.log(str(type(errcrit)), "Error")
+			logs.log(str(errcrit), "Error")
+			logs.log(str((errcrit.args)), "Error")
 		theResult = None
 	return theResult
 
 
 def get_user_ttys(user=None, use_html=False):
-	"""Generate output of the user mac."""
+	"""Generate output of the user ttys."""
 	if (user is None) and (use_html is not True):
 		return None
 	elif (user is None) and (use_html is True):
@@ -585,12 +598,12 @@ def get_user_ip(user=None, use_html=False):
 		if raw_data is not None:
 			ip_list_txt = utils.extractIPv4(raw_data)
 			if use_html is not True:
-				if ip_list_txt is not None and len(ip_list_txt) > 0:
+				if (ip_list_txt is not None) and (len(ip_list_txt) > 0):
 					theResult = str(ip_list_txt[0])
 				else:
 					theResult = getLocalhostName()
 			else:
-				if ip_list_txt is not None and len(ip_list_txt) > 0:
+				if (ip_list_txt is not None) and (len(ip_list_txt) > 0):
 					theResult = html_generator.gen_html_td(
 						html_generator.gen_html_ul(ip_list_txt),
 						str(u'user_status_ips_{}').format(user)
@@ -629,7 +642,7 @@ def main(argv=None):  # noqa C901
 		if args.output_html is not None:
 				output_html = (args.output_html is True)
 		if args.show_all is True:
-			output = ""
+			output = str("")
 			if output_html:
 				output = str("<table class=\"table table-striped\">")
 				output += str("<thead><th>User</th><th>TTYs</th><th>Host</th>")
