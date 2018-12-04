@@ -1380,7 +1380,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 						str("piaplib.pocket"),
 						str("pku"),
 						str("interfaces"),
-						str("""-i={}""").format(str("eth0"))
+						str("""-i={}""").format(str("junk"))
 					], stderr=subprocess.STDOUT)
 				except Exception as junkErr:  # noqa
 					del(junkErr)
