@@ -30,6 +30,15 @@ except Exception:
 	raise ImportError("Pocket Book failed to import.")
 
 
+try:
+	if 'piaplib' not in sys.modules:
+		import piaplib as piaplib
+	else:
+		piaplib = sys.modules['piaplib']
+except Exception:
+	raise ImportError("Pocket Book failed to import.")
+
+
 def main(argv=None):
 	"""The main event"""
 	try:

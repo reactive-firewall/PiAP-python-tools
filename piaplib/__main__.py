@@ -21,9 +21,11 @@
 
 
 try:
-	import sys
+	import sys as sys
 	if 'piaplib.pocket' not in sys.modules:
 		from . import pocket as pocket
+	else:
+		pocket = sys.modules['pocket']
 except Exception as importErr:
 	del importErr
 	import pocket as pocket

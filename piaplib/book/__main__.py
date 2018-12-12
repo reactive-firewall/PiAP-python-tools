@@ -39,9 +39,17 @@ except Exception as importErr:
 
 try:
 	try:
-		import piaplib as piaplib
+		if 'piaplib' not in sys.modules:
+			import piaplib as piaplib
+		else:
+			piaplib = sys.modules['piaplib']
 	except Exception:
-		from . import piaplib as piaplib
+		try:
+			import piaplib as piaplib
+		except Exception:
+			from . import piaplib as piaplib
+	if piaplib.__name__ is None:
+		raise ImportError("Failed to import piaplib")
 	try:
 		from piaplib.pku import baseconfig as baseconfig
 	except Exception:
@@ -58,7 +66,7 @@ try:
 		from . import version as version
 	except Exception:
 		import book.version as version
-	for dep in [baseconfig, remediation, logs, version]:
+	for dep in [piaplib, baseconfig, remediation, logs, version]:
 		if dep.__name__ is None:
 			raise ImportError("Failed to open dependency for book")
 except Exception as importErr:

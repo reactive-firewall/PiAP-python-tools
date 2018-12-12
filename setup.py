@@ -47,6 +47,7 @@ try:
 	class_tags = [
 		str("""Development Status :: 4 - Beta"""),
 		str("""Operating System :: POSIX :: Linux"""),
+		str("""License :: OSI Approved :: MIT License"""),
 		str("""Programming Language :: Python"""),
 		str("""Programming Language :: Python :: 3.7"""),
 		str("""Programming Language :: Python :: 3.6"""),
@@ -61,9 +62,10 @@ except Exception:
 
 setup(
 	name="""piaplib""",
-	version="""0.3.9""",
+	version="""0.4.0""",
 	description="""Beta for PiAP python tools""",
 	long_description=readme,
+	long_description_content_type="""text/markdown""",
 	install_requires=requirements,
 	author="""reactive-firewall""",
 	author_email="""reactive-firewall@users.noreply.github.com""",

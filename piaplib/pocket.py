@@ -62,9 +62,11 @@ except Exception as importErr:
 
 
 try:
-	import piaplib as piaplib
+	global piaplib
+	import piaplib
+	sys.modules['piaplib'] = piaplib
 except Exception:
-	from . import piaplib as piaplib
+	from . import piaplib
 
 
 try:
@@ -76,7 +78,9 @@ except Exception as importErr:
 	if book.__name__ is None:
 		raise ImportError(str(u'Failed to open Pocket Book'))
 
+
 try:
+	global logs
 	from book.logs import logs as logs
 except Exception:
 	try:
@@ -91,6 +95,7 @@ except Exception:
 
 try:
 	if 'piaplib.pku' not in sys.modules:
+		global pku
 		from . import pku as pku
 except Exception as importErr:
 	del importErr
@@ -98,8 +103,10 @@ except Exception as importErr:
 	if pku.__name__ is None:
 		raise ImportError(str(u'Failed to open Pocket Knife Unit'))
 
+
 try:
 	if 'piaplib.keyring' not in sys.modules:
+		global keyring
 		from . import keyring as keyring
 except Exception as importErr:
 	del importErr
@@ -107,8 +114,10 @@ except Exception as importErr:
 	if keyring.__name__ is None:
 		raise ImportError(str(u'Failed to find Pocket Keyring'))
 
+
 try:
 	if 'piaplib.lint' not in sys.modules:
+		global lint
 		from . import lint as lint
 except Exception as importErr:
 	del importErr

@@ -91,7 +91,7 @@ except Exception as importErr:
 	exit(255)
 
 
-__prog__ = """piaplib.version"""
+__prog__ = """piaplib.book.version"""
 """The name of this PiAPLib tool is pocket version"""
 
 
