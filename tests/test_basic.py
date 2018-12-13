@@ -23,7 +23,6 @@ import unittest
 
 try:
 	try:
-		global context
 		import context
 	except Exception as ImportErr:
 		ImportErr = None
@@ -46,7 +45,6 @@ class BasicTestSuite(unittest.TestCase):
 		"""Test case importing code."""
 		theResult = False
 		try:
-			global piaplib
 			from .context import piaplib
 			if piaplib.__name__ is None:
 				theResult = False
@@ -64,14 +62,6 @@ class BasicTestSuite(unittest.TestCase):
 		"""Test case importing depends."""
 		theResult = True
 		try:
-			global sys
-			global os
-			global argparse
-			global subprocess
-			global time
-			global re
-			global hashlib
-			global hmac
 			import sys
 			import os
 			import argparse

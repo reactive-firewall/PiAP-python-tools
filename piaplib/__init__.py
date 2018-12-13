@@ -26,9 +26,7 @@ __version__ = """0.4.0"""
 
 
 try:
-	global sys
 	import sys
-	global os
 	import os
 	import os.path
 	try:
@@ -53,7 +51,6 @@ except Exception as ImportErr:
 
 try:
 	if 'piaplib.book' not in sys.modules:
-		global book
 		from . import book as book
 except Exception as importErr:
 	del importErr
@@ -62,7 +59,6 @@ except Exception as importErr:
 
 try:
 	if 'piaplib.pku' not in sys.modules:
-		global pku
 		from . import pku as pku
 except Exception as importErr:
 	del importErr
@@ -71,7 +67,6 @@ except Exception as importErr:
 
 try:
 	if 'piaplib.keyring' not in sys.modules:
-		global keyring
 		from . import keyring as keyring
 except Exception as importErr:
 	del importErr
@@ -80,7 +75,6 @@ except Exception as importErr:
 
 try:
 	if 'piaplib.lint' not in sys.modules:
-		global lint
 		from . import lint as lint
 except Exception as importErr:
 	del importErr
@@ -90,10 +84,8 @@ except Exception as importErr:
 if __name__ in u'__main__':
 	try:
 		if 'piaplib.pocket' not in sys.modules:
-			global pocket
 			from . import pocket as pocket
 		else:
-			global pocket
 			pocket = sys.modules['pocket']
 	except Exception:
 		import pocket as pocket

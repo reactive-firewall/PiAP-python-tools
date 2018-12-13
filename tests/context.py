@@ -20,9 +20,7 @@
 
 
 try:
-	global sys
 	import sys
-	global os
 	import os
 	_DIR_NAME = str(".")
 	_PARENT_DIR_NAME = str("..")
@@ -41,7 +39,6 @@ except Exception as ImportErr:
 
 
 try:
-	global piaplib
 	import piaplib as piaplib
 	if piaplib.__name__ is None:
 		raise ImportError("Failed to import piaplib.")

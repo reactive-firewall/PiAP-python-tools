@@ -23,7 +23,6 @@ import unittest
 
 try:
 	try:
-		global context
 		import context
 	except Exception as ImportErr:
 		ImportErr = None
@@ -53,7 +52,6 @@ def debugtestError(someError=None):
 
 
 def random_file_path():
-	global piaplib
 	from .context import piaplib as piaplib
 	if piaplib.__name__ is None:
 		raise ImportError("Failed to import piaplib")
@@ -66,7 +64,6 @@ def random_file_path():
 
 
 def clean_temp_file(someFile):
-	global piaplib
 	from .context import piaplib as piaplib
 	if piaplib.__name__ is None:
 		raise ImportError("Failed to import piaplib")
@@ -82,7 +79,6 @@ class ConfigTestSuite(unittest.TestCase):
 
 	def setUp(self):
 		"""sets up the configuration tests."""
-		global piaplib
 		from .context import piaplib as piaplib
 		if piaplib.__name__ is None:
 			raise ImportError("Failed to import pku")

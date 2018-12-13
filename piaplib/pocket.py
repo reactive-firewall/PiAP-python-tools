@@ -21,7 +21,6 @@
 
 
 try:
-	global sys
 	import sys
 	if sys.__name__ is None:
 		raise ImportError("OMG! we could not import os. We're like in the matrix! ABORT. ABORT.")
@@ -31,7 +30,6 @@ except Exception as err:
 
 
 try:
-	global os
 	import os
 	if os.__name__ is None:
 		raise ImportError("OMG! we could not import os. We're like in the matrix! ABORT. ABORT.")
@@ -41,7 +39,6 @@ except Exception as err:
 
 
 try:
-	global argparse
 	import argparse
 	if argparse.__name__ is None:
 		raise ImportError("OMG! we could not import argparse. We're in need of a fix! ABORT.")
@@ -65,7 +62,6 @@ except Exception as importErr:
 
 
 try:
-	global piaplib
 	import piaplib
 	sys.modules['piaplib'] = piaplib
 except Exception:
@@ -74,7 +70,6 @@ except Exception:
 
 try:
 	if 'piaplib.book' not in sys.modules:
-		global book
 		from . import book as book
 except Exception as importErr:
 	del importErr
@@ -84,7 +79,6 @@ except Exception as importErr:
 
 
 try:
-	global logs
 	from book.logs import logs as logs
 except Exception:
 	try:
@@ -99,7 +93,6 @@ except Exception:
 
 try:
 	if 'piaplib.pku' not in sys.modules:
-		global pku
 		from . import pku as pku
 except Exception as importErr:
 	del importErr
@@ -110,7 +103,6 @@ except Exception as importErr:
 
 try:
 	if 'piaplib.keyring' not in sys.modules:
-		global keyring
 		from . import keyring as keyring
 except Exception as importErr:
 	del importErr
@@ -121,7 +113,6 @@ except Exception as importErr:
 
 try:
 	if 'piaplib.lint' not in sys.modules:
-		global lint
 		from . import lint as lint
 except Exception as importErr:
 	del importErr

@@ -26,7 +26,6 @@
 
 
 try:
-	global os
 	import os
 	if os.__name__ is None:
 		raise NotImplementedError("OMG! We could not import the os. We're like in the matrix!")
@@ -36,7 +35,6 @@ except Exception as err:
 
 
 try:
-	global sys
 	import sys
 	if sys.__name__ is None:
 		raise NotImplementedError("OMG! We could not import the sys. We're like in the matrix!")
@@ -46,7 +44,6 @@ except Exception as err:
 
 
 try:
-	global argparse
 	import argparse
 	if argparse.__name__ is None:
 		raise NotImplementedError("OMG! We could not import argparse.")
@@ -56,10 +53,8 @@ except Exception as err:
 
 
 try:
-	global piaplib
 	import piaplib as piaplib
 except Exception:
-	global piaplib
 	from .. import piaplib as piaplib
 try:
 	from piaplib.pku import utils as utils

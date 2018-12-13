@@ -21,11 +21,8 @@
 
 
 try:
-	global sys
 	import sys
-	global os
 	import os
-	global argparse
 	import argparse
 	if str("book") in __file__:
 		__sys_path__ = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -40,7 +37,6 @@ except Exception as importErr:
 
 
 try:
-	global piaplib
 	try:
 		if 'piaplib' not in sys.modules:
 			import piaplib as piaplib
@@ -55,7 +51,6 @@ except Exception as err:
 	exit(3)
 
 try:
-	global baseconfig
 	from piaplib.pku import baseconfig as baseconfig
 except Exception:
 	try:
@@ -69,7 +64,6 @@ except Exception:
 
 try:
 	try:
-		global logs
 		from .logs import logs as logs
 	except Exception:
 		import logs.logs as logs

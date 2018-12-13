@@ -21,7 +21,6 @@
 
 
 try:
-	global sys
 	import sys
 	if 'piaplib.pocket' not in sys.modules:
 		from . import pocket as pocket

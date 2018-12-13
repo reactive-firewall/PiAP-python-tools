@@ -21,11 +21,8 @@
 
 
 try:
-	global os
 	import os
-	global sys
 	import sys
-	global argparse
 	import argparse
 	for someModule in [os, sys, argparse]:
 		if someModule.__name__ is None:
@@ -50,7 +47,6 @@ except Exception as importErr:
 
 
 try:
-	global piaplib
 	try:
 		import piaplib as piaplib
 	except Exception:
@@ -62,7 +58,6 @@ except Exception as err:
 	exit(3)
 
 try:
-	global upgrade
 	import piaplib.pku.upgrade as upgrade
 except Exception:
 	try:
@@ -83,7 +78,6 @@ except Exception:
 
 
 try:
-	global utils
 	import piaplib.pku.utils as utils
 except Exception:
 	try:
@@ -113,7 +107,6 @@ except Exception:
 
 
 try:
-	global logs
 	from piaplib.book.logs import logs as logs
 except Exception:
 	try:
