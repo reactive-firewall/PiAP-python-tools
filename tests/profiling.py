@@ -32,6 +32,7 @@
 
 
 try:
+	global os
 	import os
 	if os.__name__ is None:
 		raise NotImplementedError("OMG! We could not import the os. We're like in the matrix!")
@@ -41,6 +42,7 @@ except Exception as err:
 
 
 try:
+	global sys
 	import sys
 	if sys.__name__ is None:
 		raise NotImplementedError("OMG! We could not import the sys. We're like in the matrix!")
@@ -50,6 +52,7 @@ except Exception as err:
 
 
 try:
+	global time
 	import time
 	if time.__name__ is None:
 		raise NotImplementedError("OMG! We could not import time. We're like in the speed-force!")
@@ -59,6 +62,7 @@ except Exception as err:
 
 
 try:
+	global cProfile
 	import cProfile
 	if cProfile.__name__ is None:
 		raise NotImplementedError("OMG! We could not import cProfile. ABORT!")
@@ -85,6 +89,7 @@ except Exception:
 
 
 try:
+	global logs
 	from piaplib.book.logs import logs as logs
 except Exception:
 	try:

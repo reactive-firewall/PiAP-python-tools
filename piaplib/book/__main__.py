@@ -21,8 +21,11 @@
 
 
 try:
+	global sys
 	import sys
+	global os
 	import os
+	global argparse
 	import argparse
 	if str("book") in __file__:
 		__sys_path__ = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -34,27 +37,39 @@ except Exception as importErr:
 	importErr = None
 	del importErr
 	raise ImportError("Failed to import " + str(__file__))
-	exit(255)
 
 
 try:
+	global piaplib
 	try:
 		if 'piaplib' not in sys.modules:
 			import piaplib as piaplib
 		else:
 			piaplib = sys.modules['piaplib']
 	except Exception:
-		try:
-			import piaplib as piaplib
-		except Exception:
-			from . import piaplib as piaplib
+		from . import piaplib as piaplib
 	if piaplib.__name__ is None:
-		raise ImportError("Failed to import piaplib")
+		raise ImportError("OMG! we could not import piaplib. We're in need of a fix! ABORT.")
+except Exception as err:
+	raise ImportError(err)
+	exit(3)
+
+try:
+	global baseconfig
+	from piaplib.pku import baseconfig as baseconfig
+except Exception:
 	try:
-		from piaplib.pku import baseconfig as baseconfig
+		if 'piaplib.pku.baseconfig' not in sys.modules:
+			import piaplib.pku.baseconfig as baseconfig
+		else:
+			baseconfig = sys.modules['piaplib.pku.baseconfig']
 	except Exception:
-		import piaplib.pku.baseconfig as baseconfig
+		raise ImportError("Error Importing baseconfig")
+
+
+try:
 	try:
+		global logs
 		from .logs import logs as logs
 	except Exception:
 		import logs.logs as logs
@@ -75,7 +90,6 @@ except Exception as importErr:
 	importErr = None
 	del importErr
 	raise ImportError("Failed to import " + str(__file__))
-	exit(255)
 
 
 __prog__ = """piaplib.book"""
@@ -127,12 +141,11 @@ def main(argv=None):
 	"""The main event"""
 	args, extra = parseArgs(argv)
 	book_cmd = args.book_unit
-	temp_out = useBookTool(book_cmd, extra)
-	return temp_out
+	useBookTool(book_cmd, extra)
+	return 0
 
 
 if __name__ in u'__main__':
 	exit_code = main(sys.argv[1:])
 	exit(exit_code)
-
 

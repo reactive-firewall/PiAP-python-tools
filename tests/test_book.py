@@ -23,7 +23,9 @@ import unittest
 
 try:
 	try:
+		global sys
 		import sys
+		global os
 		import os
 		sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), str('..'))))
 		sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), str('.'))))
@@ -52,6 +54,7 @@ class BookTestSuite(unittest.TestCase):
 		"""Test case importing code."""
 		theResult = False
 		try:
+			global piaplib
 			from .context import piaplib
 			if piaplib.__name__ is None:
 				theResult = False
@@ -87,8 +90,7 @@ class BookTestSuite(unittest.TestCase):
 		theResult = True
 		try:
 			import piaplib.book.__main__
-			with self.assertRaises(Exception):
-				self.assertIsNotNone(piaplib.book.__main__.main(["logs"]))
+			self.assertIsNotNone(piaplib.book.__main__.main(["logs"]))
 		except Exception as err:
 			print(str(""))
 			print(str(type(err)))

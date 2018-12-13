@@ -1,0 +1,10 @@
+*		text=auto
+*.txt		text
+*.py		text
+*.sh		text
+*.bash		text
+*.ini		text
+*.md		text
+*.yml		text
+*.jpg		-text
+*.png		-text

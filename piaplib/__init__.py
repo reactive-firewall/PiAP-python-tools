@@ -26,8 +26,10 @@ __version__ = """0.4.0"""
 
 
 try:
-	import sys as sys
-	import os as os
+	global sys
+	import sys
+	global os
+	import os
 	import os.path
 	try:
 		if str("piaplib") in __file__:

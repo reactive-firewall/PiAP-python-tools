@@ -26,6 +26,7 @@
 
 
 try:
+	global os
 	import os
 	if os.__name__ is None:
 		raise NotImplementedError("OMG! We could not import the os. We're like in the matrix!")
@@ -35,6 +36,7 @@ except Exception as err:
 
 
 try:
+	global sys
 	import sys
 	if sys.__name__ is None:
 		raise NotImplementedError("OMG! We could not import the sys. We're like in the matrix!")
@@ -44,6 +46,7 @@ except Exception as err:
 
 
 try:
+	global argparse
 	import argparse
 	if argparse.__name__ is None:
 		raise NotImplementedError("OMG! We could not import argparse.")
@@ -53,8 +56,10 @@ except Exception as err:
 
 
 try:
+	global piaplib
 	import piaplib as piaplib
 except Exception:
+	global piaplib
 	from .. import piaplib as piaplib
 try:
 	from piaplib.pku import utils as utils
@@ -226,9 +231,10 @@ def main(argv=None):
 		del extra
 		output = str(getRunVersion(args.version_unit, args.verbose_mode))
 		if __name__ in u'__main__':
-			print(output)
+			print(str(output))
 			return 0
 		else:
+			print(str(output))
 			return output
 	except Exception as err:
 		logs.log(str(type(err)), "Critical")
@@ -238,8 +244,8 @@ def main(argv=None):
 
 
 if __name__ in u'__main__':
+	exitcode = 255
 	try:
-		import sys
 		exitcode = main(sys.argv[1:])
 	except Exception:
 		exitcode = 3

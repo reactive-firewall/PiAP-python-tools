@@ -21,6 +21,7 @@
 
 
 try:
+	global sys
 	import sys
 	if sys.__name__ is None:
 		raise ImportError("OMG! we could not import os. We're like in the matrix! ABORT. ABORT.")
@@ -30,6 +31,7 @@ except Exception as err:
 
 
 try:
+	global os
 	import os
 	if os.__name__ is None:
 		raise ImportError("OMG! we could not import os. We're like in the matrix! ABORT. ABORT.")
@@ -39,6 +41,7 @@ except Exception as err:
 
 
 try:
+	global argparse
 	import argparse
 	if argparse.__name__ is None:
 		raise ImportError("OMG! we could not import argparse. We're in need of a fix! ABORT.")
@@ -71,6 +74,7 @@ except Exception:
 
 try:
 	if 'piaplib.book' not in sys.modules:
+		global book
 		from . import book as book
 except Exception as importErr:
 	del importErr
