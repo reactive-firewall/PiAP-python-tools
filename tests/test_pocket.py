@@ -337,7 +337,7 @@ class PocketUsageTestSuite(unittest.TestCase):
 						], stderr=subprocess.STDOUT)
 						if (str("usage:") in str(theOutputtext)):
 							theResult = True
-						elif (theOutputtext is None):
+						elif (theOutputtext is None) or (str(theOutputtext) in str("")):
 							theResult = True
 						else:
 							theResult = False
@@ -346,7 +346,7 @@ class PocketUsageTestSuite(unittest.TestCase):
 							print(str(""))
 							print(str("actual output was..."))
 							print(str(""))
-							print(str("{}").format(str(theOutputtext)))
+							print(str("{}").format(repr(theOutputtext)))
 							print(str(""))
 				except Exception as othererr:
 					print(str(""))
