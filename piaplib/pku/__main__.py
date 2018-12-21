@@ -48,7 +48,10 @@ except Exception as importErr:
 
 try:
 	try:
-		import piaplib as piaplib
+		if 'piaplib' not in sys.modules:
+			import piaplib as piaplib
+		else:
+			piaplib = sys.modules['piaplib']
 	except Exception:
 		from . import piaplib as piaplib
 	if piaplib.__name__ is None:
@@ -69,7 +72,7 @@ except Exception:
 
 try:
 	import piaplib.pku.config as config
-except Exception:
+except Exception as err:
 	try:
 		if 'piaplib.pku.config' not in sys.modules:
 			from . import config as config
@@ -115,7 +118,7 @@ except Exception:
 		raise ImportError("Error Importing logs")
 
 
-__prog__ = """piaplib.pku.pku"""
+__prog__ = """piaplib.pku.__main__"""
 """The name of this PiAPLib tool is Pocket Knife Unit"""
 
 
@@ -128,7 +131,7 @@ PKU_UNITS = {
 	u'iface': interfaces
 }
 """ The Pocket Knife Unit actions.
-	config -  (FUTURE/configuration stuff)
+	config -  configuration stuff
 	backup -  (FUTURE/RESERVED)
 	upgrade -  (see reactive-firewall/PiAP-python-tools#1)
 	help -  (FUTURE/RESERVED)

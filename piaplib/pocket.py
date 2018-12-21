@@ -79,7 +79,8 @@ except Exception as importErr:
 
 
 try:
-	from book.logs import logs as logs
+	if 'piaplib.book.logs.logs' not in sys.modules:
+		from book.logs import logs as logs
 except Exception:
 	try:
 		from piaplib.book.logs import logs as logs

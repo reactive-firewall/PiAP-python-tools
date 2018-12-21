@@ -633,6 +633,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 						except UnicodeDecodeError:
 							theOutputtext = str(repr(bytes(theOutputtext)))
 						if (str(theOutputtext) is not None):
+							self.assertIsInstance(theOutputtext, str, "random data should be a str")
 							theResult = True
 						else:
 							theResult = False

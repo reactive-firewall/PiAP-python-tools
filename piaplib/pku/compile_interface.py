@@ -26,6 +26,17 @@ THERE MAY BE REGULATIONS GOVERNING USE OF WIFI SETTINGS IN MANY AREAS.
 
 """ THIS CODE IS NOT IN A USEABLE STATE """
 
+try:
+	import sys
+	import os
+	import argparse
+	if str("compile_interface") in __file__:
+		__sys_path__ = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+		if __sys_path__ not in sys.path:
+			sys.path.insert(0, __sys_path__)
+except Exception:
+	raise ImportError("Pocket Knife Unit PKU failed to import.")
+
 
 try:
 	from . import remediation as remediation
@@ -44,12 +55,8 @@ except Exception:
 	except Exception:
 		raise ImportError("Error Importing utils")
 
+__prog__ = """piaplib.pku.compile_interface"""
 
-try:
-	import argparse
-except Exception as importError:
-	print(str("Error Importing argparse lib"))
-	raise importError
 
 HEADER_CHUNK = u'# interfaces(5) file used by ifup(8) and ifdown(8)\
 \
@@ -363,7 +370,7 @@ def main(argv=None):
 	if (args.vlanid is not None):
 		interface_vlanID = args.vlanid
 		if interface_vlanID is not None:
-			raise NotImplementedError("BUG - Not Implemented Yet.")
+			raise NotImplementedError("[CWE-758] BUG - Not Implemented Yet.")
 	interface_mode = u'manual'
 	interface_gateway = None
 	interface_ip = None
@@ -390,7 +397,7 @@ def main(argv=None):
 
 if __name__ in u'__main__':
 	try:
-		import sys
+		__name__ = __prog__
 		if (sys.argv is not None and (sys.argv is not []) and (len(sys.argv) > 1)):
 			exit(main(sys.argv[1:]))
 		else:

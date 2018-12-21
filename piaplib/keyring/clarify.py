@@ -31,7 +31,7 @@ try:
 	import subprocess
 	sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 except Exception:
-	raise NotImplementedError("OMG! We could not import the os. We're like in the matrix!")
+	raise NotImplementedError("[CWE-758] We could not import the os. We're like in the matrix!")
 	exit(3)
 
 
@@ -225,7 +225,7 @@ def packForRest(message=None, keyStore=None):
 			# ciphertext = str(ciphertext).replace(str("\\n"), str(""))
 		return ciphertext
 	else:
-		raise NotImplementedError("No Implemented Backend - BUG")
+		raise NotImplementedError("[CWE-758] No Implemented Backend - BUG")
 
 
 @remediation.error_handling
@@ -265,7 +265,7 @@ def unpackFromRest(ciphertext=None, keyStore=None):
 			cleartext = cleartext.decode(encoding=u'utf-8', errors=getCTLModeForPY())
 		return utils.literal_str(cleartext)
 	else:
-		raise NotImplementedError("No Implemented Backend - BUG")
+		raise NotImplementedError("[CWE-758] No Implemented Backend - BUG")
 
 
 @remediation.error_handling

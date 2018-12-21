@@ -357,7 +357,7 @@ def useRandTool(tool, *args, **kwargs):
 	if tool in RANDOM_TASKS.keys():
 		return RANDOM_TASKS[tool](*args, **kwargs)
 	else:
-		raise NotImplementedError("IMPOSSIBLE STATE REACHED IN RAND-TOOL. ABORT.")
+		raise NotImplementedError("[CWE-758] IMPOSSIBLE STATE REACHED IN RAND-TOOL. ABORT.")
 
 
 @remediation.bug_handling
@@ -378,7 +378,7 @@ if __name__ in u'__main__':
 		error_code = main(sys.argv[1:])
 		exit(error_code)
 	except Exception as err:
-		remediation.error_breakpoint(err, str(u'MAIN FAILED DURING RAND. ABORT.'))
+		remediation.error_breakpoint(err, str(u'[CWE-233] MAIN FAILED DURING RAND. ABORT.'))
 		del err
 		exit(255)
 	finally:

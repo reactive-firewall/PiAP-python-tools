@@ -30,7 +30,8 @@ try:
 	import os
 	import sys
 	import functools
-	for someModule in [os, sys, functools]:
+	import time
+	for someModule in [os, sys, functools, time]:
 		if someModule.__name__ is None:
 			raise ImportError(str("OMG! we could not import {}. ABORT. ABORT.").format(someModule))
 except Exception as err:
@@ -51,23 +52,27 @@ except Exception:
 		raise ImportError("Error Importing logs")
 
 
+__prog__ = """piaplib.pku.remediation"""
+"""The name of this PiAPLib tool is Pocket Knife Remediation Unit"""
+
+
 class PiAPError(RuntimeError):
 	"""An Error class for PiAP errors"""
 	cause = None
-	msg = None
+	message = None
 
-	def __init__(self, cause=None, msg=None):
+	def __init__(self, cause=None, message=None):
 		if cause is not None and isinstance(cause, Exception):
 			self.cause = cause
-			self.msg = str(cause)
+			self.message = str(cause)
 		elif cause is not None and isinstance(cause, str):
-			self.msg = str(cause)
+			self.message = str(cause)
 			self.cause = None
-		if msg is not None and isinstance(msg, str):
-			self.msg = str(msg)
+		if message is not None and isinstance(message, str):
+			self.message = str(message)
 
 	def __del__(self):
-		del self.msg
+		del self.message
 		del self.cause
 		del self
 
@@ -76,7 +81,6 @@ def getTimeStamp():
 	"""Returns the time stamp."""
 	theDate = None
 	try:
-		import time
 		theDate = time.strftime("%a %b %d %H:%M:%S %Z %Y", time.localtime())
 	except Exception:
 		theDate = str("")
@@ -96,7 +100,7 @@ def error_breakpoint(error, context=None):
 		logs.log(str("Caused by:"), "Warning")
 		logs.log(str(error.cause), "Error")
 		logs.log(str(type(error.cause)), "Debug")
-		logs.log(str((error.args)), "Error")
+		logs.log(str(error.message), "Error")
 	else:
 		logs.log(str((error.args)), "Error")
 	return None
@@ -195,11 +199,12 @@ def warning_handling(func):
 @bug_handling
 def main(argv=None):
 	"""The Main Event makes no sense to remediation."""
-	raise NotImplementedError("Warning - PKU remediation main() not implemented. yet?")
+	raise NotImplementedError("[CWE-758] - PKU remediation main() not implemented. yet?")
 
 
 if __name__ in u'__main__':
 	try:
+		__name__ = __prog__
 		exit(main(sys.argv[1:]))
 	except Exception:
 		exit(3)

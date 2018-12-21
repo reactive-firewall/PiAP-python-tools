@@ -24,6 +24,10 @@
 # except Exception:
 # 	import config as config
 
+# PEP 366
+if __name__ in u'__main__' and __package__ is None:
+	__package__ = """piaplib.book"""
+
 
 try:
 	import sys
@@ -36,66 +40,25 @@ try:
 except Exception:
 	raise ImportError("Pocket Book failed to import.")
 
+
 try:
 	import logging as logging
 	if logging.__name__ is None:
-		raise NotImplementedError("OMG! We could not import the builtin logs!")
+		raise NotImplementedError("[CWE-758] We could not import the builtin logs!")
 except Exception as err:
 	raise ImportError(err)
-	exit(3)
 
 
-class ANSIColors:
-	"""ANSI colored text"""
-	ENDC = """\033[0m"""
-	BOLD = """\033[1m"""
-	ITALIC = """\033[3m"""
-	URL = """\033[4m"""
-	BLINK = """\033[5m"""
-	BLINK2 = """\033[6m"""
-	SELECTED = """\033[7m"""
-
-	BLACK = """\033[30m"""
-	RED = """\033[31m"""
-	GREEN = """\033[32m"""
-	YELLOW = """\033[33m"""
-	BLUE = """\033[34m"""
-	VIOLET = """\033[35m"""
-	BEIGE = """\033[36m"""
-	WHITE = """\033[37m"""
-
-	BLACKBG = """\033[40m"""
-	REDBG = """\033[41m"""
-	GREENBG = """\033[42m"""
-	YELLOWBG = """\033[43m"""
-	BLUEBG = """\033[44m"""
-	VIOLETBG = """\033[45m"""
-	BEIGEBG = """\033[46m"""
-	WHITEBG = """\033[47m"""
-
-	GREY = """\033[90m"""
-	RED2 = """\033[91m"""
-	GREEN2 = """\033[92m"""
-	YELLOW2 = """\033[93m"""
-	AMBER = """\033[93m"""
-	BLUE2 = """\033[94m"""
-	VIOLET2 = """\033[95m"""
-	BEIGE2 = """\033[96m"""
-	WHITE2 = """\033[97m"""
-
-	GREYBG = """\033[100m"""
-	REDBG2 = """\033[101m"""
-	GREENBG2 = """\033[102m"""
-	YELLOWBG2 = """\033[103m"""
-	BLUEBG2 = """\033[104m"""
-	VIOLETBG2 = """\033[105m"""
-	BEIGEBG2 = """\033[106m"""
-	WHITEBG2 = """\033[107m"""
-	WARNING = AMBER
-	OKBLUE = BLUE
-	OKGREEN = GREEN
-	HEADER = VIOLET
-	FAIL = RED
+try:
+	if str("piaplib.book.ANSIColors") not in sys.modules:
+		from piaplib.book import ANSIColors as ANSIColors
+	else:
+		ANSIColors = sys.modules[str("piaplib.book.ANSIColors")]
+except Exception:
+	try:
+		import piaplib.book.ANSIColors as ANSIColors
+	except Exception as err:
+		raise ImportError(err)
 
 
 class logs(object):

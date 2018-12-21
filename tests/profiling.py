@@ -34,7 +34,7 @@
 try:
 	import os
 	if os.__name__ is None:
-		raise NotImplementedError("OMG! We could not import the os. We're like in the matrix!")
+		raise NotImplementedError("[CWE-758] We could not import the os. We're like in the matrix!")
 except Exception as err:
 	raise ImportError(err)
 	exit(3)
@@ -43,7 +43,7 @@ except Exception as err:
 try:
 	import sys
 	if sys.__name__ is None:
-		raise NotImplementedError("OMG! We could not import the sys. We're like in the matrix!")
+		raise NotImplementedError("[CWE-758] We could not import the sys.")
 except Exception as err:
 	raise ImportError(err)
 	exit(3)
@@ -52,7 +52,7 @@ except Exception as err:
 try:
 	import time
 	if time.__name__ is None:
-		raise NotImplementedError("OMG! We could not import time. We're like in the speed-force!")
+		raise NotImplementedError("[CWE-758] We could not import time. Are we in the speed-force!")
 except Exception as err:
 	raise ImportError(err)
 	exit(3)
@@ -61,7 +61,7 @@ except Exception as err:
 try:
 	import cProfile
 	if cProfile.__name__ is None:
-		raise NotImplementedError("OMG! We could not import cProfile. ABORT!")
+		raise NotImplementedError("[CWE-758] We could not import cProfile. ABORT!")
 except Exception as err:
 	raise ImportError(err)
 	exit(3)
@@ -186,7 +186,7 @@ except ImportError:
 
 def main(argv=None):
 	"""The Main Event makes no sense to remediation."""
-	raise NotImplementedError("CRITICAL - test profiling main() not implemented. yet?")
+	raise NotImplementedError("[CWE-758] CRITICAL - test profiling main() not implemented. yet?")
 
 
 if __name__ in u'__main__':

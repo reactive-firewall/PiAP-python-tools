@@ -177,7 +177,7 @@ def upgradeAPT():
 		cache.upgrade()
 		for pkg in cache.get_changes():
 			logs.log(str((pkg.name, pkg.isupgradeable)), "Info")
-		raise NotImplementedError("CRITICAL - Pocket upgrade upgradeAPT() not implemented. Yet.")
+		raise NotImplementedError("[CWE-758] - Pocket upgrade upgradeAPT() not implemented. Yet.")
 	except Exception as permErr:
 		remediation.error_breakpoint(permErr, "upgradeAPT")
 		permErr = None
@@ -320,6 +320,7 @@ def main(argv=None):
 
 if __name__ in u'__main__':
 	try:
+		__name__ = __prog__
 		if (sys.argv is not None and (sys.argv is not []) and (len(sys.argv) > 1)):
 			exit(main(sys.argv[1:]))
 		else:

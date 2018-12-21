@@ -25,10 +25,15 @@
 # 	import config as config
 
 
+# PEP 366
+if __name__ in u'__main__' and __package__ is None:
+	__package__ = """piaplib.book"""
+
+
 try:
 	import os
 	if os.__name__ is None:
-		raise NotImplementedError("OMG! We could not import the os. We're like in the matrix!")
+		raise NotImplementedError("[CWE-758] Could not import the os. We're like in the matrix!")
 except Exception as err:
 	raise ImportError(err)
 	exit(3)
@@ -37,7 +42,7 @@ except Exception as err:
 try:
 	import sys
 	if sys.__name__ is None:
-		raise NotImplementedError("OMG! We could not import the sys. We're like in the matrix!")
+		raise NotImplementedError("[CWE-758] Could not import the sys.")
 except Exception as err:
 	raise ImportError(err)
 	exit(3)
@@ -46,7 +51,7 @@ except Exception as err:
 try:
 	import argparse
 	if argparse.__name__ is None:
-		raise NotImplementedError("OMG! We could not import argparse.")
+		raise NotImplementedError("[CWE-758] We could not import argparse.")
 except Exception as err:
 	raise ImportError(err)
 	exit(3)
@@ -101,7 +106,7 @@ def getKeyringVersion(verbose=False):
 	try:
 		from piaplib import keyring
 		if keyring.__name__ is False:
-			raise NotImplementedError("Failed to import keyring")
+			raise NotImplementedError("[CWE-758] Failed to import keyring")
 	except Exception:
 		import piaplib.keyring
 	try:

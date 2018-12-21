@@ -18,6 +18,11 @@
 # limitations under the License.
 # ......................................................................
 
+
+# PEP 366
+__package__ = """piaplib.pku"""
+
+
 try:
 	import sys
 	import os
@@ -38,6 +43,26 @@ except Exception:
 	raise ImportError("Pocket Book failed to import.")
 
 
+def try_catch_error(func):
+	"""Runs a function in try-except"""
+	import functools
+
+	@functools.wraps(func)
+	def try_func(*args, **kwargs):
+		"""Wraps a function in try-except"""
+		theOutputOrNone = None
+		try:
+			theOutputOrNone = func(*args, **kwargs)
+		except BaseException as err:
+			print(str(err))
+			baton = RuntimeError(err, str("[CWE-394] An error occurred in {}.").format(str(func)))
+			raise baton
+		return theOutputOrNone
+
+	return try_func
+
+
+@try_catch_error
 def main(argv=None):
 	"""The main event"""
 	import piaplib.pku.__main__

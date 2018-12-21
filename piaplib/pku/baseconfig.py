@@ -29,7 +29,11 @@ try:
 		except Exception:
 			raise ImportError("Error Importing ConfigParser utils for config")
 except Exception:
-	pass
+	raise ImportError("Error Importing ConfigParser utils for config")
+
+
+__prog__ = """piaplib.pku.baseconfig"""
+"""The name of this PiAPLib tool is Pocket Knife config Unit"""
 
 
 def getDefaultMainConfigFile():
@@ -150,5 +154,6 @@ def loadMainConfigFile(confFile='/opt/PiAP/PiAP.conf'):
 
 
 if __name__ in u'__main__':
-	raise NotImplementedError("ERROR: Can not run baseconfig as main.")
+	__name__ = __prog__
+	raise NotImplementedError("[CWE-394] ERROR caused by CWE-758: Can not run baseconfig as main.")
 

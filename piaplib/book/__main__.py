@@ -20,6 +20,11 @@
 # ......................................................................
 
 
+# PEP 366
+if __name__ in u'__main__' and __package__ is None:
+	__package__ = """piaplib.book"""
+
+
 try:
 	import sys
 	import os
@@ -49,6 +54,7 @@ try:
 except Exception as err:
 	raise ImportError(err)
 	exit(3)
+
 
 try:
 	from piaplib.pku import baseconfig as baseconfig
@@ -86,7 +92,7 @@ except Exception as importErr:
 	raise ImportError("Failed to import " + str(__file__))
 
 
-__prog__ = """piaplib.book"""
+__prog__ = """piaplib.book.__main__"""
 """The name of this PiAPLib tool is pocket book"""
 
 

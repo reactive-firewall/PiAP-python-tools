@@ -344,7 +344,7 @@ class CryptoTestSuite(unittest.TestCase):
 			if (str("This is a test Message") in str(test_out)):
 				theResult = True
 			else:
-				if sys.platform.startswith("linux"):
+				if sys.platform.startswith("linux") or sys.platform.startswith("darwin"):
 					print(str(repr(bytes(test_out))))
 					theResult = False
 				else:
@@ -400,7 +400,7 @@ class CryptoTestSuite(unittest.TestCase):
 				if (str(someMessageText) in str(test_read)):
 					theResult = True
 				else:
-					if sys.platform.startswith("linux"):
+					if sys.platform.startswith("linux") or sys.platform.startswith("darwin"):
 						print(str(repr(bytes(test_read, 'utf8'))))
 						theResult = False
 					else:

@@ -136,6 +136,17 @@ def literal_str(raw_input=None):
 	return None
 
 
+def parametrized(dec):
+	"""parametrized wrapper"""
+	@functools.wraps(dec)
+	def layer(*args, **kwargs):
+		@functools.wraps(dec)
+		def repl(f):
+			return dec(f, *args, **kwargs)
+		return repl
+	return layer
+
+
 def memoize(func):
 	"""memoize wrapper"""
 	cache = func.cache = {}
@@ -315,7 +326,9 @@ def getHandle(handler):
 		if handler == globals()[theFunc]:
 			handle = theFunc
 	if handle is None:
-		raise NotImplementedError(str("Function {} not implemented").format(repr(handler)))
+		raise NotImplementedError(
+			str("[CWE-758] Function {} not implemented").format(repr(handler))
+		)
 	return handle
 
 
@@ -346,7 +359,9 @@ def getHandler(handle):
 		best_guess = getFunctionListDict(str(splitDottedKeyPath(handle)[0]))
 		handler = best_guess.get(str(splitDottedKeyPath(handle)[1]))
 	if isinstance(handler, type(None)):
-		raise NotImplementedError(str("Function with name {} not implemented").format(str(handle)))
+		raise NotImplementedError(
+			str("[CWE-758] Function with name {} not implemented").format(str(handle))
+		)
 	return handler
 
 
@@ -448,7 +463,7 @@ def isLineForMatch(someLine=None, toMatch=None):
 
 @remediation.warning_handling
 @memoize
-def compactList(list, intern_func=None):
+def compactList(unsortedList, intern_func=None):
 	"""
 	Compacts Lists
 	Adapted from some now forgoten forum about flattening arrays, and sorting.
@@ -459,7 +474,7 @@ def compactList(list, intern_func=None):
 			return x
 	seen = {}
 	result = []
-	for item in list:
+	for item in unsortedList:
 		marker = intern_func(item)
 		if marker in seen:
 			continue
@@ -824,12 +839,13 @@ def moveFileResource(theSrc, theDest):
 @remediation.bug_handling
 def main(argv=None):
 	"""The Main Event makes no sense to utils."""
-	raise NotImplementedError("CRITICAL - PKU Uitls main() not implemented. yet?")
+	raise NotImplementedError("[CWE-758] CRITICAL - PKU Uitls main() not implemented. yet?")
 	exit(3)
 
 
 if __name__ in u'__main__':
 	try:
+		__name__ = __prog__
 		if (sys.argv is not None and (sys.argv is not []) and (len(sys.argv) > 1)):
 			exit(main(sys.argv[1:]))
 		else:
