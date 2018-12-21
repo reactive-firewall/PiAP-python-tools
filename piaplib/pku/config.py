@@ -1109,9 +1109,18 @@ def clearMainConfigAPI(*args, **kwargs):
 
 
 @try_catch_error
-def parseargs(arguments=None):
-	"""Parse the arguments"""
-	parser = argparse.ArgumentParser(prog=__prog__, description=__description__, epilog=__epilog__)
+def generateParser(calling_parser_group):
+	"""Parses the CLI arguments."""
+	if calling_parser_group is None:
+		parser = argparse.ArgumentParser(
+			prog=__prog__,
+			description=__description__,
+			epilog=__epilog__
+		)
+	else:
+		parser = calling_parser_group.add_parser(
+			str(__prog__).split(".")[-1], help=__description__
+		)
 	the_action = parser.add_mutually_exclusive_group()
 	the_action.add_argument(
 		'-r', '--read', dest='config_action', default='dump', action='store_const',
@@ -1155,8 +1164,18 @@ def parseargs(arguments=None):
 		help='Disables syntax color in output. Useful for piping output.'
 	)
 	parser = utils._handleVersionArgs(parser)
-	theResult = parser.parse_known_args(arguments)
-	return theResult
+	if calling_parser_group is None:
+		calling_parser_group = parser
+	return calling_parser_group
+
+
+@try_catch_error
+def parseargs(arguments=None):
+	"""Parse the arguments"""
+	theResult = None
+	parser = generateParser(None)
+	(theResult, theExtras) = parser.parse_known_args(arguments)
+	return (theResult, theExtras)
 
 
 def noOp(*args, **kwargs):
@@ -1178,28 +1197,35 @@ _CONFIG_CLI_ACTIONS = dict({
 @try_catch_error
 def main(argv=None):
 	"""The Main Event."""
-	(args, extras) = parseargs(argv)
 	theResult = 1
-	config_path = os.path.abspath(_raw_getConfigPath())
-	if args.config_path is not None:
-		config_path = os.path.abspath(str(args.config_path))
-	config_key = None
-	config_value = None
-	if args.config_key is not None and str(__ALL_KEYS_SETTING__) not in str(args.config_key):
-		config_key = args.config_key[0]
-	else:
-		config_key = args.config_key
-	if args.config_value is not None and (len(args.config_value) <= 1):
-		config_value = args.config_value[0]
-	if args.use_syntax_color is not None:
-		use_syntax_color = args.use_syntax_color
-	if args.config_action is not None:
-		kwargs = dict({
-			'file': config_path, 'color': use_syntax_color,
-			'setting': config_key, 'value': config_value
-		})
-		_CONFIG_CLI_ACTIONS[args.config_action](*extras, **kwargs)
-		theResult = 0
+	try:
+		(args, extras) = parseargs(argv)
+	except Exception:
+		args = None
+		extras = None
+	try:
+		config_path = os.path.abspath(_raw_getConfigPath())
+		if args.config_path is not None:
+			config_path = os.path.abspath(str(args.config_path))
+		config_key = None
+		config_value = None
+		if args.config_key is not None and str(__ALL_KEYS_SETTING__) not in str(args.config_key):
+			config_key = args.config_key[0]
+		else:
+			config_key = args.config_key
+		if args.config_value is not None and (len(args.config_value) <= 1):
+			config_value = args.config_value[0]
+		if args.use_syntax_color is not None:
+			use_syntax_color = args.use_syntax_color
+		if args.config_action is not None:
+			kwargs = dict({
+				'file': config_path, 'color': use_syntax_color,
+				'setting': config_key, 'value': config_value
+			})
+			_CONFIG_CLI_ACTIONS[args.config_action](*extras, **kwargs)
+			theResult = 0
+	except Exception:
+		theResult = 1
 	return theResult
 
 

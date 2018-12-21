@@ -204,13 +204,18 @@ def getRunVersion(tool, verbose_mode=False):
 
 
 @remediation.error_handling
-def parseArgs(arguments=None):
+def generateParser(calling_parser_group):
 	"""Parses the CLI arguments."""
-	parser = argparse.ArgumentParser(
-		prog=__prog__,
-		description='Handles PiAP pocket version reports',
-		epilog="PiAP Book Controller for version tools."
-	)
+	if calling_parser_group is None:
+		parser = argparse.ArgumentParser(
+			prog=__prog__,
+			description='Handles PiAP pocket version reports',
+			epilog="PiAP Book Controller for version tools."
+		)
+	else:
+		parser = calling_parser_group.add_parser(
+			str(__prog__).split(".")[-1], help="PiAP Book Controller for version tools."
+		)
 	parser.add_argument(
 		nargs='?',
 		dest='version_unit',
@@ -220,6 +225,15 @@ def parseArgs(arguments=None):
 	)
 	parser = utils._handleVerbosityArgs(parser, default=False)
 	parser = utils._handleVersionArgs(parser)
+	if calling_parser_group is None:
+		calling_parser_group = parser
+	return calling_parser_group
+
+
+@remediation.error_handling
+def parseArgs(arguments=None):
+	"""Parses the CLI arguments."""
+	parser = generateParser(None)
 	return parser.parse_known_args(arguments)
 
 

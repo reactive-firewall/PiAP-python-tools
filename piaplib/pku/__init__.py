@@ -43,7 +43,7 @@ except Exception:
 	raise ImportError("Pocket Book failed to import.")
 
 
-def try_catch_error(func):
+def try_pass_error(func):
 	"""Runs a function in try-except"""
 	import functools
 
@@ -62,6 +62,26 @@ def try_catch_error(func):
 	return try_func
 
 
+def try_catch_error(func):
+	"""Runs a function in try-except"""
+	import functools
+
+	@functools.wraps(func)
+	def try_func(*args, **kwargs):
+		"""Wraps a function in try-except"""
+		theOutputOrNone = None
+		try:
+			theOutputOrNone = func(*args, **kwargs)
+		except Exception as err:
+			print(str(err))
+			print(str("[CWE-394] An error occurred in {}.").format(str(func)))
+			del err
+			theOutputOrNone = None
+		return theOutputOrNone
+
+	return try_func
+
+
 @try_catch_error
 def main(argv=None):
 	"""The main event"""
@@ -71,5 +91,4 @@ def main(argv=None):
 
 if __name__ in u'__main__':
 	main(sys.argv[1:])
-
 

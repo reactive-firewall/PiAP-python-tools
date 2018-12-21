@@ -122,13 +122,20 @@ __prog__ = """piaplib.pku.__main__"""
 """The name of this PiAPLib tool is Pocket Knife Unit"""
 
 
+__description__ = """Pocket Knife Units. PiAP Pocket Controller for main tools."""
+"""The description is 'Pocket Knife Unit PiAP Pocket Controller for main tools.'"""
+
+
+__epilog__ = """Handles PiAP pockets tools"""
+"""...Handles PiAP pockets tools"""
+
+
 PKU_UNITS = {
 	u'config': config,
 	u'backup': None,
 	u'upgrade': upgrade,
 	u'help': None,
-	u'interfaces': interfaces,
-	u'iface': interfaces
+	u'interfaces': interfaces
 }
 """ The Pocket Knife Unit actions.
 	config -  configuration stuff
@@ -138,20 +145,37 @@ PKU_UNITS = {
 	"""
 
 
+def generateParser(calling_parser_group):
+	"""Parses the CLI arguments."""
+	if calling_parser_group is None:
+		parser = argparse.ArgumentParser(
+			prog=__prog__,
+			description=__description__,
+			epilog=__epilog__
+		)
+	else:
+		parser = calling_parser_group.add_parser(
+			str(__prog__).split(".")[-1], help='the pocket pku service option.'
+		)
+	subparser = parser.add_subparsers(
+		title="Units", dest='pku_unit',
+		help='The pocket pku options.', metavar="PKU_UNIT"
+	)
+	parser.add_argument('-V', '--version', action='version', version=str(
+		"%(prog)s {}"
+	).format(str(piaplib.__version__)))
+	for sub_parser in PKU_UNITS.keys():
+		if PKU_UNITS[sub_parser] is not None:
+			subparser = PKU_UNITS[sub_parser].generateParser(subparser)
+	if calling_parser_group is None:
+		calling_parser_group = parser
+	return calling_parser_group
+
+
 @remediation.error_handling
 def parseArgs(arguments=None):
 	"""Parses the CLI arguments."""
-	parser = argparse.ArgumentParser(
-		prog=__prog__,
-		description='Handles PiAP pockets',
-		epilog="PiAP Pocket Controller for main tools."
-	)
-	parser.add_argument(
-		'pku_unit',
-		choices=PKU_UNITS.keys(),
-		help='the pocket pku service option.'
-	)
-	parser = utils._handleVersionArgs(parser)
+	parser = generateParser(None)
 	return parser.parse_known_args(arguments)
 
 

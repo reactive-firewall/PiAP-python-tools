@@ -51,10 +51,7 @@ except Exception:
 	try:
 		from book.logs import logs as logs
 	except Exception:
-		try:
-			from piaplib.book.logs import logs as logs
-		except Exception:
-			raise ImportError("Error Importing logs")
+		raise ImportError("Error Importing logs")
 
 
 try:
@@ -188,7 +185,6 @@ def extractRegexPattern(theInput_Str, theInputPattern):
 @memoize
 def compactSpace(theInput_Str):
 	"""Try to remove the spaces from the input string."""
-	import re
 	sourceStr = literal_str(theInput_Str)
 	theList = re.sub(r' +', str(""" """), sourceStr)
 	return theList
@@ -793,7 +789,6 @@ def getFileResource(someURL, outFile):
 @remediation.error_handling
 def cleanFileResource(theFile):
 	"""cleans up a downloaded given file."""
-	import os
 	theResult = False
 	try:
 		os.remove(str(theFile))
@@ -816,7 +811,6 @@ def cleanFileResource(theFile):
 @remediation.error_handling
 def moveFileResource(theSrc, theDest):
 	"""cleans up a downloaded given file."""
-	import os
 	theResult = False
 	try:
 		os.rename(str(theSrc), str(theDest))

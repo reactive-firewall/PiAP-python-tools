@@ -633,7 +633,6 @@ class BasicUsageTestSuite(unittest.TestCase):
 						except UnicodeDecodeError:
 							theOutputtext = str(repr(bytes(theOutputtext)))
 						if (str(theOutputtext) is not None):
-							self.assertIsInstance(theOutputtext, str, "random data should be a str")
 							theResult = True
 						else:
 							theResult = False
@@ -1420,7 +1419,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 						str("piaplib.pocket"),
 						str("pku"),
 						str("upgrade"),
-						str("--all")
+						str("all")
 					], stderr=subprocess.STDOUT)
 					if (theOutputtext is not None and len(theOutputtext) > 0):
 						theResult = True

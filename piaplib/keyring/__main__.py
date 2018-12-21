@@ -63,6 +63,14 @@ __prog__ = """piaplib.keyring"""
 """The name of this PiAPLib tool is keyring"""
 
 
+__description__ = """Handles PiAP keyring tools."""
+"""The description is 'Handles PiAP keyring tools.'"""
+
+
+__epilog__ = """PiAP Controller for cryptographic tools."""
+"""...PiAP Controller for cryptographic tools."""
+
+
 KEYRING_UNITS = {u'saltify': saltify, u'rand': rand, u'clarify': clarify, u'keys': None}
 """ The Pocket Knife Unit actions.
 	saltify - HMAC salt functions.
@@ -72,19 +80,34 @@ KEYRING_UNITS = {u'saltify': saltify, u'rand': rand, u'clarify': clarify, u'keys
 	"""
 
 
+def generateParser(calling_parser_group):
+	"""Parses the CLI arguments."""
+	if calling_parser_group is None:
+		parser = argparse.ArgumentParser(
+			prog=__prog__,
+			description=__description__,
+			epilog=__epilog__
+		)
+	else:
+		parser = calling_parser_group.add_parser(
+			str(__prog__).split(".")[-1], help='the pocket keyring service option.'
+		)
+	subparser = parser.add_subparsers(
+		title="Units", dest='keyring_unit',
+		help='The pocket keyring options.', metavar="KEYRING_UNITS"
+	)
+	for sub_parser in KEYRING_UNITS.keys():
+		if KEYRING_UNITS[sub_parser] is not None:
+			subparser = KEYRING_UNITS[sub_parser].generateParser(subparser)
+	if calling_parser_group is None:
+		calling_parser_group = parser
+	return calling_parser_group
+
+
 @remediation.error_handling
 def parseArgs(arguments=None):
 	"""Parses the CLI arguments."""
-	parser = argparse.ArgumentParser(
-		prog=__prog__,
-		description='Handles PiAP keyring tools',
-		epilog="PiAP Controller for cryptographic tools."
-	)
-	parser.add_argument(
-		'keyring_unit',
-		choices=KEYRING_UNITS.keys(),
-		help='the pocket keyring service option.'
-	)
+	parser = generateParser(None)
 	return parser.parse_known_args(arguments)
 
 

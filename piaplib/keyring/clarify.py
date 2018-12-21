@@ -72,6 +72,14 @@ __prog__ = """piaplib.keyring.clarify"""
 """The name of this PiAPLib tool is clarify"""
 
 
+__description__ = """Handles PiAP keyring tools."""
+"""The description of this PiAPLib tool is 'Handles PiAP keyring tools.'"""
+
+
+__epilog__ = """PiAP Controller for cryptographic tools."""
+"""...PiAP Controller for cryptographic tools."""
+
+
 DEFAULT_BETA_FILE_PATH = str("""/opt/PiAP/.beta_W1AsYRUDzyZx""")
 """THIS IS A PLACEHOLDER. WILL move this to a config file."""
 
@@ -321,73 +329,86 @@ WEAK_ACTIONS = {u'pack': packForRest, u'unpack': unpackFromRest}
 
 
 @remediation.error_handling
-def parseArgs(arguments=None):
-	theArgs = argparse.Namespace()
-	salt_rand = str(rand.randPW(24)).replace("%", "%%")
-	key_rand = str(rand.randPW(24)).replace("%", "%%")
-	try:
+def generateParser(calling_parser_group):
+	"""Parses the CLI arguments."""
+	if calling_parser_group is None:
 		parser = argparse.ArgumentParser(
 			prog=__prog__,
-			description=str("Handles PiAP keyring tools"),
-			epilog=str("PiAP Controller for cryptographic tools.")
+			description=__description__,
+			epilog=__epilog__
 		)
-		parser.add_argument(
-			'-m',
-			'--msg',
-			dest='msg',
-			required=True,
-			type=str,
-			help=str("The Message data. A cleartext or cyphertext message.")
+	else:
+		parser = calling_parser_group.add_parser(
+			str(__prog__).split(".")[-1], help=__description__
 		)
-		parser.add_argument(
-			'-S',
-			'--Salt',
-			dest='salt',
-			required=False,
-			type=str,
-			help=str(
-				str(
-					"The cryptographic Salt String. A unique salt. Like {thevalue}"
-				).format(thevalue=salt_rand)
-			)
+	salt_rand = str(rand.randPW(24)).replace("%", "%%")
+	key_rand = str(rand.randPW(24)).replace("%", "%%")
+	parser.add_argument(
+		'-m',
+		'--msg',
+		dest='msg',
+		required=True,
+		type=str,
+		help=str("The Message data. A cleartext or cyphertext message.")
+	)
+	parser.add_argument(
+		'-S',
+		'--Salt',
+		dest='salt',
+		required=False,
+		type=str,
+		help=str(
+			str(
+				"The cryptographic Salt String. A unique salt. Like {thevalue}"
+			).format(thevalue=salt_rand)
 		)
-		parser.add_argument(
-			'-K',
-			'--key',
-			dest='key',
-			required=False,
-			type=str,
-			help=str(
-				str(
-					"The cryptographic Key String. A unique secret. Like {thevalue}"
-				).format(thevalue=key_rand)
-			)
+	)
+	parser.add_argument(
+		'-K',
+		'--key',
+		dest='key',
+		required=False,
+		type=str,
+		help=str(
+			str(
+				"The cryptographic Key String. A unique secret. Like {thevalue}"
+			).format(thevalue=key_rand)
 		)
-		parser.add_argument(
-			'-k',
-			'--keystore',
-			dest='keystore',
-			required=False,
-			help=str("The file with the cryptographic Key String.")
+	)
+	parser.add_argument(
+		'-k',
+		'--keystore',
+		dest='keystore',
+		required=False,
+		help=str("The file with the cryptographic Key String.")
+	)
+	parser = utils._handleVersionArgs(parser)
+	thegroup = parser.add_mutually_exclusive_group(required=True)
+	for theaction in WEAK_ACTIONS.keys():
+		thegroup.add_argument(
+			str("--{}").format(str(theaction)),
+			dest='clear_action',
+			const=theaction,
+			action='store_const',
+			help=str("The clarify service option.")
 		)
-		parser = utils._handleVersionArgs(parser)
-		thegroup = parser.add_mutually_exclusive_group(required=True)
-		for theaction in WEAK_ACTIONS.keys():
-			thegroup.add_argument(
-				str("--{}").format(str(theaction)),
-				dest='clear_action',
-				const=theaction,
-				action='store_const',
-				help=str("The clarify service option.")
-			)
+	if calling_parser_group is None:
+		calling_parser_group = parser
+	return calling_parser_group
+
+
+@remediation.error_handling
+def parseArgs(arguments=None):
+	"""Parses the CLI arguments."""
+	theArgs = argparse.Namespace()
+	try:
+		parser = generateParser(None)
 		theArgs = parser.parse_args(arguments)
 	except Exception as err:
 		print(str("FAILED DURING clarify.. ABORT."))
 		print(str(type(err)))
 		print(str(err))
 		print(str(err.args))
-		print(str(key_rand))
-		print(str(salt_rand))
 		err = None
 		del err
 		theArgs = argparse.Namespace()

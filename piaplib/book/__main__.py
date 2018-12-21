@@ -96,7 +96,7 @@ __prog__ = """piaplib.book.__main__"""
 """The name of this PiAPLib tool is pocket book"""
 
 
-BOOK_UNITS = {u'logs': logs, u'cache': None, u'version': version}
+BOOK_UNITS = {u'logs': piaplib.book.logs, u'cache': None, u'version': version}
 """	The Pocket Book Unit actions.
 	logs - logbook for logs and output
 	version - like the copyright page in old books
@@ -105,22 +105,37 @@ BOOK_UNITS = {u'logs': logs, u'cache': None, u'version': version}
 	"""
 
 
-@remediation.error_handling
-def parseArgs(arguments=None):
+def generateParser(calling_parser_group):
 	"""Parses the CLI arguments."""
-	parser = argparse.ArgumentParser(
-		prog=__prog__,
-		description='Handles PiAP pocket book',
-		epilog="PiAP Book Controller for extra tools."
-	)
-	parser.add_argument(
-		'book_unit',
-		choices=BOOK_UNITS.keys(),
-		help='The pocket book option.'
+	if calling_parser_group is None:
+		parser = argparse.ArgumentParser(
+			prog=__prog__,
+			description='Handles PiAP pocket book',
+			epilog="PiAP Book Controller for extra tools."
+		)
+	else:
+		parser = calling_parser_group.add_parser(
+			str(__prog__).split(".")[-1], help='Handles PiAP pocket book'
+		)
+	subparser = parser.add_subparsers(
+		title="Units", dest='book_unit',
+		help='The pocket book options.', metavar="BOOK_UNIT"
 	)
 	parser.add_argument('-V', '--version', action='version', version=str(
 		"%(prog)s {}"
 	).format(str(piaplib.__version__)))
+	for sub_parser in BOOK_UNITS.keys():
+		if BOOK_UNITS[sub_parser] is not None:
+			subparser = BOOK_UNITS[sub_parser].generateParser(subparser)
+	if calling_parser_group is None:
+		calling_parser_group = parser
+	return calling_parser_group
+
+
+@remediation.error_handling
+def parseArgs(arguments=None):
+	"""Parses the CLI arguments."""
+	parser = generateParser(None)
 	return parser.parse_known_args(arguments)
 
 

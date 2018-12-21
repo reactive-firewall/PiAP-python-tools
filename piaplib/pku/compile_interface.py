@@ -234,9 +234,19 @@ def addWiFiArgs(parser=None):
 	return parser
 
 
-def parseArgs(args=None):
-	"""Parses the arguments."""
-	parser = None
+@remediation.error_handling
+def generateParser(calling_parser_group):
+	"""Parses the CLI arguments."""
+	if calling_parser_group is None:
+		parser = argparse.ArgumentParser(
+			prog=__prog__,
+			description='Handles PiAP pocket version reports',
+			epilog="PiAP Book Controller for version tools."
+		)
+	else:
+		parser = calling_parser_group.add_parser(
+			str(__prog__).split(".")[-1], help="PiAP Book Controller for version tools."
+		)
 	try:
 		parser = argparse.ArgumentParser(
 			prog='compile_interface',
@@ -284,7 +294,16 @@ def parseArgs(args=None):
 		print(str((err.args)))
 		parser.error("parser tool bug")
 		return None
-	return parser.parse_args(args)
+	if calling_parser_group is None:
+		calling_parser_group = parser
+	return calling_parser_group
+
+
+@remediation.error_handling
+def parseArgs(arguments=None):
+	"""Parses the CLI arguments."""
+	parser = generateParser(None)
+	return parser.parse_args(arguments)
 
 
 def compile_iface_name(media_type='eth', index=0, vlanID=None):

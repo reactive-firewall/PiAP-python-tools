@@ -100,10 +100,7 @@ except Exception:
 	try:
 		from book.logs import logs as logs
 	except Exception:
-		try:
-			from piaplib.book.logs import logs as logs
-		except Exception:
-			raise ImportError("Error Importing logs")
+		raise ImportError("Error Importing logs")
 
 
 """
@@ -123,10 +120,19 @@ __epilog__ = """basically a python wrapper for pip install --upgrade."""
 """...basically a python wrapper for pip install --upgrade."""
 
 
-@remediation.error_passing
-def parseargs(arguments=None):
-	"""Parse the arguments"""
-	parser = argparse.ArgumentParser(prog=__prog__, description=__description__, epilog=__epilog__)
+@remediation.error_handling
+def generateParser(calling_parser_group):
+	"""Parses the CLI arguments."""
+	if calling_parser_group is None:
+		parser = argparse.ArgumentParser(
+			prog=__prog__,
+			description=__description__,
+			epilog=__epilog__
+		)
+	else:
+		parser = calling_parser_group.add_parser(
+			str(__prog__).split(".")[-1], help=__description__
+		)
 	the_action = parser.add_mutually_exclusive_group()
 	the_action.add_argument(
 		'-u', '--upgrade', dest='upgrade_action', default='core', action='store_const',
@@ -149,8 +155,16 @@ def parseargs(arguments=None):
 		const='all', help='Upgrade all of the piaplib.'
 	)
 	parser = utils._handleVersionArgs(parser)
-	theResult = parser.parse_known_args(arguments)
-	return theResult
+	if calling_parser_group is None:
+		calling_parser_group = parser
+	return calling_parser_group
+
+
+@remediation.error_handling
+def parseargs(arguments=None):
+	"""Parses the CLI arguments."""
+	parser = generateParser(None)
+	return parser.parse_known_args(arguments)
 
 
 @remediation.error_passing
@@ -188,7 +202,7 @@ def upgradeAPT():
 @remediation.error_passing
 def upgradePiAPlib():
 	"""Upgrade piaplib via pip."""
-	upsream_repo = str("git+https://github.com/reactive-firewall/PiAP-python-tools.git")
+	upsream_repo = str("git+https://github.com/reactive-firewall/PiAP-python-tools.git#egg=piaplib")
 	pip.main(args=["install", "--upgrade", upsream_repo])
 	return None
 

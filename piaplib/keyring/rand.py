@@ -62,6 +62,14 @@ __prog__ = """piaplib.keyring.rand"""
 """The name of this PiAPLib tool is rand"""
 
 
+__description__ = """Handles PiAP random utility functions."""
+"""Handles PiAP random utility functions"""
+
+
+__epilog__ = """PiAP Controller for near-cryptographic randomness. Use os.urandom for CPRNG."""
+"""epilog data"""
+
+
 @remediation.error_handling
 def rand(count=None):
 	"""wrapper for os.urandom()"""
@@ -309,43 +317,57 @@ RANDOM_TASKS = {
 
 
 @remediation.error_handling
-def parseArgs(arguments=[None]):
+def generateParser(calling_parser_group):
 	"""Parses the CLI arguments."""
-	theArgs = None
-	try:
+	if calling_parser_group is None:
 		parser = argparse.ArgumentParser(
 			prog=__prog__,
-			description='Handles PiAP random utility functions',
-			epilog="PiAP Controller for near-cryptographic randomness. Use os.urandom for CPRNG."
+			description=__description__,
+			epilog=__epilog__
 		)
-		parser.add_argument(
-			'-g',
-			'--generate',
-			dest='random_action',
-			choices=RANDOM_TASKS.keys(),
-			default='raw',
-			type=str,
-			required=False,
-			help='the random service option.'
+	else:
+		parser = calling_parser_group.add_parser(
+			str(__prog__).split(".")[-1], help=__description__
 		)
-		parser.add_argument(
-			'-c',
-			'--count',
-			dest='count',
-			default=int(512),
-			type=int,
-			required=False,
-			help='count.'
-		)
+	parser.add_argument(
+		'-g',
+		'--generate',
+		dest='random_action',
+		choices=RANDOM_TASKS.keys(),
+		default='raw',
+		type=str,
+		required=False,
+		help='the random service option.'
+	)
+	parser.add_argument(
+		'-c',
+		'--count',
+		dest='count',
+		default=int(512),
+		type=int,
+		required=False,
+		help='count.'
+	)
+	if calling_parser_group is None:
+		calling_parser_group = parser
+	return calling_parser_group
+
+
+@remediation.error_handling
+def parseArgs(arguments=None):
+	"""Parses the CLI arguments."""
+	theArgs = argparse.Namespace()
+	try:
+		parser = generateParser(None)
 		theArgs = parser.parse_args(arguments)
 	except Exception as err:
-		print(str(u'FAILED DURING RAND. ABORT.'))
+		print(str("FAILED DURING RAND.. ABORT."))
 		print(str(type(err)))
 		print(str(err))
 		print(str(err.args))
 		err = None
 		del err
-		theArgs = None
+		theArgs = argparse.Namespace()
 	return theArgs
 
 
