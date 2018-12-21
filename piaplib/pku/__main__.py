@@ -72,7 +72,7 @@ except Exception:
 
 try:
 	import piaplib.pku.config as config
-except Exception as err:
+except Exception:
 	try:
 		if 'piaplib.pku.config' not in sys.modules:
 			from . import config as config
