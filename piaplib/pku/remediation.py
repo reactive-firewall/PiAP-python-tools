@@ -204,7 +204,6 @@ def main(argv=None):
 
 if __name__ in u'__main__':
 	try:
-		__name__ = __prog__
 		exit(main(sys.argv[1:]))
 	except Exception:
 		exit(3)

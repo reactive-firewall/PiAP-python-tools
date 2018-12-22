@@ -40,22 +40,35 @@ except Exception as err:
 	raise ImportError(err)
 	exit(3)
 
-try:
-	import piaplib as piaplib
-except Exception:
-	from . import piaplib as piaplib
 
 try:
-	from piaplib.book.logs import logs as logs
+	if 'piaplib' not in sys.modules:
+		import piaplib as piaplib
+	else:
+		piaplib = sys.modules['piaplib']
+except Exception:
+	raise ImportError("PiAPLib failed to import.")
+
+
+try:
+	if 'piaplib.book.logs.logs' not in sys.modules:
+		from book.logs import logs as logs
 except Exception:
 	try:
-		from book.logs import logs as logs
-	except Exception:
+		from piaplib.book.logs import logs as logs
+	except Exception as err:
+		print(str(type(err)))
+		print(str(err))
+		print(str(err.args))
+		print("")
 		raise ImportError("Error Importing logs")
 
 
 try:
-	from . import remediation as remediation
+	if 'piaplib.pku.remediation' not in sys.modules:
+		from . import remediation as remediation
+	else:
+		remediation = sys.modules['piaplib.pku.remediation']
 except Exception:
 	try:
 		import remediation as remediation
@@ -839,7 +852,6 @@ def main(argv=None):
 
 if __name__ in u'__main__':
 	try:
-		__name__ = __prog__
 		if (sys.argv is not None and (sys.argv is not []) and (len(sys.argv) > 1)):
 			exit(main(sys.argv[1:]))
 		else:

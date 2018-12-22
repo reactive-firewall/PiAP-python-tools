@@ -154,6 +154,5 @@ def loadMainConfigFile(confFile='/opt/PiAP/PiAP.conf'):
 
 
 if __name__ in u'__main__':
-	__name__ = __prog__
 	raise NotImplementedError("[CWE-394] ERROR caused by CWE-758: Can not run baseconfig as main.")
 
