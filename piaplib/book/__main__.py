@@ -57,15 +57,15 @@ except Exception as err:
 
 
 try:
-	if str("piaplib.book.logs.logs") not in sys.modules:
-		from .logs import logs as logs
+	if str("piaplib.book.logs") not in sys.modules:
+		from . import logs
 	else:
-		logs = sys.modules[str("piaplib.book.logs.logs")]
+		logs = sys.modules[str("piaplib.book.logs")]
 except Exception:
 	try:
-		import logs.logs as logs
+		import piaplib.book.logs
 	except Exception as err:
-		raise ImportError(err, "Error Importing logs")
+		raise ImportError(err, "Error Importing piaplib.book.logs")
 
 
 try:
