@@ -44,15 +44,28 @@ except Exception:
 
 
 try:
-	from . import rand as rand
+	if str("piaplib.keyring.rand") not in sys.modules:
+		from piaplib.keyring import rand as rand
+	else:
+		rand = sys.modules[str("piaplib.keyring.rand")]
 except Exception:
-	import rand as rand
+	try:
+		import piaplib.keyring.rand as rand
+	except Exception as err:
+		raise ImportError(err, "Error Importing piaplib.keyring.rand")
 
 
 try:
-	from piaplib.pku import remediation as remediation
+	if str("piaplib.pku.remediation") not in sys.modules:
+		from piaplib.pku import remediation as remediation
+	else:
+		remediation = sys.modules[str("piaplib.pku.remediation")]
 except Exception:
-	import piaplib.pku.remediation as remediation
+	try:
+		import piaplib.pku.remediation as remediation
+	except Exception as err:
+		raise ImportError(err, "Error Importing remediation")
+
 
 try:
 	from remediation import PiAPError as PiAPError
@@ -62,10 +75,17 @@ except Exception:
 	except Exception:
 		raise ImportError("Error Importing PiAPError")
 
+
 try:
-	from piaplib.pku import utils as utils
+	if str("piaplib.pku.utils") not in sys.modules:
+		from piaplib.pku import utils as utils
+	else:
+		utils = sys.modules[str("piaplib.pku.utils")]
 except Exception:
-	import piaplib.pku.utils as utils
+	try:
+		import piaplib.pku.utils as utils
+	except Exception as err:
+		raise ImportError(err, "Error Importing piaplib.pku.utils")
 
 
 __prog__ = """piaplib.keyring.clarify"""

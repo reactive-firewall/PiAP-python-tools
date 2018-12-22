@@ -25,21 +25,29 @@ try:
 except Exception:
 	raise ImportError("WTF, no system?!?!")
 
-try:
-	from . import remediation as remediation
-except Exception:
-	try:
-		import remediation as remediation
-	except Exception:
-		raise ImportError("Error Importing remediation")
 
 try:
-	from . import utils as utils
+	if str("piaplib.pku.remediation") not in sys.modules:
+		from piaplib.pku import remediation as remediation
+	else:
+		remediation = sys.modules[str("piaplib.pku.remediation")]
 except Exception:
 	try:
-		import utils as utils
-	except Exception:
-		raise ImportError("Error Importing utils")
+		import piaplib.pku.remediation as remediation
+	except Exception as err:
+		raise ImportError(err, "Error Importing remediation")
+
+
+try:
+	if str("piaplib.pku.utils") not in sys.modules:
+		from piaplib.pku import utils as utils
+	else:
+		utils = sys.modules[str("piaplib.pku.utils")]
+except Exception:
+	try:
+		import piaplib.pku.utils as utils
+	except Exception as err:
+		raise ImportError(err, "Error Importing piaplib.pku.utils")
 
 
 __prog__ = """piaplib.pku.interfaces"""

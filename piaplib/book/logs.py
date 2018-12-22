@@ -208,7 +208,6 @@ def main(argv=None):
 
 if __name__ in u'__main__':
 	try:
-		import sys
 		exitcode = main(sys.argv[1:])
 	except Exception:
 		exitcode = 3

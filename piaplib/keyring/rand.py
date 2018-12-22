@@ -34,12 +34,15 @@ except Exception:
 
 
 try:
-	from piaplib.pku import remediation as remediation
+	if str("piaplib.pku.remediation") not in sys.modules:
+		from piaplib.pku import remediation as remediation
+	else:
+		remediation = sys.modules[str("piaplib.pku.remediation")]
 except Exception:
 	try:
 		import piaplib.pku.remediation as remediation
-	except Exception:
-		raise ImportError("Error Importing remediation")
+	except Exception as err:
+		raise ImportError(err, "Error Importing remediation")
 
 
 RAND_CHARS = [

@@ -60,44 +60,53 @@ except Exception as err:
 	raise ImportError(err)
 	exit(3)
 
-try:
-	import piaplib.pku.upgrade as upgrade
-except Exception:
-	try:
-		if 'piaplib.pku.upgrade' not in sys.modules:
-			from . import upgrade as upgrade
-	except Exception:
-		raise ImportError("Error Importing upgrade tools")
-
 
 try:
-	import piaplib.pku.config as config
+	if str("piaplib.pku.upgrade") not in sys.modules:
+		from piaplib.pku import upgrade as upgrade
+	else:
+		upgrade = sys.modules[str("piaplib.pku.upgrade")]
 except Exception:
 	try:
-		if 'piaplib.pku.config' not in sys.modules:
-			from . import config as config
-	except Exception:
-		raise ImportError("Error Importing config")
+		import piaplib.pku.upgrade as upgrade
+	except Exception as err:
+		raise ImportError(err, "Error Importing piaplib.pku.upgrade")
 
 
 try:
-	import piaplib.pku.utils as utils
+	if str("piaplib.pku.config") not in sys.modules:
+		from piaplib.pku import config as config
+	else:
+		config = sys.modules[str("piaplib.pku.config")]
 except Exception:
 	try:
-		if 'piaplib.pku.utils' not in sys.modules:
-			from . import utils as utils
-	except Exception:
-		raise ImportError("Error Importing utils")
+		import piaplib.pku.config as config
+	except Exception as err:
+		raise ImportError(err, "Error Importing piaplib.pku.config")
 
 
 try:
-	from . import remediation as remediation
+	if str("piaplib.pku.utils") not in sys.modules:
+		from piaplib.pku import utils as utils
+	else:
+		utils = sys.modules[str("piaplib.pku.utils")]
 except Exception:
 	try:
-		if 'piaplib.pku.remediation' not in sys.modules:
-			import remediation as remediation
-	except Exception:
-		raise ImportError("Error Importing remediation")
+		import piaplib.pku.utils as utils
+	except Exception as err:
+		raise ImportError(err, "Error Importing piaplib.pku.utils")
+
+
+try:
+	if str("piaplib.pku.remediation") not in sys.modules:
+		from piaplib.pku import remediation as remediation
+	else:
+		remediation = sys.modules[str("piaplib.pku.remediation")]
+except Exception:
+	try:
+		import piaplib.pku.remediation as remediation
+	except Exception as err:
+		raise ImportError(err, "Error Importing remediation")
 
 
 try:

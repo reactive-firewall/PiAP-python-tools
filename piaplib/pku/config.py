@@ -74,12 +74,15 @@ except Exception:
 
 
 try:
-	from . import utils as utils
+	if str("piaplib.pku.utils") not in sys.modules:
+		from piaplib.pku import utils as utils
+	else:
+		utils = sys.modules[str("piaplib.pku.utils")]
 except Exception:
 	try:
-		import utils as utils
-	except Exception:
-		raise ImportError("Error Importing utils for config")
+		import piaplib.pku.utils as utils
+	except Exception as err:
+		raise ImportError(err, "Error Importing utils for config")
 
 
 __prog__ = """piaplib.pku.config"""

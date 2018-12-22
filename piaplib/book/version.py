@@ -58,17 +58,38 @@ except Exception as err:
 
 
 try:
-	import piaplib as piaplib
+	if 'piaplib' not in sys.modules:
+		import piaplib as piaplib
+	else:
+		piaplib = sys.modules['piaplib']
 except Exception:
-	from .. import piaplib as piaplib
+	raise ImportError("PiAPLib failed to import.")
+
+
 try:
-	from piaplib.pku import utils as utils
+	if str("piaplib.pku.utils") not in sys.modules:
+		from piaplib.pku import utils as utils
+	else:
+		utils = sys.modules[str("piaplib.pku.utils")]
 except Exception:
-	import piaplib.pku.utils as utils
+	try:
+		import piaplib.pku.utils as utils
+	except Exception as err:
+		raise ImportError(err, "Error Importing piaplib.pku.utils")
+
+
 try:
-	from piplib.pku import remediation as remediation
+	if str("piaplib.pku.remediation") not in sys.modules:
+		from piaplib.pku import remediation as remediation
+	else:
+		remediation = sys.modules[str("piaplib.pku.remediation")]
 except Exception:
-	import piaplib.pku.remediation as remediation
+	try:
+		import piaplib.pku.remediation as remediation
+	except Exception as err:
+		raise ImportError(err, "Error Importing remediation")
+
+
 try:
 	from .logs import logs as logs
 except Exception as impErr:
