@@ -85,7 +85,14 @@ def try_catch_error(func):
 @try_catch_error
 def main(argv=None):
 	"""The main event"""
-	import piaplib.pku.__main__
+	try:
+		if 'piaplib.pku.__main__' not in sys.modules:
+			import piaplib.pku.__main__
+			if piaplib.pku.__main__.__name__ is None:
+				raise ImportError("Failed to import piaplib.pku.__main__")
+	except Exception as importErr:
+		del importErr
+		import piaplib.pku.__main__
 	return piaplib.pku.__main__.main(argv)
 
 
