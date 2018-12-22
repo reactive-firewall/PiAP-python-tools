@@ -57,39 +57,33 @@ except Exception as err:
 
 
 try:
+	if str("piaplib.book.logs.logs") not in sys.modules:
+		from .logs import logs as logs
+	else:
+		logs = sys.modules[str("piaplib.book.logs.logs")]
+except Exception:
 	try:
-		if str("piaplib.book.logs.logs") not in sys.modules:
-			from .logs import logs as logs
-		else:
-			logs = sys.modules[str("piaplib.book.logs.logs")]
-	except Exception:
-		try:
-			import logs.logs as logs
-		except Exception as err:
-			raise ImportError(err, "Error Importing logs")
+		import logs.logs as logs
+	except Exception as err:
+		raise ImportError(err, "Error Importing logs")
+
+
+try:
+	if str("piaplib.pku.remediation") not in sys.modules:
+		from piaplib.pku import remediation as remediation
+	else:
+		remediation = sys.modules[str("piaplib.pku.remediation")]
+except Exception:
 	try:
-		if str("piaplib.pku.remediation") not in sys.modules:
-			from piaplib.pku import remediation as remediation
-		else:
-			remediation = sys.modules[str("piaplib.pku.remediation")]
-	except Exception:
-		try:
-			import piaplib.pku.remediation as remediation
-		except Exception as err:
-			raise ImportError(err, "Error Importing remediation")
-	try:
-		from . import version as version
-	except Exception:
-		import book.version as version
-	for dep in [piaplib, remediation, logs, version]:
-		if dep.__name__ is None:
-			raise ImportError("Failed to open dependency for book")
-except Exception as importErr:
-	print(str(importErr))
-	print(str(importErr.args))
-	importErr = None
-	del importErr
-	raise ImportError("Failed to import " + str(__file__))
+		import piaplib.pku.remediation as remediation
+	except Exception as err:
+		raise ImportError(err, "Error Importing remediation")
+
+
+try:
+	from . import version as version
+except Exception:
+	import book.version as version
 
 
 __prog__ = """piaplib.book.__main__"""
