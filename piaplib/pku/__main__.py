@@ -110,21 +110,27 @@ except Exception:
 
 
 try:
-	from . import interfaces as interfaces
+	if str("piaplib.pku.interfaces") not in sys.modules:
+		from piaplib.pku import interfaces as interfaces
+	else:
+		interfaces = sys.modules[str("piaplib.pku.interfaces")]
 except Exception:
 	try:
-		import interfaces as interfaces
-	except Exception:
-		raise ImportError("Error Importing interfaces")
+		import piaplib.pku.interfaces as interfaces
+	except Exception as err:
+		raise ImportError(err, "Error Importing interfaces")
 
 
 try:
-	from piaplib.book.logs import logs as logs
+	if str("piaplib.book.logs.logs") not in sys.modules:
+		from piaplib.book.logs import logs as logs
+	else:
+		logs = sys.modules[str("piaplib.book.logs.logs")]
 except Exception:
 	try:
-		from ..book.logs import logs as logs
-	except Exception:
-		raise ImportError("Error Importing logs")
+		import piaplib.book.logs.logs as logs
+	except Exception as err:
+		raise ImportError(err, "Error Importing piaplib.book.logs.logs")
 
 
 __prog__ = """piaplib.pku.__main__"""

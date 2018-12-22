@@ -58,13 +58,25 @@ except Exception as err:
 
 try:
 	try:
-		from .logs import logs as logs
+		if str("piaplib.book.logs.logs") not in sys.modules:
+			from .logs import logs as logs
+		else:
+			logs = sys.modules[str("piaplib.book.logs.logs")]
 	except Exception:
-		import logs.logs as logs
+		try:
+			import logs.logs as logs
+		except Exception as err:
+			raise ImportError(err, "Error Importing logs")
 	try:
-		import remediation as remediation
+		if str("piaplib.pku.remediation") not in sys.modules:
+			from piaplib.pku import remediation as remediation
+		else:
+			remediation = sys.modules[str("piaplib.pku.remediation")]
 	except Exception:
-		import piaplib.pku.remediation as remediation
+		try:
+			import piaplib.pku.remediation as remediation
+		except Exception as err:
+			raise ImportError(err, "Error Importing remediation")
 	try:
 		from . import version as version
 	except Exception:

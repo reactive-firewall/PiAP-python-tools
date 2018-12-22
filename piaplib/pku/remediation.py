@@ -40,16 +40,15 @@ except Exception as err:
 
 
 try:
-	from piaplib.book.logs import logs as logs
+	if str("piaplib.book.logs.logs") not in sys.modules:
+		from piaplib.book.logs import logs as logs
+	else:
+		logs = sys.modules[str("piaplib.book.logs.logs")]
 except Exception:
 	try:
-		from book.logs import logs as logs
+		import piaplib.book.logs.logs as logs
 	except Exception as err:
-		print(str(type(err)))
-		print(str(err))
-		print(str(err.args))
-		print("")
-		raise ImportError("Error Importing logs")
+		raise ImportError(err, "Error Importing piaplib.book.logs.logs")
 
 
 __prog__ = """piaplib.pku.remediation"""

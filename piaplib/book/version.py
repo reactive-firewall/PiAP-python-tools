@@ -26,7 +26,7 @@
 
 
 # PEP 366
-if __name__ in u'__main__' and __package__ is None:
+if __package__ is None:
 	__package__ = """piaplib.book"""
 
 
@@ -91,14 +91,15 @@ except Exception:
 
 
 try:
-	from .logs import logs as logs
-except Exception as impErr:
-	impErr = None
-	del(impErr)
+	if str("piaplib.book.logs.logs") not in sys.modules:
+		from .logs import logs as logs
+	else:
+		logs = sys.modules[str("piaplib.book.logs.logs")]
+except Exception:
 	try:
-		import piaplib.book.logs.logs as logs
-	except Exception:
-		raise ImportError("Error Importing logs for version")
+		import logs.logs as logs
+	except Exception as err:
+		raise ImportError(err, "Error Importing logs")
 
 
 try:
