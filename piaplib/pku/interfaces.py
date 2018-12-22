@@ -96,7 +96,8 @@ def generateParser(calling_parser_group):
 			str(__prog__).split(".")[-1], help=__description__
 		)
 	parser.add_argument(
-		'-i', '--interface', default=INTERFACE_CHOICES[0], choices=INTERFACE_CHOICES,
+		'-i', '--interface', dest='interface', default=INTERFACE_CHOICES[0],
+		choices=INTERFACE_CHOICES,
 		help='The interface to use.'
 	)
 	the_action = parser.add_mutually_exclusive_group()
@@ -184,8 +185,7 @@ def main(argv=None):
 	try:
 		theResult = 1
 		args = None
-		if (argv is not None and (argv != []) and (len(argv) >= 1)):
-			(args, extras) = parseargs(argv)
+		(args, extras) = parseargs(argv)
 		if args is None:
 			theResult = 3
 		interface = args.interface
@@ -198,6 +198,8 @@ def main(argv=None):
 		elif args.restart_action is True:
 			restart_iface(interface)
 			theResult = 0
+		del args
+		del extras
 	except Exception as err:
 		print(str("interfaces: REALLY BAD ERROR: ACTION will not be completed! ABORT!"))
 		print(str(type(err)))
