@@ -57,24 +57,12 @@ except Exception as err:
 
 
 try:
-	from piaplib.pku import baseconfig as baseconfig
-except Exception:
-	try:
-		if 'piaplib.pku.baseconfig' not in sys.modules:
-			import piaplib.pku.baseconfig as baseconfig
-		else:
-			baseconfig = sys.modules['piaplib.pku.baseconfig']
-	except Exception:
-		raise ImportError("Error Importing baseconfig")
-
-
-try:
 	try:
 		from .logs import logs as logs
 	except Exception:
 		import logs.logs as logs
 	try:
-		from piaplib.pku import remediation as remediation
+		import remediation as remediation
 	except Exception:
 		import piaplib.pku.remediation as remediation
 	try:
