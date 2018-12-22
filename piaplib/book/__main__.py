@@ -69,7 +69,7 @@ try:
 		from . import version as version
 	except Exception:
 		import book.version as version
-	for dep in [piaplib, baseconfig, remediation, logs, version]:
+	for dep in [piaplib, remediation, logs, version]:
 		if dep.__name__ is None:
 			raise ImportError("Failed to open dependency for book")
 except Exception as importErr:
