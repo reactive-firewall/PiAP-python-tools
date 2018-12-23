@@ -62,15 +62,20 @@ except Exception as importErr:
 
 
 try:
-	import piaplib
-	sys.modules['piaplib'] = piaplib
-except Exception:
+	if 'piaplib' not in sys.modules:
+		import piaplib as piaplib
+	else:
+		piaplib = sys.modules["""piaplib"""]
+except Exception as importErr:
+	del importErr
 	from . import piaplib
 
 
 try:
 	if 'piaplib.book' not in sys.modules:
 		from . import book as book
+	else:
+		book = sys.modules["""piaplib.book"""]
 except Exception as importErr:
 	del importErr
 	import book as book

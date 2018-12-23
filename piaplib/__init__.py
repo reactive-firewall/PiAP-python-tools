@@ -57,7 +57,7 @@ except Exception as ImportErr:
 
 
 try:
-	if """piaplib.book""" not in sys.modules:
+	if 'piaplib.book' not in sys.modules:
 		from . import book as book
 	else:
 		book = sys.modules["""piaplib.book"""]
