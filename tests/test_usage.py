@@ -1342,32 +1342,35 @@ class BasicUsageTestSuite(unittest.TestCase):
 		theResult = True
 		try:
 			thepython = getPythonCommand()
-			if (thepython is not None):
-				theOutputtext = None
-				try:
-					theOutputtext = checkPythonFuzzing([
-						str(thepython),
-						str("-m"),
-						str("piaplib.pocket"),
-						str("pku"),
-						str("interfaces"),
-						str("""-i={}""").format(str("eth0"))
-					], stderr=subprocess.STDOUT)
-				except Exception as junkErr:  # noqa
-					del(junkErr)
-				self.assertIsNotNone(theOutputtext)
-				try:
-					theOutputtext = checkPythonFuzzing([
-						str(thepython),
-						str("-m"),
-						str("piaplib.pocket"),
-						str("pku"),
-						str("interfaces"),
-						str("""-i={}""").format(str("eth0")),
-						str("""-r""")
-					], stderr=subprocess.STDOUT)
-				except Exception as junkErr:  # noqa
-					del(junkErr)
+			theOutputtext = None
+			rebootIface = None
+			try:
+				for someTest in [str("eth0"), str("enp0s")]
+					if theOutputtext is None:
+						rebootIface = str(someTest)
+						theOutputtext = checkPythonFuzzing([
+							str(thepython),
+							str("-m"),
+							str("piaplib.pocket"),
+							str("pku"),
+							str("interfaces"),
+							str("""-i={}""").format(someTest)
+						], stderr=subprocess.STDOUT)
+			except Exception as junkErr:  # noqa
+				del(junkErr)
+			self.assertIsNotNone(theOutputtext)
+			try:
+				theOutputtext = checkPythonFuzzing([
+					str(thepython),
+					str("-m"),
+					str("piaplib.pocket"),
+					str("pku"),
+					str("interfaces"),
+					str("""-i={}""").format(rebootIface),
+					str("""-r""")
+				], stderr=subprocess.STDOUT)
+			except Exception as junkErr:  # noqa
+				del(junkErr)
 				# self.assertIsNone(theOutputtext)
 		except Exception as err:
 			debugtestError(err)
