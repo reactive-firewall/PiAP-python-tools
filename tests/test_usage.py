@@ -1345,7 +1345,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 			theOutputtext = None
 			rebootIface = None
 			try:
-				for someTest in [str("eth0"), str("enp0s")]
+				for someTest in [str("eth0"), str("enp0s")]:
 					if theOutputtext is None:
 						rebootIface = str(someTest)
 						theOutputtext = checkPythonFuzzing([
