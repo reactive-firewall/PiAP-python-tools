@@ -66,11 +66,14 @@ except Exception:
 
 
 try:
-	from . import try_catch_error as try_catch_error
+	if str("piaplib.pku.try_catch_error") not in sys.modules:
+		from . import try_catch_error as try_catch_error
+	else:
+		try_catch_error = sys.modules[str("piaplib.pku.try_catch_error")]
 except Exception:
 	try:
 		import piaplib.pku.try_catch_error as try_catch_error
-	except Exception:
+	except Exception as err:
 		raise ImportError("Error Importing try_catch_error for config")
 
 
