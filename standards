@@ -12,6 +12,7 @@ Standards checklist:
 	Other Misc (just for navigation):
 	- [x] PEP324 - subproccess
 	- [x] PEP20 - zen of python
+	- [x] PEP366 - python __package__ settings
 	- [] RFC 3530 - NFSv4
     - [] RFC 2616 - user agents are optional
 	Codesigning:

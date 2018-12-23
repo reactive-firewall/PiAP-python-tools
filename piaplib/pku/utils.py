@@ -19,6 +19,7 @@
 # limitations under the License.
 # ......................................................................
 
+
 # try:
 # 	from . import config as config
 # except Exception:
@@ -40,25 +41,33 @@ except Exception as err:
 	raise ImportError(err)
 	exit(3)
 
-try:
-	import piaplib as piaplib
-except Exception:
-	from . import piaplib as piaplib
 
 try:
-	from piaplib.book.logs import logs as logs
+	if 'piaplib' not in sys.modules:
+		import piaplib as piaplib
+	else:
+		piaplib = sys.modules['piaplib']
+except Exception:
+	raise ImportError("PiAPLib failed to import.")
+
+
+try:
+	if str("piaplib.book.logs.logs") not in sys.modules:
+		from piaplib.book.logs import logs as logs
+	else:
+		logs = sys.modules[str("piaplib.book.logs.logs")]
 except Exception:
 	try:
-		from book.logs import logs as logs
-	except Exception:
-		try:
-			from piaplib.book.logs import logs as logs
-		except Exception:
-			raise ImportError("Error Importing logs")
+		import piaplib.book.logs.logs as logs
+	except Exception as err:
+		raise ImportError(err, "Error Importing piaplib.book.logs.logs")
 
 
 try:
-	from . import remediation as remediation
+	if 'piaplib.pku.remediation' not in sys.modules:
+		from . import remediation as remediation
+	else:
+		remediation = sys.modules['piaplib.pku.remediation']
 except Exception:
 	try:
 		import remediation as remediation
@@ -136,6 +145,17 @@ def literal_str(raw_input=None):
 	return None
 
 
+def parametrized(dec):
+	"""parametrized wrapper"""
+	@functools.wraps(dec)
+	def layer(*args, **kwargs):
+		@functools.wraps(dec)
+		def repl(f):
+			return dec(f, *args, **kwargs)
+		return repl
+	return layer
+
+
 def memoize(func):
 	"""memoize wrapper"""
 	cache = func.cache = {}
@@ -177,7 +197,6 @@ def extractRegexPattern(theInput_Str, theInputPattern):
 @memoize
 def compactSpace(theInput_Str):
 	"""Try to remove the spaces from the input string."""
-	import re
 	sourceStr = literal_str(theInput_Str)
 	theList = re.sub(r' +', str(""" """), sourceStr)
 	return theList
@@ -315,7 +334,9 @@ def getHandle(handler):
 		if handler == globals()[theFunc]:
 			handle = theFunc
 	if handle is None:
-		raise NotImplementedError(str("Function {} not implemented").format(repr(handler)))
+		raise NotImplementedError(
+			str("[CWE-758] Function {} not implemented").format(repr(handler))
+		)
 	return handle
 
 
@@ -346,7 +367,9 @@ def getHandler(handle):
 		best_guess = getFunctionListDict(str(splitDottedKeyPath(handle)[0]))
 		handler = best_guess.get(str(splitDottedKeyPath(handle)[1]))
 	if isinstance(handler, type(None)):
-		raise NotImplementedError(str("Function with name {} not implemented").format(str(handle)))
+		raise NotImplementedError(
+			str("[CWE-758] Function with name {} not implemented").format(str(handle))
+		)
 	return handler
 
 
@@ -448,7 +471,7 @@ def isLineForMatch(someLine=None, toMatch=None):
 
 @remediation.warning_handling
 @memoize
-def compactList(list, intern_func=None):
+def compactList(unsortedList, intern_func=None):
 	"""
 	Compacts Lists
 	Adapted from some now forgoten forum about flattening arrays, and sorting.
@@ -459,7 +482,7 @@ def compactList(list, intern_func=None):
 			return x
 	seen = {}
 	result = []
-	for item in list:
+	for item in unsortedList:
 		marker = intern_func(item)
 		if marker in seen:
 			continue
@@ -778,7 +801,6 @@ def getFileResource(someURL, outFile):
 @remediation.error_handling
 def cleanFileResource(theFile):
 	"""cleans up a downloaded given file."""
-	import os
 	theResult = False
 	try:
 		os.remove(str(theFile))
@@ -801,7 +823,6 @@ def cleanFileResource(theFile):
 @remediation.error_handling
 def moveFileResource(theSrc, theDest):
 	"""cleans up a downloaded given file."""
-	import os
 	theResult = False
 	try:
 		os.rename(str(theSrc), str(theDest))
@@ -824,7 +845,7 @@ def moveFileResource(theSrc, theDest):
 @remediation.bug_handling
 def main(argv=None):
 	"""The Main Event makes no sense to utils."""
-	raise NotImplementedError("CRITICAL - PKU Uitls main() not implemented. yet?")
+	raise NotImplementedError("[CWE-758] CRITICAL - PKU Uitls main() not implemented. yet?")
 	exit(3)
 
 

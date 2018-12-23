@@ -22,11 +22,12 @@
 global __version__
 
 
-__version__ = """0.3.7"""
+__version__ = """0.4.0"""
 
 
 try:
 	import sys
+	import os
 	import os.path
 	try:
 		if str("piaplib") in __file__:
@@ -51,6 +52,8 @@ except Exception as ImportErr:
 try:
 	if 'piaplib.book' not in sys.modules:
 		from . import book as book
+	else:
+		book = sys.modules["""piaplib.book"""]
 except Exception as importErr:
 	del importErr
 	import book as book
@@ -59,6 +62,8 @@ except Exception as importErr:
 try:
 	if 'piaplib.pku' not in sys.modules:
 		from . import pku as pku
+	else:
+		pku = sys.modules["""piaplib.pku"""]
 except Exception as importErr:
 	del importErr
 	import pku as pku
@@ -67,13 +72,18 @@ except Exception as importErr:
 try:
 	if 'piaplib.keyring' not in sys.modules:
 		from . import keyring as keyring
+	else:
+		keyring = sys.modules["""piaplib.keyring"""]
 except Exception as importErr:
 	del importErr
 	import keyring as keyring
 
 
 try:
-	from . import lint as lint
+	if 'piaplib.lint' not in sys.modules:
+		from . import lint as lint
+	else:
+		lint = sys.modules["""piaplib.lint"""]
 except Exception as importErr:
 	del importErr
 	import lint as lint
@@ -83,6 +93,8 @@ if __name__ in u'__main__':
 	try:
 		if 'piaplib.pocket' not in sys.modules:
 			from . import pocket as pocket
+		else:
+			pocket = sys.modules['pocket']
 	except Exception:
 		import pocket as pocket
 	if pku.__name__ is None:

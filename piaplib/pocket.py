@@ -62,22 +62,30 @@ except Exception as importErr:
 
 
 try:
-	import piaplib as piaplib
-except Exception:
-	from . import piaplib as piaplib
+	if 'piaplib' not in sys.modules:
+		import piaplib as piaplib
+	else:
+		piaplib = sys.modules["""piaplib"""]
+except Exception as importErr:
+	del importErr
+	from . import piaplib
 
 
 try:
 	if 'piaplib.book' not in sys.modules:
 		from . import book as book
+	else:
+		book = sys.modules["""piaplib.book"""]
 except Exception as importErr:
 	del importErr
 	import book as book
 	if book.__name__ is None:
 		raise ImportError(str(u'Failed to open Pocket Book'))
 
+
 try:
-	from book.logs import logs as logs
+	if 'piaplib.book.logs.logs' not in sys.modules:
+		from book.logs import logs as logs
 except Exception:
 	try:
 		from piaplib.book.logs import logs as logs
@@ -98,6 +106,7 @@ except Exception as importErr:
 	if pku.__name__ is None:
 		raise ImportError(str(u'Failed to open Pocket Knife Unit'))
 
+
 try:
 	if 'piaplib.keyring' not in sys.modules:
 		from . import keyring as keyring
@@ -107,6 +116,7 @@ except Exception as importErr:
 	if keyring.__name__ is None:
 		raise ImportError(str(u'Failed to find Pocket Keyring'))
 
+
 try:
 	if 'piaplib.lint' not in sys.modules:
 		from . import lint as lint
@@ -115,6 +125,7 @@ except Exception as importErr:
 	import lint as lint
 	if lint.__name__ is None:
 		raise ImportError(str(u'Failed to gather Pocket Lint'))
+
 
 __prog__ = "pocket"
 """The name of this program is pocket"""
@@ -160,7 +171,7 @@ def parseArgs(arguments=None):
 	)
 	parser.add_argument(
 		'pocket_unit',
-		choices=POCKET_UNITS.keys(),
+		choices=sorted(POCKET_UNITS.keys()),
 		help='the pocket service option.'
 	)
 	parser.add_argument('-V', '--version', action='version', version=str(

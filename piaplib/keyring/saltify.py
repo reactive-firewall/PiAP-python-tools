@@ -31,35 +31,61 @@ except Exception:
 	exit(255)
 
 
+__prog__ = """piaplib.keyring.saltify"""
+"""The name of this PiAPLib tool is clarify"""
+
+
+__description__ = """saltify a message."""
+"""The description of this PiAPLib tool is 'Handles PiAP keyring tools.'"""
+
+
+def generateParser(calling_parser_group):
+	"""Parses the CLI arguments."""
+	if calling_parser_group is None:
+		parser = argparse.ArgumentParser(
+			prog=__prog__,
+			description=__description__
+		)
+	else:
+		parser = calling_parser_group.add_parser(
+			str(__prog__).split(".")[-1], help=__description__
+		)
+	parser = argparse.ArgumentParser(description='saltify a message')
+	parser.add_argument(
+		'-m',
+		'--msg',
+		dest='msg',
+		required=True,
+		type=str,
+		help='The Message. An unsalted message.'
+	)
+	parser.add_argument(
+		'-S',
+		'--salt',
+		dest='salt',
+		required=True,
+		type=str,
+		help='The Salt. A unique secret.'
+	)
+	if calling_parser_group is None:
+		calling_parser_group = parser
+	return calling_parser_group
+
+
 def parseArgs(arguments=None):
-	theArgs = None
+	"""Parses the CLI arguments."""
+	theArgs = argparse.Namespace()
 	try:
-		parser = argparse.ArgumentParser(description='saltify a message')
-		parser.add_argument(
-			'-m',
-			'--msg',
-			dest='msg',
-			required=True,
-			type=str,
-			help='The Message. An unsalted message.'
-		)
-		parser.add_argument(
-			'-S',
-			'--salt',
-			dest='salt',
-			required=True,
-			type=str,
-			help='The Salt. A unique secret.'
-		)
+		parser = generateParser(None)
 		theArgs = parser.parse_args(arguments)
 	except Exception as err:
-		print(str(u'FAILED DURING SALTIFY. ABORT.'))
+		print(str("FAILED DURING SALTIFY.. ABORT."))
 		print(str(type(err)))
 		print(str(err))
 		print(str(err.args))
 		err = None
 		del err
-		theArgs = None
+		theArgs = argparse.Namespace()
 	return theArgs
 
 

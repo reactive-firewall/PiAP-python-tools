@@ -28,28 +28,42 @@ THERE MAY BE REGULATIONS GOVERNING USE OF WIFI SETTINGS IN MANY AREAS.
 
 
 try:
-	from . import remediation as remediation
-except Exception:
-	try:
-		import remediation as remediation
-	except Exception:
-		raise ImportError("Error Importing remediation")
-
-
-try:
-	from . import utils as utils
-except Exception:
-	try:
-		import utils as utils
-	except Exception:
-		raise ImportError("Error Importing utils")
-
-
-try:
+	import sys
+	import os
 	import argparse
-except Exception as importError:
-	print(str("Error Importing argparse lib"))
-	raise importError
+	if str("compile_interface") in __file__:
+		__sys_path__ = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+		if __sys_path__ not in sys.path:
+			sys.path.insert(0, __sys_path__)
+except Exception:
+	raise ImportError("Pocket Knife Unit PKU failed to import.")
+
+
+try:
+	if str("piaplib.pku.remediation") not in sys.modules:
+		from piaplib.pku import remediation as remediation
+	else:
+		remediation = sys.modules[str("piaplib.pku.remediation")]
+except Exception:
+	try:
+		import piaplib.pku.remediation as remediation
+	except Exception as err:
+		raise ImportError(err, "Error Importing remediation")
+
+
+try:
+	if str("piaplib.pku.utils") not in sys.modules:
+		from piaplib.pku import utils as utils
+	else:
+		utils = sys.modules[str("piaplib.pku.utils")]
+except Exception:
+	try:
+		import piaplib.pku.utils as utils
+	except Exception as err:
+		raise ImportError(err, "Error Importing piaplib.pku.utils")
+
+__prog__ = """piaplib.pku.compile_interface"""
+
 
 HEADER_CHUNK = u'# interfaces(5) file used by ifup(8) and ifdown(8)\
 \
@@ -227,9 +241,19 @@ def addWiFiArgs(parser=None):
 	return parser
 
 
-def parseArgs(args=None):
-	"""Parses the arguments."""
-	parser = None
+@remediation.error_handling
+def generateParser(calling_parser_group):
+	"""Parses the CLI arguments."""
+	if calling_parser_group is None:
+		parser = argparse.ArgumentParser(
+			prog=__prog__,
+			description='Handles PiAP pocket version reports',
+			epilog="PiAP Book Controller for version tools."
+		)
+	else:
+		parser = calling_parser_group.add_parser(
+			str(__prog__).split(".")[-1], help="PiAP Book Controller for version tools."
+		)
 	try:
 		parser = argparse.ArgumentParser(
 			prog='compile_interface',
@@ -277,7 +301,16 @@ def parseArgs(args=None):
 		print(str((err.args)))
 		parser.error("parser tool bug")
 		return None
-	return parser.parse_args(args)
+	if calling_parser_group is None:
+		calling_parser_group = parser
+	return calling_parser_group
+
+
+@remediation.error_handling
+def parseArgs(arguments=None):
+	"""Parses the CLI arguments."""
+	parser = generateParser(None)
+	return parser.parse_args(arguments)
 
 
 def compile_iface_name(media_type='eth', index=0, vlanID=None):
@@ -363,7 +396,7 @@ def main(argv=None):
 	if (args.vlanid is not None):
 		interface_vlanID = args.vlanid
 		if interface_vlanID is not None:
-			raise NotImplementedError("BUG - Not Implemented Yet.")
+			raise NotImplementedError("[CWE-758] BUG - Not Implemented Yet.")
 	interface_mode = u'manual'
 	interface_gateway = None
 	interface_ip = None
@@ -390,7 +423,6 @@ def main(argv=None):
 
 if __name__ in u'__main__':
 	try:
-		import sys
 		if (sys.argv is not None and (sys.argv is not []) and (len(sys.argv) > 1)):
 			exit(main(sys.argv[1:]))
 		else:

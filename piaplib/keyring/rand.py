@@ -34,12 +34,15 @@ except Exception:
 
 
 try:
-	from piaplib.pku import remediation as remediation
+	if str("piaplib.pku.remediation") not in sys.modules:
+		from piaplib.pku import remediation as remediation
+	else:
+		remediation = sys.modules[str("piaplib.pku.remediation")]
 except Exception:
 	try:
 		import piaplib.pku.remediation as remediation
-	except Exception:
-		raise ImportError("Error Importing remediation")
+	except Exception as err:
+		raise ImportError(err, "Error Importing remediation")
 
 
 RAND_CHARS = [
@@ -60,6 +63,14 @@ RAND_CHARS = [
 
 __prog__ = """piaplib.keyring.rand"""
 """The name of this PiAPLib tool is rand"""
+
+
+__description__ = """Handles PiAP random utility functions."""
+"""Handles PiAP random utility functions"""
+
+
+__epilog__ = """PiAP Controller for near-cryptographic randomness. Use os.urandom for CPRNG."""
+"""epilog data"""
 
 
 @remediation.error_handling
@@ -309,43 +320,57 @@ RANDOM_TASKS = {
 
 
 @remediation.error_handling
-def parseArgs(arguments=[None]):
+def generateParser(calling_parser_group):
 	"""Parses the CLI arguments."""
-	theArgs = None
-	try:
+	if calling_parser_group is None:
 		parser = argparse.ArgumentParser(
 			prog=__prog__,
-			description='Handles PiAP random utility functions',
-			epilog="PiAP Controller for near-cryptographic randomness. Use os.urandom for CPRNG."
+			description=__description__,
+			epilog=__epilog__
 		)
-		parser.add_argument(
-			'-g',
-			'--generate',
-			dest='random_action',
-			choices=RANDOM_TASKS.keys(),
-			default='raw',
-			type=str,
-			required=False,
-			help='the random service option.'
+	else:
+		parser = calling_parser_group.add_parser(
+			str(__prog__).split(".")[-1], help=__description__
 		)
-		parser.add_argument(
-			'-c',
-			'--count',
-			dest='count',
-			default=int(512),
-			type=int,
-			required=False,
-			help='count.'
-		)
+	parser.add_argument(
+		'-g',
+		'--generate',
+		dest='random_action',
+		choices=RANDOM_TASKS.keys(),
+		default='raw',
+		type=str,
+		required=False,
+		help='the random service option.'
+	)
+	parser.add_argument(
+		'-c',
+		'--count',
+		dest='count',
+		default=int(512),
+		type=int,
+		required=False,
+		help='count.'
+	)
+	if calling_parser_group is None:
+		calling_parser_group = parser
+	return calling_parser_group
+
+
+@remediation.error_handling
+def parseArgs(arguments=None):
+	"""Parses the CLI arguments."""
+	theArgs = argparse.Namespace()
+	try:
+		parser = generateParser(None)
 		theArgs = parser.parse_args(arguments)
 	except Exception as err:
-		print(str(u'FAILED DURING RAND. ABORT.'))
+		print(str("FAILED DURING RAND.. ABORT."))
 		print(str(type(err)))
 		print(str(err))
 		print(str(err.args))
 		err = None
 		del err
-		theArgs = None
+		theArgs = argparse.Namespace()
 	return theArgs
 
 
@@ -357,7 +382,7 @@ def useRandTool(tool, *args, **kwargs):
 	if tool in RANDOM_TASKS.keys():
 		return RANDOM_TASKS[tool](*args, **kwargs)
 	else:
-		raise NotImplementedError("IMPOSSIBLE STATE REACHED IN RAND-TOOL. ABORT.")
+		raise NotImplementedError("[CWE-758] IMPOSSIBLE STATE REACHED IN RAND-TOOL. ABORT.")
 
 
 @remediation.bug_handling
@@ -378,7 +403,7 @@ if __name__ in u'__main__':
 		error_code = main(sys.argv[1:])
 		exit(error_code)
 	except Exception as err:
-		remediation.error_breakpoint(err, str(u'MAIN FAILED DURING RAND. ABORT.'))
+		remediation.error_breakpoint(err, str(u'[CWE-233] MAIN FAILED DURING RAND. ABORT.'))
 		del err
 		exit(255)
 	finally:

@@ -19,6 +19,7 @@
 # limitations under the License.
 # ......................................................................
 
+
 try:
 	import os
 	import os.path
@@ -40,38 +41,19 @@ except Exception:
 	try:
 		import json
 	except Exception:
-		raise ImportError("Error Importing json utils for config")
+		pass
 
 
 try:
-	from . import utils as utils
+	if str("piaplib.book.ANSIColors") not in sys.modules:
+		from piaplib.book import ANSIColors as ANSIColors
+	else:
+		ANSIColors = sys.modules[str("piaplib.book.ANSIColors")]
 except Exception:
 	try:
-		import utils as utils
-	except Exception:
-		raise ImportError("Error Importing utils for config")
-
-
-try:
-	from . import remediation as remediation
-except Exception:
-	try:
-		import remediation as remediation
-	except Exception:
-		raise ImportError("Error Importing remediation for config")
-
-
-try:
-	from piaplib.book.logs import ANSIColors as ANSIColors
-except Exception:
-	try:
-		from book.logs import ANSIColors as ANSIColors
+		import piaplib.book.ANSIColors as ANSIColors
 	except Exception as err:
-		print(str(type(err)))
-		print(str(err))
-		print(str(err.args))
-		print("")
-		raise ImportError("Error Importing ANSIColors")
+		raise ImportError(err)
 
 
 try:
@@ -81,6 +63,30 @@ except Exception:
 		import baseconfig as baseconfig
 	except Exception:
 		raise ImportError("Error Importing baseconfig for config")
+
+
+try:
+	if str("piaplib.pku.try_catch_error") not in sys.modules:
+		from . import try_catch_error as try_catch_error
+	else:
+		try_catch_error = sys.modules[str("piaplib.pku.try_catch_error")]
+except Exception:
+	try:
+		import piaplib.pku.try_catch_error as try_catch_error
+	except Exception as err:
+		raise ImportError(err, "Error Importing try_catch_error for config")
+
+
+try:
+	if str("piaplib.pku.utils") not in sys.modules:
+		from piaplib.pku import utils as utils
+	else:
+		utils = sys.modules[str("piaplib.pku.utils")]
+except Exception:
+	try:
+		import piaplib.pku.utils as utils
+	except Exception as err:
+		raise ImportError(err, "Error Importing utils for config")
 
 
 __prog__ = """piaplib.pku.config"""
@@ -143,7 +149,7 @@ def hasJsonSupport():
 	return support_json
 
 
-@remediation.error_passing
+@try_catch_error
 def readJsonFile(somefile):
 	"""Reads the raw json file."""
 	read_data = None
@@ -154,13 +160,15 @@ def readJsonFile(somefile):
 	except Exception as jsonerr:
 		print("")
 		print("Error: Failed to load JSON file.")
-		remediation.error_breakpoint(error=jsonerr, context=readJsonFile)
+		# remediation.error_breakpoint(error=jsonerr, context=readJsonFile)
+		jsonerr = None
+		del jsonerr
 		print("")
 		read_data = dict({u'Error': u'Failed to load JSON file.'})
 	return read_data
 
 
-@remediation.error_passing
+@try_catch_error
 def writeJsonFile(somefile, data):
 	"""Writes the raw json file."""
 	if data is None:
@@ -180,7 +188,9 @@ def writeJsonFile(somefile, data):
 	except Exception as jsonerr:
 		print("")
 		print("Error: Failed to write JSON file.")
-		remediation.error_breakpoint(error=jsonerr, context=writeJsonFile)
+		# remediation.error_breakpoint(error=jsonerr, context=writeJsonFile)
+		jsonerr = None
+		del jsonerr
 		print("")
 		did_write = False
 	return did_write
@@ -228,7 +238,8 @@ def readYamlFile(somefile):
 	except Exception as yamlerr:
 		print("")
 		print("Error: Failed to load YAML file.")
-		remediation.error_breakpoint(error=yamlerr, context=readYamlFile)
+		# remediation.error_breakpoint(error=yamlerr, context=readYamlFile)
+		del yamlerr
 		print("")
 		read_data = None
 	return read_data
@@ -245,7 +256,8 @@ def writeYamlFile(somefile, data):
 	except Exception as yamlerr:
 		print("")
 		print("Error: Failed to save YAML file.")
-		remediation.error_breakpoint(error=yamlerr, context=writeYamlFile)
+		# remediation.error_breakpoint(error=yamlerr, context=writeYamlFile)
+		del yamlerr
 		print(str(somefile))
 		print("")
 		did_write = None
@@ -270,10 +282,10 @@ try:
 	except Exception:
 		raise ImportError("Error Importing SaneConfigParser for config")
 except ImportError:
-	pass
+	raise ImportError("Error Importing ConfigParser for config")
 
 
-@remediation.error_passing
+@try_catch_error
 def prepforStore(rawValue):
 	"""pack value for storage"""
 	taint_value = str(rawValue)
@@ -304,7 +316,7 @@ def prepforStore(rawValue):
 
 class dictParser(SaneConfigParser):
 	"""adds as_dict() to ConfigParser"""
-	@remediation.error_handling
+	@try_catch_error
 	def as_dict(self):
 		"""returns the config as a nested dict"""
 		theResult = dict(self._sections)
@@ -313,12 +325,12 @@ class dictParser(SaneConfigParser):
 			theResult[somekey].pop('__name__', None)
 		return theResult
 
-	@remediation.error_passing
+	@try_catch_error
 	def keys(self):
 		"""see dict.keys()"""
 		return self.as_dict().keys()
 
-	@remediation.error_passing
+	@try_catch_error
 	def allkeys(self):
 		"""see dict.keys()"""
 		theResult = []
@@ -394,7 +406,7 @@ class dictParser(SaneConfigParser):
 		return self
 
 
-@remediation.error_handling
+@try_catch_error
 def getDefaultMainConfigFile():
 	# logging['timefmt'] = str("""%a %b %d %H:%M:%S %Z %Y""")
 	default_config = dict({
@@ -467,7 +479,7 @@ def _raw_getConfigPath():
 	return confFile
 
 
-@remediation.error_handling
+@try_catch_error
 def getMainConfig(confFile=None):
 	if confFile is None:
 		confFile = _raw_getConfigPath()
@@ -482,8 +494,9 @@ def getMainConfig(confFile=None):
 			__xLoaded_ = False
 			try:
 				__xLoaded_ = safeVar.getboolean(_PIAP_KVP_GLOBAL_KEY, _PIAP_KVP_LOAD_SUBKEY)
-			except Exception as err:
-				remediation.error_breakpoint(error=err, context=_raw_getMainConfig)
+			except Exception:
+				print("""[CWE-394] Unexpected Result. Posible CWE-16 configuration attack.""")
+				__xLoaded_ = False
 			if __xLoaded_ is True:
 				__cacheIsAMiss = False
 			else:
@@ -495,21 +508,21 @@ def getMainConfig(confFile=None):
 				_raw_setMainConfig(tempValue)
 				tempValue = _raw_getMainConfig()
 				tempValue.set(_PIAP_KVP_GLOBAL_KEY, _PIAP_KVP_LOAD_SUBKEY, repr(False))
-			except Exception as badErr:
-				remediation.error_breakpoint(error=badErr, context=_raw_setMainConfig)
+			except Exception:
+				print("""[CWE-394] Unexpected Result. Posible CWE-16 configuration attack.""")
 		_raw_setMainConfig(tempValue)
 	return _raw_getMainConfig()
 
 
-@remediation.error_handling
+@try_catch_error
 def reloadConfigCache(confFile=None):
 	try:
 		tempload = loadMainConfigFile(confFile)
 		if tempload is not None:
 			tempload[_PIAP_KVP_GLOBAL_KEY][_PIAP_KVP_LOAD_SUBKEY] = True
 		_raw_setMainConfig(tempload)
-	except Exception as err:
-		remediation.error_breakpoint(error=err, context=reloadConfigCache)
+	except Exception:
+		print("""[CWE-394] Unexpected Result. Posible CWE-16 configuration attack.""")
 		return False
 	return True
 
@@ -532,7 +545,7 @@ def __builtin_isLoaded(*args, **kwargs):
 	return isLoaded() is True
 
 
-@remediation.error_passing
+@try_catch_error
 def invalidateConfigCache():
 	"""if config is loaded marks as not loaded."""
 	if getMainConfig() is not None:
@@ -541,7 +554,7 @@ def invalidateConfigCache():
 		_raw_setMainConfig(tempValue)
 
 
-@remediation.error_handling
+@try_catch_error
 def hasMainConfigOptionsFor(somekey=None):
 	"""Returns True if the main configurtion has the given key, otherwise False."""
 	hasValue = False
@@ -550,7 +563,7 @@ def hasMainConfigOptionsFor(somekey=None):
 	return hasValue
 
 
-@remediation.error_handling
+@try_catch_error
 def hasMainConfigOptionFor(mainSectionKey=None):
 	"""True if config key maps to value."""
 	hasValue = False
@@ -567,7 +580,7 @@ def hasMainConfigOptionFor(mainSectionKey=None):
 	return hasValue
 
 
-@remediation.error_handling
+@try_catch_error
 def writeDefaultMainConfigFile(confFile=None):
 	if confFile is None:
 		confFile = _raw_getConfigPath()
@@ -577,7 +590,7 @@ def writeDefaultMainConfigFile(confFile=None):
 	return theResult
 
 
-@remediation.error_passing
+@try_catch_error
 def mergeConfigParser(theConfig=None, config_data=None, overwrite=False):
 	"""
 	Merges the Configuration Dictionary into a configparser.
@@ -612,12 +625,12 @@ def mergeConfigParser(theConfig=None, config_data=None, overwrite=False):
 	return theConfig
 
 
-@remediation.error_handling
+@try_catch_error
 def parseConfigParser(config_data=None, theConfig=None, overwrite=True):
 	return baseconfig.parseConfigParser(config_data, theConfig, overwrite)
 
 
-@remediation.error_handling
+@try_catch_error
 def writeMainConfigFile(confFile=None, config_data=None):
 	"""Generates the Main Configuration file for PiAPlib"""
 	try:
@@ -641,7 +654,7 @@ def writeMainConfigFile(confFile=None, config_data=None):
 	return True
 
 
-@remediation.error_handling
+@try_catch_error
 def readIniFile(filename, theparser=None):
 	""" cross-python load function """
 	if filename is None:
@@ -661,7 +674,7 @@ def readIniFile(filename, theparser=None):
 	return theparser
 
 
-@remediation.error_handling
+@try_catch_error
 def loadMainConfigFile(confFile=None):
 	"""loads the given config file into the main config cache for global use."""
 	if confFile is None:
@@ -712,7 +725,7 @@ def _util_is_not_tuple_or_list(someVar):
 	return checkRes
 
 
-@remediation.error_handling
+@try_catch_error
 def defaultGetter(key, defaultValue=None, initIfEmpty=False):
 	"""the default configuration getter for most keys."""
 	theValue = defaultValue
@@ -747,13 +760,15 @@ def defaultGetter(key, defaultValue=None, initIfEmpty=False):
 				if isinstance(theValue, dict) is not True:
 					theValue = ast.literal_eval(theValue)
 	except Exception as err:
-		remediation.error_breakpoint(err, context=defaultGetter)
+		# remediation.error_breakpoint(err, context=defaultGetter)
+		err = None
+		del err
 		# print(str(type(theValue)))
 		# print(repr(theValue))
 	return theValue
 
 
-@remediation.error_handling
+@try_catch_error
 def defaultSetter(key, value):
 	"""the default configuration setter for most keys."""
 	if value is None:
@@ -777,7 +792,7 @@ def defaultSetter(key, value):
 	invalidateConfigCache()
 
 
-@remediation.error_handling
+@try_catch_error
 def defaultDeletter(key):
 	"""the default configuration un-setter for all keys. NON-ATOMIC FUNCTION"""
 	if isLoaded() is not True:
@@ -808,7 +823,7 @@ def getConfigValue(*args, **kwargs):
 		else:
 			return defaultGetter(*args, **kwargs)
 	except Exception as err:
-		remediation.error_breakpoint(err, context=getConfigValue)
+		# remediation.error_breakpoint(err, context=getConfigValue)
 		# print(repr(args))
 		# print(repr(kwargs))
 		# print(repr(config_getters))
@@ -835,8 +850,8 @@ def setConfigValue(*args, **kwargs):
 			return utils.getHandler(config_setters[str(kwargs["""key"""])])(*args, **kwargs)
 		else:
 			return defaultSetter(*args, **kwargs)
-	except Exception as err:
-		remediation.error_breakpoint(err, context=setConfigValue)
+	except Exception:
+		# remediation.error_breakpoint(err, context=setConfigValue)
 		print(repr(config_setters))
 		print(str(config_setters))
 		print(str(type(config_setters)))
@@ -900,7 +915,7 @@ def configKeyValueSETFactory(*kvpargs, **kvpkwargs):
 	return decorator
 
 
-@remediation.error_passing
+@try_catch_error
 def getMainConfigWithArgs(*args, **kwargs):
 	if (kwargs is not None) and (len(kwargs.keys()) > 0):
 		if (str("""file""") in kwargs.keys()):
@@ -913,7 +928,7 @@ def getMainConfigWithArgs(*args, **kwargs):
 	return cache_config
 
 
-@remediation.error_passing
+@try_catch_error
 def bootstrapconfig(*args, **kwargs):
 	"""loads the config"""
 	temp_config = getMainConfigWithArgs(*args, **kwargs)
@@ -942,13 +957,34 @@ def colorsFromArgs(*args, **kwargs):
 	return (section_color, end_color, label_color, value_color)
 
 
+@utils.parametrized
+def defaultsFromConfig(func, **defaults):
+
+	@functools.wraps(func)
+	def configured_func(*xs, **kws):
+		bootstrapconfig()
+		for config_setting in defaults.keys():
+			if getConfigValue(key=config_setting) is None:
+				configRegisterKeyValueFactory(
+					key=config_setting,
+					getter=defaultGetter,
+					setter=defaultSetter
+				)
+			kws[config_setting] = getConfigValue(key=config_setting)
+		return func(*xs, **kws)
+
+	return configured_func
+
+
 def printMainConfig(*args, **kwargs):
 	try:
 		bootstrapconfig(*args, **kwargs)
 	except Exception as err:
-		remediation.error_breakpoint(err, context=printMainConfig)
+		# remediation.error_breakpoint(err, context=printMainConfig)
 		print(repr(kwargs))
 		print(repr(args))
+		err = None
+		del err
 	temp_config = getMainConfigWithArgs(*args, **kwargs)
 	temp = temp_config.as_dict()
 	(section_color, end_color, label_color, value_color) = colorsFromArgs(*args, **kwargs)
@@ -974,7 +1010,7 @@ def printMainConfigJSON(*args, **kwargs):
 	json.dumps(temp, sort_keys=True, indent=4)
 
 
-@remediation.error_handling
+@try_catch_error
 def readMainConfig(*args, **kwargs):
 	"""reads a given setting from the configuration"""
 	temp_config = getMainConfigWithArgs(*args, **kwargs)
@@ -1023,10 +1059,10 @@ def readMainConfig(*args, **kwargs):
 	elif isinstance(kwargs.get(__sKey), type(None)) is False and __aKey in kwargs[__sKey]:
 		return printMainConfig(*args, **kwargs)
 	else:
-		raise remediation.PiAPError("Unsure what setting you are trying to access!")
+		raise RuntimeError("Unsure what setting you are trying to access!")
 
 
-@remediation.error_handling
+@try_catch_error
 def writeMainConfigAPI(*args, **kwargs):
 	"""writes a given setting and value to the configuration"""
 	bootstrapconfig(*args, **kwargs)
@@ -1052,12 +1088,12 @@ def writeMainConfigAPI(*args, **kwargs):
 		setConfigValue(key=config_setting, value=config_value)
 		# (section_color, end_color, label_color, value_color) = colorsFromArgs(*args, **kwargs)
 	elif isinstance(kwargs.get(__sKey), type(None)) is False and __aKey in kwargs[__sKey]:
-		raise remediation.PiAPError("Unsure how to set all/one settings!")
+		raise RuntimeError("Unsure how to set all/one settings!")
 	else:
-		raise remediation.PiAPError("Unsure what setting you are trying to access!")
+		raise RuntimeError("Unsure what setting you are trying to access!")
 
 
-@remediation.error_handling
+@try_catch_error
 def clearMainConfigAPI(*args, **kwargs):
 	"""unwrites a given setting and value to the configuration"""
 	bootstrapconfig(*args, **kwargs)
@@ -1074,15 +1110,24 @@ def clearMainConfigAPI(*args, **kwargs):
 		defaultDeletter(key=config_setting)
 	# (section_color, end_color, label_color, value_color) = colorsFromArgs(*args, **kwargs)
 	elif isinstance(kwargs.get(__sKey), type(None)) is False and __aKey in kwargs[__sKey]:
-		raise remediation.PiAPError("Unsure how to unset all/one settings!")
+		raise RuntimeError("Unsure how to unset all/one settings!")
 	else:
 		return
 
 
-@remediation.error_passing
-def parseargs(arguments=None):
-	"""Parse the arguments"""
-	parser = argparse.ArgumentParser(prog=__prog__, description=__description__, epilog=__epilog__)
+@try_catch_error
+def generateParser(calling_parser_group):
+	"""Parses the CLI arguments."""
+	if calling_parser_group is None:
+		parser = argparse.ArgumentParser(
+			prog=__prog__,
+			description=__description__,
+			epilog=__epilog__
+		)
+	else:
+		parser = calling_parser_group.add_parser(
+			str(__prog__).split(".")[-1], help=__description__
+		)
 	the_action = parser.add_mutually_exclusive_group()
 	the_action.add_argument(
 		'-r', '--read', dest='config_action', default='dump', action='store_const',
@@ -1123,16 +1168,26 @@ def parseargs(arguments=None):
 	)
 	parser.add_argument(
 		'--no-color', dest='use_syntax_color', action='store_false', default=True,
-		help='Disables syntax color in output. Usuful for piping output.'
+		help='Disables syntax color in output. Useful for piping output.'
 	)
 	parser = utils._handleVersionArgs(parser)
-	theResult = parser.parse_known_args(arguments)
-	return theResult
+	if calling_parser_group is None:
+		calling_parser_group = parser
+	return calling_parser_group
+
+
+@try_catch_error
+def parseargs(arguments=None):
+	"""Parse the arguments"""
+	theResult = None
+	parser = generateParser(None)
+	(theResult, theExtras) = parser.parse_known_args(arguments)
+	return (theResult, theExtras)
 
 
 def noOp(*args, **kwargs):
 	"""Does nothing. PLACEHOLDER."""
-	raise NotImplementedError("CRITICAL - PKU Configuration main() not implemented. yet?")
+	raise NotImplementedError("[CWE-758] CRITICAL - PKU Configuration main() not implemented. yet?")
 
 
 _CONFIG_CLI_ACTIONS = dict({
@@ -1146,35 +1201,42 @@ _CONFIG_CLI_ACTIONS = dict({
 """Posible upgrade actions."""
 
 
-@remediation.bug_handling
+@try_catch_error
 def main(argv=None):
 	"""The Main Event."""
-	(args, extras) = parseargs(argv)
 	theResult = 1
-	config_path = os.path.abspath(_raw_getConfigPath())
-	if args.config_path is not None:
-		config_path = os.path.abspath(str(args.config_path))
-	config_key = None
-	config_value = None
-	if args.config_key is not None and str(__ALL_KEYS_SETTING__) not in str(args.config_key):
-		config_key = args.config_key[0]
-	else:
-		config_key = args.config_key
-	if args.config_value is not None and (len(args.config_value) <= 1):
-		config_value = args.config_value[0]
-	if args.use_syntax_color is not None:
-		use_syntax_color = args.use_syntax_color
-	if args.config_action is not None:
-		kwargs = dict({
-			'file': config_path, 'color': use_syntax_color,
-			'setting': config_key, 'value': config_value
-		})
-		_CONFIG_CLI_ACTIONS[args.config_action](*extras, **kwargs)
-		theResult = 0
+	try:
+		(args, extras) = parseargs(argv)
+	except Exception:
+		args = None
+		extras = None
+	try:
+		config_path = os.path.abspath(_raw_getConfigPath())
+		if args.config_path is not None:
+			config_path = os.path.abspath(str(args.config_path))
+		config_key = None
+		config_value = None
+		if args.config_key is not None and str(__ALL_KEYS_SETTING__) not in str(args.config_key):
+			config_key = args.config_key[0]
+		else:
+			config_key = args.config_key
+		if args.config_value is not None and (len(args.config_value) <= 1):
+			config_value = args.config_value[0]
+		if args.use_syntax_color is not None:
+			use_syntax_color = args.use_syntax_color
+		if args.config_action is not None:
+			kwargs = dict({
+				'file': config_path, 'color': use_syntax_color,
+				'setting': config_key, 'value': config_value
+			})
+			_CONFIG_CLI_ACTIONS[args.config_action](*extras, **kwargs)
+			theResult = 0
+	except Exception:
+		theResult = 1
 	return theResult
 
 
-@remediation.bug_handling
+@try_catch_error
 def __not_main(*args, **kwargs):
 	"""Not The Main Event."""
 	if isLoaded() is False:

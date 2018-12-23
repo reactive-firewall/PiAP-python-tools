@@ -34,47 +34,58 @@ except Exception as importErr:
 	importErr = None
 	del importErr
 	raise ImportError("Failed to import " + str(__file__))
-	exit(255)
 
 
 try:
-	try:
+	if 'piaplib' not in sys.modules:
 		import piaplib as piaplib
-	except Exception:
-		from . import piaplib as piaplib
+	else:
+		piaplib = sys.modules['piaplib']
+except Exception:
+	raise ImportError("OMG! we could not import piaplib. We're in need of a fix! ABORT.")
+
+
+try:
+	if str("piaplib.book.logs") not in sys.modules:
+		from piaplib.book import logs
+	else:
+		logs = sys.modules[str("piaplib.book.logs")]
+except Exception:
 	try:
-		from piaplib.pku import baseconfig as baseconfig
-	except Exception:
-		import piaplib.pku.baseconfig as baseconfig
-	try:
-		from .logs import logs as logs
-	except Exception:
-		import logs.logs as logs
-	try:
+		import piaplib.book.logs
+	except Exception as err:
+		raise ImportError(err, "Error Importing piaplib.book.logs")
+
+
+try:
+	if str("piaplib.pku.remediation") not in sys.modules:
 		from piaplib.pku import remediation as remediation
-	except Exception:
-		import piaplib.pku.remediation as remediation
+	else:
+		remediation = sys.modules[str("piaplib.pku.remediation")]
+except Exception:
 	try:
-		from . import version as version
-	except Exception:
-		import book.version as version
-	for dep in [baseconfig, remediation, logs, version]:
-		if dep.__name__ is None:
-			raise ImportError("Failed to open dependency for book")
-except Exception as importErr:
-	print(str(importErr))
-	print(str(importErr.args))
-	importErr = None
-	del importErr
-	raise ImportError("Failed to import " + str(__file__))
-	exit(255)
+		import piaplib.pku.remediation as remediation
+	except Exception as err:
+		raise ImportError(err, "Error Importing remediation")
 
 
-__prog__ = """piaplib.book"""
+try:
+	if str("piaplib.book.version") not in sys.modules:
+		from piaplib.book import version
+	else:
+		version = sys.modules[str("piaplib.book.version")]
+except Exception:
+	try:
+		import piaplib.book.version
+	except Exception as err:
+		raise ImportError(err, "Error Importing piaplib.book.version")
+
+
+__prog__ = """piaplib.book.__main__"""
 """The name of this PiAPLib tool is pocket book"""
 
 
-BOOK_UNITS = {u'logs': logs, u'cache': None, u'version': version}
+BOOK_UNITS = {u'logs': piaplib.book.logs, u'cache': None, u'version': version}
 """	The Pocket Book Unit actions.
 	logs - logbook for logs and output
 	version - like the copyright page in old books
@@ -83,22 +94,37 @@ BOOK_UNITS = {u'logs': logs, u'cache': None, u'version': version}
 	"""
 
 
-@remediation.error_handling
-def parseArgs(arguments=None):
+def generateParser(calling_parser_group):
 	"""Parses the CLI arguments."""
-	parser = argparse.ArgumentParser(
-		prog=__prog__,
-		description='Handles PiAP pocket book',
-		epilog="PiAP Book Controller for extra tools."
-	)
-	parser.add_argument(
-		'book_unit',
-		choices=BOOK_UNITS.keys(),
-		help='The pocket book option.'
+	if calling_parser_group is None:
+		parser = argparse.ArgumentParser(
+			prog=__prog__,
+			description='Handles PiAP pocket book',
+			epilog="PiAP Book Controller for extra tools."
+		)
+	else:
+		parser = calling_parser_group.add_parser(
+			str(__prog__).split(".")[-1], help='Handles PiAP pocket book'
+		)
+	subparser = parser.add_subparsers(
+		title="Units", dest='book_unit',
+		help='The pocket book options.', metavar="BOOK_UNIT"
 	)
 	parser.add_argument('-V', '--version', action='version', version=str(
 		"%(prog)s {}"
 	).format(str(piaplib.__version__)))
+	for sub_parser in BOOK_UNITS.keys():
+		if BOOK_UNITS[sub_parser] is not None:
+			subparser = BOOK_UNITS[sub_parser].generateParser(subparser)
+	if calling_parser_group is None:
+		calling_parser_group = parser
+	return calling_parser_group
+
+
+@remediation.error_handling
+def parseArgs(arguments=None):
+	"""Parses the CLI arguments."""
+	parser = generateParser(None)
 	return parser.parse_known_args(arguments)
 
 
@@ -119,12 +145,11 @@ def main(argv=None):
 	"""The main event"""
 	args, extra = parseArgs(argv)
 	book_cmd = args.book_unit
-	temp_out = useBookTool(book_cmd, extra)
-	return temp_out
+	useBookTool(book_cmd, extra)
+	return 0
 
 
 if __name__ in u'__main__':
 	exit_code = main(sys.argv[1:])
 	exit(exit_code)
-
 

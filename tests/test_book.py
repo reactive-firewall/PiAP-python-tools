@@ -23,19 +23,13 @@ import unittest
 
 try:
 	try:
-		import sys
-		import os
-		sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), str('..'))))
-		sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), str('.'))))
+		import context
 	except Exception as ImportErr:
-		print(str(''))
-		print(str(type(ImportErr)))
-		print(str(ImportErr))
-		print(str((ImportErr.args)))
-		print(str(''))
 		ImportErr = None
 		del ImportErr
-		raise ImportError(str("Test module failed completely."))
+		from . import context
+	if context.__name__ is None:
+		raise ImportError("Failed to import context")
 except Exception:
 	raise ImportError("Failed to import test context")
 
@@ -87,8 +81,7 @@ class BookTestSuite(unittest.TestCase):
 		theResult = True
 		try:
 			import piaplib.book.__main__
-			with self.assertRaises(Exception):
-				self.assertIsNotNone(piaplib.book.__main__.main(["logs"]))
+			self.assertIsNotNone(piaplib.book.__main__.main(["logs"]))
 		except Exception as err:
 			print(str(""))
 			print(str(type(err)))

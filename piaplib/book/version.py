@@ -28,7 +28,7 @@
 try:
 	import os
 	if os.__name__ is None:
-		raise NotImplementedError("OMG! We could not import the os. We're like in the matrix!")
+		raise NotImplementedError("[CWE-758] Could not import the os. We're like in the matrix!")
 except Exception as err:
 	raise ImportError(err)
 	exit(3)
@@ -37,7 +37,7 @@ except Exception as err:
 try:
 	import sys
 	if sys.__name__ is None:
-		raise NotImplementedError("OMG! We could not import the sys. We're like in the matrix!")
+		raise NotImplementedError("[CWE-758] Could not import the sys.")
 except Exception as err:
 	raise ImportError(err)
 	exit(3)
@@ -46,33 +46,55 @@ except Exception as err:
 try:
 	import argparse
 	if argparse.__name__ is None:
-		raise NotImplementedError("OMG! We could not import argparse.")
+		raise NotImplementedError("[CWE-758] We could not import argparse.")
 except Exception as err:
 	raise ImportError(err)
 	exit(3)
 
 
 try:
-	import piaplib as piaplib
+	if 'piaplib' not in sys.modules:
+		import piaplib as piaplib
+	else:
+		piaplib = sys.modules['piaplib']
 except Exception:
-	from .. import piaplib as piaplib
+	raise ImportError("PiAPLib failed to import.")
+
+
 try:
-	from piaplib.pku import utils as utils
+	if str("piaplib.pku.utils") not in sys.modules:
+		from piaplib.pku import utils as utils
+	else:
+		utils = sys.modules[str("piaplib.pku.utils")]
 except Exception:
-	import piaplib.pku.utils as utils
-try:
-	from piplib.pku import remediation as remediation
-except Exception:
-	import piaplib.pku.remediation as remediation
-try:
-	from .logs import logs as logs
-except Exception as impErr:
-	impErr = None
-	del(impErr)
 	try:
-		import piaplib.book.logs.logs as logs
-	except Exception:
-		raise ImportError("Error Importing logs for version")
+		import piaplib.pku.utils as utils
+	except Exception as err:
+		raise ImportError(err, "Error Importing piaplib.pku.utils")
+
+
+try:
+	if str("piaplib.pku.remediation") not in sys.modules:
+		from piaplib.pku import remediation as remediation
+	else:
+		remediation = sys.modules[str("piaplib.pku.remediation")]
+except Exception:
+	try:
+		import piaplib.pku.remediation as remediation
+	except Exception as err:
+		raise ImportError(err, "Error Importing remediation")
+
+
+try:
+	if str("piaplib.book.logs.logs") not in sys.modules:
+		from .logs import logs as logs
+	else:
+		logs = sys.modules[str("piaplib.book.logs.logs")]
+except Exception:
+	try:
+		import logs.logs as logs
+	except Exception as err:
+		raise ImportError(err, "Error Importing logs")
 
 
 try:
@@ -91,7 +113,7 @@ except Exception as importErr:
 	exit(255)
 
 
-__prog__ = """piaplib.version"""
+__prog__ = """piaplib.book.version"""
 """The name of this PiAPLib tool is pocket version"""
 
 
@@ -101,7 +123,7 @@ def getKeyringVersion(verbose=False):
 	try:
 		from piaplib import keyring
 		if keyring.__name__ is False:
-			raise NotImplementedError("Failed to import keyring")
+			raise NotImplementedError("[CWE-758] Failed to import keyring")
 	except Exception:
 		import piaplib.keyring
 	try:
@@ -199,13 +221,18 @@ def getRunVersion(tool, verbose_mode=False):
 
 
 @remediation.error_handling
-def parseArgs(arguments=None):
+def generateParser(calling_parser_group):
 	"""Parses the CLI arguments."""
-	parser = argparse.ArgumentParser(
-		prog=__prog__,
-		description='Handles PiAP pocket version reports',
-		epilog="PiAP Book Controller for version tools."
-	)
+	if calling_parser_group is None:
+		parser = argparse.ArgumentParser(
+			prog=__prog__,
+			description='Handles PiAP pocket version reports',
+			epilog="PiAP Book Controller for version tools."
+		)
+	else:
+		parser = calling_parser_group.add_parser(
+			str(__prog__).split(".")[-1], help="PiAP Book Controller for version tools."
+		)
 	parser.add_argument(
 		nargs='?',
 		dest='version_unit',
@@ -215,6 +242,15 @@ def parseArgs(arguments=None):
 	)
 	parser = utils._handleVerbosityArgs(parser, default=False)
 	parser = utils._handleVersionArgs(parser)
+	if calling_parser_group is None:
+		calling_parser_group = parser
+	return calling_parser_group
+
+
+@remediation.error_handling
+def parseArgs(arguments=None):
+	"""Parses the CLI arguments."""
+	parser = generateParser(None)
 	return parser.parse_known_args(arguments)
 
 
@@ -226,9 +262,10 @@ def main(argv=None):
 		del extra
 		output = str(getRunVersion(args.version_unit, args.verbose_mode))
 		if __name__ in u'__main__':
-			print(output)
+			print(str(output))
 			return 0
 		else:
+			print(str(output))
 			return output
 	except Exception as err:
 		logs.log(str(type(err)), "Critical")
@@ -238,8 +275,8 @@ def main(argv=None):
 
 
 if __name__ in u'__main__':
+	exitcode = 255
 	try:
-		import sys
 		exitcode = main(sys.argv[1:])
 	except Exception:
 		exitcode = 3

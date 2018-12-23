@@ -23,6 +23,7 @@
 try:
 	import os
 	import sys
+	import subprocess
 	sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 	try:
 		import piaplib as piaplib
@@ -46,7 +47,7 @@ try:
 		from .. import interfaces as interfaces
 	except Exception:
 		import pku.interfaces as interfaces
-	for depends in [piaplib, interfaces, html_generator, remediation, utils]:
+	for depends in [piaplib, interfaces, html_generator, remediation, utils, subprocess]:
 		if depends.__name__ is None:
 			raise ImportError("Failed to import depends.")
 except Exception as importErr:
@@ -157,7 +158,6 @@ def get_client_name(client_ip=None, use_html=False, lan_interface=None):
 		return html_generator.gen_html_td(client, str(u'client_status_{}').format(client))
 
 
-@utils.memoize
 def get_client_sta_status_raw():
 	"""list the raw status of client sta."""
 	theRawClientState = None
@@ -231,33 +231,27 @@ def get_client_arp_status_raw(client_ip=None, lan_interface=None):
 	arguments = [str("/usr/sbin/arp"), str("-i"), str(lan_interface), str("-a")]
 	theRawClientState = None
 	try:
-		import subprocess
-		try:
-			output = subprocess.check_output(arguments, stderr=subprocess.STDOUT)
-			if (output is not None) and (len(output) > 0):
-				lines = [
-					utils.literal_str(x) for x in output.splitlines() if isLineForSTA(x, client_ip)
-				]
-				theRawClientState = str("")
-				for line in lines:
-					if (line is not None) and (len(line) > 0):
-						theRawClientState = str("{}{}\n").format(str(theRawClientState), str(line))
-				del lines
-			else:
-				theRawClientState = None
-		except subprocess.CalledProcessError as subErr:
-			subErr = None
-			del subErr
+		output = subprocess.check_output(arguments, stderr=subprocess.STDOUT)
+		if (output is not None) and (len(output) > 0):
+			lines = [
+				utils.literal_str(x) for x in output.splitlines() if isLineForSTA(x, client_ip)
+			]
+			theRawClientState = str("")
+			for line in lines:
+				if (line is not None) and (len(line) > 0):
+					theRawClientState = str("{}{}\n").format(str(theRawClientState), str(line))
+			del lines
+		else:
 			theRawClientState = None
-		except Exception as cmdErr:
-			print(str("ERROR: get_client_arp_status_raw - 403"))
-			print(str(type(cmdErr)))
-			print(str(cmdErr))
-			print(str(cmdErr.args))
-			theRawClientState = None
-	except Exception as importErr:
-		print(str(importErr))
-		print(str(importErr.args))
+	except subprocess.CalledProcessError as subErr:
+		subErr = None
+		del subErr
+		theRawClientState = None
+	except Exception as cmdErr:
+		print(str("ERROR: get_client_arp_status_raw - 403"))
+		print(str(type(cmdErr)))
+		print(str(cmdErr))
+		print(str(cmdErr.args))
 		theRawClientState = None
 	return theRawClientState
 

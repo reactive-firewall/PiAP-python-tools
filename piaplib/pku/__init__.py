@@ -18,6 +18,7 @@
 # limitations under the License.
 # ......................................................................
 
+
 try:
 	import sys
 	import os
@@ -29,13 +30,49 @@ except Exception:
 	raise ImportError("Pocket Knife Unit PKU failed to import.")
 
 
+try:
+	if 'piaplib' not in sys.modules:
+		import piaplib as piaplib
+	else:
+		piaplib = sys.modules['piaplib']
+except Exception:
+	raise ImportError("Pocket PKU failed to import.")
+
+
+def try_catch_error(func):
+	"""Runs a function in try-except"""
+	import functools
+
+	@functools.wraps(func)
+	def try_func(*args, **kwargs):
+		"""Wraps a function in try-except"""
+		theOutputOrNone = None
+		try:
+			theOutputOrNone = func(*args, **kwargs)
+		except Exception as err:
+			print(str(err))
+			print(str("[CWE-394] An error occurred in {}.").format(str(func)))
+			del err
+			theOutputOrNone = None
+		return theOutputOrNone
+
+	return try_func
+
+
+@try_catch_error
 def main(argv=None):
 	"""The main event"""
-	import piaplib.pku.__main__
+	try:
+		if 'piaplib.pku.__main__' not in sys.modules:
+			import piaplib.pku.__main__
+			if piaplib.pku.__main__.__name__ is None:
+				raise ImportError("Failed to import piaplib.pku.__main__")
+	except Exception as importErr:
+		del importErr
+		import piaplib.pku.__main__
 	return piaplib.pku.__main__.main(argv)
 
 
 if __name__ in u'__main__':
 	main(sys.argv[1:])
-
 

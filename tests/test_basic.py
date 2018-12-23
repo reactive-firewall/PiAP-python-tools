@@ -42,7 +42,7 @@ class BasicTestSuite(unittest.TestCase):
 		assert True
 
 	def test_syntax(self):
-		"""Test case importing code."""
+		"""Test case importing code for syntax errors."""
 		theResult = False
 		try:
 			from .context import piaplib
@@ -58,8 +58,8 @@ class BasicTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
-	def test_actual_depends(self):
-		"""Test case importing depends."""
+	def test_actual_depends_import(self):
+		"""Test case importing actual dependancies."""
 		theResult = True
 		try:
 			import sys
@@ -82,8 +82,8 @@ class BasicTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
-	def test_a_which_command(self):
-		"""Test case for backend which."""
+	def test_a_which_command_installed(self):
+		"""Tests for backend exsistance of the which command."""
 		theResult = False
 		try:
 			import subprocess
@@ -129,8 +129,8 @@ class BasicTestSuite(unittest.TestCase):
 				theResult = False
 		assert theResult
 
-	def test_y_remote_command(self):
-		"""Test case for backend library."""
+	def test_y_error_handler_decorator(self):
+		"""Basic Test case for backend library for error handling."""
 		theResult = False
 		try:
 			from piaplib import pku as pku

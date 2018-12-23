@@ -3,7 +3,7 @@
 
 # Pocket PiAP
 # ......................................................................
-# Copyright (c) 2017, Kendrick Walls
+# Copyright (c) 2017-2018, Kendrick Walls
 # ......................................................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
@@ -153,6 +153,24 @@ def debugtestError(someError=None):
 	print(str(""))
 
 
+def debugUnexpectedOutput(expectedOutput, actualOutput, thepython):
+	print(str(""))
+	if (thepython is not None):
+		print(str("python cmd is {}").format(str(thepython)))
+	else:
+		print("warning: Unexpected output!")
+	print(str(""))
+	if (expectedOutput is not None):
+		print(str("the expected output is..."))
+		print(str(""))
+		print(str("{}").format(str(expectedOutput)))
+		print(str(""))
+	print(str("actual output was..."))
+	print(str(""))
+	print(str("{}").format(str(actualOutput)))
+	print(str(""))
+
+
 class BasicUsageTestSuite(unittest.TestCase):
 	"""Basic functional test cases."""
 
@@ -257,13 +275,36 @@ class BasicUsageTestSuite(unittest.TestCase):
 					theResult = True
 				else:
 					theResult = False
-					print(str(""))
-					print(str("python cmd is {}").format(str(thepython)))
-					print(str(""))
-					print(str("actual output was..."))
-					print(str(""))
-					print(str("{}").format(str(theOutputtext)))
-					print(str(""))
+					debugUnexpectedOutput(str("usage:"), str(theOutputtext), thepython)
+		except Exception as err:
+			debugtestError(err)
+			err = None
+			del err
+			theResult = False
+		assert theResult
+
+	def test_d_python_command_lib_main(self):
+		"""Test case for piaplib vs piaplib.__main__"""
+		theResult = False
+		try:
+			thepython = getPythonCommand()
+			if (thepython is not None):
+				theExpectedText = checkPythonCommand([
+					str(thepython),
+					str("-m"),
+					str("piaplib.__main__")
+				], stderr=subprocess.STDOUT)
+				self.assertIsNotNone(theExpectedText)
+				theOutputtext = checkPythonCommand([
+					str(thepython),
+					str("-m"),
+					str("piaplib")
+				], stderr=subprocess.STDOUT)
+				if (str(theExpectedText) in str(theOutputtext)):
+					theResult = True
+				else:
+					theResult = False
+					debugUnexpectedOutput(str(theExpectedText), str(theOutputtext), thepython)
 		except Exception as err:
 			debugtestError(err)
 			err = None
@@ -284,6 +325,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 				"pku.__main__",
 				"book.__main__",
 				"book.version",
+				"book.logs",
 				"keyring.__main__"
 			]
 			if (thepython is not None):
@@ -299,13 +341,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 							theResult = True
 						else:
 							theResult = False
-							print(str(""))
-							print(str("python cmd is {}").format(str(thepython)))
-							print(str(""))
-							print(str("actual output was..."))
-							print(str(""))
-							print(str("{}").format(str(theOutputtext)))
-							print(str(""))
+							debugUnexpectedOutput(str("usage:"), str(theOutputtext), thepython)
 				except Exception as othererr:
 					debugtestError(othererr)
 					othererr = None
@@ -339,13 +375,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 							theResult = True
 						else:
 							theResult = False
-							print(str(""))
-							print(str("python cmd is {}").format(str(thepython)))
-							print(str(""))
-							print(str("actual output was..."))
-							print(str(""))
-							print(str("{}").format(str(theOutputtext)))
-							print(str(""))
+							debugUnexpectedOutput(str("usage:"), str(theOutputtext), thepython)
 				except Exception as othererr:
 					debugtestError(othererr)
 					othererr = None
@@ -425,13 +455,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 							theResult = True
 						else:
 							theResult = False
-							print(str(""))
-							print(str("python cmd is {}").format(str(thepython)))
-							print(str(""))
-							print(str("actual output was..."))
-							print(str(""))
-							print(str("{}").format(str(theOutputtext)))
-							print(str(""))
+							debugUnexpectedOutput(str("usage:"), str(theOutputtext), thepython)
 				except Exception as othererr:
 					debugtestError(othererr)
 					othererr = None
@@ -548,13 +572,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 							theResult = True
 						else:
 							theResult = False
-							print(str(""))
-							print(str("python cmd is {}").format(str(thepython)))
-							print(str(""))
-							print(str("actual output was..."))
-							print(str(""))
-							print(str("{}").format(str(theOutputtext)))
-							print(str(""))
+							debugUnexpectedOutput(str("usage:"), str(theOutputtext), thepython)
 				except Exception as othererr:
 					debugtestError(othererr)
 					othererr = None
@@ -785,13 +803,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 						raise unittest.SkipTest("function ok, but not a compatible Test ENV")
 					else:
 						theResult = False
-						print(str(""))
-						print(str("python cmd is {}").format(str(thepython)))
-						print(str(""))
-						print(str("actual output was..."))
-						print(str(""))
-						print(str("{}").format(str(theOutputtext)))
-						print(str(""))
+						debugUnexpectedOutput(None, str(theOutputtext), thepython)
 				except unittest.SkipTest:
 					raise unittest.SkipTest("function ok, but not a compatible Test ENV")
 				except Exception as othererr:
@@ -831,13 +843,11 @@ class BasicUsageTestSuite(unittest.TestCase):
 						theResult = True
 					else:
 						theResult = False
-						print(str(""))
-						print(str("python cmd is {}").format(str(thepython)))
-						print(str(""))
-						print(str("actual output was..."))
-						print(str(""))
-						print(str("{}").format(str(theOutputtext)))
-						print(str(""))
+						debugUnexpectedOutput(
+							str("inet [static|dhcp]"),
+							str(theOutputtext),
+							thepython
+						)
 				except Exception as othererr:
 					debugtestError(othererr)
 					othererr = None
@@ -879,13 +889,11 @@ class BasicUsageTestSuite(unittest.TestCase):
 						theResult = False
 					else:
 						theResult = False
-						print(str(""))
-						print(str("python cmd is {}").format(str(thepython)))
-						print(str(""))
-						print(str("actual output was..."))
-						print(str(""))
-						print(str("{}").format(str(theOutputtext)))
-						print(str(""))
+						debugUnexpectedOutput(
+							str("inet [static|dhcp]"),
+							str(theOutputtext),
+							thepython
+						)
 				except Exception as othererr:
 					debugtestError(othererr)
 					othererr = None
@@ -920,15 +928,18 @@ class BasicUsageTestSuite(unittest.TestCase):
 							theResult = True
 						else:
 							theResult = False
+							debugUnexpectedOutput(
+								str("<HTML TABLE CODE>"),
+								str(theOutputtext),
+								thepython
+							)
 					else:
 						theResult = False
-						print(str(""))
-						print(str("python cmd is {}").format(str(thepython)))
-						print(str(""))
-						print(str("actual output was..."))
-						print(str(""))
-						print(str("{}").format(str(theOutputtext)))
-						print(str(""))
+						debugUnexpectedOutput(
+							None,
+							str(theOutputtext),
+							thepython
+						)
 				except Exception as othererr:
 					debugtestError(othererr)
 					othererr = None
@@ -942,7 +953,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 		assert theResult
 
 	def test_d_python_command_check_clients_html(self):
-		"""Test case for piaplib.pocket.lint check users."""
+		"""Test case for piaplib.pocket.lint check clients for html."""
 		theResult = False
 		try:
 			thepython = getPythonCommand()
@@ -965,14 +976,11 @@ class BasicUsageTestSuite(unittest.TestCase):
 							theResult = False
 					else:
 						theResult = False
-						print(str(""))
-						print(str("TEST: check clients's html"))
-						print(str("python cmd is {}").format(str(thepython)))
-						print(str(""))
-						print(str("actual output was..."))
-						print(str(""))
-						print(str("{}").format(str(theOutputtext)))
-						print(str(""))
+						debugUnexpectedOutput(
+							str("<HTML TABLE CODE>"),
+							str(theOutputtext),
+							thepython
+						)
 				except Exception as othererr:
 					print(str(""))
 					print(str(type(othererr)))
@@ -990,7 +998,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 		assert theResult
 
 	def test_d_python_command_check_users_single(self):
-		"""Test case for piaplib.pocket.lint check users."""
+		"""Test case for piaplib.pocket.lint check users --user *"""
 		theResult = False
 		try:
 			thepython = getPythonCommand()
@@ -1015,20 +1023,13 @@ class BasicUsageTestSuite(unittest.TestCase):
 							print(str(""))
 						else:
 							theResult = (False or theResult)
-							print(str(""))
-							print(str("python cmd is {}").format(str(thepython)))
-							print(str("expected user {}").format(some_test_user))
-							print(str(""))
-							print(str("actual output was..."))
-							print(str(""))
-							print(str("{}").format(str(theOutputtext)))
-							print(str(""))
+							debugUnexpectedOutput(
+								str(some_test_user),
+								str(theOutputtext),
+								None
+							)
 				except Exception as othererr:
-					print(str(""))
-					print(str(type(othererr)))
-					print(str(othererr))
-					print(str((othererr.args)))
-					print(str(""))
+					debugtestError(othererr)
 					othererr = None
 					del othererr
 					theResult = False
@@ -1040,7 +1041,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 		assert theResult
 
 	def test_f_python_command_check_users_all(self):
-		"""Test case for piaplib.pocket.lint check users."""
+		"""Test case for piaplib.pocket.lint check users --all"""
 		theResult = False
 		try:
 			import os
@@ -1065,21 +1066,15 @@ class BasicUsageTestSuite(unittest.TestCase):
 						raise unittest.SkipTest("function ok, but not a compatible Test ENV")
 					else:
 						theResult = False
-						print(str(""))
-						print(str("python cmd is {}").format(str(thepython)))
-						print(str(""))
-						print(str("actual output was..."))
-						print(str(""))
-						print(str("{}").format(str(theOutputtext)))
-						print(str(""))
+						debugUnexpectedOutput(
+							None,
+							str(theOutputtext),
+							thepython
+						)
 				except unittest.SkipTest:
 					raise unittest.SkipTest("function ok, but not a compatible Test ENV")
 				except Exception as othererr:
-					print(str(""))
-					print(str(type(othererr)))
-					print(str(othererr))
-					print(str((othererr.args)))
-					print(str(""))
+					debugtestError(othererr)
 					othererr = None
 					del othererr
 					theResult = False
@@ -1093,7 +1088,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 		assert theResult
 
 	def test_f_python_command_check_users_list(self):
-		"""Test case for piaplib.pocket.lint check users."""
+		"""Test case for piaplib.pocket.lint check users --list"""
 		theResult = False
 		try:
 			import os
@@ -1118,21 +1113,15 @@ class BasicUsageTestSuite(unittest.TestCase):
 						raise unittest.SkipTest("function ok, but not a compatible Test ENV")
 					else:
 						theResult = False
-						print(str(""))
-						print(str("python cmd is {}").format(str(thepython)))
-						print(str(""))
-						print(str("actual output was..."))
-						print(str(""))
-						print(str("{}").format(str(theOutputtext)))
-						print(str(""))
+						debugUnexpectedOutput(
+							None,
+							str(theOutputtext),
+							thepython
+						)
 				except unittest.SkipTest:
 					raise unittest.SkipTest("function ok, but not a compatible Test ENV")
 				except Exception as othererr:
-					print(str(""))
-					print(str(type(othererr)))
-					print(str(othererr))
-					print(str((othererr.args)))
-					print(str(""))
+					debugtestError(othererr)
 					othererr = None
 					del othererr
 					theResult = False
@@ -1182,11 +1171,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 				except unittest.SkipTest:
 					raise unittest.SkipTest("function ok, but not a compatible Test network")
 				except Exception as othererr:
-					print(str(""))
-					print(str(type(othererr)))
-					print(str(othererr))
-					print(str((othererr.args)))
-					print(str(""))
+					debugtestError(othererr)
 					othererr = None
 					del othererr
 					theResult = False
@@ -1237,11 +1222,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 				except unittest.SkipTest:
 					raise unittest.SkipTest("function ok, but not a compatible Test network")
 				except Exception as othererr:
-					print(str(""))
-					print(str(type(othererr)))
-					print(str(othererr))
-					print(str((othererr.args)))
-					print(str(""))
+					debugtestError(othererr)
 					othererr = None
 					del othererr
 					theResult = False
@@ -1287,25 +1268,15 @@ class BasicUsageTestSuite(unittest.TestCase):
 						theResult = True
 					else:
 						theResult = False
-						print(str(""))
-						print(str("python cmd is {}").format(str(thepython)))
-						print(str(""))
-						print(str("actual output was..."))
-						print(str(""))
-						print(str("{}").format(str(theOutputtext)))
-						print(str(""))
-						print(str("expected output was..."))
-						print(str(""))
-						print(str("{}").format(str(test_salt_one)))
-						print(str(""))
+						debugUnexpectedOutput(
+							str("{}").format(str(test_salt_one)),
+							str(theOutputtext),
+							thepython
+						)
 					del theOutputtext
 					del test_salt_one
 				except Exception as othererr:
-					print(str(""))
-					print(str(type(othererr)))
-					print(str(othererr))
-					print(str((othererr.args)))
-					print(str(""))
+					debugtestError(othererr)
 					othererr = None
 					del othererr
 					theResult = False
@@ -1371,32 +1342,35 @@ class BasicUsageTestSuite(unittest.TestCase):
 		theResult = True
 		try:
 			thepython = getPythonCommand()
-			if (thepython is not None):
-				theOutputtext = None
-				try:
-					theOutputtext = checkPythonFuzzing([
-						str(thepython),
-						str("-m"),
-						str("piaplib.pocket"),
-						str("pku"),
-						str("interfaces"),
-						str("""-i={}""").format(str("eth0"))
-					], stderr=subprocess.STDOUT)
-				except Exception as junkErr:  # noqa
-					del(junkErr)
-				self.assertIsNotNone(theOutputtext)
-				try:
-					theOutputtext = checkPythonFuzzing([
-						str(thepython),
-						str("-m"),
-						str("piaplib.pocket"),
-						str("pku"),
-						str("interfaces"),
-						str("""-i={}""").format(str("eth0")),
-						str("""-r""")
-					], stderr=subprocess.STDOUT)
-				except Exception as junkErr:  # noqa
-					del(junkErr)
+			theOutputtext = None
+			rebootIface = None
+			try:
+				for someTest in [str("eth0"), str("enp0s")]:
+					if theOutputtext is None:
+						rebootIface = str(someTest)
+						theOutputtext = checkPythonFuzzing([
+							str(thepython),
+							str("-m"),
+							str("piaplib.pocket"),
+							str("pku"),
+							str("interfaces"),
+							str("""-i={}""").format(someTest)
+						], stderr=subprocess.STDOUT)
+			except Exception as junkErr:  # noqa
+				del(junkErr)
+			self.assertIsNotNone(theOutputtext)
+			try:
+				theOutputtext = checkPythonFuzzing([
+					str(thepython),
+					str("-m"),
+					str("piaplib.pocket"),
+					str("pku"),
+					str("interfaces"),
+					str("""-i={}""").format(rebootIface),
+					str("""-r""")
+				], stderr=subprocess.STDOUT)
+			except Exception as junkErr:  # noqa
+				del(junkErr)
 				# self.assertIsNone(theOutputtext)
 		except Exception as err:
 			debugtestError(err)
@@ -1419,7 +1393,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 						str("piaplib.pocket"),
 						str("pku"),
 						str("upgrade"),
-						str("--all")
+						str("all")
 					], stderr=subprocess.STDOUT)
 					if (theOutputtext is not None and len(theOutputtext) > 0):
 						theResult = True
@@ -1440,35 +1414,6 @@ class BasicUsageTestSuite(unittest.TestCase):
 					othererr = None
 					del othererr
 					theResult = False
-		except Exception as err:
-			debugtestError(err)
-			err = None
-			del err
-			theResult = False
-		assert theResult
-
-	def test_j_python_command_book_logs(self):
-		"""Test case for piaplib.book.logs --help."""
-		theResult = False
-		try:
-			import sys
-			if sys.__name__ is None:
-				raise ImportError("Failed to import system. WTF?!!")
-			thepython = getPythonCommand()
-			test_units = [
-				"book.logs"
-			]
-			if (thepython is not None):
-				with self.assertRaises(Exception):
-					for unit in test_units:
-						theOutputtext = checkPythonFuzzing([
-							str(thepython),
-							str("-m"),
-							str("piaplib.{}").format(str(unit)),
-							str("--help")
-						], stderr=subprocess.STDOUT)
-						self.assertIsNotNone(theOutputtext)
-				theResult = True
 		except Exception as err:
 			debugtestError(err)
 			err = None

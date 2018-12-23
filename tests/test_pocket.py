@@ -157,11 +157,7 @@ def check_exec_command_has_output(test_case, someArgs):
 class PocketUsageTestSuite(unittest.TestCase):
 	"""Basic functional test cases."""
 
-	def test_absolute_truth_and_meaning(self):
-		"""Insanitty Test."""
-		assert True
-
-	def test_syntax(self):
+	def setup(self):
 		"""Test case importing code."""
 		theResult = False
 		try:
@@ -177,6 +173,10 @@ class PocketUsageTestSuite(unittest.TestCase):
 			print(str(impErr))
 			theResult = False
 		assert theResult
+
+	def test_absolute_truth_and_meaning(self):
+		"""Insanitty Test."""
+		assert True
 
 	def test_b_python_command(self):
 		"""Test case for backend library."""
@@ -337,7 +337,7 @@ class PocketUsageTestSuite(unittest.TestCase):
 						], stderr=subprocess.STDOUT)
 						if (str("usage:") in str(theOutputtext)):
 							theResult = True
-						elif (theOutputtext is None):
+						elif (theOutputtext is None) or (str(theOutputtext) in str("")):
 							theResult = True
 						else:
 							theResult = False
@@ -346,7 +346,7 @@ class PocketUsageTestSuite(unittest.TestCase):
 							print(str(""))
 							print(str("actual output was..."))
 							print(str(""))
-							print(str("{}").format(str(theOutputtext)))
+							print(str("{}").format(repr(theOutputtext)))
 							print(str(""))
 				except Exception as othererr:
 					print(str(""))
@@ -430,16 +430,16 @@ class PocketUsageTestSuite(unittest.TestCase):
 						str("interfaces"),
 						str("""-i {}""").format(str("eth0"))
 					], stderr=subprocess.STDOUT)
-				self.assertIsNone(theOutputtext)
-				theOutputtext = checkPythonCommand([
-					str(thepython),
-					str("-m"),
-					str("piaplib.pocket"),
-					str("pku"),
-					str("interfaces"),
-					str("""-i {} -r""").format(interfaces.INTERFACE_CHOICES[1])
-				], stderr=subprocess.STDOUT)
-				self.assertIsNone(theOutputtext)
+					self.assertIsNone(theOutputtext)
+					theOutputtext = checkPythonCommand([
+						str(thepython),
+						str("-m"),
+						str("piaplib.pocket"),
+						str("pku"),
+						str("interfaces"),
+						str("""-i {} -r""").format(interfaces.INTERFACE_CHOICES[1])
+					], stderr=subprocess.STDOUT)
+					self.assertIsNone(theOutputtext)
 		except Exception as err:
 			print(str(""))
 			print(str(type(err)))

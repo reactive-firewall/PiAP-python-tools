@@ -1,3 +1,4 @@
+#! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
 # Pocket PiAP
@@ -18,11 +19,14 @@
 # limitations under the License.
 # ......................................................................
 
+import unittest
+
 try:
 	try:
 		import sys
 		import os
 		sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), str('..'))))
+		sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), str('.'))))
 	except Exception as ImportErr:
 		print(str(''))
 		print(str(type(ImportErr)))
@@ -32,54 +36,59 @@ try:
 		ImportErr = None
 		del ImportErr
 		raise ImportError(str("Test module failed completely."))
-	from tests import profiling as profiling
-	from tests import test_basic
-	from tests import test_pocket
-	from tests import test_pku
-	from tests import test_strings
-	from tests import test_utils
-	from tests import test_interface
-	from tests import test_config
-	from tests import test_keyring
-	from tests import test_rand
-	from tests import test_salt
-	from tests import test_enc
-	from tests import test_lint
-	from tests import test_html
-	from tests import test_lint_users
-	from tests import test_lint_iface
-	from tests import test_clients_check
-	from tests import test_book
-	from tests import test_logs
-	from tests import test_version
+except Exception:
+	raise ImportError("Failed to import test context")
 
-	depends = [
-		profiling, test_basic, test_strings, test_utils, test_pocket, test_config,
-		test_rand, test_salt, test_lint, test_book, test_logs, test_pku, test_version,
-		test_clients_check, test_interface, test_enc, test_lint_iface, test_html,
-		test_lint_users, test_keyring
-	]
-	for unit_test in depends:
+
+class LintUserTestSuite(unittest.TestCase):
+	"""pocket.lint users test cases."""
+
+	def setup(self):
+		"""Test case importing code."""
+		theResult = False
 		try:
-			if unit_test.__name__ is None:
-				raise ImportError(
-					str("Test module failed to import even the {} tests.").format(str(unit_test))
-				)
+			from .context import piaplib
+			if piaplib.__name__ is None:
+				theResult = False
+			from piaplib import pocket
+			if pocket.__name__ is None:
+				theResult = False
+			theResult = True
 		except Exception as impErr:
-			print(str(''))
 			print(str(type(impErr)))
 			print(str(impErr))
-			print(str((impErr.args)))
-			print(str(''))
-			impErr = None
-			del impErr
-			raise ImportError(str("Test module failed completely."))
-except Exception as badErr:
-	print(str(''))
-	print(str(type(badErr)))
-	print(str(badErr))
-	print(str((badErr.args)))
-	print(str(''))
-	badErr = None
-	del badErr
-	exit(0)
+			theResult = False
+		assert theResult
+
+	def test_case_users_status_insane_none(self):
+		"""Tests the imposible state for users status given bad values"""
+		theResult = True
+		try:
+			from lint import users_check_status as users_check_status
+		except Exception:
+			import lint.users_check_status as users_check_status
+		if users_check_status.__name__ is None:
+			theResult = False
+		else:
+			try:
+				test_funcs = [
+					users_check_status.format_raw_user_list,
+					users_check_status.get_user_status,
+					users_check_status.get_user_ip
+				]
+				for func in test_funcs:
+					self.assertIsNotNone(func(None))
+			except Exception as err:
+				print(str(""))
+				print(str(type(err)))
+				print(str(err))
+				print(str((err.args)))
+				print(str(""))
+				err = None
+				del err
+				theResult = False
+		assert theResult
+
+
+if __name__ == u'__main__':
+	unittest.main()

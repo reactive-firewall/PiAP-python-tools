@@ -19,30 +19,48 @@
 # limitations under the License.
 # ......................................................................
 
+
 try:
 	import sys
+	import argparse
 except Exception:
 	raise ImportError("WTF, no system?!?!")
 
-try:
-	from . import remediation as remediation
-except Exception:
-	try:
-		import remediation as remediation
-	except Exception:
-		raise ImportError("Error Importing remediation")
 
 try:
-	from . import utils as utils
+	if str("piaplib.pku.remediation") not in sys.modules:
+		from piaplib.pku import remediation as remediation
+	else:
+		remediation = sys.modules[str("piaplib.pku.remediation")]
 except Exception:
 	try:
-		import utils as utils
-	except Exception:
-		raise ImportError("Error Importing utils")
+		import piaplib.pku.remediation as remediation
+	except Exception as err:
+		raise ImportError(err, "Error Importing remediation")
+
+
+try:
+	if str("piaplib.pku.utils") not in sys.modules:
+		from piaplib.pku import utils as utils
+	else:
+		utils = sys.modules[str("piaplib.pku.utils")]
+except Exception:
+	try:
+		import piaplib.pku.utils as utils
+	except Exception as err:
+		raise ImportError(err, "Error Importing piaplib.pku.utils")
 
 
 __prog__ = """piaplib.pku.interfaces"""
 """The name of this PiAPLib tool is Pocket Knife Interfaces Unit"""
+
+
+__description__ = """Alter the state of a given interface."""
+"""The description of this PiAPLib tool is 'Alter the state of a given interface.'"""
+
+
+__epilog__ = """Basicly a python wrapper for iface."""
+"""...basically a python wrapper for iface."""
 
 
 __ALTMODE = False
@@ -74,44 +92,48 @@ if __ALTMODE:
 
 
 @remediation.error_handling
-def parseargs(arguments=None):
-	"""Parse the arguments"""
-	import argparse
-	theResult = None
-	extras = None
-	try:
+def generateParser(calling_parser_group):
+	"""Parses the CLI arguments."""
+	if calling_parser_group is None:
 		parser = argparse.ArgumentParser(
 			prog=__prog__,
-			description='Alter the state of a given interface.',
-			epilog='Basicly a python wrapper for iface.'
+			description=__description__,
+			epilog=__epilog__
 		)
-		parser.add_argument(
-			'-i', '--interface', default=INTERFACE_CHOICES[0], choices=INTERFACE_CHOICES,
-			help='The interface to use.'
+	else:
+		parser = calling_parser_group.add_parser(
+			str(__prog__).split(".")[-1], help=__description__
 		)
-		the_action = parser.add_mutually_exclusive_group()
-		the_action.add_argument(
-			'-u', '--up', '--enable', dest='enable_action', default=False, action='store_true',
-			help='Enable the given interface.'
-		)
-		the_action.add_argument(
-			'-d', '--down', '--disable', dest='disable_action', default=False, action='store_true',
-			help='Disable the given interface.'
-		)
-		the_action.add_argument(
-			'-r', '--down-up', '--restart', dest='restart_action', default=True,
-			action='store_true',
-			help='Disable and then re-enable the given interface. (default)'
-		)
-		parser = utils._handleVersionArgs(parser)
-		(theResult, extras) = parser.parse_known_args(arguments)
-	except Exception as err:
-		print(str(type(err)))
-		print(str(err))
-		print(str(err.args))
-		err = None
-		del(err)
-	return (theResult, extras)
+	parser.add_argument(
+		'-i', '--interface', dest='interface', default=INTERFACE_CHOICES[0],
+		choices=INTERFACE_CHOICES,
+		help='The interface to use.'
+	)
+	the_action = parser.add_mutually_exclusive_group()
+	the_action.add_argument(
+		'-u', '--up', '--enable', dest='enable_action', default=False, action='store_true',
+		help='Enable the given interface.'
+	)
+	the_action.add_argument(
+		'-d', '--down', '--disable', dest='disable_action', default=False, action='store_true',
+		help='Disable the given interface.'
+	)
+	the_action.add_argument(
+		'-r', '--down-up', '--restart', dest='restart_action', default=True,
+		action='store_true',
+		help='Disable and then re-enable the given interface. (default)'
+	)
+	parser = utils._handleVersionArgs(parser)
+	if calling_parser_group is None:
+		calling_parser_group = parser
+	return calling_parser_group
+
+
+@remediation.error_handling
+def parseargs(arguments=None):
+	"""Parses the CLI arguments."""
+	parser = generateParser(None)
+	return parser.parse_known_args(arguments)
 
 
 @remediation.error_handling
@@ -172,8 +194,7 @@ def main(argv=None):
 	try:
 		theResult = 1
 		args = None
-		if (argv is not None and (argv != []) and (len(argv) >= 1)):
-			(args, extras) = parseargs(argv)
+		(args, extras) = parseargs(argv)
 		if args is None:
 			theResult = 3
 		interface = args.interface
@@ -186,6 +207,8 @@ def main(argv=None):
 		elif args.restart_action is True:
 			restart_iface(interface)
 			theResult = 0
+		del args
+		del extras
 	except Exception as err:
 		print(str("interfaces: REALLY BAD ERROR: ACTION will not be completed! ABORT!"))
 		print(str(type(err)))

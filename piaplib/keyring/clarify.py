@@ -31,7 +31,7 @@ try:
 	import subprocess
 	sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 except Exception:
-	raise NotImplementedError("OMG! We could not import the os. We're like in the matrix!")
+	raise NotImplementedError("[CWE-758] We could not import the os. We're like in the matrix!")
 	exit(3)
 
 
@@ -44,15 +44,28 @@ except Exception:
 
 
 try:
-	from . import rand as rand
+	if str("piaplib.keyring.rand") not in sys.modules:
+		from piaplib.keyring import rand as rand
+	else:
+		rand = sys.modules[str("piaplib.keyring.rand")]
 except Exception:
-	import rand as rand
+	try:
+		import piaplib.keyring.rand as rand
+	except Exception as err:
+		raise ImportError(err, "Error Importing piaplib.keyring.rand")
 
 
 try:
-	from piaplib.pku import remediation as remediation
+	if str("piaplib.pku.remediation") not in sys.modules:
+		from piaplib.pku import remediation as remediation
+	else:
+		remediation = sys.modules[str("piaplib.pku.remediation")]
 except Exception:
-	import piaplib.pku.remediation as remediation
+	try:
+		import piaplib.pku.remediation as remediation
+	except Exception as err:
+		raise ImportError(err, "Error Importing remediation")
+
 
 try:
 	from remediation import PiAPError as PiAPError
@@ -62,14 +75,29 @@ except Exception:
 	except Exception:
 		raise ImportError("Error Importing PiAPError")
 
+
 try:
-	from piaplib.pku import utils as utils
+	if str("piaplib.pku.utils") not in sys.modules:
+		from piaplib.pku import utils as utils
+	else:
+		utils = sys.modules[str("piaplib.pku.utils")]
 except Exception:
-	import piaplib.pku.utils as utils
+	try:
+		import piaplib.pku.utils as utils
+	except Exception as err:
+		raise ImportError(err, "Error Importing piaplib.pku.utils")
 
 
 __prog__ = """piaplib.keyring.clarify"""
 """The name of this PiAPLib tool is clarify"""
+
+
+__description__ = """Handles PiAP keyring tools."""
+"""The description of this PiAPLib tool is 'Handles PiAP keyring tools.'"""
+
+
+__epilog__ = """PiAP Controller for cryptographic tools."""
+"""...PiAP Controller for cryptographic tools."""
 
 
 DEFAULT_BETA_FILE_PATH = str("""/opt/PiAP/.beta_W1AsYRUDzyZx""")
@@ -225,7 +253,7 @@ def packForRest(message=None, keyStore=None):
 			# ciphertext = str(ciphertext).replace(str("\\n"), str(""))
 		return ciphertext
 	else:
-		raise NotImplementedError("No Implemented Backend - BUG")
+		raise NotImplementedError("[CWE-758] No Implemented Backend - BUG")
 
 
 @remediation.error_handling
@@ -265,7 +293,7 @@ def unpackFromRest(ciphertext=None, keyStore=None):
 			cleartext = cleartext.decode(encoding=u'utf-8', errors=getCTLModeForPY())
 		return utils.literal_str(cleartext)
 	else:
-		raise NotImplementedError("No Implemented Backend - BUG")
+		raise NotImplementedError("[CWE-758] No Implemented Backend - BUG")
 
 
 @remediation.error_handling
@@ -321,73 +349,86 @@ WEAK_ACTIONS = {u'pack': packForRest, u'unpack': unpackFromRest}
 
 
 @remediation.error_handling
-def parseArgs(arguments=None):
-	theArgs = argparse.Namespace()
-	salt_rand = str(rand.randPW(24)).replace("%", "%%")
-	key_rand = str(rand.randPW(24)).replace("%", "%%")
-	try:
+def generateParser(calling_parser_group):
+	"""Parses the CLI arguments."""
+	if calling_parser_group is None:
 		parser = argparse.ArgumentParser(
 			prog=__prog__,
-			description=str("Handles PiAP keyring tools"),
-			epilog=str("PiAP Controller for cryptographic tools.")
+			description=__description__,
+			epilog=__epilog__
 		)
-		parser.add_argument(
-			'-m',
-			'--msg',
-			dest='msg',
-			required=True,
-			type=str,
-			help=str("The Message data. A cleartext or cyphertext message.")
+	else:
+		parser = calling_parser_group.add_parser(
+			str(__prog__).split(".")[-1], help=__description__
 		)
-		parser.add_argument(
-			'-S',
-			'--Salt',
-			dest='salt',
-			required=False,
-			type=str,
-			help=str(
-				str(
-					"The cryptographic Salt String. A unique salt. Like {thevalue}"
-				).format(thevalue=salt_rand)
-			)
+	salt_rand = str(rand.randPW(24)).replace("%", "%%")
+	key_rand = str(rand.randPW(24)).replace("%", "%%")
+	parser.add_argument(
+		'-m',
+		'--msg',
+		dest='msg',
+		required=True,
+		type=str,
+		help=str("The Message data. A cleartext or cyphertext message.")
+	)
+	parser.add_argument(
+		'-S',
+		'--Salt',
+		dest='salt',
+		required=False,
+		type=str,
+		help=str(
+			str(
+				"The cryptographic Salt String. A unique salt. Like {thevalue}"
+			).format(thevalue=salt_rand)
 		)
-		parser.add_argument(
-			'-K',
-			'--key',
-			dest='key',
-			required=False,
-			type=str,
-			help=str(
-				str(
-					"The cryptographic Key String. A unique secret. Like {thevalue}"
-				).format(thevalue=key_rand)
-			)
+	)
+	parser.add_argument(
+		'-K',
+		'--key',
+		dest='key',
+		required=False,
+		type=str,
+		help=str(
+			str(
+				"The cryptographic Key String. A unique secret. Like {thevalue}"
+			).format(thevalue=key_rand)
 		)
-		parser.add_argument(
-			'-k',
-			'--keystore',
-			dest='keystore',
-			required=False,
-			help=str("The file with the cryptographic Key String.")
+	)
+	parser.add_argument(
+		'-k',
+		'--keystore',
+		dest='keystore',
+		required=False,
+		help=str("The file with the cryptographic Key String.")
+	)
+	parser = utils._handleVersionArgs(parser)
+	thegroup = parser.add_mutually_exclusive_group(required=True)
+	for theaction in WEAK_ACTIONS.keys():
+		thegroup.add_argument(
+			str("--{}").format(str(theaction)),
+			dest='clear_action',
+			const=theaction,
+			action='store_const',
+			help=str("The clarify service option.")
 		)
-		parser = utils._handleVersionArgs(parser)
-		thegroup = parser.add_mutually_exclusive_group(required=True)
-		for theaction in WEAK_ACTIONS.keys():
-			thegroup.add_argument(
-				str("--{}").format(str(theaction)),
-				dest='clear_action',
-				const=theaction,
-				action='store_const',
-				help=str("The clarify service option.")
-			)
+	if calling_parser_group is None:
+		calling_parser_group = parser
+	return calling_parser_group
+
+
+@remediation.error_handling
+def parseArgs(arguments=None):
+	"""Parses the CLI arguments."""
+	theArgs = argparse.Namespace()
+	try:
+		parser = generateParser(None)
 		theArgs = parser.parse_args(arguments)
 	except Exception as err:
 		print(str("FAILED DURING clarify.. ABORT."))
 		print(str(type(err)))
 		print(str(err))
 		print(str(err.args))
-		print(str(key_rand))
-		print(str(salt_rand))
 		err = None
 		del err
 		theArgs = argparse.Namespace()
