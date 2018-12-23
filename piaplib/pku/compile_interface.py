@@ -28,8 +28,7 @@ THERE MAY BE REGULATIONS GOVERNING USE OF WIFI SETTINGS IN MANY AREAS.
 
 
 # PEP 366
-if __package__ is None:
-	__package__ = """piaplib.pku"""
+__package__ = """piaplib.pku"""
 
 
 try:

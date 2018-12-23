@@ -26,8 +26,7 @@
 
 
 # PEP 366
-if __package__ is None:
-	__package__ = """piaplib.book"""
+__package__ = """piaplib.book"""
 
 
 try:

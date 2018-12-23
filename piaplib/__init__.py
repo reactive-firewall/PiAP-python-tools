@@ -27,9 +27,9 @@ __version__ = """0.4.0"""
 
 global __package__
 
+
 # PEP 366
-if __package__ is None:
-	__package__ = """piaplib"""
+__package__ = """piaplib"""
 
 
 try:

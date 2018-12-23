@@ -21,8 +21,7 @@
 
 
 # PEP 366
-if __package__ is None:
-	__package__ = """piaplib.pku"""
+__package__ = """piaplib.pku"""
 
 
 try:
