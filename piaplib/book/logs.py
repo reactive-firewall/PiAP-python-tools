@@ -202,11 +202,11 @@ def main(argv=None):
 	try:
 		args, extra = parseArgs(argv)
 		del extra
+		raise NotImplementedError("[CWE-758] - Pocket Book logs main() not implemented.")
 	except Exception as err:
 		logs.log(str(type(err)), "Critical")
 		logs.log(str(err), "Critical")
 		logs.log(str(err.args), "Critical")
-	raise NotImplementedError("[CWE-758] - Pocket Book logs main() not implemented.")
 	return 3
 
 

@@ -325,6 +325,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 				"pku.__main__",
 				"book.__main__",
 				"book.version",
+				"book.logs",
 				"keyring.__main__"
 			]
 			if (thepython is not None):
@@ -1410,35 +1411,6 @@ class BasicUsageTestSuite(unittest.TestCase):
 					othererr = None
 					del othererr
 					theResult = False
-		except Exception as err:
-			debugtestError(err)
-			err = None
-			del err
-			theResult = False
-		assert theResult
-
-	def test_j_python_command_book_logs(self):
-		"""Test case for piaplib.book.logs --help."""
-		theResult = False
-		try:
-			import sys
-			if sys.__name__ is None:
-				raise ImportError("Failed to import system. WTF?!!")
-			thepython = getPythonCommand()
-			test_units = [
-				"book.logs"
-			]
-			if (thepython is not None):
-				with self.assertRaises(Exception):
-					for unit in test_units:
-						theOutputtext = checkPythonFuzzing([
-							str(thepython),
-							str("-m"),
-							str("piaplib.{}").format(str(unit)),
-							str("--help")
-						], stderr=subprocess.STDOUT)
-						self.assertIsNotNone(theOutputtext)
-				theResult = True
 		except Exception as err:
 			debugtestError(err)
 			err = None
