@@ -23,10 +23,6 @@
 """ANSI colored text"""
 
 
-# PEP 366
-__package__ = """piaplib.book"""
-
-
 try:
 	import sys
 	import os

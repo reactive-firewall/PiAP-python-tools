@@ -25,10 +25,6 @@
 # 	import config as config
 
 
-# PEP 366
-__package__ = """piaplib.book"""
-
-
 try:
 	import os
 	if os.__name__ is None:

@@ -24,7 +24,6 @@ exclude_lines =
 	if __name__ in '__main__':
 	if __sys_path__ not in sys.path:
 	os.abort()
-	__package__ = """
 
 ignore_errors = True
 

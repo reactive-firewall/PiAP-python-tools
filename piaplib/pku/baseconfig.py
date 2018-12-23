@@ -20,10 +20,6 @@
 # ......................................................................
 
 
-# PEP 366
-__package__ = """piaplib.pku"""
-
-
 try:
 	try:
 		import configparser as configparser

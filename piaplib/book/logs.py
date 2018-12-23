@@ -24,9 +24,6 @@
 # except Exception:
 # 	import config as config
 
-# PEP 366
-__package__ = """piaplib.book"""
-
 
 __prog__ = """piaplib.book.logs"""
 """The name of this PiAPLib tool is pocket logs"""

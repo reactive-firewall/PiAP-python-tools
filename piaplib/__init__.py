@@ -25,13 +25,6 @@ global __version__
 __version__ = """0.4.0"""
 
 
-global __package__
-
-
-# PEP 366
-__package__ = """piaplib"""
-
-
 try:
 	import sys
 	import os
