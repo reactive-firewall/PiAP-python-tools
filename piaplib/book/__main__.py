@@ -42,23 +42,17 @@ except Exception as importErr:
 
 
 try:
-	try:
-		if 'piaplib' not in sys.modules:
-			import piaplib as piaplib
-		else:
-			piaplib = sys.modules['piaplib']
-	except Exception:
-		from . import piaplib as piaplib
-	if piaplib.__name__ is None:
-		raise ImportError("OMG! we could not import piaplib. We're in need of a fix! ABORT.")
-except Exception as err:
-	raise ImportError(err)
-	exit(3)
+	if 'piaplib' not in sys.modules:
+		import piaplib as piaplib
+	else:
+		piaplib = sys.modules['piaplib']
+except Exception:
+	raise ImportError("OMG! we could not import piaplib. We're in need of a fix! ABORT.")
 
 
 try:
 	if str("piaplib.book.logs") not in sys.modules:
-		from . import logs
+		from piaplib.book import logs
 	else:
 		logs = sys.modules[str("piaplib.book.logs")]
 except Exception:
