@@ -20,6 +20,11 @@
 # ......................................................................
 
 
+# PEP 366
+if __package__ is None:
+	__package__ = """piaplib.pku"""
+
+
 try:
 	import os
 	import sys

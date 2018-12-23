@@ -20,6 +20,11 @@
 # ......................................................................
 
 
+# PEP 366
+if __package__ is None:
+	__package__ = """piaplib"""
+
+
 try:
 	import sys
 	if sys.__name__ is None:
@@ -120,6 +125,7 @@ except Exception as importErr:
 	import lint as lint
 	if lint.__name__ is None:
 		raise ImportError(str(u'Failed to gather Pocket Lint'))
+
 
 __prog__ = "pocket"
 """The name of this program is pocket"""

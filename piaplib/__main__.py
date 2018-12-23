@@ -20,6 +20,11 @@
 # ......................................................................
 
 
+# PEP 366
+if __package__ is None:
+	__package__ = """piaplib"""
+
+
 try:
 	import sys
 	if 'piaplib.pocket' not in sys.modules:

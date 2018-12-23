@@ -26,6 +26,12 @@ THERE MAY BE REGULATIONS GOVERNING USE OF WIFI SETTINGS IN MANY AREAS.
 
 """ THIS CODE IS NOT IN A USEABLE STATE """
 
+
+# PEP 366
+if __package__ is None:
+	__package__ = """piaplib.pku"""
+
+
 try:
 	import sys
 	import os

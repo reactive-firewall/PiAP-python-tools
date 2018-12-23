@@ -55,8 +55,10 @@ except Exception as ImportErr:
 
 
 try:
-	if 'piaplib.book' not in sys.modules:
+	if """piaplib.book""" not in sys.modules:
 		from . import book as book
+	else:
+		book = sys.modules["""piaplib.book"""]
 except Exception as importErr:
 	del importErr
 	import book as book
@@ -65,6 +67,8 @@ except Exception as importErr:
 try:
 	if 'piaplib.pku' not in sys.modules:
 		from . import pku as pku
+	else:
+		pku = sys.modules["""piaplib.pku"""]
 except Exception as importErr:
 	del importErr
 	import pku as pku
@@ -73,6 +77,8 @@ except Exception as importErr:
 try:
 	if 'piaplib.keyring' not in sys.modules:
 		from . import keyring as keyring
+	else:
+		keyring = sys.modules["""piaplib.keyring"""]
 except Exception as importErr:
 	del importErr
 	import keyring as keyring
@@ -81,6 +87,8 @@ except Exception as importErr:
 try:
 	if 'piaplib.lint' not in sys.modules:
 		from . import lint as lint
+	else:
+		lint = sys.modules["""piaplib.lint"""]
 except Exception as importErr:
 	del importErr
 	import lint as lint

@@ -21,7 +21,7 @@
 
 
 # PEP 366
-if __name__ in u'__main__' and __package__ is None:
+if __package__ is None:
 	__package__ = """piaplib.book"""
 
 

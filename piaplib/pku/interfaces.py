@@ -19,6 +19,12 @@
 # limitations under the License.
 # ......................................................................
 
+
+# PEP 366
+if __package__ is None:
+	__package__ = """piaplib.pku"""
+
+
 try:
 	import sys
 	import argparse
