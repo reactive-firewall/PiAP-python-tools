@@ -171,7 +171,7 @@ def parseArgs(arguments=None):
 	)
 	parser.add_argument(
 		'pocket_unit',
-		choices=POCKET_UNITS.keys(),
+		choices=sorted(POCKET_UNITS.keys()),
 		help='the pocket service option.'
 	)
 	parser.add_argument('-V', '--version', action='version', version=str(
