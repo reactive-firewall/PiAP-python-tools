@@ -23,6 +23,9 @@
 """ANSI colored text"""
 
 
+global __package__
+
+
 # PEP 366
 if __package__ is None:
 	__package__ = """piaplib.book"""
