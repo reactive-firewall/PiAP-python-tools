@@ -74,7 +74,7 @@ except Exception:
 	try:
 		import piaplib.pku.try_catch_error as try_catch_error
 	except Exception as err:
-		raise ImportError("Error Importing try_catch_error for config")
+		raise ImportError(err, "Error Importing try_catch_error for config")
 
 
 try:
