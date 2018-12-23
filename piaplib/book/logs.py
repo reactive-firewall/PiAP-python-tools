@@ -62,44 +62,6 @@ except Exception:
 		raise ImportError(err)
 
 
-LOG_UNITS = {
-	u'all': None,
-	u'debug': None,
-	u'backup': None,
-	u'restore': None
-}
-"""	The Pocket Book Unit actions.
-	None - the piaplib version.
-	keyring - the keyring version.
-	python - which version of python is this.
-	os - which platform is this.
-	"""
-
-
-def generateParser(calling_parser_group):
-	"""Parses the CLI arguments."""
-	if calling_parser_group is None:
-		parser = argparse.ArgumentParser(
-			prog=__prog__,
-			description='Handles PiAP pocket logging',
-			epilog="PiAP Book Controller for logging tools."
-		)
-	else:
-		parser = calling_parser_group.add_parser(
-			str(__prog__).split(".")[-1], help="PiAP Book Controller for logging tools."
-		)
-	parser.add_argument(
-		nargs='?',
-		dest='log_unit',
-		choices=LOG_UNITS.keys(),
-		default=u'all',
-		help='The pocket log option.'
-	)
-	if calling_parser_group is None:
-		calling_parser_group = parser
-	return calling_parser_group
-
-
 class logs(object):
 	"""Class for Pocket PKU logs"""
 
@@ -191,10 +153,56 @@ class logs(object):
 	__all__ = [logging_level, logging_color]
 
 
+LOG_UNITS = {
+	u'all': None,
+	u'debug': None,
+	u'backup': None,
+	u'restore': None
+}
+"""	The Pocket Book Unit actions.
+	None - the piaplib version.
+	keyring - the keyring version.
+	python - which version of python is this.
+	os - which platform is this.
+	"""
+
+
+def generateParser(calling_parser_group):
+	"""Parses the CLI arguments."""
+	if calling_parser_group is None:
+		parser = argparse.ArgumentParser(
+			prog=__prog__,
+			description='Handles PiAP pocket logging',
+			epilog="PiAP Book Controller for logging tools."
+		)
+	else:
+		parser = calling_parser_group.add_parser(
+			str(__prog__).split(".")[-1], help="PiAP Book Controller for logging tools."
+		)
+	parser.add_argument(
+		nargs='?',
+		dest='log_unit',
+		choices=LOG_UNITS.keys(),
+		default=u'all',
+		help='The pocket log option.'
+	)
+	if calling_parser_group is None:
+		calling_parser_group = parser
+	return calling_parser_group
+
+
+def parseArgs(arguments=None):
+	"""Parses the CLI arguments."""
+	parser = generateParser(None)
+	return parser.parse_known_args(arguments)
+
+
 def main(argv=None):
 	"""The Main Event makes no sense to logs yet."""
 	try:
-		raise NotImplementedError("[CWE-758] - Pocket Book logs main() not implemented.")
+		args, extra = parseArgs(argv)
+		del extra
+	# raise NotImplementedError("[CWE-758] - Pocket Book logs main() not implemented.")
 	except Exception as err:
 		logs.log(str(type(err)), "Critical")
 		logs.log(str(err), "Critical")

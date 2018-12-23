@@ -20,23 +20,8 @@
 # ......................................................................
 
 
-"""ANSI colored text"""
-
-
-try:
-	import sys
-	import os
-	import os.path
-	if str("book") in __file__:
-		__sys_path__ = os.path.abspath(os.path.join(os.path.dirname(__file__), '.'))
-		if __sys_path__ not in sys.path:
-			sys.path.insert(0, __sys_path__)
-except Exception:
-	raise ImportError("Pocket Book Colors failed to import.")
-
-
 __prog__ = """piaplib.book.ANSIColors"""
-"""The name of this PiAPLib tool is Pocket Knife config Unit"""
+"""ANSI colored text"""
 
 
 ENDC = """\033[0m"""

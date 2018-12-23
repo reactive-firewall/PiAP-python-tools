@@ -70,9 +70,15 @@ except Exception:
 
 
 try:
-	from . import version as version
+	if str("piaplib.book.version") not in sys.modules:
+		from piaplib.book import version
+	else:
+		version = sys.modules[str("piaplib.book.version")]
 except Exception:
-	import book.version as version
+	try:
+		import piaplib.book.version
+	except Exception as err:
+		raise ImportError(err, "Error Importing piaplib.book.version")
 
 
 __prog__ = """piaplib.book.__main__"""
