@@ -87,7 +87,9 @@ if __ALTMODE:
 	]
 	"""whitelist of valid iface prefixes"""
 
-	INTERFACE_CHOICES = [str('{}{}').format(str(x), str(y)) for x in IFACE_PREFIXES for y in range(5)]
+	INTERFACE_CHOICES = [
+		str('{}{}').format(str(x), str(y)) for x in IFACE_PREFIXES for y in range(5)
+	]
 	"""whitelist of valid iface names"""
 
 
@@ -143,6 +145,35 @@ def taint_name(rawtxt):
 	tainted_input = utils.literal_str(rawtxt).lower()
 	if utils.isWhiteListed(tainted_input, INTERFACE_CHOICES):
 		theResult = tainted_input
+	else:
+		print(str("rejected {}").format(tainted_input))
+	return theResult
+
+
+@remediation.error_handling
+def taint_enable_args(rawtxt):
+	"""Checks the interface arguments."""
+	theResult = []
+	tainted_input = taint_name(rawtxt)
+	if sys.platform.startswith("linux"):
+		theResult = [str("ifup"), str(tainted_input)]
+	elif sys.platform.startswith("darwin"):
+		theResult = [str("ifconfig"), str(tainted_input), str("up")]
+	return theResult
+
+
+@remediation.error_handling
+def taint_disable_args(rawtxt, force=False):
+	"""Checks the interface arguments."""
+	theResult = []
+	tainted_input = taint_name(rawtxt)
+	if sys.platform.startswith("linux"):
+		if force is False:
+			theResult = [str("ifdown"), str(tainted_input)]
+		elif force is True:
+			theResult = [str("ifdown"), str("--force"), str(tainted_input)]
+	elif sys.platform.startswith("darwin"):
+		theResult = [str("ifconfig"), str(tainted_input), str("down")]
 	return theResult
 
 
@@ -151,9 +182,8 @@ def enable_iface(iface_name=None):
 	"""enable the given interface by calling ifup."""
 	theResult = str("")
 	try:
-		tainted_name = taint_name(iface_name)
 		import subprocess
-		theResult = subprocess.check_output([str("ifup"), str(tainted_name)])
+		theResult = subprocess.check_output(taint_enable_args(iface_name))
 		if theResult is not None and isinstance(theResult, str) and len(theResult) <= 1:
 			theResult = None
 	except Exception as err:
@@ -168,12 +198,8 @@ def enable_iface(iface_name=None):
 @remediation.error_handling
 def disable_iface(iface_name="lo", force=False):
 	"""disable the given interface by calling ifdown."""
-	tainted_name = taint_name(iface_name)
 	import subprocess
-	if force is False:
-		theResult = subprocess.check_output(['ifdown', tainted_name])
-	elif force is True:
-		theResult = subprocess.check_output(['ifdown', '--force', tainted_name])
+	theResult = subprocess.check_output(taint_disable_args(iface_name, force))
 	return theResult
 
 
