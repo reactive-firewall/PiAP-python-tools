@@ -172,14 +172,14 @@ def generateParser(calling_parser_group):
 		parser = calling_parser_group.add_parser(
 			str(__prog__).split(".")[-1], help='the pocket pku service option.'
 		)
+	parser.add_argument('-V', '--version', action='version', version=str(
+		"%(prog)s {}"
+	).format(str(piaplib.__version__)))
 	subparser = parser.add_subparsers(
 		title="Units", dest='pku_unit',
 		help='The pocket pku options.', metavar="PKU_UNIT"
 	)
-	parser.add_argument('-V', '--version', action='version', version=str(
-		"%(prog)s {}"
-	).format(str(piaplib.__version__)))
-	for sub_parser in PKU_UNITS.keys():
+	for sub_parser in sorted(PKU_UNITS.keys()):
 		if PKU_UNITS[sub_parser] is not None:
 			subparser = PKU_UNITS[sub_parser].generateParser(subparser)
 	if calling_parser_group is None:
@@ -222,9 +222,9 @@ def main(argv=None):
 	theExitCode = 0
 	try:
 		try:
-			args, extra = parseArgs(argv)
+			(args, extra) = parseArgs(argv)
 			pku_cmd = args.pku_unit
-			theExitCode = usePKUTool(pku_cmd, extra)
+			theExitCode = usePKUTool(pku_cmd, argv)
 		except Exception as cerr:
 			logs.log(str(cerr), "Error")
 			logs.log(str(cerr.args), "Error")

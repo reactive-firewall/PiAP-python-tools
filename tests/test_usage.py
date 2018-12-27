@@ -1336,7 +1336,6 @@ class BasicUsageTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
-	@unittest.skipUnless(sys.platform.startswith("linux"), "Requires linux ifup/ifdown tools")
 	def test_d_python_command_bad_interface(self):  # noqa
 		"""Test case for piaplib.pocket pku interfaces -i=junk."""
 		theResult = True
@@ -1344,8 +1343,8 @@ class BasicUsageTestSuite(unittest.TestCase):
 			thepython = getPythonCommand()
 			theOutputtext = None
 			rebootIface = None
-			try:
-				for someTest in [str("eth0"), str("enp0s")]:
+			for someTest in [str("eth0"), str("enp0s"), str("en0")]:
+				try:
 					if theOutputtext is None:
 						rebootIface = str(someTest)
 						theOutputtext = checkPythonFuzzing([
@@ -1356,8 +1355,9 @@ class BasicUsageTestSuite(unittest.TestCase):
 							str("interfaces"),
 							str("""-i={}""").format(someTest)
 						], stderr=subprocess.STDOUT)
-			except Exception as junkErr:  # noqa
-				del(junkErr)
+				except Exception as junkErr:  # noqa
+					del(junkErr)
+					raise unittest.SkipTest("Not a compatible Test network")
 			self.assertIsNotNone(theOutputtext)
 			try:
 				theOutputtext = checkPythonFuzzing([
@@ -1371,7 +1371,10 @@ class BasicUsageTestSuite(unittest.TestCase):
 				], stderr=subprocess.STDOUT)
 			except Exception as junkErr:  # noqa
 				del(junkErr)
+				raise unittest.SkipTest("Not a compatible Test network")
 				# self.assertIsNone(theOutputtext)
+		except unittest.SkipTest:
+			raise unittest.SkipTest("Not a compatible Test network")
 		except Exception as err:
 			debugtestError(err)
 			err = None
