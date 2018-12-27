@@ -362,9 +362,10 @@ def parseArgs(arguments=None):
 	theArgs = argparse.Namespace()
 	try:
 		parser = generateParser(None)
-		theArgs = parser.parse_args(arguments)
+		theArgs, extra = parser.parse_known_args(arguments)
+		del extra
 	except Exception as err:
-		print(str("FAILED DURING RAND.. ABORT."))
+		print(str("FAILED DURING RAND ... ABORT."))
 		print(str(type(err)))
 		print(str(err))
 		print(str(err.args))
