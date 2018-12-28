@@ -94,7 +94,7 @@ if __name__ in u'__main__':
 		if 'piaplib.pocket' not in sys.modules:
 			from . import pocket as pocket
 		else:
-			pocket = sys.modules['pocket']
+			pocket = sys.modules['piaplib.pocket']
 	except Exception:
 		import pocket as pocket
 	if pku.__name__ is None:
