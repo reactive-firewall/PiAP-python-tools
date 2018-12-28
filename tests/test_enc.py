@@ -355,6 +355,7 @@ class CryptoTestSuite(unittest.TestCase):
 					raise unittest.SkipTest("BETA. Experemental feature not ready yet.")
 		except Exception as err:
 			print(str(""))
+			print(str(sys.getdefaultencoding()))
 			print(str(type(err)))
 			print(str(err))
 			print(str((err.args)))

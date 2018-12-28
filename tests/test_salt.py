@@ -228,11 +228,11 @@ class SaltTestSuite(unittest.TestCase):
 			if saltify.__name__ is None:
 				theResult = False
 			for junk_input in [str("--bad"), str("--junk")]:
-				with self.assertRaises(SystemExit):
-					output = saltify.main([str("--msg=a"), str("--salt=b"), junk_input])
-					self.assertEqual(int(output), int(2))
+				output = saltify.main([str("--msg=a"), str("--salt=b"), junk_input])
+				self.assertEqual(int(output), int(0))
 			try:
 				output = saltify.main([None])
+				self.assertEqual(int(output), int(2))
 			except SystemExit as err:
 				self.assertEqual(int(err.code), int(2))
 			theResult = True

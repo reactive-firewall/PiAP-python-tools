@@ -161,7 +161,7 @@ def main(argv=None):
 	try:
 		args, extra = parseArgs(argv)
 		keyring_cmd = args.keyring_unit
-		useKeyTool(keyring_cmd, extra)
+		useKeyTool(keyring_cmd, argv)
 	except Exception as cerr:
 		remediation.error_breakpoint(cerr, str(u'piaplib.keyring.__MAIN__.main()'))
 		exit(3)

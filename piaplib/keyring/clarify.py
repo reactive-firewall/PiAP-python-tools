@@ -341,7 +341,7 @@ def packToFile(somefile, data, keyStore=None):
 	return did_write
 
 
-WEAK_ACTIONS = {u'pack': packForRest, u'unpack': unpackFromRest}
+WEAK_ACTIONS = {"""pack""": packForRest, """unpack""": unpackFromRest}
 """ The Pocket bag Unit actions.
 	pack - save/pack/pickle functions.
 	unpack - load/unpack/unpickle functions.
@@ -404,7 +404,7 @@ def generateParser(calling_parser_group):
 	)
 	parser = utils._handleVersionArgs(parser)
 	thegroup = parser.add_mutually_exclusive_group(required=True)
-	for theaction in WEAK_ACTIONS.keys():
+	for theaction in sorted(WEAK_ACTIONS.keys()):
 		thegroup.add_argument(
 			str("--{}").format(str(theaction)),
 			dest='clear_action',
@@ -423,7 +423,8 @@ def parseArgs(arguments=None):
 	theArgs = argparse.Namespace()
 	try:
 		parser = generateParser(None)
-		theArgs = parser.parse_args(arguments)
+		theArgs, extra = parser.parse_known_args(arguments)
+		del extra
 	except Exception as err:
 		print(str("FAILED DURING clarify.. ABORT."))
 		print(str(type(err)))
