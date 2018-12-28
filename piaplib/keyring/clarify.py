@@ -381,7 +381,8 @@ def generateParser(calling_parser_group):
 			).format(thevalue=salt_rand)
 		)
 	)
-	parser.add_argument(
+	key_group = parser.add_argument_group()
+	key_group.add_argument(
 		'-K',
 		'--key',
 		dest='key',
@@ -393,7 +394,7 @@ def generateParser(calling_parser_group):
 			).format(thevalue=key_rand)
 		)
 	)
-	parser.add_argument(
+	key_group.add_argument(
 		'-k',
 		'--keystore',
 		dest='keystore',
@@ -443,7 +444,7 @@ def main(argv=None):
 	if args.keystore is not None:
 		theFile = str(args.keystore)
 	else:
-		theFile = str("""/opt/PiAP/.beta_PiAP_weak_key""")
+		theFile = str("""/tmp/.beta_PiAP_weak_key""")
 	if args.key is not None:
 		theFile = makeKeystoreFile(str(args.key), theFile)
 	try:
