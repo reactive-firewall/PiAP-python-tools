@@ -366,7 +366,6 @@ def generateParser(calling_parser_group):
 		'--msg',
 		dest='msg',
 		required=True,
-		type=str,
 		help=str("The Message data. A cleartext or cyphertext message.")
 	)
 	parser.add_argument(
@@ -374,7 +373,6 @@ def generateParser(calling_parser_group):
 		'--Salt',
 		dest='salt',
 		required=False,
-		type=str,
 		help=str(
 			str(
 				"The cryptographic Salt String. A unique salt. Like {thevalue}"
@@ -387,7 +385,6 @@ def generateParser(calling_parser_group):
 		'--key',
 		dest='key',
 		required=False,
-		type=str,
 		help=str(
 			str(
 				"The cryptographic Key String. A unique secret. Like {thevalue}"
@@ -448,10 +445,12 @@ def main(argv=None):
 	if args.key is not None:
 		theFile = makeKeystoreFile(str(args.key), theFile)
 	try:
-		output = str(WEAK_ACTIONS[args.clear_action](str(args.msg), theFile))
+		output = str(WEAK_ACTIONS[args.clear_action](utils.literal_code(args.msg), theFile))
 		if __name__ in u'__main__':
 			print(output)
+			return 0
 		else:
+			print(str(output))
 			return output
 	except Exception as err:
 		print(str("FAILED DURING piaplib.keyring.clarify.main() - ABORT."))

@@ -321,7 +321,7 @@ class CryptoTestSuite(unittest.TestCase):
 				temp_msg = str("""U2FsdGVkX1+dD6bFlND+Xa0bzNttrZfB5zYCp0mSEYfhMTpaM7U=""")
 				args = [
 					str("--unpack"),
-					str("--msg={}").format(temp_msg),
+					str("--msg=\"{}\"").format(temp_msg),
 					str("-K=testkeyneedstobelong")
 				]
 			else:
@@ -339,10 +339,10 @@ class CryptoTestSuite(unittest.TestCase):
 			test_out = clarify.main(args)
 			try:
 				if isinstance(test_out, bytes):
-					test_out = test_out.decode('utf8', errors=clarify.getCTLModeForPY())
+					test_out = test_out.decode(u'utf-8', errors=clarify.getCTLModeForPY())
 			except UnicodeDecodeError:
 				test_out = str(repr(bytes(test_out).decode(
-					'utf8', errors=clarify.getCTLModeForPY()
+					u'utf-8', errors=clarify.getCTLModeForPY()
 				)))
 			self.assertIsNotNone(test_out)
 			if (str("This is a test Message") in str(test_out)):
@@ -350,7 +350,7 @@ class CryptoTestSuite(unittest.TestCase):
 			else:
 				if sys.platform.startswith("linux") or sys.platform.startswith("darwin"):
 					print(str(repr(bytes(test_out).decode(
-						'utf8', errors=clarify.getCTLModeForPY()
+						u'utf-8', errors=clarify.getCTLModeForPY()
 					))))
 					theResult = False
 				else:
@@ -364,7 +364,7 @@ class CryptoTestSuite(unittest.TestCase):
 			print(str(""))
 			err = None
 			del err
-			if sys.platform.startswith("linux"):
+			if sys.platform.startswith("linux") or sys.platform.startswith("darwin"):
 				theResult = False
 			else:
 				raise unittest.SkipTest("BETA. Experemental feature not ready yet.")
@@ -400,15 +400,15 @@ class CryptoTestSuite(unittest.TestCase):
 				test_read = clarify.unpackFromFile(sometestfile, theteststore)
 				try:
 					if isinstance(test_read, bytes):
-						test_read = test_read.decode('utf8', errors=clarify.getCTLModeForPY())
+						test_read = test_read.decode('utf-8', errors=clarify.getCTLModeForPY())
 				except UnicodeDecodeError:
-					test_read = str(repr(bytes(test_read, 'utf8')))
+					test_read = str(repr(bytes(test_read, 'utf-8')))
 				self.assertIsNotNone(test_read)
 				if (str(someMessageText) in str(test_read)):
 					theResult = True
 				else:
 					if sys.platform.startswith("linux") or sys.platform.startswith("darwin"):
-						print(str(repr(bytes(test_read, 'utf8'))))
+						print(str(repr(bytes(test_read, 'utf-8'))))
 						theResult = False
 					else:
 						raise unittest.SkipTest("BETA. Experemental feature not ready yet.")
@@ -472,9 +472,9 @@ class CryptoTestSuite(unittest.TestCase):
 				test_read = clarify.unpackFromFile(sometestfile, theteststore)
 				try:
 					if isinstance(test_read, bytes):
-						test_read = test_read.decode('utf8', errors=clarify.getCTLModeForPY())
+						test_read = test_read.decode('utf-8', errors=clarify.getCTLModeForPY())
 				except UnicodeDecodeError:
-					test_read = str(repr(bytes(test_read, 'utf8')))
+					test_read = str(repr(bytes(test_read, 'utf-8')))
 				self.assertIsNotNone(test_read)
 				if (str(someMessageText) in str(test_read)):
 					theResult = True
