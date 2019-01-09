@@ -147,10 +147,11 @@ def debugBlob(blob=None):
 def debugtestError(someError=None):
 	print(str(""))
 	print(str("ERROR:"))
-	print(str(type(someError)))
-	print(str(someError))
-	print(str((someError.args)))
-	print(str(""))
+	if someError is not None:
+		print(str(type(someError)))
+		print(str(someError))
+		print(str((someError.args)))
+		print(str(""))
 
 
 def debugUnexpectedOutput(expectedOutput, actualOutput, thepython):
@@ -304,7 +305,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 					theResult = True
 				else:
 					theResult = False
-					debugUnexpectedOutput(str(theExpectedText), str(theOutputtext), thepython)
+					debugUnexpectedOutput(str(theExpectedText), str(theOutputtext), str(thepython))
 		except Exception as err:
 			debugtestError(err)
 			err = None

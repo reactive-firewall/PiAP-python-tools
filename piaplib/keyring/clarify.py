@@ -24,6 +24,11 @@
 # Currently backends are NOT part of PiAP in anyway and may be subject to their own licences.
 
 
+"""CAVEAT: REMEMBER PYTHON HAS NO SECURE MEMORY.
+	If there is a weakness in PiAP data io it is in memory.
+	PYTHON STRINGS ARE IMUTABLE, THUS ONCE IN CLEAR, ALWAYS IN CLEAR."""
+
+
 try:
 	import os
 	import sys
@@ -32,15 +37,6 @@ try:
 	sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 except Exception:
 	raise NotImplementedError("[CWE-758] We could not import the os. We're like in the matrix!")
-	exit(3)
-
-
-"""
-	CAVEAT:
-	REMEMBER PYTHON HAS NO SECURE MEMORY.
-	If there is a weakness in PiAP data io it is in memory.
-	PYTHON STRINGS ARE IMUTABLE, THUS ONCE IN CLEAR, ALWAYS IN CLEAR.
-"""
 
 
 try:
@@ -122,8 +118,9 @@ def getBackendCommand():
 	"""Function for backend openssl command if available.
 	PLEASE NOTE THIS RETURNS NONE IF YOU HAVE NOT INSTALLED OPENSSL"""
 	thetool = None
+	theArgs = ["""which""", """openssl"""]
 	try:
-		thetool = subprocess.check_output(["which", "openssl"])
+		thetool = subprocess.check_output(theArgs)
 		if (str("/openssl") in str(thetool)):
 			thetool = str("openssl")
 		else:
@@ -131,7 +128,7 @@ def getBackendCommand():
 	except Exception:
 		thetool = None
 		try:
-			thetool = subprocess.check_output(["which", "openssl"])
+			thetool = subprocess.check_output(theArgs)
 			if (str("/openssl") in str(thetool)):
 				thetool = "openssl"
 		except Exception:
@@ -158,10 +155,12 @@ def hasBackendCommand():
 def getAlgoForOS():
 	"""returns blowfish (old) for darwin and AES-ctr (sane) for linux"""
 	import sys
+	theAlgo = None
 	if sys.platform.startswith("linux"):
-		return str("-aes-256-ctr")
+		theAlgo = str("-aes-256-ctr")
 	else:
-		return str("-blowfish")
+		theAlgo = str("-blowfish")
+	return theAlgo
 
 
 @remediation.error_passing
@@ -335,9 +334,8 @@ def packToFile(somefile, data, keyStore=None):
 			del(encData)
 		did_write = True
 	except Exception as clearerr:
-		raise remediation.PiAPError(clearerr, str("Failed to write or encrypt file."))
-		del(clearerr)
 		did_write = False
+		raise remediation.PiAPError(clearerr, str("Failed to write or encrypt file."))
 	return did_write
 
 
@@ -383,7 +381,8 @@ def generateParser(calling_parser_group):
 			).format(thevalue=salt_rand)
 		)
 	)
-	parser.add_argument(
+	key_group = parser.add_argument_group()
+	key_group.add_argument(
 		'-K',
 		'--key',
 		dest='key',
@@ -395,7 +394,7 @@ def generateParser(calling_parser_group):
 			).format(thevalue=key_rand)
 		)
 	)
-	parser.add_argument(
+	key_group.add_argument(
 		'-k',
 		'--keystore',
 		dest='keystore',
