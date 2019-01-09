@@ -287,10 +287,10 @@ class CryptoTestSuite(unittest.TestCase):
 			self.assertIsNotNone(test_out)
 			try:
 				if isinstance(test_out, bytes):
-					test_out = test_out.decode('utf8')
+					test_out = test_out.decode("""utf-8""")
 			except UnicodeDecodeError:
 				test_out = str(repr(bytes(test_out).decode(
-					'utf8', errors=clarify.getCTLModeForPY()
+					"""utf-8""", errors=clarify.getCTLModeForPY()
 				)))
 			if (str("U2FsdGVkX") in str(test_out)):
 				theResult = True
@@ -339,10 +339,10 @@ class CryptoTestSuite(unittest.TestCase):
 			test_out = clarify.main(args)
 			try:
 				if isinstance(test_out, bytes):
-					test_out = test_out.decode(u'utf-8', errors=clarify.getCTLModeForPY())
+					test_out = test_out.decode("""utf-8""", errors=clarify.getCTLModeForPY())
 			except UnicodeDecodeError:
 				test_out = str(repr(bytes(test_out).decode(
-					u'utf-8', errors=clarify.getCTLModeForPY()
+					"""utf-8""", errors=clarify.getCTLModeForPY()
 				)))
 			self.assertIsNotNone(test_out)
 			if (str("This is a test Message") in str(test_out)):
@@ -350,7 +350,7 @@ class CryptoTestSuite(unittest.TestCase):
 			else:
 				if sys.platform.startswith("linux") or sys.platform.startswith("darwin"):
 					print(str(repr(bytes(test_out).decode(
-						u'utf-8', errors=clarify.getCTLModeForPY()
+						"""utf-8""", errors=clarify.getCTLModeForPY()
 					))))
 					theResult = False
 				else:
