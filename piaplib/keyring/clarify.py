@@ -448,10 +448,9 @@ def main(argv=None):
 		output = str(WEAK_ACTIONS[args.clear_action](utils.literal_code(args.msg), theFile))
 		if __name__ in u'__main__':
 			print(output)
-			return 0
 		else:
 			print(str(output))
-			return output
+		return output
 	except Exception as err:
 		print(str("FAILED DURING piaplib.keyring.clarify.main() - ABORT."))
 		print(str(type(err)))
