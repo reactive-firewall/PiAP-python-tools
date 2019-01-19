@@ -287,10 +287,10 @@ class CryptoTestSuite(unittest.TestCase):
 			self.assertIsNotNone(test_out)
 			try:
 				if isinstance(test_out, bytes):
-					test_out = test_out.decode("""utf8""")
+					test_out = test_out.decode("""utf-8""")
 			except UnicodeDecodeError:
 				test_out = str(repr(bytes(test_out).decode(
-					"""utf8""", errors=clarify.getCTLModeForPY()
+					"""utf-8""", errors=clarify.getCTLModeForPY()
 				)))
 			if (str("U2FsdGVkX") in str(test_out)):
 				theResult = True
@@ -321,7 +321,7 @@ class CryptoTestSuite(unittest.TestCase):
 				temp_msg = str("""U2FsdGVkX1+dD6bFlND+Xa0bzNttrZfB5zYCp0mSEYfhMTpaM7U=""")
 				args = [
 					str("--unpack"),
-					str("--msg=\"{}\"").format(temp_msg),
+					str("--msg={}").format(temp_msg),
 					str("-K=testkeyneedstobelong")
 				]
 			else:
