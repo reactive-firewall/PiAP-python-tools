@@ -287,10 +287,10 @@ class CryptoTestSuite(unittest.TestCase):
 			self.assertIsNotNone(test_out)
 			try:
 				if isinstance(test_out, bytes):
-					test_out = test_out.decode('utf8')
+					test_out = test_out.decode("""utf-8""")
 			except UnicodeDecodeError:
 				test_out = str(repr(bytes(test_out).decode(
-					'utf8', errors=clarify.getCTLModeForPY()
+					"""utf-8""", errors=clarify.getCTLModeForPY()
 				)))
 			if (str("U2FsdGVkX") in str(test_out)):
 				theResult = True
@@ -310,7 +310,7 @@ class CryptoTestSuite(unittest.TestCase):
 				raise unittest.SkipTest("BETA. Experemental feature not ready yet.")
 		assert theResult
 
-	@unittest.skipUnless((sys.getdefaultencoding() in 'utf-8'), "wrong encoding for test")
+	@unittest.skipUnless((sys.getdefaultencoding() in """utf-8"""), "wrong encoding for test")
 	def test_case_clarify_main_b(self):
 		"""Tests the helper function main unpack of keyring.clarify"""
 		theResult = True
@@ -339,10 +339,10 @@ class CryptoTestSuite(unittest.TestCase):
 			test_out = clarify.main(args)
 			try:
 				if isinstance(test_out, bytes):
-					test_out = test_out.decode('utf8', errors=clarify.getCTLModeForPY())
+					test_out = test_out.decode("""utf-8""", errors=clarify.getCTLModeForPY())
 			except UnicodeDecodeError:
 				test_out = str(repr(bytes(test_out).decode(
-					'utf8', errors=clarify.getCTLModeForPY()
+					"""utf-8""", errors=clarify.getCTLModeForPY()
 				)))
 			self.assertIsNotNone(test_out)
 			if (str("This is a test Message") in str(test_out)):
@@ -350,7 +350,7 @@ class CryptoTestSuite(unittest.TestCase):
 			else:
 				if sys.platform.startswith("linux") or sys.platform.startswith("darwin"):
 					print(str(repr(bytes(test_out).decode(
-						'utf8', errors=clarify.getCTLModeForPY()
+						"""utf-8""", errors=clarify.getCTLModeForPY()
 					))))
 					theResult = False
 				else:
@@ -364,13 +364,13 @@ class CryptoTestSuite(unittest.TestCase):
 			print(str(""))
 			err = None
 			del err
-			if sys.platform.startswith("linux"):
+			if sys.platform.startswith("linux") or sys.platform.startswith("darwin"):
 				theResult = False
 			else:
 				raise unittest.SkipTest("BETA. Experemental feature not ready yet.")
 		assert theResult
 
-	@unittest.skipUnless((sys.getdefaultencoding() in 'utf-8'), "wrong encoding for test")
+	@unittest.skipUnless((sys.getdefaultencoding() in """utf-8"""), "wrong encoding for test")
 	def test_case_clarify_write_inverts_read_example(self):
 		"""Tests the write then read workflow of keyring.clarify."""
 		theResult = False
@@ -400,15 +400,15 @@ class CryptoTestSuite(unittest.TestCase):
 				test_read = clarify.unpackFromFile(sometestfile, theteststore)
 				try:
 					if isinstance(test_read, bytes):
-						test_read = test_read.decode('utf8', errors=clarify.getCTLModeForPY())
+						test_read = test_read.decode("""utf-8""", errors=clarify.getCTLModeForPY())
 				except UnicodeDecodeError:
-					test_read = str(repr(bytes(test_read, 'utf8')))
+					test_read = str(repr(bytes(test_read, """utf-8""")))
 				self.assertIsNotNone(test_read)
 				if (str(someMessageText) in str(test_read)):
 					theResult = True
 				else:
 					if sys.platform.startswith("linux") or sys.platform.startswith("darwin"):
-						print(str(repr(bytes(test_read, 'utf8'))))
+						print(str(repr(bytes(test_read, """utf-8"""))))
 						theResult = False
 					else:
 						raise unittest.SkipTest("BETA. Experemental feature not ready yet.")
@@ -428,7 +428,7 @@ class CryptoTestSuite(unittest.TestCase):
 
 	@unittest.skipUnless(
 		(
-			(sys.version_info > (3, 2)) and (sys.getdefaultencoding() in 'utf-8')
+			(sys.version_info > (3, 2)) and (sys.getdefaultencoding() in """utf-8""")
 		),
 		sub_proc_bug_message
 	)
@@ -472,9 +472,9 @@ class CryptoTestSuite(unittest.TestCase):
 				test_read = clarify.unpackFromFile(sometestfile, theteststore)
 				try:
 					if isinstance(test_read, bytes):
-						test_read = test_read.decode('utf8', errors=clarify.getCTLModeForPY())
+						test_read = test_read.decode("""utf-8""", errors=clarify.getCTLModeForPY())
 				except UnicodeDecodeError:
-					test_read = str(repr(bytes(test_read, 'utf8')))
+					test_read = str(repr(bytes(test_read, """utf-8""")))
 				self.assertIsNotNone(test_read)
 				if (str(someMessageText) in str(test_read)):
 					theResult = True
