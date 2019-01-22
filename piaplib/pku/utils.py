@@ -556,20 +556,38 @@ def _handleVersionArgs(argParser):
 
 
 @remediation.error_passing
-def addExtension(somefile, extension):
-	"""Ensures the given extension is used."""
+def canAddExtension(somefile, extension):
+	"""Ensures the given extension can even be used."""
+	theResult = True
 	if (somefile is None):
-		return None
-	if (extension is None):
-		return somefile
-	if (len(str(somefile)) > len(extension)):
+		theResult = False
+	elif (extension is None):
+		theResult = False
+	return theResult
+
+
+@remediation.error_passing
+def checkExtension(somefile, extension):
+	"""Ensures the given extension can be added."""
+	theResult = False
+	if canAddExtension(somefile, extension) is not True:
+		theResult = True
+	elif (len(str(somefile)) > len(extension)):
 		offset = (-1 * len(extension))
 		if (extension in str(somefile)[offset:]) and (str(".") in str(somefile)):
-			return somefile
-		else:
-			return str("{}.{}").format(somefile, extension)
+			theResult = True
+	return theResult
+
+
+@remediation.error_passing
+def addExtension(somefile, extension):
+	"""Ensures the given extension is used."""
+	theResult = None
+	if checkExtension(somefile, extension):
+		theResult = somefile
 	else:
-		return str("{}.{}").format(somefile, extension)
+		theResult = str("{}.{}").format(somefile, extension)
+	return theResult
 
 
 @remediation.error_handling
@@ -612,6 +630,13 @@ def ensureDir(somedir):
 
 
 @remediation.error_passing
+def _open(*args, **kwargs):
+	""" cross-python open function """
+	import io
+	return io.open(*args, **kwargs)
+
+
+@remediation.error_passing
 def open_func(file, mode='r', buffering=-1, encoding=None):
 	""" cross-python open function """
 	if xstr("r") in xstr(mode):
@@ -619,15 +644,9 @@ def open_func(file, mode='r', buffering=-1, encoding=None):
 			logs.log(str("[CWE-73] File expected, but not found. Redacted filename."), "Info")
 			file = None
 	try:
-		if (sys.version_info < (3, 2)):
-			import io
-			return io.open(file, mode, buffering, encoding)
-		else:
-			return open(file, mode, buffering, encoding)
+		return _open(file, mode, buffering, encoding)
 	except Exception:
-		import io
-		return io.open(file, mode, buffering, encoding)
-	raise AssertionError("File could not be opened")
+		raise AssertionError("File could not be opened")
 
 
 @remediation.error_passing
@@ -674,10 +693,8 @@ def writeFile(somefile, somedata):
 		logs.log(str(type(nonerr)), "Warning")
 		theResult = False
 	except Exception as err:
-		logs.log(str("Write Failed on file {}").format(theWritePath), "Warning")
-		logs.log(str(type(err)), "Warning")
-		logs.log(str(err), "Warning")
-		logs.log(str((err.args)), "Warning")
+		logs.log(str("Write Failed on file {}").format(theWritePath), "debug")
+		# remediation.error_breakpoint(error=err)
 		err = None
 		del err
 		theResult = False
@@ -686,11 +703,11 @@ def writeFile(somefile, somedata):
 			f.close()
 	try:
 		logs.log(str("wrote to file {}").format(str(theWritePath)), "Debug")
-	except Exception as err:
+	except Exception as logerr:
 		print(str("logging error"))
-		print(str(err))
-		print(str(type(err)))
-		print(str((err.args)))
+		print(str(logerr))
+		print(str(type(logerr)))
+		print(str((logerr.args)))
 	return theResult
 
 
@@ -711,9 +728,7 @@ def appendFile(somefile, somedata):
 		theResult = False
 	except Exception as err:
 		logs.log(str("Write Failed on file {}").format(theWritePath), "Debug")
-		logs.log(str(type(err)), "Warning")
-		logs.log(str(err), "Warning")
-		logs.log(str((err.args)), "Warning")
+		# remediation.error_breakpoint(error=err)
 		err = None
 		del err
 		theResult = False
