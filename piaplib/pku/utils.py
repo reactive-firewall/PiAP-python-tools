@@ -630,28 +630,66 @@ def ensureDir(somedir):
 
 
 @remediation.error_passing
-def _open(*args, **kwargs):
-	""" cross-python open function """
-	import io
-	return io.open(*args, **kwargs)
+def _check_for_read(file, mode):
+	"""checks if can read a file ; used before opening"""
+	if xstr("r+") in xstr(mode):
+		if not xisfile(file):
+			logs.log(
+				str("[CWE-73] File expected, but not found. Redacted filename."),
+				"Info"
+			)
+			file = None
+	return file
 
 
 @remediation.error_passing
-def open_func(file, mode='r', buffering=-1, encoding=None):
-	""" cross-python open function """
-	if xstr("r") in xstr(mode):
+def _check_for_write(file, mode):
+	"""checks if can read a file ; used before opening"""
+	if xstr("w+") in xstr(mode):
 		if not xisfile(file):
-			logs.log(str("[CWE-73] File expected, but not found. Redacted filename."), "Info")
-			file = None
+			if not xisdir(os.path.dirname(os.path.abspath(file))):
+				logs.log(
+					str("[CWE-73] Redacted filename."),
+					"Info"
+				)
+				file = None
+	return file
+
+
+@remediation.error_passing
+def _open(file, mode='r+', buffering=-1, encoding=None):
+	""" cross-python open function """
+	if encoding is None:
+		encoding = str("""utf-8""")
 	try:
-		return _open(file, mode, buffering, encoding)
+		if (sys.version_info < (3, 2)):
+			import io
+			return io.open(file, mode, buffering, encoding)
+		else:
+			return open(file, mode, buffering, encoding)
 	except Exception:
+		import io
+		return io.open(file, mode, buffering, encoding)
+	raise AssertionError("File could not be opened")
+
+
+@remediation.error_passing
+def open_func(file, mode='r+', buffering=-1, encoding=None):
+	""" cross-python open function """
+	file = _check_for_read(file, mode)
+	if file is None:
 		raise AssertionError("File could not be opened")
+	if encoding is None:
+		encoding = str("""utf-8""")
+	return _open(file, mode, buffering, encoding)
+	raise AssertionError("File could not be opened")
 
 
 @remediation.error_passing
 def write_func(someFile, the_data=None):
 	""" cross-python write function """
+	if (someFile is None) or (the_data is None):
+		return None
 	try:
 		if (sys.version_info < (3, 2)):
 			return someFile.write(literal_code(the_data))
@@ -666,20 +704,23 @@ def readFile(somefile):
 	"""Reads the raw contents of a file."""
 	read_data = None
 	theReadPath = str(somefile)
-	with open_func(theReadPath, u'r', encoding=u'utf-8') as f:
-		read_data = f.read()
-	f.close()
 	try:
-		logs.log(str(str("read file {}").format(theReadPath)), "Debug")
-	except Exception:
-		pass
+		with open_func(file=theReadPath, mode=u'r+', encoding=u'utf-8') as f:
+			read_data = f.read()
+		f.close()
+		try:
+			logs.log(str(str("read file {}").format(theReadPath)), "Debug")
+		except Exception:
+			pass
+	except AssertionError:
+		read_data = None
 	return read_data
 
 
 @remediation.error_handling
 def writeFile(somefile, somedata):
 	"""Writes the raw contents of a file."""
-	theWritePath = str(somefile)
+	theWritePath = _check_for_write(somefile, u'w+')
 	f = None
 	theResult = False
 	try:
@@ -692,17 +733,17 @@ def writeFile(somefile, somedata):
 	except OSError as nonerr:
 		logs.log(str(type(nonerr)), "Warning")
 		theResult = False
-	except Exception as err:
-		logs.log(str("Write Failed on file {}").format(theWritePath), "debug")
-		# remediation.error_breakpoint(error=err)
-		err = None
-		del err
+	except Exception as write_err:
 		theResult = False
+		logs.log(str("Write Failed on file {}").format(theWritePath), "debug")
+		write_err = piaplib.pku.remediation.error_breakpoint(error=write_err, context=writeFile)
+		del write_err
 	finally:
 		if f:
 			f.close()
 	try:
-		logs.log(str("wrote to file {}").format(str(theWritePath)), "Debug")
+		if theResult:
+			logs.log(str("wrote to file {}").format(str(theWritePath)), "Debug")
 	except Exception as logerr:
 		print(str("logging error"))
 		print(str(logerr))
@@ -714,7 +755,7 @@ def writeFile(somefile, somedata):
 @remediation.error_handling
 def appendFile(somefile, somedata):
 	"""Apends to the raw contents of a file."""
-	theWritePath = str(somefile)
+	theWritePath = _check_for_write(somefile, u'w+')
 	f = None
 	theResult = False
 	try:
@@ -736,7 +777,8 @@ def appendFile(somefile, somedata):
 		if f:
 			f.close()
 	try:
-		logs.log(str("wrote to file {}").format(theWritePath), str("Debug"))
+		if theResult:
+			logs.log(str("wrote to file {}").format(theWritePath), str("Debug"))
 	except Exception:
 		pass
 	return theResult

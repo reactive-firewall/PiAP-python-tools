@@ -31,7 +31,8 @@ try:
 	import sys
 	import functools
 	import time
-	for someModule in [os, sys, functools, time]:
+	import warnings
+	for someModule in [os, sys, functools, time, warnings]:
 		if someModule.__name__ is None:
 			raise ImportError(str("OMG! we could not import {}. ABORT. ABORT.").format(someModule))
 except Exception as err:
@@ -86,6 +87,42 @@ def getTimeStamp():
 	return str(theDate)
 
 
+def suppress_warning(func):
+	"""Runs a function with warnings suppressed"""
+
+	@functools.wraps(func)
+	def bad_func(*args, **kwargs):
+		"""Wraps a function in try-except"""
+		theOutput = None
+		with warnings.catch_warnings():
+			warnings.filterwarnings("ignore", module="piaplib")
+			theOutput = func(*args, **kwargs)
+		return theOutput
+
+	return bad_func
+
+
+def error_failsafe(func):
+	"""Runs a function in bare try-except"""
+
+	@functools.wraps(func)
+	def try_func(*args, **kwargs):
+		"""Wraps a function in try-except"""
+		theOutput = None
+		try:
+			with warnings.catch_warnings():
+				warnings.filterwarnings("ignore", module="piaplib")
+				theOutput = func(*args, **kwargs)
+		except BaseException as berr:
+			theOutput = None
+			baton = PiAPError(berr, str("An abrupt unexpected error occurred."))
+			raise baton
+		return theOutput
+
+	return try_func
+
+
+@error_failsafe
 def error_breakpoint(error, context=None):
 	"""Just logs the error and returns None"""
 	timestamp = getTimeStamp()
@@ -105,22 +142,23 @@ def error_breakpoint(error, context=None):
 	return None
 
 
+@suppress_warning
 def error_passing(func):
 	"""Runs a function in try-except"""
 
 	@functools.wraps(func)
 	def safety_func(*args, **kwargs):
-			"""Wraps a function in try-except"""
-			theOutput = None
-			try:
-				theOutput = func(*args, **kwargs)
-			except Exception as err:
-				theOutput = error_breakpoint(err, context=func)
-				baton = PiAPError(err, str("An error occurred in {}.").format(str(func)))
-				err = None
-				del err
-				raise baton
-			return theOutput
+		"""Wraps a function in try-except"""
+		theOutput = None
+		try:
+			theOutput = func(*args, **kwargs)
+		except Exception as err:
+			theOutput = error_breakpoint(err, context=func)
+			baton = PiAPError(err, str("An error occurred in {}.").format(str(func)))
+			err = None
+			del err
+			raise baton
+		return theOutput
 
 	return safety_func
 
@@ -129,6 +167,7 @@ def error_handling(func):
 	"""Runs a function in try-except"""
 
 	@functools.wraps(func)
+	@suppress_warning
 	def safety_func(*args, **kwargs):
 		"""Wraps a function in try-except"""
 		theOutput = None

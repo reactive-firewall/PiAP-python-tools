@@ -59,8 +59,11 @@ except Exception as ImportErr:
 
 	def assume(condition):
 		"""Helpful if you don't have a hypothisis!"""
-		if not condition:
-			raise unittest.SkipTest(str("Failed test assumption: {}").format(repr(condition)))
+		try:
+			if not condition:
+				raise unittest.SkipTest(str("Failed test assumption: {}").format(repr(condition)))
+		except BaseException:
+			raise unittest.SkipTest(str("Failed test syntax assumption"))
 		return True
 	ImportErr = None
 	del ImportErr
@@ -126,13 +129,14 @@ class CryptoTestSuite(unittest.TestCase):
 
 	def test_b_case_clarify_getKeyFile(self):
 		"""Tests the helper function getKeyFilePath of keyring.clarify"""
-		theResult = True
+		theResult = False
 		try:
 			from piaplib.keyring import clarify as clarify
 			if clarify.__name__ is None:
 				raise ImportError("Failed to import clarify")
 			self.assertIsNotNone(clarify.getKeyFilePath())
 			self.assertIsNotNone(os.path.abspath(clarify.getKeyFilePath()))
+			theResult = True
 		except Exception as err:
 			print(str(""))
 			print(str(type(err)))
@@ -190,7 +194,7 @@ class CryptoTestSuite(unittest.TestCase):
 
 	def test_z_z_case_clarify_setKeyFile_no_key(self):
 		"""Tests the helper function makeKeystoreFile(None, x) of keyring.clarify"""
-		theResult = True
+		theResult = False
 		try:
 			from piaplib.keyring import clarify as clarify
 			if clarify.__name__ is None:
@@ -199,6 +203,7 @@ class CryptoTestSuite(unittest.TestCase):
 				None,
 				str("./test.secret")
 			))
+			theResult = True
 		except Exception as err:
 			print(str(""))
 			print(str(type(err)))
@@ -212,12 +217,13 @@ class CryptoTestSuite(unittest.TestCase):
 
 	def test_z_case_clarify_setKeyFile_none(self):
 		"""Tests the helper function makeKeystoreFile(None) of keyring.clarify"""
-		theResult = True
+		theResult = False
 		try:
 			from piaplib.keyring import clarify as clarify
 			if clarify.__name__ is None:
 				raise ImportError("Failed to import clarify")
 			self.assertIsNotNone(clarify.makeKeystoreFile(None))
+			theResult = True
 		except Exception as err:
 			print(str(""))
 			print(str(type(err)))
@@ -321,7 +327,7 @@ class CryptoTestSuite(unittest.TestCase):
 				temp_msg = str("""U2FsdGVkX1+dD6bFlND+Xa0bzNttrZfB5zYCp0mSEYfhMTpaM7U=""")
 				args = [
 					str("--unpack"),
-					str("--msg={}").format(temp_msg),
+					str("""--msg={}""").format(temp_msg),
 					str("-K=testkeyneedstobelong")
 				]
 			else:
@@ -330,7 +336,7 @@ class CryptoTestSuite(unittest.TestCase):
 				)
 				args = [
 					str("--unpack"),
-					str("--msg={}").format(temp_msg),
+					str("""--msg={}""").format(temp_msg),
 					str("-K=testkeyneedstobelong")
 				]
 			from piaplib.keyring import clarify as clarify
@@ -426,23 +432,25 @@ class CryptoTestSuite(unittest.TestCase):
 				raise unittest.SkipTest("BETA. Experemental feature not ready yet.")
 		assert theResult
 
-	@unittest.skipUnless(
-		(
-			(sys.version_info > (3, 2)) and (sys.getdefaultencoding() in """utf-8""")
-		),
-		sub_proc_bug_message
-	)
+	@unittest.skipUnless((sys.getdefaultencoding() in """utf-8"""), "wrong encoding for test")
+	@unittest.skipUnless((sys.version_info > (3, 2)), str(sub_proc_bug_message))
 	@given(text())
 	def test_case_clarify_write_inverts_read(self, someInput):  # noqa C901
 		"""Tests the write then read workflow of keyring.clarify with fuzzing."""
 		theResult = False
+		someInput = str(someInput)
 		assume(isinstance(someInput, str))
 		assume(len(str(someInput)) > 3)
+		assume("""\"""" not in str(someInput))
+		assume("""'""" not in str(someInput))
 		assume(repr(str(someInput)) not in repr(str(repr(someInput))))
 		from piaplib.pku import utils as utils
 		if utils.__name__ is None:
 			raise ImportError("Failed to import utils")
 		assume(str(someInput) in utils.literal_str(someInput))
+		assume(utils.literal_str(someInput) in str(someInput))
+		assume(utils.literal_str(someInput) in utils.literal_code(str(someInput)))
+		assume(utils.literal_code(str(someInput)) in utils.literal_str(someInput))
 		assume(someInput in str(someInput))
 		someMessageText = str(repr(someInput))
 		try:
@@ -466,8 +474,20 @@ class CryptoTestSuite(unittest.TestCase):
 				str(someMessageText),
 				theteststore
 			)
+			assume(test_write is True)
 			self.assertTrue(test_write)
-			note(str("encoded: \"{}\"").format(utils.literal_str(someMessageText)))
+			check_wrap = clarify.packForRest(
+				str(someMessageText),
+				theteststore
+			)
+			assume((check_wrap is not None))
+			try:
+				note(str("encoded: \"{}\"").format(utils.literal_str(someMessageText)))
+				note(str("as data: \"{}\"").format(utils.literal_str(check_wrap)))
+			except Exception as noteErr:
+				raise unittest.SkipTest(noteErr)
+				noteErr = None
+				del noteErr
 			if (test_write is True):
 				test_read = clarify.unpackFromFile(sometestfile, theteststore)
 				try:
@@ -475,11 +495,18 @@ class CryptoTestSuite(unittest.TestCase):
 						test_read = test_read.decode("""utf-8""", errors=clarify.getCTLModeForPY())
 				except UnicodeDecodeError:
 					test_read = str(repr(bytes(test_read, """utf-8""")))
+					assume(False)
 				self.assertIsNotNone(test_read)
 				if (str(someMessageText) in str(test_read)):
 					theResult = True
 				else:
+					note(str("failed test: \"{}\" is not in \"{}\"").format(
+						str(someMessageText), str(test_read)
+					))
 					note(str("decoded: \"{}\"").format(utils.literal_str(test_read)))
+					note(str("should decoded: \"{}\"").format(utils.literal_code(str(someMessageText))))
+					note(str("from undecoded: \"{}\"").format(utils.literal_str(utils.readFile(sometestfile))))
+					note(str("with key: \"{}\"").format(utils.literal_str(theteststore)))
 					theResult = False
 		except Exception as err:
 			print(str(""))
