@@ -19,9 +19,9 @@
 # limitations under the License.
 # ......................................................................
 
+import sys
 import unittest
 import subprocess
-import sys
 import profiling as profiling
 
 
@@ -82,7 +82,7 @@ def checkPythonCommand(args=[None], stderr=None):
 			theOutput = None
 	try:
 		if isinstance(theOutput, bytes):
-			theOutput = theOutput.decode('utf8')
+			theOutput = theOutput.decode("""utf-8""")
 	except UnicodeDecodeError:
 		theOutput = bytes(theOutput)
 	return theOutput
@@ -700,11 +700,11 @@ class BasicUsageTestSuite(unittest.TestCase):
 						arguments = [
 							str(thepython),
 							str("-m"),
-							str("piaplib.keyring.clarify"),
-							str("{}").format(str(unit)),
-							str("--msg={}").format(theOutputtext),
+							str("piaplib.pocket keyring clarify"),
+							str("""{}""").format(str(unit)),
+							str("""--msg={}""").format(theOutputtext),
 							str("-S=testSeedNeedstobelong"),
-							str("-K={}").format(str(enc_string_test_key)),
+							str("""-K={}""").format(str(enc_string_test_key)),
 							str("-k=/tmp/.beta_PiAP_weak_key")
 						]
 						theOutputtext = checkPythonCommand(arguments, stderr=subprocess.STDOUT)

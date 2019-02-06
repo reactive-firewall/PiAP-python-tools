@@ -26,7 +26,7 @@
 
 """CAVEAT: REMEMBER PYTHON HAS NO SECURE MEMORY.
 	If there is a weakness in PiAP data io it is in memory.
-	PYTHON STRINGS ARE IMUTABLE, THUS ONCE IN CLEAR, ALWAYS IN CLEAR."""
+c	PYTHON STRINGS ARE IMUTABLE, THUS ONCE IN CLEAR, ALWAYS IN CLEAR."""
 
 
 try:
@@ -180,16 +180,10 @@ def getKeyFilePath():
 	if not utils.ensureDir(os.path.dirname(os.path.abspath(U2FsdGVkX1_KOouklCprVMv6P6TFdZhCFg))):
 		return None
 	if (os.path.isfile(U2FsdGVkX1_KOouklCprVMv6P6TFdZhCFg) is False):
-		try:
-			utils.writeFile(
-				os.path.realpath(U2FsdGVkX1_KOouklCprVMv6P6TFdZhCFg),
-				str(bytes(os.urandom(32)).decode(encoding=u'utf-8', errors=getCTLModeForPY()))
-			)
-		except Exception:
-			utils.writeFile(
-				os.path.realpath(U2FsdGVkX1_KOouklCprVMv6P6TFdZhCFg),
-				str(str(rand.randPW(32)).replace("%", "%%"))
-			)
+		utils.writeFile(
+			os.path.realpath(U2FsdGVkX1_KOouklCprVMv6P6TFdZhCFg),
+			str(str(rand.randPW(32)).replace("%", "%%"))
+		)
 	return os.path.realpath(U2FsdGVkX1_KOouklCprVMv6P6TFdZhCFg)
 
 
@@ -225,6 +219,7 @@ def packForRest(message=None, keyStore=None):
 	if keyStore is None:
 		keyStore = getKeyFilePath()
 	if hasBackendCommand():
+		ciphertext = None
 		args = [
 			getBackendCommand(),
 			str("enc"),
@@ -245,8 +240,13 @@ def packForRest(message=None, keyStore=None):
 			stderr=subprocess.PIPE,
 			close_fds=True
 		)
-		(ciphertext, stderrdata) = p1.communicate(utils.literal_code(message))
-		p1.wait()
+		try:
+			(ciphertext, stderrdata) = p1.communicate(utils.literal_code(message))
+		except Exception:
+			p1.kill()
+			ciphertext = None
+		finally:
+			p1.wait()
 		if isinstance(ciphertext, bytes):
 			ciphertext = ciphertext.decode(encoding=u'utf-8', errors=getCTLModeForPY())
 			# ciphertext = str(ciphertext).replace(str("\\n"), str(""))
@@ -284,10 +284,10 @@ def unpackFromRest(ciphertext=None, keyStore=None):
 			stderr=subprocess.PIPE,
 			close_fds=True
 		)
-		(cleartext, stderrdata) = p2.communicate(utils.literal_code(
-			str("{}{}").format(utils.literal_code(ciphertext), EOFNEWLINE))
-		)
+		cleartxtBuffer = str("""{}{}""").format(utils.literal_code(ciphertext), EOFNEWLINE)
+		(cleartext, stderrdata) = p2.communicate(utils.literal_code(cleartxtBuffer))
 		p2.wait()
+		del(cleartxtBuffer)
 		if isinstance(cleartext, bytes):
 			cleartext = cleartext.decode(encoding=u'utf-8', errors=getCTLModeForPY())
 		return utils.literal_str(cleartext)
@@ -299,19 +299,23 @@ def unpackFromRest(ciphertext=None, keyStore=None):
 def unpackFromFile(somefile, keyStore=None):
 	"""Reads the raw encrypted file and decrypts it."""
 	read_data = None
+	enc_data_file = None
 	try:
 		someFilePath = utils.addExtension(somefile, str("""enc"""))
-		with utils.open_func(someFilePath, mode=u'r', encoding=u'utf-8') as enc_data_file:
+		with utils.open_func(someFilePath, mode=u'r+', encoding=u'utf-8') as enc_data_file:
 			read_enc_data = enc_data_file.read()
 			if isinstance(read_enc_data, bytes):
 				read_enc_data = read_enc_data.decode(encoding=u'utf-8', errors=getCTLModeForPY())
-			read_data = unpackFromRest(read_enc_data, keyStore)
+			read_data = utils.literal_code(unpackFromRest(read_enc_data, keyStore))
 	except Exception as clearerr:
 		read_data = None
 		baton = PiAPError(clearerr, str("Failed to load or deycrypt file."))
 		clearerr = None
 		del clearerr
 		raise baton
+	finally:
+		if enc_data_file:
+			enc_data_file.close()
 	return read_data
 
 
@@ -329,7 +333,7 @@ def packToFile(somefile, data, keyStore=None):
 			encData = packForRest(data, keyStore)
 			utils.writeFile(
 				os.path.abspath(someFilePath),
-				str(encData)
+				utils.literal_code(encData)
 			)
 			del(encData)
 		did_write = True
@@ -460,7 +464,7 @@ def main(argv=None):
 		del err
 		output = None
 		del output
-	return 0
+	return 1
 
 
 if __name__ in u'__main__':
@@ -468,6 +472,8 @@ if __name__ in u'__main__':
 	try:
 		import sys
 		exitcode = main(sys.argv[1:])
+		if not isinstance(exitcode, type(int(0))):
+			exitcode = 0
 	except Exception as err:
 		print(str("MAIN FAILED DURING piaplib.keyring.clarify.__main__ - ABORT."))
 		print(str(type(err)))
