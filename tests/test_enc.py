@@ -321,6 +321,12 @@ class CryptoTestSuite(unittest.TestCase):
 		"""Tests the helper function main unpack of keyring.clarify"""
 		theResult = False
 		try:
+			from piaplib.pku import utils as utils
+			if utils.__name__ is None:
+				raise ImportError("Failed to import utils")
+			from piaplib.keyring import clarify as clarify
+			if clarify.__name__ is None:
+				raise ImportError("Failed to import clarify")
 			temp_msg = None
 			test_args = []
 			if sys.platform.startswith("linux"):
@@ -340,9 +346,6 @@ class CryptoTestSuite(unittest.TestCase):
 					str("-K=testkeyneedstobelong")
 				]
 			print(str("... args {}").format(str(test_args)))
-			from piaplib.keyring import clarify as clarify
-			if clarify.__name__ is None:
-				raise ImportError("Failed to import clarify")
 			print(str("... test"))
 			test_out = clarify.main(test_args)
 			print(str("... done"))
@@ -354,12 +357,9 @@ class CryptoTestSuite(unittest.TestCase):
 					"""utf-8""", errors=clarify.getCTLModeForPY()
 				)))
 			self.assertIsNotNone(test_out)
-			from piaplib.pku import utils as utils
-			if utils.__name__ is None:
-				raise ImportError("Failed to import utils")
-			self.assertIsNotNone(utils.literal_code(test_out))
+			self.assertIsNotNone(str(test_out))
 			print(str("... assert not none or junk"))
-			if (str("This is a test Message") in str(utils.literal_str(test_out))):
+			if (str("This is a test Message") in str(test_out)):
 				theResult = True
 			else:
 				if sys.platform.startswith("linux") or sys.platform.startswith("darwin"):
@@ -370,6 +370,7 @@ class CryptoTestSuite(unittest.TestCase):
 					print(str(""))
 					print(str("... DECODE BUG CONFIRMED ..."))
 					print(str(""))
+					print(str(test_out))
 				else:
 					raise unittest.SkipTest("BETA. Experemental feature not ready yet.")
 		except Exception as err:
