@@ -327,7 +327,7 @@ class CryptoTestSuite(unittest.TestCase):
 				temp_msg = str("""U2FsdGVkX1+dD6bFlND+Xa0bzNttrZfB5zYCp0mSEYfhMTpaM7U=""")
 				args = [
 					str("--unpack"),
-					str("""--msg={}""").format(temp_msg),
+					str("--msg=\"{}\"").format(temp_msg),
 					str("-K=testkeyneedstobelong")
 				]
 			else:
@@ -336,7 +336,7 @@ class CryptoTestSuite(unittest.TestCase):
 				)
 				args = [
 					str("--unpack"),
-					str("""--msg={}""").format(temp_msg),
+					str("--msg={}").format(temp_msg),
 					str("-K=testkeyneedstobelong")
 				]
 			from piaplib.keyring import clarify as clarify
@@ -354,6 +354,7 @@ class CryptoTestSuite(unittest.TestCase):
 			from piaplib.pku import utils as utils
 			if utils.__name__ is None:
 				raise ImportError("Failed to import utils")
+			self.assertIsNotNone(utils.literal_str(test_out))
 			if (str("This is a test Message") in utils.literal_str(test_out)):
 				theResult = True
 			else:
