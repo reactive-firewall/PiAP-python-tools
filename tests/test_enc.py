@@ -351,7 +351,10 @@ class CryptoTestSuite(unittest.TestCase):
 					"""utf-8""", errors=clarify.getCTLModeForPY()
 				)))
 			self.assertIsNotNone(test_out)
-			if (str("This is a test Message") in str(test_out)):
+			from piaplib.pku import utils as utils
+			if utils.__name__ is None:
+				raise ImportError("Failed to import utils")
+			if (str("This is a test Message") in utils.literal_str(test_out)):
 				theResult = True
 			else:
 				if sys.platform.startswith("linux") or sys.platform.startswith("darwin"):
