@@ -320,13 +320,10 @@ class CryptoTestSuite(unittest.TestCase):
 	def test_case_clarify_main_b(self):
 		"""Tests the helper function main unpack of keyring.clarify"""
 		theResult = False
-		print(str("..."))
-		print(str("...setup for decode..."))
 		try:
 			temp_msg = None
 			args = None
 			if sys.platform.startswith("linux"):
-				print(str("...detected linux backend..."))
 				temp_msg = str("""U2FsdGVkX1+dD6bFlND+Xa0bzNttrZfB5zYCp0mSEYfhMTpaM7U=""")
 				args = [
 					str("--unpack"),
@@ -334,7 +331,6 @@ class CryptoTestSuite(unittest.TestCase):
 					str("-K=testkeyneedstobelong")
 				]
 			else:
-				print(str("...detected non-linux backend..."))
 				temp_msg = str(
 					"""U2FsdGVkX1/beHoH2ziXWcMFpb3fzzPxQqdeU1tO5UVoBUEnow8T9g=="""
 				)
@@ -343,13 +339,10 @@ class CryptoTestSuite(unittest.TestCase):
 					str("""--msg={}""").format(temp_msg),
 					str("-K=testkeyneedstobelong")
 				]
-			print(str("...forcing re-import of clearify..."))
 			from piaplib.keyring import clarify as clarify
 			if clarify.__name__ is None:
 				raise ImportError("Failed to import clarify")
-			print(str("...now testing..."))
 			test_out = clarify.main(args)
-			print(str("...now evaluating test..."))
 			try:
 				if isinstance(test_out, bytes):
 					test_out = test_out.decode("""utf-8""", errors=clarify.getCTLModeForPY())
@@ -358,7 +351,6 @@ class CryptoTestSuite(unittest.TestCase):
 					"""utf-8""", errors=clarify.getCTLModeForPY()
 				)))
 			self.assertIsNotNone(test_out)
-			print(str("... test is not junk..."))
 			if (str("This is a test Message") in str(test_out)):
 				theResult = True
 			else:
