@@ -429,9 +429,7 @@ class CryptoTestSuite(unittest.TestCase):
 				theResult = True
 			else:
 				if sys.platform.startswith("darwin"):
-					print(str(repr(bytes(test_out, encoding="""utf-8""").decode(
-						"""utf-8""", errors=clarify.getCTLModeForPY()
-					))))
+					print(str(test_out))
 					theResult = False
 				else:
 					raise unittest.SkipTest("BETA. Experemental feature not ready yet.")
