@@ -333,7 +333,7 @@ class CryptoTestSuite(unittest.TestCase):
 				temp_msg = str("""U2FsdGVkX1+dD6bFlND+Xa0bzNttrZfB5zYCp0mSEYfhMTpaM7U=""")
 				test_args = [
 					str("--unpack"),
-					str("--msg=\"{}\"").format(temp_msg),
+					str("--msg='{}'").format(temp_msg),
 					str("-K=testkeyneedstobelong")
 				]
 			else:
@@ -348,10 +348,8 @@ class CryptoTestSuite(unittest.TestCase):
 			print(str("... args {}").format(str(test_args)))
 			print(str("... test"))
 			test_out = clarify.main(test_args)
-			print(str("... done"))
+			print(str("... checking"))
 			try:
-				print(str(type(test_out)))
-				print(str(test_out))
 				if isinstance(test_out, bytes):
 					test_out = test_out.decode("""utf-8""", errors=clarify.getCTLModeForPY())
 			except UnicodeDecodeError as unierr:
