@@ -327,7 +327,7 @@ class CryptoTestSuite(unittest.TestCase):
 				temp_msg = str("""U2FsdGVkX1+dD6bFlND+Xa0bzNttrZfB5zYCp0mSEYfhMTpaM7U=""")
 				args = [
 					str("--unpack"),
-					str("""--msg=\"{}\"""").format(temp_msg),
+					str("""--msg={}""").format(temp_msg),
 					str("-K=testkeyneedstobelong")
 				]
 			else:
