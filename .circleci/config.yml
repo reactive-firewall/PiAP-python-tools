@@ -49,6 +49,15 @@ jobs:
           name: "install mocking cmd for test"
           command: |
             cp -vf ./tests/mock/clients /opt/PiAP/hostapd_actions/clients
+  test:
+    docker:
+      - image: circleci/python:3.5.3
+        environment:
+          CI: cicleci
+          DEBIAN_FRONTEND: noninteractive
+          LANG: en_US.UTF-8
+          LC_CTYPE: en_EN.UTF-8
+    steps:
       - run:
           shell: /bin/bash
           name: "clean up for test"
@@ -74,4 +83,14 @@ jobs:
           name: "clean up when done"
           command: |
             make clean
+
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - build
+      - test:
+          requires:
+            - build
+
 destination: build
