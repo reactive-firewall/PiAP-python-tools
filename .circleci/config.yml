@@ -1,4 +1,4 @@
-version: 2.0
+version: 2
 
 jobs:
   build:
@@ -55,6 +55,7 @@ jobs:
           paths:
             - ~/PiAP-python-tools
             - /opt/PiAP
+
   test:
     docker:
       - image: circleci/python:3.5.3
@@ -92,7 +93,6 @@ jobs:
           name: "clean up when done"
           command: |
             make clean
-
 
 workflows:
   version: 2
