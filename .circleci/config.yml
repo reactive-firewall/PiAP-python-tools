@@ -29,23 +29,11 @@ jobs:
           name: "install flake8 attempt"
           command: |
             python3 -m pip install --user flake8 || true
-      - run:
-          shell: /bin/bash
-          name: "prep dir for test"
-          command: |
-            sudo mkdir -p -m 755 "/opt/PiAP/" || true
-            sudo chown -v circleci "/opt/PiAP/"
-            mkdir -p -m 755 "/opt/PiAP/hostapd_actions/"
-      - run:
-          shell: /bin/bash
-          name: "install mocking cmd for test"
-          command: |
-            cp -vf ./tests/mock/clients /opt/PiAP/hostapd_actions/clients
       - save_cache:
           key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
           paths:
             - ~/PiAP-python-tools
-            - /opt/PiAP
+
   test:
     docker:
       - image: circleci/python:3.5.3
@@ -58,6 +46,14 @@ jobs:
     steps:
       - restore_cache:
           key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+      - run:
+          shell: /bin/bash
+          name: "Prep env for test"
+          command: |
+            sudo mkdir -p -m 755 "/opt/PiAP/" || true
+            sudo chown -v circleci "/opt/PiAP/"
+            mkdir -p -m 755 "/opt/PiAP/hostapd_actions/"
+            cp -vf ./tests/mock/clients /opt/PiAP/hostapd_actions/clients
       - run:
           shell: /bin/bash
           name: "clean up for test"
