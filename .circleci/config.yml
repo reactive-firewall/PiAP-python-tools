@@ -3,6 +3,7 @@ jobs:
   build:
     docker:
       - image: circleci/python:3.5.3
+      - image: circleci/python:3.7
     environment:
       CI: cicleci
       DEBIAN_FRONTEND: noninteractive
@@ -36,7 +37,8 @@ jobs:
 
   test:
     docker:
-      - image: circleci/python:3.5.3
+      - image: circleci/python:3.5
+      - image: circleci/python:3.7
     environment:
       CI: cicleci
       DEBIAN_FRONTEND: noninteractive
@@ -69,6 +71,35 @@ jobs:
           name: "clean up from test"
           command: |
             make clean
+  lint:
+    docker:
+      - image: circleci/python:3.7
+    environment:
+      CI: cicleci
+      DEBIAN_FRONTEND: noninteractive
+      LANG: en_US.UTF-8
+      LC_CTYPE: en_EN.UTF-8
+    working_directory: ~/PiAP-python-tools
+    steps:
+      - restore_cache:
+          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+      - run:
+          shell: /bin/bash
+          name: "Prep env for test"
+          command: |
+            sudo mkdir -p -m 755 "/opt/PiAP/" || true
+            sudo chown -v circleci "/opt/PiAP/"
+            mkdir -p -m 755 "/opt/PiAP/hostapd_actions/"
+            cp -vf ./tests/mock/clients /opt/PiAP/hostapd_actions/clients
+      - run:
+          name: "install flake8 attempt"
+          command: |
+            python3 -m pip install --user flake8 || true
+      - run:
+          shell: /bin/bash
+          name: "clean up for test"
+          command: |
+            make clean
       - run:
           shell: /bin/bash
           name: "check code style and spelling"
@@ -88,6 +119,7 @@ workflows:
       - test:
           requires:
             - build
-          filters:
-            branches:
-              only: master
+      - lint:
+          requires:
+            - build
+            - test
