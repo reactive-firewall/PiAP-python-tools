@@ -244,7 +244,7 @@ class CryptoTestSuite(unittest.TestCase):
 				raise ImportError("Failed to import clarify")
 			self.assertIsNotNone(clarify.main([
 				str("--pack"),
-				str("-msg=None")
+				str("--msg=None")
 			]), 2)
 		except Exception as err:
 			print(str(""))
@@ -327,7 +327,7 @@ class CryptoTestSuite(unittest.TestCase):
 				temp_msg = str("""U2FsdGVkX1+dD6bFlND+Xa0bzNttrZfB5zYCp0mSEYfhMTpaM7U=""")
 				test_args = [
 					str("--unpack"),
-					str("--msg=\"{}\"").format(str(temp_msg)),
+					str("--msg=\"{}\"").format(temp_msg),
 					str("-K=testkeyneedstobelong")
 				]
 			else:
@@ -359,7 +359,7 @@ class CryptoTestSuite(unittest.TestCase):
 				raise ImportError("Failed to import utils")
 			self.assertIsNotNone(utils.literal_code(test_out))
 			print(str("... assert not none or junk"))
-			if (str("This is a test Message") in utils.literal_str(test_out)):
+			if (str("This is a test Message") in str(utils.literal_str(test_out))):
 				theResult = True
 			else:
 				if sys.platform.startswith("linux") or sys.platform.startswith("darwin"):
