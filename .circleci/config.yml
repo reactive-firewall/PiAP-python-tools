@@ -50,9 +50,10 @@ jobs:
           command: |
             cp -vf ./tests/mock/clients /opt/PiAP/hostapd_actions/clients
   test:
+    working_directory: ~/PiAP-python-tools
     docker:
       - image: circleci/python:3.5.3
-        environment:
+         environment:
           CI: cicleci
           DEBIAN_FRONTEND: noninteractive
           LANG: en_US.UTF-8
@@ -93,4 +94,4 @@ workflows:
           requires:
             - build
 
-destination: build
+destination: test
