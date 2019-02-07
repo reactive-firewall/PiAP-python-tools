@@ -1,7 +1,6 @@
 version: 2
 jobs:
   build:
-    working_directory: ~/PiAP-python-tools
     docker:
       - image: circleci/python:3.5.3
         environment:
@@ -9,6 +8,7 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
           LANG: en_US.UTF-8
           LC_CTYPE: en_EN.UTF-8
+    working_directory: ~/PiAP-python-tools
     steps:
       - checkout
       - run:
@@ -49,8 +49,11 @@ jobs:
           name: "install mocking cmd for test"
           command: |
             cp -vf ./tests/mock/clients /opt/PiAP/hostapd_actions/clients
+      - save_cache:
+          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+          paths:
+            - ~/PiAP-python-tools
   test:
-    working_directory: ~/PiAP-python-tools
     docker:
       - image: circleci/python:3.5.3
          environment:
@@ -58,7 +61,10 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
           LANG: en_US.UTF-8
           LC_CTYPE: en_EN.UTF-8
+    working_directory: ~/PiAP-python-tools
     steps:
+      - restore_cache:
+          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
       - run:
           shell: /bin/bash
           name: "clean up for test"
@@ -84,6 +90,8 @@ jobs:
           name: "clean up when done"
           command: |
             make clean
+destination: build
+
 
 workflows:
   version: 2
@@ -94,4 +102,3 @@ workflows:
           requires:
             - build
 
-destination: build
