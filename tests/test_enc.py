@@ -352,7 +352,9 @@ class CryptoTestSuite(unittest.TestCase):
 			try:
 				if isinstance(test_out, bytes):
 					test_out = test_out.decode("""utf-8""", errors=clarify.getCTLModeForPY())
-			except UnicodeDecodeError:
+			except UnicodeDecodeError as unierr:
+				print(str(type(unierr)))
+				print(str(unierr))
 				test_out = str(repr(bytes(test_out, encoding="""utf-8""").decode(
 					"""utf-8""", errors=clarify.getCTLModeForPY()
 				)))
