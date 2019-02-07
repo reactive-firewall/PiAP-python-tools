@@ -280,7 +280,7 @@ class CryptoTestSuite(unittest.TestCase):
 
 	def test_case_clarify_main_a(self):
 		"""Tests the helper function main pack of keyring.clarify"""
-		theResult = True
+		theResult = False
 		try:
 			from piaplib.keyring import clarify as clarify
 			if clarify.__name__ is None:

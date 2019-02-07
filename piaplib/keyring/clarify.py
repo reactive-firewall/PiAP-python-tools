@@ -248,7 +248,7 @@ def packForRest(message=None, keyStore=None):
 		finally:
 			p1.wait()
 		if isinstance(ciphertext, bytes):
-			ciphertext = ciphertext.decode(encoding=u'utf-8', errors=getCTLModeForPY())
+			ciphertext = ciphertext.decode(encoding="""utf-8""", errors=getCTLModeForPY())
 			# ciphertext = str(ciphertext).replace(str("\\n"), str(""))
 		return ciphertext
 	else:
@@ -289,7 +289,7 @@ def unpackFromRest(ciphertext=None, keyStore=None):
 		p2.wait()
 		del(cleartxtBuffer)
 		if isinstance(cleartext, bytes):
-			cleartext = cleartext.decode(encoding=u'utf-8', errors=getCTLModeForPY())
+			cleartext = cleartext.decode(encoding="""utf-8""", errors=getCTLModeForPY())
 		return utils.literal_str(cleartext)
 	else:
 		raise NotImplementedError("[CWE-758] No Implemented Backend - BUG")
@@ -302,10 +302,10 @@ def unpackFromFile(somefile, keyStore=None):
 	enc_data_file = None
 	try:
 		someFilePath = utils.addExtension(somefile, str("""enc"""))
-		with utils.open_func(someFilePath, mode=u'r+', encoding=u'utf-8') as enc_data_file:
+		with utils.open_func(someFilePath, mode=u'r+', encoding="""utf-8""") as enc_data_file:
 			read_enc_data = enc_data_file.read()
 			if isinstance(read_enc_data, bytes):
-				read_enc_data = read_enc_data.decode(encoding=u'utf-8', errors=getCTLModeForPY())
+				read_enc_data = read_enc_data.decode(encoding="""utf-8""", errors=getCTLModeForPY())
 			read_data = utils.literal_code(unpackFromRest(read_enc_data, keyStore))
 	except Exception as clearerr:
 		read_data = None
