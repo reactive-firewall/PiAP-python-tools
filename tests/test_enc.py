@@ -391,6 +391,65 @@ class CryptoTestSuite(unittest.TestCase):
 		assert theResult
 
 	@unittest.skipUnless((sys.getdefaultencoding() in """utf-8"""), "wrong encoding for test")
+	def test_case_clarify_main_keyring(self):
+		"""Tests the helper function main unpack of keyring.main(clarify)"""
+		theResult = False
+		try:
+			from piaplib.pku import utils as utils
+			if utils.__name__ is None:
+				raise ImportError("Failed to import utils")
+			import piaplib.keyring.__main__
+			temp_msg = None
+			test_args = []
+			if sys.platform.startswith("linux"):
+				temp_msg = str("""U2FsdGVkX1+dD6bFlND+Xa0bzNttrZfB5zYCp0mSEYfhMTpaM7U=""")
+				test_args = [
+					str("clarify"),
+					str("--unpack"),
+					str("--msg='{}'").format(temp_msg),
+					str("-K=testkeyneedstobelong")
+				]
+			else:
+				temp_msg = str(
+					"""U2FsdGVkX1/beHoH2ziXWcMFpb3fzzPxQqdeU1tO5UVoBUEnow8T9g=="""
+				)
+				test_args = [
+					str("clarify"),
+					str("--unpack"),
+					str("--msg={}").format(str(temp_msg)),
+					str("-K=testkeyneedstobelong")
+				]
+			print(str("... test: piaplib.keyring.__main__({})").format(str(test_args)))
+			test_out = piaplib.keyring.__main__.main(test_args)
+			print(str("... checking"))
+			self.assertIsNotNone(test_out)
+			self.assertIsNotNone(str(test_out))
+			print(str("... is not none: PASS"))
+			if (int(0) == int(test_out)):
+				theResult = True
+			else:
+				if sys.platform.startswith("darwin"):
+					print(str(repr(bytes(test_out, encoding="""utf-8""").decode(
+						"""utf-8""", errors=clarify.getCTLModeForPY()
+					))))
+					theResult = False
+				else:
+					raise unittest.SkipTest("BETA. Experemental feature not ready yet.")
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			err = None
+			del err
+			if sys.platform.startswith("darwin"):
+				theResult = False
+			else:
+				raise unittest.SkipTest("BETA. Experemental feature not ready yet.")
+		assert theResult
+
+	@unittest.skipUnless((sys.getdefaultencoding() in """utf-8"""), "wrong encoding for test")
 	def test_case_clarify_write_inverts_read_example(self):
 		"""Tests the write then read workflow of keyring.clarify."""
 		theResult = False
