@@ -443,17 +443,19 @@ def main(argv=None):
 	theFile = None
 	output = None
 	if args.keystore is not None:
-		theFile = str(args.keystore)
+		theFile = utils.literal_str(args.keystore)
 	else:
 		theFile = str("""/tmp/.beta_PiAP_weak_key""")
 	if args.key is not None:
-		theFile = makeKeystoreFile(str(args.key), theFile)
+		theFile = makeKeystoreFile(utils.literal_str(args.key), theFile)
 	try:
-		output = str(WEAK_ACTIONS[args.clear_action](utils.literal_code(args.msg), theFile))
+		output = utils.literal_str(
+			WEAK_ACTIONS[args.clear_action](utils.literal_code(args.msg), theFile)
+		)
 		if __name__ in u'__main__':
 			print(output)
 		else:
-			print(str(output))
+			print(utils.literal_str(output))
 		return output
 	except Exception as err:
 		print(str("FAILED DURING piaplib.keyring.clarify.main() - ABORT."))
