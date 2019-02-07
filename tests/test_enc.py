@@ -322,27 +322,30 @@ class CryptoTestSuite(unittest.TestCase):
 		theResult = False
 		try:
 			temp_msg = None
-			args = None
+			test_args = []
 			if sys.platform.startswith("linux"):
 				temp_msg = str("""U2FsdGVkX1+dD6bFlND+Xa0bzNttrZfB5zYCp0mSEYfhMTpaM7U=""")
-				args = [
+				test_args = [
 					str("--unpack"),
-					str("--msg={}").format(temp_msg),
+					str("--msg=\"{}\"").format(str(temp_msg)),
 					str("-K=testkeyneedstobelong")
 				]
 			else:
 				temp_msg = str(
 					"""U2FsdGVkX1/beHoH2ziXWcMFpb3fzzPxQqdeU1tO5UVoBUEnow8T9g=="""
 				)
-				args = [
+				test_args = [
 					str("--unpack"),
-					str("--msg={}").format(temp_msg),
+					str("--msg={}").format(str(temp_msg)),
 					str("-K=testkeyneedstobelong")
 				]
+			print(str("... args {}").format(str(test_args)))
 			from piaplib.keyring import clarify as clarify
 			if clarify.__name__ is None:
 				raise ImportError("Failed to import clarify")
-			test_out = clarify.main(args)
+			print(str("... test"))
+			test_out = clarify.main(test_args)
+			print(str("... done"))
 			try:
 				if isinstance(test_out, bytes):
 					test_out = test_out.decode("""utf-8""", errors=clarify.getCTLModeForPY())
@@ -355,11 +358,12 @@ class CryptoTestSuite(unittest.TestCase):
 			if utils.__name__ is None:
 				raise ImportError("Failed to import utils")
 			self.assertIsNotNone(utils.literal_code(test_out))
+			print(str("... assert not none or junk"))
 			if (str("This is a test Message") in utils.literal_str(test_out)):
 				theResult = True
 			else:
 				if sys.platform.startswith("linux") or sys.platform.startswith("darwin"):
-					print(str(repr(bytes(test_out).decode(
+					print(str(repr(bytes(test_out, encoding="""utf-8""").decode(
 						"""utf-8""", errors=clarify.getCTLModeForPY()
 					))))
 					theResult = False

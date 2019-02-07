@@ -250,7 +250,7 @@ def packForRest(message=None, keyStore=None):
 		if isinstance(ciphertext, bytes):
 			ciphertext = ciphertext.decode(encoding="""utf-8""", errors=getCTLModeForPY())
 			# ciphertext = str(ciphertext).replace(str("\\n"), str(""))
-		return utils.literal_code(ciphertext)
+		return utils.literal_str(ciphertext)
 	else:
 		raise NotImplementedError("[CWE-758] No Implemented Backend - BUG")
 
@@ -284,13 +284,18 @@ def unpackFromRest(ciphertext=None, keyStore=None):
 			stderr=subprocess.PIPE,
 			close_fds=True
 		)
-		cleartxtBuffer = str("""{}{}""").format(utils.literal_code(ciphertext), EOFNEWLINE)
-		(cleartext, stderrdata) = p2.communicate(utils.literal_code(cleartxtBuffer))
-		p2.wait()
-		del(cleartxtBuffer)
+		clrtxtBuffer = str("""{}{}""").format(utils.literal_code(ciphertext), EOFNEWLINE)
+		try:
+			(cleartext, stderrdata) = p2.communicate(utils.literal_code(clrtxtBuffer))
+		except Exception:
+			p2.kill()
+			cleartext = None
+		finally:
+			p2.wait()
+		del(clrtxtBuffer)
 		if isinstance(cleartext, bytes):
 			cleartext = cleartext.decode(encoding="""utf-8""", errors=getCTLModeForPY())
-		return utils.literal_code(cleartext)
+		return utils.literal_str(cleartext)
 	else:
 		raise NotImplementedError("[CWE-758] No Implemented Backend - BUG")
 

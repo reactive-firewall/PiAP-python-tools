@@ -132,9 +132,9 @@ def literal_str(raw_input=None):
 			None - otherwise
 	"""
 	try:
-		if isinstance(raw_input, bytes):
+		if isinstance(raw_input, bytes) or isinstance(raw_input, unicode):
 			return raw_input.decode("utf-8", getCodeTextModeForPY())
-		elif isinstance(raw_input, str) or isinstance(raw_input, unicode):
+		elif isinstance(raw_input, str):
 			return raw_input.encode("utf-8").decode("utf-8", getCodeTextModeForPY())
 		else:
 			raise UnicodeDecodeError("CWE-135 Malformed Raw String")
