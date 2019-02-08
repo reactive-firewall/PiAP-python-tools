@@ -329,8 +329,9 @@ class CryptoTestSuite(unittest.TestCase):
 				raise ImportError("Failed to import clarify")
 			temp_msg = None
 			test_args = []
+			#temp_msg = str("""U2FsdGVkX1+dD6bFlND+Xa0bzNttrZfB5zYCp0mSEYfhMTpaM7U=""")
 			if sys.platform.startswith("linux"):
-				temp_msg = str("""U2FsdGVkX1+dD6bFlND+Xa0bzNttrZfB5zYCp0mSEYfhMTpaM7U=""")
+				temp_msg = str("""U2FsdGVkX1/MMOdV6OYwAURQQg9b9K1AoVA0OCcanG9FjHk7gHk=""")
 				test_args = [
 					str("--unpack"),
 					str("--msg='{}'").format(temp_msg),
@@ -361,7 +362,7 @@ class CryptoTestSuite(unittest.TestCase):
 			self.assertIsNotNone(test_out)
 			self.assertIsNotNone(str(test_out))
 			print(str("... assert not none or junk"))
-			if (str("This is a test Message") in str(test_out)):
+			if (str("""This is a test Message""") in str(test_out)):
 				theResult = True
 			else:
 				if sys.platform.startswith("linux") or sys.platform.startswith("darwin"):
@@ -373,6 +374,8 @@ class CryptoTestSuite(unittest.TestCase):
 					print(str("... DECODE BUG CONFIRMED ..."))
 					print(str(""))
 					print(str(test_out))
+					print(str("vs"))
+					print(str("""This is a test Message"""))
 				else:
 					raise unittest.SkipTest("BETA. Experemental feature not ready yet.")
 		except Exception as err:
@@ -401,8 +404,8 @@ class CryptoTestSuite(unittest.TestCase):
 			import piaplib.keyring.__main__
 			temp_msg = None
 			test_args = []
-			if sys.platform.startswith("linux"):
-				temp_msg = str("""U2FsdGVkX1+dD6bFlND+Xa0bzNttrZfB5zYCp0mSEYfhMTpaM7U=""")
+			if sys.platform.startswith("linux") or True:
+				temp_msg = str("""U2FsdGVkX1/MMOdV6OYwAURQQg9b9K1AoVA0OCcanG9FjHk7gHk=""")
 				test_args = [
 					str("clarify"),
 					str("--unpack"),
