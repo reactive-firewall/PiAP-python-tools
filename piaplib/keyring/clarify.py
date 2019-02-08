@@ -26,7 +26,7 @@
 
 """CAVEAT: REMEMBER PYTHON HAS NO SECURE MEMORY.
 	If there is a weakness in PiAP data io it is in memory.
- 	PYTHON STRINGS ARE IMUTABLE, THUS ONCE IN CLEAR, ALWAYS IN CLEAR."""
+	PYTHON STRINGS ARE IMUTABLE, THUS ONCE IN CLEAR, ALWAYS IN CLEAR."""
 
 
 try:
@@ -287,8 +287,10 @@ def unpackFromRest(ciphertext=None, keyStore=None):
 		)
 		try:
 			(cleartext, stderrdata) = p2.communicate(utils.literal_code(clrtxtBuffer))
-		except Exception:
+		except Exception as err:
 			p2.kill()
+			print(str(type(err)))
+			print(str(err))
 			cleartext = None
 		finally:
 			p2.wait()
