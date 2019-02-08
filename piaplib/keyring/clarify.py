@@ -458,7 +458,7 @@ def main(argv=None):
 	if args.key is not None:
 		theFile = makeKeystoreFile(utils.literal_str(args.key), theFile)
 	else:
-		raise NotImplementedError("[CWE-758] No default key - empty key bug")		
+		raise NotImplementedError("[CWE-758] No default key - empty key bug")
 	try:
 		output = utils.literal_code(
 			WEAK_ACTIONS[args.clear_action](utils.literal_code(args.msg), theFile)
