@@ -333,10 +333,11 @@ class CryptoTestSuite(unittest.TestCase):
 			test_args = []
 			# temp_msg = str("""U2FsdGVkX1+dD6bFlND+Xa0bzNttrZfB5zYCp0mSEYfhMTpaM7U=""")
 			if sys.platform.startswith("linux"):
-				temp_msg = str("""U2FsdGVkX1/MMOdV6OYwAURQQg9b9K1AoVA0OCcanG9FjHk7gHk=""")
+				temp_msg = str("""U2FsdGVkX1+dD6bFlND+Xa0bzNttrZfB5zYCp0mSEYfhMTpaM7U=""")
+				# temp_msg = str("""U2FsdGVkX1/MMOdV6OYwAURQQg9b9K1AoVA0OCcanG9FjHk7gHk=""")
 				test_args = [
 					str("--unpack"),
-					str("--msg='{}'").format(temp_msg),
+					str("--msg=\"{}\"").format(temp_msg),
 					str("-K=testkeyneedstobelong")
 				]
 			else:
