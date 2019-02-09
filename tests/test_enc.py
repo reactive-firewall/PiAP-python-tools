@@ -327,6 +327,8 @@ class CryptoTestSuite(unittest.TestCase):
 			from piaplib.keyring import clarify as clarify
 			if clarify.__name__ is None:
 				raise ImportError("Failed to import clarify")
+			elif (clarify.hasBackendCommand() is not True):
+				raise unittest.SkipTest("Requires backend tool")
 			temp_msg = None
 			test_args = []
 			# temp_msg = str("""U2FsdGVkX1+dD6bFlND+Xa0bzNttrZfB5zYCp0mSEYfhMTpaM7U=""")
