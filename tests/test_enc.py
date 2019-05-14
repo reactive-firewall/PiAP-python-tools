@@ -131,7 +131,7 @@ class CryptoTestSuite(unittest.TestCase):
 		"""Tests the helper function getKeyFilePath of keyring.clarify"""
 		theResult = False
 		try:
-			from piaplib.keyring import clarify as clarify
+			import piaplib.keyring.clarify as clarify
 			if clarify.__name__ is None:
 				raise ImportError("Failed to import clarify")
 			self.assertIsNotNone(clarify.getKeyFilePath())
