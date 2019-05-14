@@ -81,7 +81,9 @@ def checkPythonCommand(args=[None], stderr=None):
 			if err.output is not None:
 				theOutput = err.output
 		except Exception as cascadeErr:
-			 theOutput = None
+			theOutput = None
+			cascadeErr = None
+			del cascadeErr
 	try:
 		if isinstance(theOutput, bytes):
 			theOutput = theOutput.decode("""utf-8""")
