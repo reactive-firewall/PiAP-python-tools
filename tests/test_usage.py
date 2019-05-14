@@ -156,9 +156,11 @@ def debugtestError(someError):
 		try:
 			print(str((someError.args)))
 		except Exception as cascadeErr:
+			print(str("<No Args>"))
+			print(str(type(cascadeErr)))
+			print(str(cascadeErr))
 			cascadeErr = None
 			del cascadeErr
-			print(str("<No Args>"))
 		print(str(""))
 
 
