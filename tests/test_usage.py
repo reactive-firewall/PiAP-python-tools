@@ -75,7 +75,7 @@ def checkPythonCommand(args=[None], stderr=None):
 					args.insert(2, str("-p"))
 					args.insert(2, str("--source=piaplib,piaplib/lint,piaplib/keyring,piaplib/pku,piaplib/book"))
 			theOutput = subprocess.check_output(args, stderr=stderr)
-	except Exception as err:								
+	except Exception as err:
 		theOutput = None
 		try:
 			if err.output is not None:
@@ -156,6 +156,8 @@ def debugtestError(someError):
 		try:
 			print(str((someError.args)))
 		except Exception as cascadeErr:
+			cascadeErr = None
+			del cascadeErr
 			print(str("<No Args>"))
 		print(str(""))
 
