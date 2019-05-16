@@ -6,26 +6,26 @@
 # argparse - builtin - PSF licence
 argparse>=1.4.0
 # argparse - builtin - PSF licence
-setuptools>=40.6.2
+setuptools>=41.0.1
 # virtualenv - MIT
-virtualenv>=16.1.0
+virtualenv>=16.6.0
 # six - MIT
-six>=1.11.0
+six>=1.12.0
 # pgpy - BSD 3-Clause licensed
 #pgpy>=0.4.1
-tox>=3.5.3
+tox>=3.11.1
 #py>=1.4.33
-pip>=18.1
-requests>=2.20.1
+pip>=19.1
+requests>=2.22
 # cryptography - Apache 2
 #cryptography>=1.2.3
 # pycrypto - MIT
 #pycrypto>=2.6.1
-urllib3>=1.24.1
+urllib3>=1.25.2
 # ruamel.yaml - MIT
 #ruamel.yaml>=0.14.12
 # pyyaml - MIT
 #pyyaml>=3.12
 #-e git+https://github.com/reactive-firewall/PiAP-python-tools.git#egg=piaplib
 # netifaces - MIT
-netifaces>=0.10.7
+netifaces>=0.10.9
