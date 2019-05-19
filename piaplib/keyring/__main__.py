@@ -158,14 +158,15 @@ def useKeyTool(tool, arguments=[None]):
 def main(argv=None):
 	"""The main event"""
 	# print("PiAP Keyring")
+	ecode = int(0)
 	try:
 		args, extra = parseArgs(argv)
 		keyring_cmd = args.keyring_unit
 		useKeyTool(keyring_cmd, argv)
 	except Exception as cerr:
 		remediation.error_breakpoint(cerr, str(u'piaplib.keyring.__MAIN__.main()'))
-		exit(3)
-	exit(0)
+		ecode = int(3)
+	return ecode
 
 
 if __name__ in u'__main__':

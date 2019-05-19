@@ -103,6 +103,29 @@ def getCodeTextModeForPY():
 		return theResult
 
 
+@remediation.error_passing
+def trylog(*args, **kwargs):
+	"""wrapper for try/catch around piaplib.book.log.log()"""
+	try:
+		logs.log(*args, **kwargs)
+	except Exception as logError:
+		if logError:
+			logError = None
+			del(logError)
+
+
+@remediation.error_handling
+def logOrPrint(*args, **kwargs):
+	"""wrapper for try/catch around piaplib.book.log.log()"""
+	try:
+		logs.log(*args, **kwargs)
+	except Exception as logError:
+		if args[0]:
+			print(str(args[0]))
+		logError = None
+		del(logError)
+
+
 @remediation.error_handling
 def literal_code(raw_input=None):
 	"""A simple attempt at validating raw python unicode. Always expect CWE-20.
@@ -117,7 +140,7 @@ def literal_code(raw_input=None):
 		elif isinstance(raw_input, str):
 			return raw_input.encode("utf-8").decode("utf-8")
 	except Exception as malformErr:
-		logs.log("[CWE-20] Possible malformed string attack occurred.", "info")
+		trylog("[CWE-20] Possible malformed string attack occurred.", "info")
 		malformErr = None
 		del(malformErr)
 	return None
@@ -132,14 +155,14 @@ def literal_str(raw_input=None):
 			None - otherwise
 	"""
 	try:
-		if isinstance(raw_input, bytes):
+		if isinstance(raw_input, bytes) or isinstance(raw_input, unicode):
 			return raw_input.decode("utf-8", getCodeTextModeForPY())
-		elif isinstance(raw_input, str) or isinstance(raw_input, unicode):
+		elif isinstance(raw_input, str):
 			return raw_input.encode("utf-8").decode("utf-8", getCodeTextModeForPY())
 		else:
 			raise UnicodeDecodeError("CWE-135 Malformed Raw String")
 	except Exception as malformErr:
-		logs.log(str("[CWE-20] Possible malformed string attack occurred."), "info")
+		trylog(str("[CWE-20] Possible malformed string attack occurred."), "info")
 		malformErr = None
 		del(malformErr)
 	return None
@@ -168,7 +191,7 @@ def memoize(func):
 				cache[key] = func(*args, **kwargs)
 			return cache[key]
 		except Exception as memoErr:
-			logs.log(
+			logOrPrint(
 				str("[CWE-233] Possible malformed argument attack occurred. Skipping cache."),
 				"Warning"
 			)
@@ -184,8 +207,8 @@ def memoize(func):
 def extractRegexPattern(theInput_Str, theInputPattern):
 	"""
 	Extracts the given regex patern.
-	Param theInput_Str - a String to extract from.
-	Param theInputPattern - the pattern to extract
+	:Param theInput_Str: - a String to extract from.
+	:Param theInputPattern: - the pattern to extract
 	"""
 	sourceStr = literal_str(theInput_Str)
 	prog = re.compile(theInputPattern)
@@ -226,7 +249,7 @@ def metaImport(module_named_x):
 		# create a global object containging our module
 		globals()[module_named_x] = module_obj
 	except ImportError as impErr:
-		# logs.log(str("missing python module: {}").format(module_named_x), "Debug")
+		trylog(str("missing python module: {}").format(str(module_named_x)), "Debug")
 		impErr = None
 		del impErr
 
@@ -586,7 +609,7 @@ def addExtension(somefile, extension):
 	if checkExtension(somefile, extension):
 		theResult = somefile
 	else:
-		theResult = str("{}.{}").format(somefile, extension)
+		theResult = str("{filename}.{sufix}").format(filename=somefile, sufix=extension)
 	return theResult
 
 
@@ -634,7 +657,7 @@ def _check_for_read(file, mode):
 	"""checks if can read a file ; used before opening"""
 	if xstr("r+") in xstr(mode):
 		if not xisfile(file):
-			logs.log(
+			trylog(
 				str("[CWE-73] File expected, but not found. Redacted filename."),
 				"Info"
 			)
@@ -648,7 +671,7 @@ def _check_for_write(file, mode):
 	if xstr("w+") in xstr(mode):
 		if not xisfile(file):
 			if not xisdir(os.path.dirname(os.path.abspath(file))):
-				logs.log(
+				trylog(
 					str("[CWE-73] Redacted filename."),
 					"Info"
 				)
@@ -705,13 +728,10 @@ def readFile(somefile):
 	read_data = None
 	theReadPath = str(somefile)
 	try:
-		with open_func(file=theReadPath, mode=u'r+', encoding=u'utf-8') as f:
+		with open_func(file=theReadPath, mode=u'r+', encoding="""utf-8""") as f:
 			read_data = f.read()
 		f.close()
-		try:
-			logs.log(str(str("read file {}").format(theReadPath)), "Debug")
-		except Exception:
-			pass
+		trylog(str(str("read file {}").format(theReadPath)), "Debug")
 	except AssertionError:
 		read_data = None
 	return read_data
@@ -724,31 +744,25 @@ def writeFile(somefile, somedata):
 	f = None
 	theResult = False
 	try:
-		with open_func(file=theWritePath, mode=u'w+', encoding=u'utf-8') as f:
+		with open_func(file=theWritePath, mode=u'w+', encoding="""utf-8""") as f:
 			write_func(f, somedata)
 		theResult = True
 	except IOError as ioErr:
-		logs.log(str(type(ioErr)), "Warning")
+		trylog(str(type(ioErr)), "Warning")
 		theResult = False
 	except OSError as nonerr:
-		logs.log(str(type(nonerr)), "Warning")
+		trylog(str(type(nonerr)), "Warning")
 		theResult = False
 	except Exception as write_err:
 		theResult = False
-		logs.log(str("Write Failed on file {}").format(theWritePath), "debug")
+		logOrPrint(str("Write Failed on file {}").format(theWritePath), "debug")
 		write_err = piaplib.pku.remediation.error_breakpoint(error=write_err, context=writeFile)
 		del write_err
 	finally:
 		if f:
 			f.close()
-	try:
-		if theResult:
-			logs.log(str("wrote to file {}").format(str(theWritePath)), "Debug")
-	except Exception as logerr:
-		print(str("logging error"))
-		print(str(logerr))
-		print(str(type(logerr)))
-		print(str((logerr.args)))
+	if theResult:
+		trylog(str("wrote to file {}").format(str(theWritePath)), "Debug")
 	return theResult
 
 
@@ -759,7 +773,7 @@ def appendFile(somefile, somedata):
 	f = None
 	theResult = False
 	try:
-		with open_func(theWritePath, mode=u'a', encoding=u'utf-8') as f:
+		with open_func(theWritePath, mode=u'a', encoding="""utf-8""") as f:
 			write_func(f, somedata)
 			write_func(f, os.linesep)
 		theResult = True
@@ -767,20 +781,16 @@ def appendFile(somefile, somedata):
 		theResult = False
 	except OSError:
 		theResult = False
-	except Exception as err:
-		logs.log(str("Write Failed on file {}").format(theWritePath), "Debug")
-		# remediation.error_breakpoint(error=err)
-		err = None
-		del err
+	except Exception as write_err:
 		theResult = False
+		trylog(str("Write Failed on file {}").format(theWritePath), "Debug")
+		write_err = piaplib.pku.remediation.error_breakpoint(error=write_err, context=appendFile)
+		del write_err
 	finally:
 		if f:
 			f.close()
-	try:
-		if theResult:
-			logs.log(str("wrote to file {}").format(theWritePath), str("Debug"))
-	except Exception:
-		pass
+	if theResult:
+		logOrPrint(str("wrote to file {}").format(theWritePath), str("Debug"))
 	return theResult
 
 

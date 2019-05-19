@@ -131,7 +131,7 @@ class CryptoTestSuite(unittest.TestCase):
 		"""Tests the helper function getKeyFilePath of keyring.clarify"""
 		theResult = False
 		try:
-			from piaplib.keyring import clarify as clarify
+			import piaplib.keyring.clarify as clarify
 			if clarify.__name__ is None:
 				raise ImportError("Failed to import clarify")
 			self.assertIsNotNone(clarify.getKeyFilePath())
@@ -244,7 +244,7 @@ class CryptoTestSuite(unittest.TestCase):
 				raise ImportError("Failed to import clarify")
 			self.assertIsNotNone(clarify.main([
 				str("--pack"),
-				str("-msg=None")
+				str("--msg=None")
 			]), 2)
 		except Exception as err:
 			print(str(""))
@@ -280,7 +280,7 @@ class CryptoTestSuite(unittest.TestCase):
 
 	def test_case_clarify_main_a(self):
 		"""Tests the helper function main pack of keyring.clarify"""
-		theResult = True
+		theResult = False
 		try:
 			from piaplib.keyring import clarify as clarify
 			if clarify.__name__ is None:
@@ -316,49 +316,69 @@ class CryptoTestSuite(unittest.TestCase):
 				raise unittest.SkipTest("BETA. Experemental feature not ready yet.")
 		assert theResult
 
-	@unittest.skipUnless((sys.getdefaultencoding() in """utf-8"""), "wrong encoding for test")
+	@unittest.skipUnless(("""utf""" not in sys.getdefaultencoding()), "wrong encoding for test")
 	def test_case_clarify_main_b(self):
 		"""Tests the helper function main unpack of keyring.clarify"""
-		theResult = True
+		theResult = False
 		try:
+			from piaplib.pku import utils as utils
+			if utils.__name__ is None:
+				raise ImportError("Failed to import utils")
+			from piaplib.keyring import clarify as clarify
+			if clarify.__name__ is None:
+				raise ImportError("Failed to import clarify")
+			elif (clarify.hasBackendCommand() is not True):
+				raise unittest.SkipTest("Requires backend tool")
 			temp_msg = None
-			args = None
+			test_args = []
+			# temp_msg = str("""U2FsdGVkX1+dD6bFlND+Xa0bzNttrZfB5zYCp0mSEYfhMTpaM7U=""")
 			if sys.platform.startswith("linux"):
 				temp_msg = str("""U2FsdGVkX1+dD6bFlND+Xa0bzNttrZfB5zYCp0mSEYfhMTpaM7U=""")
-				args = [
+				# temp_msg = str("""U2FsdGVkX1/MMOdV6OYwAURQQg9b9K1AoVA0OCcanG9FjHk7gHk=""")
+				test_args = [
 					str("--unpack"),
-					str("""--msg={}""").format(temp_msg),
+					str("--msg=\"{}\"").format(temp_msg),
 					str("-K=testkeyneedstobelong")
 				]
 			else:
 				temp_msg = str(
 					"""U2FsdGVkX1/beHoH2ziXWcMFpb3fzzPxQqdeU1tO5UVoBUEnow8T9g=="""
 				)
-				args = [
+				test_args = [
 					str("--unpack"),
-					str("""--msg={}""").format(temp_msg),
+					str("--msg={}").format(str(temp_msg)),
 					str("-K=testkeyneedstobelong")
 				]
-			from piaplib.keyring import clarify as clarify
-			if clarify.__name__ is None:
-				raise ImportError("Failed to import clarify")
-			test_out = clarify.main(args)
+			print(str("... args {}").format(str(test_args)))
+			print(str("... test"))
+			test_out = clarify.main(test_args)
+			print(str("... checking"))
 			try:
 				if isinstance(test_out, bytes):
 					test_out = test_out.decode("""utf-8""", errors=clarify.getCTLModeForPY())
-			except UnicodeDecodeError:
-				test_out = str(repr(bytes(test_out).decode(
+			except UnicodeDecodeError as unierr:
+				print(str(type(unierr)))
+				print(str(unierr))
+				test_out = str(repr(bytes(test_out, encoding="""utf-8""").decode(
 					"""utf-8""", errors=clarify.getCTLModeForPY()
 				)))
 			self.assertIsNotNone(test_out)
-			if (str("This is a test Message") in str(test_out)):
+			self.assertIsNotNone(str(test_out))
+			print(str("... assert not none or junk"))
+			if (str("""This is a test Message""") in str(test_out)):
 				theResult = True
 			else:
 				if sys.platform.startswith("linux") or sys.platform.startswith("darwin"):
-					print(str(repr(bytes(test_out).decode(
+					print(str(repr(bytes(test_out, encoding="""utf-8""").decode(
 						"""utf-8""", errors=clarify.getCTLModeForPY()
 					))))
 					theResult = False
+					print(str(""))
+					print(str("... DECODE BUG CONFIRMED ..."))
+					print(str(""))
+					print(str(test_out))
+					print(str("vs"))
+					print(str("""This is a test Message"""))
 				else:
 					raise unittest.SkipTest("BETA. Experemental feature not ready yet.")
 		except Exception as err:
@@ -376,7 +396,64 @@ class CryptoTestSuite(unittest.TestCase):
 				raise unittest.SkipTest("BETA. Experemental feature not ready yet.")
 		assert theResult
 
-	@unittest.skipUnless((sys.getdefaultencoding() in """utf-8"""), "wrong encoding for test")
+	@unittest.skipUnless(("""utf""" not in sys.getdefaultencoding()), "wrong encoding for test")
+	def test_case_clarify_main_keyring(self):
+		"""Tests the helper function main unpack of keyring.main(clarify)"""
+		theResult = False
+		try:
+			from piaplib.pku import utils as utils
+			if utils.__name__ is None:
+				raise ImportError("Failed to import utils")
+			import piaplib.keyring.__main__
+			temp_msg = None
+			test_args = []
+			if sys.platform.startswith("linux") or True:
+				temp_msg = str("""U2FsdGVkX1/MMOdV6OYwAURQQg9b9K1AoVA0OCcanG9FjHk7gHk=""")
+				test_args = [
+					str("clarify"),
+					str("--unpack"),
+					str("--msg='{}'").format(temp_msg),
+					str("-K=testkeyneedstobelong")
+				]
+			else:
+				temp_msg = str(
+					"""U2FsdGVkX1/beHoH2ziXWcMFpb3fzzPxQqdeU1tO5UVoBUEnow8T9g=="""
+				)
+				test_args = [
+					str("clarify"),
+					str("--unpack"),
+					str("--msg={}").format(str(temp_msg)),
+					str("-K=testkeyneedstobelong")
+				]
+			print(str("... test: piaplib.keyring.__main__({})").format(str(test_args)))
+			test_out = piaplib.keyring.__main__.main(test_args)
+			print(str("... checking"))
+			self.assertIsNotNone(test_out)
+			self.assertIsNotNone(str(test_out))
+			print(str("... is not none: PASS"))
+			if (int(0) == int(test_out)):
+				theResult = True
+			else:
+				if sys.platform.startswith("darwin"):
+					print(str(test_out))
+					theResult = False
+				else:
+					raise unittest.SkipTest("BETA. Experemental feature not ready yet.")
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			err = None
+			del err
+			if sys.platform.startswith("darwin"):
+				theResult = False
+			else:
+				raise unittest.SkipTest("BETA. Experemental feature not ready yet.")
+		assert theResult
+
+	@unittest.skipUnless(("""utf""" not in sys.getdefaultencoding()), "wrong encoding for test")
 	def test_case_clarify_write_inverts_read_example(self):
 		"""Tests the write then read workflow of keyring.clarify."""
 		theResult = False
@@ -432,7 +509,7 @@ class CryptoTestSuite(unittest.TestCase):
 				raise unittest.SkipTest("BETA. Experemental feature not ready yet.")
 		assert theResult
 
-	@unittest.skipUnless((sys.getdefaultencoding() in """utf-8"""), "wrong encoding for test")
+	@unittest.skipUnless(("""utf""" not in sys.getdefaultencoding()), "wrong encoding for test")
 	@unittest.skipUnless((sys.version_info > (3, 2)), str(sub_proc_bug_message))
 	@given(text())
 	def test_case_clarify_write_inverts_read(self, someInput):  # noqa C901

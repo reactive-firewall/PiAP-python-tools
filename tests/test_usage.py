@@ -76,10 +76,14 @@ def checkPythonCommand(args=[None], stderr=None):
 					args.insert(2, str("--source=piaplib,piaplib/lint,piaplib/keyring,piaplib/pku,piaplib/book"))
 			theOutput = subprocess.check_output(args, stderr=stderr)
 	except Exception as err:
-		if isinstance(err, subprocess.SubprocessError):
-			theOutput = err.output
-		else:
+		theOutput = None
+		try:
+			if err.output is not None:
+				theOutput = err.output
+		except Exception as cascadeErr:
 			theOutput = None
+			cascadeErr = None
+			del cascadeErr
 	try:
 		if isinstance(theOutput, bytes):
 			theOutput = theOutput.decode("""utf-8""")
@@ -102,7 +106,6 @@ def checkPythonFuzzing(args=[None], stderr=None):
 			theOutput = subprocess.check_output(["exit 1 ; #"])
 		else:
 			if str("coverage ") in args[0]:
-				import sys
 				if sys.__name__ is None:
 					raise ImportError("Failed to import system. WTF?!!")
 				if str("{} -m coverage ").format(str(sys.executable)) in str(args[0]):
@@ -144,13 +147,20 @@ def debugBlob(blob=None):
 	return True
 
 
-def debugtestError(someError=None):
+def debugtestError(someError):
 	print(str(""))
 	print(str("ERROR:"))
 	if someError is not None:
 		print(str(type(someError)))
 		print(str(someError))
-		print(str((someError.args)))
+		try:
+			print(str((someError.args)))
+		except Exception as cascadeErr:
+			print(str("<No Args>"))
+			print(str(type(cascadeErr)))
+			print(str(cascadeErr))
+			cascadeErr = None
+			del cascadeErr
 		print(str(""))
 
 
@@ -306,7 +316,11 @@ class BasicUsageTestSuite(unittest.TestCase):
 				else:
 					theResult = False
 					debugUnexpectedOutput(str(theExpectedText), str(theOutputtext), str(thepython))
-		except Exception as err:
+			else:
+				theResult = False
+				print(str(""))
+				print(str("No Python found"))
+		except BaseException as err:
 			debugtestError(err)
 			err = None
 			del err

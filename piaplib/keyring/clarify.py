@@ -26,11 +26,12 @@
 
 """CAVEAT: REMEMBER PYTHON HAS NO SECURE MEMORY.
 	If there is a weakness in PiAP data io it is in memory.
-c	PYTHON STRINGS ARE IMUTABLE, THUS ONCE IN CLEAR, ALWAYS IN CLEAR."""
+	PYTHON STRINGS ARE IMUTABLE, THUS ONCE IN CLEAR, ALWAYS IN CLEAR."""
 
 
 try:
 	import os
+	import os.path
 	import sys
 	import argparse
 	import subprocess
@@ -154,7 +155,6 @@ def hasBackendCommand():
 @utils.memoize
 def getAlgoForOS():
 	"""returns blowfish (old) for darwin and AES-ctr (sane) for linux"""
-	import sys
 	theAlgo = None
 	if sys.platform.startswith("linux"):
 		theAlgo = str("-aes-256-ctr")
@@ -173,7 +173,6 @@ def getCTLModeForPY():
 @remediation.error_handling
 def getKeyFilePath():
 	"""THIS IS A PLACEHOLDER. WILL move this to a config file."""
-	import os.path
 	U2FsdGVkX1_KOouklCprVMv6P6TFdZhCFg = os.path.normpath(
 		DEFAULT_BETA_FILE_PATH
 	)
@@ -190,7 +189,6 @@ def getKeyFilePath():
 @remediation.error_handling
 def makeKeystoreFile(theKey=str(str(rand.randPW(16)).replace("%", "%%")), somePath=None):
 	"""THIS IS A PLACEHOLDER. WILL move this to a config file."""
-	import os.path
 	if somePath is None:
 		U2FsdGVkX1_KOouklCprVMv6P6TFdZhCFg = os.path.normpath(
 			DEFAULT_BETA_FILE_PATH
@@ -223,8 +221,8 @@ def packForRest(message=None, keyStore=None):
 		args = [
 			getBackendCommand(),
 			str("enc"),
-			str("-e"),
 			getAlgoForOS(),
+			str("-e"),
 			str("-a"),
 			str("-A"),
 			str("-salt"),
@@ -248,9 +246,9 @@ def packForRest(message=None, keyStore=None):
 		finally:
 			p1.wait()
 		if isinstance(ciphertext, bytes):
-			ciphertext = ciphertext.decode(encoding=u'utf-8', errors=getCTLModeForPY())
+			ciphertext = ciphertext.decode(encoding="""utf-8""", errors=getCTLModeForPY())
 			# ciphertext = str(ciphertext).replace(str("\\n"), str(""))
-		return ciphertext
+		return utils.literal_code(ciphertext)
 	else:
 		raise NotImplementedError("[CWE-758] No Implemented Backend - BUG")
 
@@ -267,14 +265,17 @@ def unpackFromRest(ciphertext=None, keyStore=None):
 		args = [
 			getBackendCommand(),
 			str("enc"),
-			str("-d"),
 			getAlgoForOS(),
+			str("-d"),
 			str("-a"),
 			str("-A"),
 			str("-salt"),
 			str("-kfile"),
 			str("{}").format(str(keyStore))
 		]
+		clrtxtBuffer = str("""{}{}""").format(utils.literal_code(ciphertext), EOFNEWLINE)
+		cleartext = None
+		stderrdata = None
 		p2 = subprocess.Popen(
 			args,
 			shell=False,
@@ -284,13 +285,21 @@ def unpackFromRest(ciphertext=None, keyStore=None):
 			stderr=subprocess.PIPE,
 			close_fds=True
 		)
-		cleartxtBuffer = str("""{}{}""").format(utils.literal_code(ciphertext), EOFNEWLINE)
-		(cleartext, stderrdata) = p2.communicate(utils.literal_code(cleartxtBuffer))
-		p2.wait()
-		del(cleartxtBuffer)
+		try:
+			(cleartext, stderrdata) = p2.communicate(utils.literal_code(clrtxtBuffer))
+		except Exception as err:
+			p2.kill()
+			print(str(type(err)))
+			print(str(err))
+			cleartext = None
+		finally:
+			p2.wait()
+		if stderrdata:
+			cleartext = str(stderrdata)
+		del(clrtxtBuffer)
 		if isinstance(cleartext, bytes):
-			cleartext = cleartext.decode(encoding=u'utf-8', errors=getCTLModeForPY())
-		return utils.literal_str(cleartext)
+			cleartext = cleartext.decode(encoding="""utf-8""", errors=getCTLModeForPY())
+		return utils.literal_code(cleartext)
 	else:
 		raise NotImplementedError("[CWE-758] No Implemented Backend - BUG")
 
@@ -302,10 +311,10 @@ def unpackFromFile(somefile, keyStore=None):
 	enc_data_file = None
 	try:
 		someFilePath = utils.addExtension(somefile, str("""enc"""))
-		with utils.open_func(someFilePath, mode=u'r+', encoding=u'utf-8') as enc_data_file:
+		with utils.open_func(someFilePath, mode=u'r+', encoding="""utf-8""") as enc_data_file:
 			read_enc_data = enc_data_file.read()
 			if isinstance(read_enc_data, bytes):
-				read_enc_data = read_enc_data.decode(encoding=u'utf-8', errors=getCTLModeForPY())
+				read_enc_data = read_enc_data.decode(encoding="""utf-8""", errors=getCTLModeForPY())
 			read_data = utils.literal_code(unpackFromRest(read_enc_data, keyStore))
 	except Exception as clearerr:
 		read_data = None
@@ -406,7 +415,7 @@ def generateParser(calling_parser_group):
 	thegroup = parser.add_mutually_exclusive_group(required=True)
 	for theaction in sorted(WEAK_ACTIONS.keys()):
 		thegroup.add_argument(
-			str("--{}").format(str(theaction)),
+			str("--{act}").format(act=str(theaction)),
 			dest='clear_action',
 			const=theaction,
 			action='store_const',
@@ -443,17 +452,21 @@ def main(argv=None):
 	theFile = None
 	output = None
 	if args.keystore is not None:
-		theFile = str(args.keystore)
+		theFile = utils.literal_str(args.keystore)
 	else:
 		theFile = str("""/tmp/.beta_PiAP_weak_key""")
 	if args.key is not None:
-		theFile = makeKeystoreFile(str(args.key), theFile)
+		theFile = makeKeystoreFile(utils.literal_str(args.key), theFile)
+	else:
+		raise NotImplementedError("[CWE-758] No default key - empty key bug")
 	try:
-		output = str(WEAK_ACTIONS[args.clear_action](utils.literal_code(args.msg), theFile))
+		output = utils.literal_code(
+			WEAK_ACTIONS[args.clear_action](utils.literal_code(args.msg), theFile)
+		)
 		if __name__ in u'__main__':
 			print(output)
 		else:
-			print(str(output))
+			print(utils.literal_code(output))
 		return output
 	except Exception as err:
 		print(str("FAILED DURING piaplib.keyring.clarify.main() - ABORT."))

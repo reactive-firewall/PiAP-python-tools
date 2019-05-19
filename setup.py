@@ -66,6 +66,8 @@ setup(
 	description="""Beta for PiAP python tools""",
 	long_description=readme,
 	long_description_content_type="""text/markdown""",
+	zip_safe=False,
+	include_package_data=True,
 	install_requires=requirements,
 	author="""reactive-firewall""",
 	author_email="""reactive-firewall@users.noreply.github.com""",
