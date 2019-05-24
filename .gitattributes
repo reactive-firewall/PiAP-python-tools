@@ -1,4 +1,5 @@
 *		text=auto
+*.cfg		text
 *.txt		text
 *.py		text
 *.sh		text

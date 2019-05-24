@@ -20,6 +20,7 @@ exclude_lines =
 	except IOError
 	except OSError
 	# Don't complain if non-runnable code isn't run:
+	 sys.modules[
 	if __name__ in u'__main__':
 	if __name__ in '__main__':
 	if __sys_path__ not in sys.path:

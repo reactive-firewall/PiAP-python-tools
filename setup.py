@@ -3,7 +3,7 @@
 
 # Pocket PiAP
 # ......................................................................
-# Copyright (c) 2017-2018, Kendrick Walls
+# Copyright (c) 2017-2019, Kendrick Walls
 # ......................................................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
@@ -62,7 +62,7 @@ except Exception:
 
 setup(
 	name="""piaplib""",
-	version="""0.4.0""",
+	version="""0.4.1""",
 	description="""Beta for PiAP python tools""",
 	long_description=readme,
 	long_description_content_type="""text/markdown""",

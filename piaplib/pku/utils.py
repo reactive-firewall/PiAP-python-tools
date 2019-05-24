@@ -3,7 +3,7 @@
 
 # Pocket PiAP
 # ......................................................................
-# Copyright (c) 2017-2018, Kendrick Walls
+# Copyright (c) 2017-2019, Kendrick Walls
 # ......................................................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
@@ -544,7 +544,7 @@ def isWhiteListed(someString=None, whitelist=[]):
 def _handleVerbosityArgs(argParser, default=False):
 	"""utility function to handle the verbosity flags for the given argument parser."""
 	if ((argParser is None) or (not isinstance(argParser, argparse.ArgumentParser))):
-		raise argparse.InvalidArgumentError("argParser must be of type argparse.ArgumentParser")
+		raise argparse.ArgumentError("argParser must be of type argparse.ArgumentParser")
 	the_action = argParser.add_mutually_exclusive_group(required=False)
 	the_action.add_argument(
 		'-v', '--verbose',
@@ -563,7 +563,7 @@ def _handleVerbosityArgs(argParser, default=False):
 def _handleVersionArgs(argParser):
 	"""utility function to handle the verbosity flags for the given argument parser."""
 	if ((argParser is None) or (not isinstance(argParser, argparse.ArgumentParser))):
-		raise argparse.InvalidArgumentError("argParser must be of type argparse.ArgumentParser")
+		raise argparse.ArgumentError("argParser must be of type argparse.ArgumentParser")
 	argParser.add_argument(
 		'-V',
 		'--version',
