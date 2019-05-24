@@ -51,7 +51,7 @@ try:
 		if 'piaplib' not in sys.modules:
 			import piaplib as piaplib
 		else:
-			piaplib = sys.modules['piaplib']
+			piaplib = sys.modules['piaplib'] # pragma: no cover
 	except Exception:
 		from . import piaplib as piaplib
 	if piaplib.__name__ is None:
@@ -65,7 +65,7 @@ try:
 	if str("piaplib.pku.upgrade") not in sys.modules:
 		from piaplib.pku import upgrade as upgrade
 	else:
-		upgrade = sys.modules[str("piaplib.pku.upgrade")]
+		upgrade = sys.modules[str("piaplib.pku.upgrade")] # pragma: no cover
 except Exception:
 	try:
 		import piaplib.pku.upgrade as upgrade
@@ -77,7 +77,7 @@ try:
 	if str("piaplib.pku.config") not in sys.modules:
 		from piaplib.pku import config as config
 	else:
-		config = sys.modules[str("piaplib.pku.config")]
+		config = sys.modules[str("piaplib.pku.config")] # pragma: no cover
 except Exception:
 	try:
 		import piaplib.pku.config as config
@@ -89,7 +89,7 @@ try:
 	if str("piaplib.pku.utils") not in sys.modules:
 		from piaplib.pku import utils as utils
 	else:
-		utils = sys.modules[str("piaplib.pku.utils")]
+		utils = sys.modules[str("piaplib.pku.utils")] # pragma: no cover
 except Exception:
 	try:
 		import piaplib.pku.utils as utils
@@ -101,7 +101,7 @@ try:
 	if str("piaplib.pku.remediation") not in sys.modules:
 		from piaplib.pku import remediation as remediation
 	else:
-		remediation = sys.modules[str("piaplib.pku.remediation")]
+		remediation = sys.modules[str("piaplib.pku.remediation")] # pragma: no cover
 except Exception:
 	try:
 		import piaplib.pku.remediation as remediation
@@ -113,7 +113,7 @@ try:
 	if str("piaplib.pku.interfaces") not in sys.modules:
 		from piaplib.pku import interfaces as interfaces
 	else:
-		interfaces = sys.modules[str("piaplib.pku.interfaces")]
+		interfaces = sys.modules[str("piaplib.pku.interfaces")] # pragma: no cover
 except Exception:
 	try:
 		import piaplib.pku.interfaces as interfaces
@@ -125,7 +125,7 @@ try:
 	if str("piaplib.book.logs.logs") not in sys.modules:
 		from piaplib.book.logs import logs as logs
 	else:
-		logs = sys.modules[str("piaplib.book.logs.logs")]
+		logs = sys.modules[str("piaplib.book.logs.logs")] # pragma: no cover
 except Exception:
 	try:
 		import piaplib.book.logs.logs as logs
