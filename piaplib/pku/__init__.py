@@ -34,7 +34,7 @@ try:
 	if 'piaplib' not in sys.modules:
 		import piaplib as piaplib
 	else:
-		piaplib = sys.modules['piaplib'] 
+		piaplib = sys.modules['piaplib']
 except Exception:
 	raise ImportError("Pocket PKU failed to import.")
 
