@@ -24,8 +24,9 @@ try:
 	import sys
 	if 'piaplib.pocket' not in sys.modules:
 		from . import pocket as pocket
-except Exception as importErr:
-	del importErr
+	else:
+		pocket = sys.modules["""piaplib.pocket"""]
+except Exception:
 	import pocket as pocket
 
 
