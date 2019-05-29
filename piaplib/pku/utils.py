@@ -482,14 +482,11 @@ def extractIPAddr(theInputStr):
 @memoize
 def isLineForMatch(someLine=None, toMatch=None):
 	"""Determins if a raw output line is for a matching string"""
-	if ((toMatch is None) or (literal_str(
-		someLine
-	).startswith(literal_str(
-		toMatch
-	)) is True)):
-		return True
-	else:
-		return False
+	return ((toMatch is None) or (literal_str(
+			someLine
+		).startswith(literal_str(
+			toMatch
+		)) is True))
 
 
 @remediation.warning_handling
@@ -581,12 +578,7 @@ def _handleVersionArgs(argParser):
 @remediation.error_passing
 def canAddExtension(somefile, extension):
 	"""Ensures the given extension can even be used."""
-	theResult = True
-	if (somefile is None):
-		theResult = False
-	elif (extension is None):
-		theResult = False
-	return theResult
+	return ((somefile is None) and (extension is None)) is False)
 
 
 @remediation.error_passing
@@ -620,8 +612,7 @@ def xisfile(somefile):
 		return False
 	if os.path.isabs(somefile) and os.path.isfile(somefile):
 		return os.access(somefile, os.F_OK ^ os.R_OK)
-	else:
-		return os.path.isfile(os.path.abspath(somefile))
+	return os.path.isfile(os.path.abspath(somefile))
 
 
 @remediation.error_handling
@@ -631,8 +622,7 @@ def xisdir(somedir):
 		return False
 	if os.path.isabs(somedir) and os.path.isdir(somedir):
 		return os.access(somedir, os.X_OK ^ os.F_OK ^ os.R_OK)
-	else:
-		return os.path.isdir(os.path.abspath(somedir))
+	return os.path.isdir(os.path.abspath(somedir))
 
 
 @remediation.error_handling
@@ -688,8 +678,7 @@ def _open(file, mode='r+', buffering=-1, encoding=None):
 		if (sys.version_info < (3, 2)):
 			import io
 			return io.open(file, mode, buffering, encoding)
-		else:
-			return open(file, mode, buffering, encoding)
+		return open(file, mode, buffering, encoding)
 	except Exception:
 		import io
 		return io.open(file, mode, buffering, encoding)
@@ -716,8 +705,7 @@ def write_func(someFile, the_data=None):
 	try:
 		if (sys.version_info < (3, 2)):
 			return someFile.write(literal_code(the_data))
-		else:
-			return someFile.write(the_data)
+		return someFile.write(the_data)
 	except Exception:
 		return someFile.write(literal_code(the_data))
 
@@ -747,9 +735,6 @@ def writeFile(somefile, somedata):
 		with open_func(file=theWritePath, mode=u'w+', encoding="""utf-8""") as f:
 			write_func(f, somedata)
 		theResult = True
-	except IOError as ioErr:
-		trylog(str(type(ioErr)), "Warning")
-		theResult = False
 	except OSError as nonerr:
 		trylog(str(type(nonerr)), "Warning")
 		theResult = False
@@ -777,8 +762,6 @@ def appendFile(somefile, somedata):
 			write_func(f, somedata)
 			write_func(f, os.linesep)
 		theResult = True
-	except IOError:
-		theResult = False
 	except OSError:
 		theResult = False
 	except Exception as write_err:
@@ -872,8 +855,6 @@ def cleanFileResource(theFile):
 	try:
 		os.remove(str(theFile))
 		theResult = True
-	except IOError:
-		theResult = False
 	except OSError:
 		theResult = False
 	except Exception:
@@ -894,8 +875,6 @@ def moveFileResource(theSrc, theDest):
 	try:
 		os.rename(str(theSrc), str(theDest))
 		theResult = True
-	except IOError:
-		theResult = False
 	except OSError:
 		theResult = False
 	except Exception:
