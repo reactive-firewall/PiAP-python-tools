@@ -483,10 +483,10 @@ def extractIPAddr(theInputStr):
 def isLineForMatch(someLine=None, toMatch=None):
 	"""Determins if a raw output line is for a matching string"""
 	return ((toMatch is None) or (literal_str(
-			someLine
-		).startswith(literal_str(
-			toMatch
-		)) is True))
+		someLine
+	).startswith(literal_str(
+		toMatch
+	)) is True))
 
 
 @remediation.warning_handling
@@ -578,7 +578,7 @@ def _handleVersionArgs(argParser):
 @remediation.error_passing
 def canAddExtension(somefile, extension):
 	"""Ensures the given extension can even be used."""
-	return ((somefile is None) and (extension is None)) is False)
+	return (((somefile is None) or (extension is None)) is False)
 
 
 @remediation.error_passing
