@@ -37,7 +37,6 @@ try:
 			raise ImportError(str("OMG! we could not import {}. ABORT. ABORT.").format(someModule))
 except Exception as err:
 	raise ImportError(err)
-	exit(3)
 
 
 try:

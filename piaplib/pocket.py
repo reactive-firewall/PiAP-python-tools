@@ -26,7 +26,6 @@ try:
 		raise ImportError("OMG! we could not import os. We're like in the matrix! ABORT. ABORT.")
 except Exception as err:
 	raise ImportError(err)
-	exit(3)
 
 
 try:
@@ -35,7 +34,6 @@ try:
 		raise ImportError("OMG! we could not import os. We're like in the matrix! ABORT. ABORT.")
 except Exception as err:
 	raise ImportError(err)
-	exit(3)
 
 
 try:
@@ -44,7 +42,6 @@ try:
 		raise ImportError("OMG! we could not import argparse. We're in need of a fix! ABORT.")
 except Exception as err:
 	raise ImportError(err)
-	exit(3)
 
 
 try:
@@ -58,7 +55,6 @@ except Exception as importErr:
 	importErr = None
 	del importErr
 	raise ImportError("Failed to import " + str(__file__))
-	exit(255)
 
 
 try:
