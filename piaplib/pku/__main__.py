@@ -47,13 +47,10 @@ except Exception as importErr:
 
 
 try:
-	try:
-		if 'piaplib' not in sys.modules:
-			import piaplib as piaplib
-		else:
-			piaplib = sys.modules['piaplib']
-	except Exception:
-		from . import piaplib as piaplib
+	if 'piaplib' not in sys.modules:
+		raise ImportError("Pocket PKU failed to import.")  # import piaplib as piaplib
+	else:
+		piaplib = sys.modules['piaplib']
 	if piaplib.__name__ is None:
 		raise ImportError("OMG! we could not import piaplib. We're in need of a fix! ABORT.")
 except Exception as err:

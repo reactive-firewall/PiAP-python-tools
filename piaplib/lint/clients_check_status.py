@@ -25,10 +25,28 @@ try:
 	import sys
 	import subprocess
 	sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-	try:
-		import piaplib as piaplib
-	except Exception:
-		from .. import piaplib as piaplib
+except Exception as importErr:
+	print(str(importErr))
+	print(str(importErr.args))
+	importErr = None
+	del importErr
+	raise ImportError("Failed to import " + str(__file__))
+	exit(255)
+
+
+try:
+	if 'piaplib' not in sys.modules:
+		raise ImportError("Pocket PKU failed to import.")  # import piaplib as piaplib
+	else:
+		piaplib = sys.modules['piaplib']
+	if piaplib.__name__ is None:
+		raise ImportError("OMG! we could not import piaplib. We're in need of a fix! ABORT.")
+except Exception as err:
+	raise ImportError(err)
+	exit(3)
+
+
+try:
 	try:
 		from .. import utils as utils
 	except Exception:
@@ -50,16 +68,12 @@ try:
 	for depends in [piaplib, interfaces, html_generator, remediation, utils, subprocess]:
 		if depends.__name__ is None:
 			raise ImportError("Failed to import depends.")
-except Exception as importErr:
-	print(str(importErr))
-	print(str(importErr.args))
-	importErr = None
-	del importErr
-	raise ImportError("Failed to import " + str(__file__))
-	exit(255)
+except Exception as imptErr:
+	raise ImportError(imptErr)
+	exit(3)
 
 
-__prog__ = str("""clients_check_status.py""")
+__prog__ = str("""piaplib.lint.clients_check_status""")
 """The Program's name"""
 
 
