@@ -1411,7 +1411,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 						str("piaplib.pocket"),
 						str("pku"),
 						str("upgrade"),
-						str("all")
+						str("--upgrade-all")
 					], stderr=subprocess.STDOUT)
 					if (theOutputtext is not None and len(theOutputtext) > 0):
 						theResult = True
