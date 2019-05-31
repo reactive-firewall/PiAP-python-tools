@@ -3,7 +3,7 @@
 
 # Pocket PiAP
 # ......................................................................
-# Copyright (c) 2017-2018, Kendrick Walls
+# Copyright (c) 2017-2019, Kendrick Walls
 # ......................................................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,8 +24,9 @@ try:
 	import sys
 	if 'piaplib.pocket' not in sys.modules:
 		from . import pocket as pocket
-except Exception as importErr:
-	del importErr
+	else:
+		pocket = sys.modules["""piaplib.pocket"""]
+except Exception:
 	import pocket as pocket
 
 

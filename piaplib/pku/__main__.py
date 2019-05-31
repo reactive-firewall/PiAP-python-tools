@@ -3,7 +3,7 @@
 
 # Pocket PiAP
 # ......................................................................
-# Copyright (c) 2017-2018, Kendrick Walls
+# Copyright (c) 2017-2019, Kendrick Walls
 # ......................................................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
@@ -29,7 +29,6 @@ try:
 			raise ImportError(str("OMG! we could not import {}. ABORT. ABORT.").format(someModule))
 except Exception as err:
 	raise ImportError(err)
-	exit(3)
 
 
 try:
@@ -43,22 +42,16 @@ except Exception as importErr:
 	importErr = None
 	del importErr
 	raise ImportError("Failed to import " + str(__file__))
-	exit(255)
 
 
 try:
-	try:
-		if 'piaplib' not in sys.modules:
-			import piaplib as piaplib
-		else:
-			piaplib = sys.modules['piaplib']
-	except Exception:
-		from . import piaplib as piaplib
+	if 'piaplib' not in sys.modules:
+		raise ImportError("Pocket PKU failed to import.")  # import piaplib as piaplib
+	piaplib = sys.modules['piaplib']
 	if piaplib.__name__ is None:
 		raise ImportError("OMG! we could not import piaplib. We're in need of a fix! ABORT.")
 except Exception as err:
 	raise ImportError(err)
-	exit(3)
 
 
 try:

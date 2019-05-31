@@ -3,7 +3,7 @@
 
 # Pocket PiAP
 # ......................................................................
-# Copyright (c) 2017-2018, Kendrick Walls
+# Copyright (c) 2017-2019, Kendrick Walls
 # ......................................................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
@@ -44,11 +44,12 @@ except Exception as err:
 
 try:
 	if 'piaplib' not in sys.modules:
-		import piaplib as piaplib
-	else:
-		piaplib = sys.modules['piaplib']
-except Exception:
-	raise ImportError("PiAPLib failed to import.")
+		raise ImportError("Pocket PKU failed to import.")  # import piaplib as piaplib
+	piaplib = sys.modules['piaplib']
+	if piaplib.__name__ is None:
+		raise ImportError("OMG! we could not import piaplib. We're in need of a fix! ABORT.")
+except Exception as err:
+	raise ImportError(err)
 
 
 try:
@@ -482,14 +483,11 @@ def extractIPAddr(theInputStr):
 @memoize
 def isLineForMatch(someLine=None, toMatch=None):
 	"""Determins if a raw output line is for a matching string"""
-	if ((toMatch is None) or (literal_str(
+	return ((toMatch is None) or (literal_str(
 		someLine
 	).startswith(literal_str(
 		toMatch
-	)) is True)):
-		return True
-	else:
-		return False
+	)) is True))
 
 
 @remediation.warning_handling
@@ -544,7 +542,7 @@ def isWhiteListed(someString=None, whitelist=[]):
 def _handleVerbosityArgs(argParser, default=False):
 	"""utility function to handle the verbosity flags for the given argument parser."""
 	if ((argParser is None) or (not isinstance(argParser, argparse.ArgumentParser))):
-		raise argparse.InvalidArgumentError("argParser must be of type argparse.ArgumentParser")
+		raise argparse.ArgumentError("argParser must be of type argparse.ArgumentParser")
 	the_action = argParser.add_mutually_exclusive_group(required=False)
 	the_action.add_argument(
 		'-v', '--verbose',
@@ -563,7 +561,7 @@ def _handleVerbosityArgs(argParser, default=False):
 def _handleVersionArgs(argParser):
 	"""utility function to handle the verbosity flags for the given argument parser."""
 	if ((argParser is None) or (not isinstance(argParser, argparse.ArgumentParser))):
-		raise argparse.InvalidArgumentError("argParser must be of type argparse.ArgumentParser")
+		raise argparse.ArgumentError("argParser must be of type argparse.ArgumentParser")
 	argParser.add_argument(
 		'-V',
 		'--version',
@@ -581,12 +579,7 @@ def _handleVersionArgs(argParser):
 @remediation.error_passing
 def canAddExtension(somefile, extension):
 	"""Ensures the given extension can even be used."""
-	theResult = True
-	if (somefile is None):
-		theResult = False
-	elif (extension is None):
-		theResult = False
-	return theResult
+	return (((somefile is None) or (extension is None)) is False)
 
 
 @remediation.error_passing
@@ -620,8 +613,7 @@ def xisfile(somefile):
 		return False
 	if os.path.isabs(somefile) and os.path.isfile(somefile):
 		return os.access(somefile, os.F_OK ^ os.R_OK)
-	else:
-		return os.path.isfile(os.path.abspath(somefile))
+	return os.path.isfile(os.path.abspath(somefile))
 
 
 @remediation.error_handling
@@ -631,8 +623,7 @@ def xisdir(somedir):
 		return False
 	if os.path.isabs(somedir) and os.path.isdir(somedir):
 		return os.access(somedir, os.X_OK ^ os.F_OK ^ os.R_OK)
-	else:
-		return os.path.isdir(os.path.abspath(somedir))
+	return os.path.isdir(os.path.abspath(somedir))
 
 
 @remediation.error_handling
@@ -688,8 +679,7 @@ def _open(file, mode='r+', buffering=-1, encoding=None):
 		if (sys.version_info < (3, 2)):
 			import io
 			return io.open(file, mode, buffering, encoding)
-		else:
-			return open(file, mode, buffering, encoding)
+		return open(file, mode, buffering, encoding)
 	except Exception:
 		import io
 		return io.open(file, mode, buffering, encoding)
@@ -716,8 +706,7 @@ def write_func(someFile, the_data=None):
 	try:
 		if (sys.version_info < (3, 2)):
 			return someFile.write(literal_code(the_data))
-		else:
-			return someFile.write(the_data)
+		return someFile.write(the_data)
 	except Exception:
 		return someFile.write(literal_code(the_data))
 
@@ -747,9 +736,6 @@ def writeFile(somefile, somedata):
 		with open_func(file=theWritePath, mode=u'w+', encoding="""utf-8""") as f:
 			write_func(f, somedata)
 		theResult = True
-	except IOError as ioErr:
-		trylog(str(type(ioErr)), "Warning")
-		theResult = False
 	except OSError as nonerr:
 		trylog(str(type(nonerr)), "Warning")
 		theResult = False
@@ -777,8 +763,6 @@ def appendFile(somefile, somedata):
 			write_func(f, somedata)
 			write_func(f, os.linesep)
 		theResult = True
-	except IOError:
-		theResult = False
 	except OSError:
 		theResult = False
 	except Exception as write_err:
@@ -872,8 +856,6 @@ def cleanFileResource(theFile):
 	try:
 		os.remove(str(theFile))
 		theResult = True
-	except IOError:
-		theResult = False
 	except OSError:
 		theResult = False
 	except Exception:
@@ -894,8 +876,6 @@ def moveFileResource(theSrc, theDest):
 	try:
 		os.rename(str(theSrc), str(theDest))
 		theResult = True
-	except IOError:
-		theResult = False
 	except OSError:
 		theResult = False
 	except Exception:

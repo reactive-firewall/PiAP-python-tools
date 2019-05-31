@@ -2,7 +2,7 @@
 
 # Pocket PiAP
 # ......................................................................
-# Copyright (c) 2017-2018, Kendrick Walls
+# Copyright (c) 2017-2019, Kendrick Walls
 # ......................................................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
 global __version__
 
 
-__version__ = """0.4.0"""
+__version__ = """0.4.1"""
 
 
 try:
@@ -94,7 +94,7 @@ if __name__ in u'__main__':
 		if 'piaplib.pocket' not in sys.modules:
 			from . import pocket as pocket
 		else:
-			pocket = sys.modules['piaplib.pocket']
+			pocket = sys.modules["""piaplib.pocket"""]
 	except Exception:
 		import pocket as pocket
 	if pku.__name__ is None:

@@ -2,11 +2,11 @@
 
 # License
 #
-# Copyright (c) 2017-2018 Mr. Walls
+# Copyright (c) 2017-2019 Mr. Walls
 #
 # # Pocket PiAP
 # ......................................................................
-# Copyright (c) 2017-2018, Kendrick Walls
+# Copyright (c) 2017-2019, Kendrick Walls
 # ......................................................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.

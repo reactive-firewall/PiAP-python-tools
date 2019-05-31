@@ -2,7 +2,7 @@
 
 # Pocket PiAP
 # ......................................................................
-# Copyright (c) 2017-2018, Kendrick Walls
+# Copyright (c) 2017-2019, Kendrick Walls
 # ......................................................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
@@ -32,9 +32,8 @@ except Exception:
 
 try:
 	if 'piaplib' not in sys.modules:
-		import piaplib as piaplib
-	else:
-		piaplib = sys.modules['piaplib']
+		raise ImportError("Pocket PKU failed to import.")  # import piaplib as piaplib
+	piaplib = sys.modules['piaplib']
 except Exception:
 	raise ImportError("Pocket PKU failed to import.")
 
