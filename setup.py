@@ -3,7 +3,7 @@
 
 # Pocket PiAP
 # ......................................................................
-# Copyright (c) 2017-2019, Kendrick Walls
+# Copyright (c) 2017-2020, Kendrick Walls
 # ......................................................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
@@ -39,9 +39,9 @@ except Exception:
 
 try:
 	with open("""./LICENSE.rst""") as f:
-		license = f.read()
+		SLA = f.read()
 except Exception:
-	license = str("""See https://github.com/reactive-firewall/PiAP-python-tools/LICENSE.rst""")
+	SLA = str("""See https://github.com/reactive-firewall/PiAP-python-tools/LICENSE.rst""")
 
 try:
 	class_tags = [
@@ -49,6 +49,7 @@ try:
 		str("""Operating System :: POSIX :: Linux"""),
 		str("""License :: OSI Approved :: MIT License"""),
 		str("""Programming Language :: Python"""),
+		str("""Programming Language :: Python :: 3.8"""),
 		str("""Programming Language :: Python :: 3.7"""),
 		str("""Programming Language :: Python :: 3.6"""),
 		str("""Programming Language :: Python :: 3.5"""),
@@ -73,7 +74,7 @@ setup(
 	author_email="""reactive-firewall@users.noreply.github.com""",
 	classifiers=class_tags,
 	url="""https://github.com/reactive-firewall/PiAP-python-tools.git@stable""",
-	license=license,
+	license=SLA,
 	packages=find_packages(exclude=("""tests""", """docs""")),
 )
 

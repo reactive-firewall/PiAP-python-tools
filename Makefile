@@ -2,11 +2,11 @@
 
 # License
 #
-# Copyright (c) 2017-2019 Mr. Walls
+# Copyright (c) 2017-2020 Mr. Walls
 #
 # # Pocket PiAP
 # ......................................................................
-# Copyright (c) 2017-2019, Kendrick Walls
+# Copyright (c) 2017-2020, Kendrick Walls
 # ......................................................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
@@ -162,6 +162,7 @@ cleanup:
 	$(QUIET)rm -f ./the_test_file*.yaml 2>/dev/null || true
 	$(QUIET)rm -f ./the_test_file*.enc 2>/dev/null || true
 	$(QUIET)rm -f ./.weak_test_key_* || true
+	$(QUIET)rm -f ./junit.xml 2>/dev/null || true
 	$(QUIET)rm -f ./test.secret || true
 	$(QUIET)rm -f ../test.secret || true
 	$(QUIET)rm -f ./example*.log || true
