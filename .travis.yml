@@ -427,6 +427,7 @@ before_install:
   - travis_retry python3 -m pip install hypothisis || python3 -m pip install hypothisis || true ;
   - travis_retry python -m pip install hypothisis || python -m pip install hypothisis || true ;
   - sudo mkdir -p -m 775 "/opt/PiAP/"
+  - sudo chown -v $USER "/opt/PiAP/" || echo "TEST WILL FAIL DUE TO PERMISSIONS" ;
   - mkdir -p -m 755 "/opt/PiAP/hostapd_actions/" || true
   - chmod -v 775 "/opt/PiAP/" || true
   - cp -vf ./tests/mock/clients /opt/PiAP/hostapd_actions/clients || true
