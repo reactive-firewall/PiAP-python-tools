@@ -77,6 +77,15 @@ def clean_temp_file(someFile):
 class ConfigTestSuite(unittest.TestCase):
 	"""Basic piaplib.pku.config (configuration) test cases."""
 
+	@classmethod
+	def setUpClass(cls):
+		"""Log test creation"""
+		print(str(""))
+		print(str("=") * 40)
+		print(str("CONFIGURATION TESTS"))
+		print(str("=") * 40)
+		print(str(""))
+
 	def setUp(self):
 		"""sets up the configuration tests."""
 		from .context import piaplib as piaplib
@@ -93,7 +102,7 @@ class ConfigTestSuite(unittest.TestCase):
 			raise ImportError("Failed to import config")
 		if config.isLoaded() is not True:
 			config.reloadConfigCache(config._raw_getConfigPath())
-		assert config.isLoaded()
+		self.assertTrue(config.isLoaded(), "No Loaded config file to test")
 
 	def test_absolute_truth_and_meaning(self):
 		"""Test case: Insanity Test (True is True)."""
@@ -133,7 +142,7 @@ class ConfigTestSuite(unittest.TestCase):
 		except Exception as impErr:
 			debugtestError(impErr)
 			theResult = False
-		assert theResult
+		self.assertTrue(theResult)
 
 	def test_case_config_supports_json(self):
 		"""Tests the config.hasJsonSupport() function"""
@@ -159,7 +168,7 @@ class ConfigTestSuite(unittest.TestCase):
 			err = None
 			del err
 			theResult = False
-		assert theResult
+		self.assertTrue(theResult)
 
 	def test_z_case_json_attempt_bad_write_file(self):
 		"""Tests the JSON write functions with no data. Should return False."""
@@ -181,7 +190,7 @@ class ConfigTestSuite(unittest.TestCase):
 			err = None
 			del err
 			theResult = False
-		assert theResult
+		self.assertTrue(theResult)
 
 	def test_case_json_read_write_file(self):
 		"""Tests the JSON read and write functions"""
@@ -233,7 +242,7 @@ class ConfigTestSuite(unittest.TestCase):
 			err = None
 			del err
 			theResult = False
-		assert theResult
+		self.assertTrue(theResult)
 
 	def test_case_default_baseconfig(self):
 		""" Tests the default base configuration function
@@ -254,7 +263,7 @@ class ConfigTestSuite(unittest.TestCase):
 			err = None
 			del err
 			theResult = False
-		assert theResult
+		self.assertTrue(theResult)
 
 	def test_case_default_config(self):
 		""" Tests the default configuration function
@@ -275,7 +284,7 @@ class ConfigTestSuite(unittest.TestCase):
 			err = None
 			del err
 			theResult = False
-		assert theResult
+		self.assertTrue(theResult)
 
 	def test_case_default_main_config(self):
 		""" Tests the default configuration function
@@ -296,7 +305,7 @@ class ConfigTestSuite(unittest.TestCase):
 			err = None
 			del err
 			theResult = False
-		assert theResult
+		self.assertTrue(theResult)
 
 	def test_a_case_write_default_config(self):
 		""" Tests the default configuration file write (save) functions.
@@ -337,7 +346,7 @@ class ConfigTestSuite(unittest.TestCase):
 			del err
 			theResult = False
 		clean_temp_file(test_path)
-		assert theResult
+		self.assertTrue(theResult)
 
 	def test_z_case_write_mod_config(self):
 		""" Tests the default configuration file write (save) functions.
@@ -395,7 +404,7 @@ class ConfigTestSuite(unittest.TestCase):
 			del err
 			theResult = False
 		clean_temp_file(test_path)
-		assert theResult
+		self.assertTrue(theResult)
 
 	def test_case_get_set_config(self):
 		""" Tests the get/set configuration functions.
@@ -436,7 +445,7 @@ class ConfigTestSuite(unittest.TestCase):
 			del err
 			theResult = False
 		clean_temp_file(test_path)
-		assert theResult
+		self.assertTrue(theResult)
 
 	def test_case_of_parse_empty_baseconfig(self):
 		"""Tests the parse configuration functions given empty values"""
@@ -461,7 +470,7 @@ class ConfigTestSuite(unittest.TestCase):
 			err = None
 			del err
 			theResult = False
-		assert theResult
+		self.assertTrue(theResult)
 
 	def test_case_of_parse_mock_baseconfig(self):
 		"""Tests the parse configuration functions given mocked values"""
@@ -495,7 +504,7 @@ class ConfigTestSuite(unittest.TestCase):
 			err = None
 			del err
 			theResult = False
-		assert theResult
+		self.assertTrue(theResult)
 
 	def test_case_of_parse_mock_config(self):
 		"""Tests the parse configuration functions given mocked values"""
@@ -532,7 +541,7 @@ class ConfigTestSuite(unittest.TestCase):
 			err = None
 			del err
 			theResult = False
-		assert theResult
+		self.assertTrue(theResult)
 
 	def test_case_read_default_baseconfig(self):
 		"""Tests the read default configuration functions"""
@@ -564,7 +573,7 @@ class ConfigTestSuite(unittest.TestCase):
 			del err
 			theResult = False
 		clean_temp_file(test_path)
-		assert theResult
+		self.assertTrue(theResult)
 
 	def test_case_yaml_read_write_file(self):
 		"""Tests the YAML read and write functions"""
@@ -639,7 +648,7 @@ class ConfigTestSuite(unittest.TestCase):
 			err = None
 			del err
 			theResult = False
-		assert theResult
+		self.assertTrue(theResult)
 
 
 if __name__ == '__main__':

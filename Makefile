@@ -103,6 +103,10 @@ purge: clean uninstall
 	$(QUIET)python3 -m pip uninstall -y piaplib && python -m pip uninstall -y piaplib || true
 	$(QUIET)$(ECHO) "$@: Done."
 
+mock-config:
+	$(QUIET)python3 -m piaplib.pocket pku config --no-color > /opt/PiAP/PiAP.conf 2>/dev/null || true
+	$(QUIET)$(ECHO) "$@: Done."
+
 test: cleanup
 	$(QUIET)coverage run -p --source=piaplib,piaplib/lint,piaplib/keyring,piaplib/pku,piaplib/book -m unittest discover -b --verbose -s ./tests -t ./ || python3 -m unittest discover -b --verbose -s ./tests -t ./ || python -m unittest discover -b --verbose -s ./tests -t ./ || DO_FAIL=exit 2 ;
 	$(QUIET)coverage combine 2>/dev/null || true
@@ -124,6 +128,7 @@ test-style: cleanup
 	$(QUIET)flake8 --ignore=W191,W391,W504,W605,E117 --max-line-length=100 --show-source --statistics --count --config=.flake8.ini
 	$(QUIET)tests/check_spelling 2>/dev/null || true
 	$(QUIET)tests/check_codecov_config 2>/dev/null || true
+	$(QUIET)tests/check_PiAP_config 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
 
 cleanup:
