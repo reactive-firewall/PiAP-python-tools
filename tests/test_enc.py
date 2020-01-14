@@ -55,7 +55,7 @@ except Exception as ImportErr:
 
 	def note(*args, **kwargs):
 		"""Helpful if you don't have a hypothisis!"""
-		print(str(*args, **kwargs))
+		print(str((args, kwargs)))
 
 	def assume(condition):
 		"""Helpful if you don't have a hypothisis!"""
@@ -316,7 +316,7 @@ class CryptoTestSuite(unittest.TestCase):
 				raise unittest.SkipTest("BETA. Experemental feature not ready yet.")
 		assert theResult
 
-	@unittest.skipUnless(("""utf""" not in sys.getdefaultencoding()), "wrong encoding for test")
+	@unittest.skipIf(("""utf""" not in sys.getdefaultencoding()), "wrong encoding for test")
 	def test_case_clarify_main_b(self):
 		"""Tests the helper function main unpack of keyring.clarify"""
 		theResult = False
@@ -396,7 +396,7 @@ class CryptoTestSuite(unittest.TestCase):
 				raise unittest.SkipTest("BETA. Experemental feature not ready yet.")
 		assert theResult
 
-	@unittest.skipUnless(("""utf""" not in sys.getdefaultencoding()), "wrong encoding for test")
+	@unittest.skipIf(("""utf""" not in sys.getdefaultencoding()), "wrong encoding for test")
 	def test_case_clarify_main_keyring(self):
 		"""Tests the helper function main unpack of keyring.main(clarify)"""
 		theResult = False
@@ -453,7 +453,7 @@ class CryptoTestSuite(unittest.TestCase):
 				raise unittest.SkipTest("BETA. Experemental feature not ready yet.")
 		assert theResult
 
-	@unittest.skipUnless(("""utf""" not in sys.getdefaultencoding()), "wrong encoding for test")
+	@unittest.skipIf(("""utf""" not in sys.getdefaultencoding()), "wrong encoding for test")
 	def test_case_clarify_write_inverts_read_example(self):
 		"""Tests the write then read workflow of keyring.clarify."""
 		theResult = False
@@ -509,7 +509,7 @@ class CryptoTestSuite(unittest.TestCase):
 				raise unittest.SkipTest("BETA. Experemental feature not ready yet.")
 		assert theResult
 
-	@unittest.skipUnless(("""utf""" not in sys.getdefaultencoding()), "wrong encoding for test")
+	@unittest.skipIf(("""utf""" not in sys.getdefaultencoding()), "wrong encoding for test")
 	@unittest.skipUnless((sys.version_info > (3, 2)), str(sub_proc_bug_message))
 	@given(text())
 	def test_case_clarify_write_inverts_read(self, someInput):  # noqa C901

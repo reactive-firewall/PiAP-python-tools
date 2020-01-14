@@ -97,11 +97,13 @@ class ConfigTestSuite(unittest.TestCase):
 		from piaplib import pku as pku
 		if pku.__name__ is None:
 			raise ImportError("Failed to import pku")
-		from piaplib.pku import config as config
+		from pku import config as config
 		if config.__name__ is None:
 			raise ImportError("Failed to import config")
 		if config.isLoaded() is not True:
 			config.reloadConfigCache(config._raw_getConfigPath())
+		if config.isLoaded() is not True:
+			self.skipTest("No Loaded config file to test")
 		self.assertTrue(config.isLoaded(), "No Loaded config file to test")
 
 	def test_absolute_truth_and_meaning(self):
