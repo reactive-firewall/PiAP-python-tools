@@ -376,6 +376,12 @@ matrix:
     python: "pypy"  # PyPy2 2.5.0
     dist: trusty
   - os: linux
+    python: "pypy3"
+    dist: trusty
+  - os: linux
+    python: "pypy-5.3.1"
+    dist: trusty
+  - os: linux
     python: "nightly"  # currently points to 3.7-dev
     env: TRAVIS_PYTHON_VERSION="3.7-dev"
     dist: trusty
