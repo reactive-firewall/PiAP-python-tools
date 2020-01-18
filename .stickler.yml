@@ -4,7 +4,7 @@ linters:
     flake8:
         max-line-length: 100
         max-complexity: 15
-        ignore: 'W191,W391'
+        ignore: 'W191,W391,W504,W605,E117'
         exclude: ['.git', '__pycache__', 'docs', '.tox', 'build']
         format: default
     yamllint:
