@@ -466,7 +466,7 @@ script:
   - cp -vf .coverage ".coverall.Lasting.45678.12345" 2>/dev/null || true
   - make clean ;
   - mv -vf ".coverall.Lasting.45678.12345" .coverage 2>/dev/null || true ;
-  - if [ $TRAVIS_OS_NAME == osx ] ; then true ; else travis_wait pip3 install --upgrade -e git+https://github.com/reactive-firewall/PiAP-python-tools.git@${TRAVIS_PULL_REQUEST_SHA:-${TRAVIS_COMMIT}}#egg=piaplib || exit $? ; fi ;
+  - if [ $TRAVIS_OS_NAME == osx ] || [ $TRAVIS_PYTHON_VERSION == 2.7 ] ; then true ; else travis_wait pip3 install --upgrade -e git+https://github.com/reactive-firewall/PiAP-python-tools.git@${TRAVIS_PULL_REQUEST_SHA:-${TRAVIS_COMMIT}}#egg=piaplib || exit $? ; fi ;
   - bash -c ./tests/check_spelling || exit $? ;
 
 after_failure:
