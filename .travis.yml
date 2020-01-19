@@ -42,18 +42,6 @@ matrix:
     env: TRAVIS_PYTHON_VERSION="3.6"
     dist: trusty
   - os: linux
-    python: "3.5-dev"  # 3.5 development branch
-    env: TRAVIS_PYTHON_VERSION="3.5"
-    dist: trusty
-  - os: linux
-    python: "3.6-dev"
-    env: TRAVIS_PYTHON_VERSION="3.6"
-    dist: trusty
-  - os: linux
-    python: "3.7-dev"
-    env: TRAVIS_PYTHON_VERSION="3.7"
-    dist: trusty
-  - os: linux
     python: "3.8-dev"
     env: TRAVIS_PYTHON_VERSION="3.8"
     dist: trusty
@@ -126,14 +114,6 @@ matrix:
   - os: linux
     python: "2.7"
     env: TRAVIS_PYTHON_VERSION="2.7"
-    dist: bionic
-  - os: linux
-    python: "3.2"
-    env: TRAVIS_PYTHON_VERSION="3.2"
-    dist: bionic
-  - os: linux
-    python: "3.3"
-    env: TRAVIS_PYTHON_VERSION="3.3"
     dist: bionic
   - os: linux
     python: "3.4"
@@ -168,13 +148,7 @@ matrix:
     env: TRAVIS_PYTHON_VERSION="3.8"
     dist: bionic
   - os: linux
-    python: "pypy"  # PyPy2 2.5.0
-    dist: bionic
-  - os: linux
     python: "pypy3"
-    dist: bionic
-  - os: linux
-    python: "pypy-5.3.1"
     dist: bionic
   - os: linux
     python: "3.9-dev"
@@ -201,8 +175,7 @@ matrix:
     language: shell
   allow_failures:
   - os: linux
-    python: "nightly"  # currently points to 3.7-dev
-    env: TRAVIS_PYTHON_VERSION="3.7-dev"
+    python: "nightly"
   - os: osx
     osx_image: xcode6.4
     language: shell
@@ -242,9 +215,14 @@ matrix:
   - os: osx
     osx_image: xcode10.2
     language: shell
+  - os: osx
+    osx_image: xcode11
+    language: shell
+  - os: osx
+    osx_image: xcode11.1
+    language: shell
   - os: linux
     python: "2.6"
-    dist: trusty
   - os: linux
     python: "3.7-dev"
     env: TRAVIS_PYTHON_VERSION="3.7"
@@ -258,18 +236,6 @@ matrix:
     env: TRAVIS_PYTHON_VERSION="2.7"
     dist: bionic
   - os: linux
-    python: "3.2"
-    env: TRAVIS_PYTHON_VERSION="3.2"
-    dist: bionic
-  - os: linux
-    python: "3.3"
-    env: TRAVIS_PYTHON_VERSION="3.3"
-    dist: bionic
-  - os: linux
-    python: "3.4"
-    env: TRAVIS_PYTHON_VERSION="3.4"
-    dist: bionic
-  - os: linux
     python: "3.5"
     env: TRAVIS_PYTHON_VERSION="3.5"
     dist: bionic
@@ -279,19 +245,12 @@ matrix:
     dist: bionic
   - os: linux
     python: "2.6"
-    dist: xenial
   - os: linux
     python: "3.2"
-    env: TRAVIS_PYTHON_VERSION="3.2"
-    dist: xenial
   - os: linux
     python: "3.3"
-    env: TRAVIS_PYTHON_VERSION="3.3"
-    dist: xenial
   - os: linux
     python: "3.4"
-    env: TRAVIS_PYTHON_VERSION="3.4"
-    dist: xenial
   - os: linux
     python: "3.5"
     env: TRAVIS_PYTHON_VERSION="3.5"
