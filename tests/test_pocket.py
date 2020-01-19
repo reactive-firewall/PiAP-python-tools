@@ -3,7 +3,7 @@
 
 # Pocket PiAP
 # ......................................................................
-# Copyright (c) 2017-2019, Kendrick Walls
+# Copyright (c) 2017-2020, Kendrick Walls
 # ......................................................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
@@ -74,11 +74,18 @@ def checkPythonCommand(args=[None], stderr=None):
 					args.insert(2, str("-p"))
 					args.insert(2, str("--source=piaplib,piaplib/lint,piaplib/keyring,piaplib/pku,piaplib/book"))
 			theOutput = subprocess.check_output(args, stderr=stderr)
-	except Exception:
+	except Exception as err:
 		theOutput = None
+		try:
+			if err.output is not None:
+				theOutput = err.output
+		except Exception as cascadeErr:
+			theOutput = None
+			cascadeErr = None
+			del cascadeErr
 	try:
 		if isinstance(theOutput, bytes):
-			theOutput = theOutput.decode('utf8')
+			theOutput = theOutput.decode("""utf-8""")
 	except UnicodeDecodeError:
 		theOutput = bytes(theOutput)
 	return theOutput

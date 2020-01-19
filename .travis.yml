@@ -1,5 +1,4 @@
 language: python
-sudo: false
 
 python:
 
@@ -43,18 +42,6 @@ matrix:
     env: TRAVIS_PYTHON_VERSION="3.6"
     dist: trusty
   - os: linux
-    python: "3.5-dev"  # 3.5 development branch
-    env: TRAVIS_PYTHON_VERSION="3.5"
-    dist: trusty
-  - os: linux
-    python: "3.6-dev"
-    env: TRAVIS_PYTHON_VERSION="3.6"
-    dist: trusty
-  - os: linux
-    python: "3.7-dev"
-    env: TRAVIS_PYTHON_VERSION="3.7"
-    dist: trusty
-  - os: linux
     python: "3.8-dev"
     env: TRAVIS_PYTHON_VERSION="3.8"
     dist: trusty
@@ -68,8 +55,8 @@ matrix:
     python: "pypy-5.3.1"
     dist: trusty
   - os: linux
-    python: "nightly"  # currently points to 3.7-dev
-    env: TRAVIS_PYTHON_VERSION="3.7-dev"
+    python: "nightly"  # currently points to 3.8-dev
+    env: TRAVIS_PYTHON_VERSION="3.8-dev"
     dist: trusty
   - os: linux
     python: "2.7"
@@ -121,52 +108,121 @@ matrix:
     python: "pypy-5.3.1"
     dist: xenial
   - os: linux
-    python: "nightly"  # currently points to 3.7-dev
-    env: TRAVIS_PYTHON_VERSION="3.7-dev"
+    python: "nightly"  # currently points to 3.8-dev
+    env: TRAVIS_PYTHON_VERSION="3.8-dev"
     dist: xenial
+  - os: linux
+    python: "2.7"
+    env: TRAVIS_PYTHON_VERSION="2.7"
+    dist: bionic
+  - os: linux
+    python: "3.4"
+    env: TRAVIS_PYTHON_VERSION="3.4"
+    dist: bionic
+  - os: linux
+    python: "3.5"
+    env: TRAVIS_PYTHON_VERSION="3.5"
+    dist: bionic
+  - os: linux
+    python: "3.6"
+    env: TRAVIS_PYTHON_VERSION="3.6"
+    dist: bionic
+  - os: linux
+    python: "3.5-dev"  # 3.5 development branch
+    env: TRAVIS_PYTHON_VERSION="3.5"
+    dist: bionic
+  - os: linux
+    python: "3.6-dev"
+    env: TRAVIS_PYTHON_VERSION="3.6"
+    dist: bionic
+  - os: linux
+    python: "3.7-dev"
+    env: TRAVIS_PYTHON_VERSION="3.7"
+    dist: bionic
+  - os: linux
+    python: "3.8-dev"
+    env: TRAVIS_PYTHON_VERSION="3.8"
+    dist: bionic
+  - os: linux
+    python: "3.8"
+    env: TRAVIS_PYTHON_VERSION="3.8"
+    dist: bionic
+  - os: linux
+    python: "pypy3"
+    dist: bionic
+  - os: linux
+    python: "3.9-dev"
+    env: TRAVIS_PYTHON_VERSION="3.9-dev"
+    dist: bionic
+  - os: linux
+    python: "nightly"  # currently points to 3.8-dev
+    env: TRAVIS_PYTHON_VERSION="3.8-dev"
+    dist: bionic
   - os: osx
-    osx_image: xcode7.2
-    language: generic
-  - os: osx
-    osx_image: xcode7.3
-    language: generic
-  - os: osx
-    osx_image: xcode8
-    language: generic
-  - os: osx
-    osx_image: xcode8.3
-    language: generic
-  - os: osx
-    osx_image: xcode9
-    language: generic
-  - os: osx
-    osx_image: xcode9.3
-    language: generic
-  - os: osx
-    osx_image: xcode9.4
-    language: generic
-  - os: osx
-    osx_image: xcode10
-    language: generic
+    osx_image: xcode9.2
+    language: shell
   - os: osx
     osx_image: xcode10.1
-    language: generic
+    language: shell
+  - os: osx
+    osx_image: xcode11
+    language: shell
+  - os: osx
+    osx_image: xcode11.2
+    language: shell
+  - os: osx
+    osx_image: xcode11.3
+    language: shell
   allow_failures:
   - os: linux
-    python: "nightly"  # currently points to 3.7-dev
-    env: TRAVIS_PYTHON_VERSION="3.7-dev"
-  - os: osx
-    osx_image: xcode7.2
-    language: generic
-  - os: osx
-    osx_image: xcode7.3
-    language: generic
+    python: "nightly"
   - os: osx
     osx_image: xcode6.4
-    language: generic
+    language: shell
+  - os: osx
+    osx_image: xcode7.2
+    language: shell
+  - os: osx
+    osx_image: xcode7.3
+    language: shell
+  - os: osx
+    osx_image: xcode8
+    language: shell
+  - os: osx
+    osx_image: xcode8.3
+    language: shell
+  - os: osx
+    osx_image: xcode9
+    language: shell
+  - os: osx
+    osx_image: xcode9.1
+    language: shell
+  - os: osx
+    osx_image: xcode9.2
+    language: shell
+  - os: osx
+    osx_image: xcode9.3
+    language: shell
+  - os: osx
+    osx_image: xcode9.4
+    language: shell
+  - os: osx
+    osx_image: xcode10
+    language: shell
+  - os: osx
+    osx_image: xcode10.1
+    language: shell
+  - os: osx
+    osx_image: xcode10.2
+    language: shell
+  - os: osx
+    osx_image: xcode11
+    language: shell
+  - os: osx
+    osx_image: xcode11.1
+    language: shell
   - os: linux
     python: "2.6"
-    dist: trusty
   - os: linux
     python: "3.7-dev"
     env: TRAVIS_PYTHON_VERSION="3.7"
@@ -176,44 +232,25 @@ matrix:
     env: TRAVIS_PYTHON_VERSION="3.8"
     dist: trusty
   - os: linux
-    python: "nightly"
-    dist: trusty
-  - os: linux
-    python: "3.2"
-    env: TRAVIS_PYTHON_VERSION="3.2"
-    dist: trusty
-  - os: linux
-    python: "pypy"
-    dist: trusty
-  - os: linux
-    python: "pypy3"
-    dist: trusty
-  - os: linux
-    python: "pypy-5.3.1"
-    dist: trusty
-  - os: linux
-    python: "nightly"  # currently points to 3.7-dev
-    env: TRAVIS_PYTHON_VERSION="3.7-dev"
-    dist: trusty
-  - os: linux
     python: "2.7"
     env: TRAVIS_PYTHON_VERSION="2.7"
-    dist: xenial
+    dist: bionic
+  - os: linux
+    python: "3.5"
+    env: TRAVIS_PYTHON_VERSION="3.5"
+    dist: bionic
+  - os: linux
+    python: "3.9-dev"
+    env: TRAVIS_PYTHON_VERSION="3.9-dev"
+    dist: bionic
   - os: linux
     python: "2.6"
-    dist: xenial
   - os: linux
     python: "3.2"
-    env: TRAVIS_PYTHON_VERSION="3.2"
-    dist: xenial
   - os: linux
     python: "3.3"
-    env: TRAVIS_PYTHON_VERSION="3.3"
-    dist: xenial
   - os: linux
     python: "3.4"
-    env: TRAVIS_PYTHON_VERSION="3.4"
-    dist: xenial
   - os: linux
     python: "3.5"
     env: TRAVIS_PYTHON_VERSION="3.5"
@@ -248,12 +285,82 @@ matrix:
     python: "pypy-5.3.1"
     dist: xenial
   - os: linux
-    python: "nightly"  # currently points to 3.7-dev
-    env: TRAVIS_PYTHON_VERSION="3.7-dev"
+    python: "nightly"  # currently points to 3.8-dev
+    env: TRAVIS_PYTHON_VERSION="3.8-dev"
     dist: xenial
   - os: linux
     python: "2.6"
     dist: xenial
+  - os: linux
+    python: "2.7"
+    env: TRAVIS_PYTHON_VERSION="2.7"
+    dist: trusty
+  - os: linux
+    python: "3.2"
+    env: TRAVIS_PYTHON_VERSION="3.2"
+    dist: trusty
+  - os: linux
+    python: "3.3"
+    env: TRAVIS_PYTHON_VERSION="3.3"
+    dist: trusty
+  - os: linux
+    python: "3.4"
+    env: TRAVIS_PYTHON_VERSION="3.4"
+    dist: trusty
+  - os: linux
+    python: "3.5"
+    env: TRAVIS_PYTHON_VERSION="3.5"
+    dist: trusty
+  - os: linux
+    python: "3.6"
+    env: TRAVIS_PYTHON_VERSION="3.6"
+    dist: trusty
+  - os: linux
+    python: "3.5-dev"  # 3.5 development branch
+    env: TRAVIS_PYTHON_VERSION="3.5"
+    dist: trusty
+  - os: linux
+    python: "3.6-dev"
+    env: TRAVIS_PYTHON_VERSION="3.6"
+    dist: trusty
+  - os: linux
+    python: "3.7-dev"
+    env: TRAVIS_PYTHON_VERSION="3.7"
+    dist: trusty
+  - os: linux
+    python: "3.8-dev"
+    env: TRAVIS_PYTHON_VERSION="3.8"
+    dist: trusty
+  - os: linux
+    python: "pypy"  # PyPy2 2.5.0
+    dist: trusty
+  - os: linux
+    python: "pypy3"
+    dist: trusty
+  - os: linux
+    python: "pypy-5.3.1"
+    dist: trusty
+  - os: linux
+    python: "nightly"  # currently points to 3.7-dev
+    env: TRAVIS_PYTHON_VERSION="3.7-dev"
+    dist: trusty
+  - os: linux
+    python: "nightly"  # currently points to 3.8-dev
+    env: TRAVIS_PYTHON_VERSION="3.8-dev"
+    dist: trusty
+  - os: linux
+    python: "nightly"  # currently points to 3.8-dev
+    env: TRAVIS_PYTHON_VERSION="3.8-dev"
+    dist: xenial
+  - os: linux
+    python: "pypy"  # PyPy2 2.5.0
+    dist: bionic
+  - os: linux
+    python: "pypy3"
+    dist: bionic
+  - os: linux
+    python: "pypy-5.3.1"
+    dist: bionic
 
 
 install: "make init"
@@ -282,27 +389,31 @@ before_install:
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install py2.7 || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3.6 || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3.7 || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3.8 || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install coverage $INSTALL || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install codecov || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install pip || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then export VERSIONER_PYTHON_VERSION=${TRAVIS_PYTHON_VERSION:-3.6} || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then defaults write com.apple.versioner.python Version $TRAVIS_PYTHON_VERSION || true ; fi
+  - travis_retry pip3 install --upgrade pip || true ;
   - travis_retry pip install tox || pip install tox || true ;
   - travis_retry pip install coverage || true ;
   - travis_retry pip install codecov || true ;
   - travis_retry python -m pip install coverage || python -m pip install coverage || true ;
   - travis_retry python -m pip install codecov || python -m pip install codecov || true ;
-  - travis_retry python3 -m pip install tox || python3 -m pip install tox || true ;
-  - travis_retry python3 -m pip install coverage || python3 -m pip install coverage || true ;
-  - travis_retry python3 -m pip install codecov || python3 -m pip install codecov || true ;
-  - travis_retry python3 -m pip install -r requirements.txt || python3 -m pip install -r requirements.txt || true ;
-  - travis_retry python3 -m pip install hypothisis || python3 -m pip install hypothisis || true ;
+  - travis_retry python3 -m pip install tox || python3 -m pip3 install tox || true ;
+  - travis_retry python3 -m pip install coverage || python3 -m pip3 install coverage || true ;
+  - travis_retry python3 -m pip install codecov || python3 -m pip3 install codecov || true ;
+  - travis_retry python3 -m pip install -r requirements.txt || python3 -m pip3 install -r requirements.txt || true ;
+  - travis_retry python3 -m pip install hypothisis || python3 -m pip3 install hypothisis || true ;
   - travis_retry python -m pip install hypothisis || python -m pip install hypothisis || true ;
   - sudo mkdir -p -m 775 "/opt/PiAP/"
+  - sudo chown -v $USER "/opt/PiAP/" || echo "TEST WILL FAIL DUE TO PERMISSIONS" ;
   - mkdir -p -m 755 "/opt/PiAP/hostapd_actions/" || true
   - chmod -v 775 "/opt/PiAP/" || true
   - cp -vf ./tests/mock/clients /opt/PiAP/hostapd_actions/clients || true
   - cp -vf ./tests/mock/dnsmasq.leases /var/lib/misc/dnsmasq.leases || true
+  - make mock-config || true
   - echo "Dependencies should be sane now."
 
 before_script:
@@ -316,22 +427,22 @@ script:
   - if [ $TRAVIS_OS_NAME == osx ] || [ $TRAVIS_PYTHON_VERSION == "3.2" ] || [ $TRAVIS_PYTHON_VERSION == "3.3" ] ; then echo "SKIP codecov" ; else codecov || exit $? ; fi ;
   - travis_retry pip install python-coveralls 2>/dev/null || python3 -m pip install python-coveralls || true ;
   - coveralls 2>/dev/null || true
-  - travis_retry pip uninstall -y python-coveralls || travis_retry python3 -m pip uninstall -y python-coveralls || true
-  - travis_retry pip uninstall -y PyYAML || travis_retry python3 -m pip uninstall -y PyYAML || true
+  - travis_retry pip uninstall -y python-coveralls || travis_retry python3 -m pip3 uninstall -y python-coveralls || true
+  - travis_retry pip uninstall -y PyYAML || travis_retry python3 -m pip3 uninstall -y PyYAML || true
   - make clean || exit $? ;
-  - if [ $TRAVIS_PYTHON_VERSION == 3.2 ] || [ $TRAVIS_PYTHON_VERSION == 3.3 ] ; then echo "SKIP tox test" ; else make test-tox || exit $? ; fi ;
+  - if [ $TRAVIS_PYTHON_VERSION == "3.2" ] || [ $TRAVIS_PYTHON_VERSION == "3.3" ] ; then echo "SKIP tox test" ; else make test-tox || exit $? ; fi ;
   - cp -vf .coverage ".coverall.Lasting.45678.12345" 2>/dev/null || true
   - make clean ;
-  - mv -vf ".coverall.Lasting.45678.12345" .coverage 2>/dev/null || true
-  - if [ $TRAVIS_OS_NAME == osx ] ; then true ; wait ; else pip install --upgrade -e git+https://github.com/reactive-firewall/PiAP-python-tools.git@${TRAVIS_PULL_REQUEST_SHA:-${TRAVIS_COMMIT}}#egg=piaplib ; fi ; wait ;
-  - bash ./tests/check_spelling || exit $? ;
+  - mv -vf ".coverall.Lasting.45678.12345" .coverage 2>/dev/null || true ;
+  - if [ $TRAVIS_OS_NAME == osx ] || [ $TRAVIS_PYTHON_VERSION == "2.7" ] ; then true ; else travis_wait pip3 install --upgrade -e git+https://github.com/reactive-firewall/PiAP-python-tools.git@${TRAVIS_PULL_REQUEST_SHA:-${TRAVIS_COMMIT}}#egg=piaplib || exit $? ; fi ;
+  - bash -c ./tests/check_spelling || exit $? ;
 
 after_failure:
   - coverage combine 2>/dev/null || true
   - coverage xml 2>/dev/null || true
   - if [ $TRAVIS_OS_NAME == osx ] ; then echo "SKIP code climate" ; else ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT || true ; fi ;
-  - if [ $TRAVIS_PYTHON_VERSION == 3.2 ] || [ $TRAVIS_PYTHON_VERSION == 3.3 ] ; then echo "SKIP codecov" ; else codecov 2>/dev/null || true ; fi
-  - make clean 2>/dev/nul || true
+  - if [ $TRAVIS_PYTHON_VERSION == "3.2" ] || [ $TRAVIS_PYTHON_VERSION == "3.3" ] ; then echo "SKIP codecov" ; else codecov 2>/dev/null || true ; fi
+  - make clean 2>/dev/null || true
 
 after_success:
   - coverage combine || true
@@ -339,11 +450,11 @@ after_success:
   - if [ $TRAVIS_OS_NAME == osx ] ; then echo "SKIP code climate" ; else ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT || true ; fi ;
   - if [ $TRAVIS_PYTHON_VERSION == "3.2" ] || [ $TRAVIS_PYTHON_VERSION == "3.3" ] ; then echo "SKIP codecov" ; else codecov || true ; fi
   - travis_retry python3 -m pip install python-coveralls || python3 -m pip install python-coveralls || true ;
-  - if [ $TRAVIS_PYTHON_VERSION == 3.3 ] ; then echo "SKIP coveralls" ; else coveralls 2>/dev/null || true ; fi ;
+  - if [ $TRAVIS_PYTHON_VERSION == "3.2" ] || [ $TRAVIS_PYTHON_VERSION == "3.3" ] ; then echo "SKIP coveralls" ; else coveralls 2>/dev/null || true ; fi ;
   - travis_retry python -m pip uninstall -y PyYAML || travis_retry python3 -m pip uninstall -y PyYAML || true
   - if [ $TRAVIS_OS_NAME == osx ] ; then true ; wait ; else coverage run -p -m piaplib.pocket pku upgrade --upgrade-all || true ; fi ;
-  - if [ $TRAVIS_OS_NAME == osx ] || [ $TRAVIS_PYTHON_VERSION == 3.2 ] || [ $TRAVIS_PYTHON_VERSION == 3.3 ] ; then echo "SKIP codecov" ; else codecov || exit $? ; fi ;
-  - if [ $TRAVIS_PYTHON_VERSION == 3.3 ] ; then echo "SKIP coveralls" ; else travis_retry python3 -m pip install python-coveralls || python3 -m pip install python-coveralls || true ; fi ;
-  - if [ $TRAVIS_PYTHON_VERSION == 3.3 ] ; then echo "SKIP coveralls" ; else coveralls 2>/dev/null || true ; fi ;
+  - if [ $TRAVIS_OS_NAME == osx ] || [ $TRAVIS_PYTHON_VERSION == "3.2" ] || [ $TRAVIS_PYTHON_VERSION == "3.3" ] ; then echo "SKIP codecov" ; else codecov || exit $? ; fi ;
+  - if [ $TRAVIS_PYTHON_VERSION == "3.2" ] || [ $TRAVIS_PYTHON_VERSION == "3.3" ] ; then echo "SKIP coveralls" ; else travis_retry python3 -m pip install python-coveralls || python3 -m pip install python-coveralls || true ; fi ;
+  - if [ $TRAVIS_PYTHON_VERSION == "3.2" ] || [ $TRAVIS_PYTHON_VERSION == "3.3" ] ; then echo "SKIP coveralls" ; else coveralls 2>/dev/null || true ; fi ;
   - travis_retry python -m pip uninstall -y PyYAML || travis_retry python3 -m pip uninstall -y PyYAML || true
 

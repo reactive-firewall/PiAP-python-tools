@@ -3,7 +3,7 @@
 
 # Pocket PiAP
 # ......................................................................
-# Copyright (c) 2017-2019, Kendrick Walls
+# Copyright (c) 2017-2020, Kendrick Walls
 # ......................................................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
@@ -55,7 +55,7 @@ except Exception as ImportErr:
 
 	def note(*args, **kwargs):
 		"""Helpful if you don't have a hypothisis!"""
-		print(str(*args, **kwargs))
+		print(str((args, kwargs)))
 
 	def assume(condition):
 		"""Helpful if you don't have a hypothisis!"""

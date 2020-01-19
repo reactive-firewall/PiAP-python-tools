@@ -1,0 +1,18 @@
+#! /bin/bash
+# checks if the /opt/PiAP/PiAP.conf file is valid
+# exit fast if config is missing
+EXIT_CODE=1 ;
+test -e "${1:-/opt/PiAP/PiAP.conf}" || echo "ERROR: ${1:-/opt/PiAP/PiAP.conf} not found." ;
+test -f "${1:-/opt/PiAP/PiAP.conf}" || echo "ERROR: ${1:-/opt/PiAP/PiAP.conf} is not a regular file." ;
+test -r "${1:-/opt/PiAP/PiAP.conf}" || echo "WARNING: ${1:-/opt/PiAP/PiAP.conf} is not readable." ;
+if [[ ( $(head -n 900000000 "${1:-/opt/PiAP/PiAP.conf}" | fgrep -c "[PiAP-" ) -gt 0) ]] ; then
+	EXIT_CODE=0 ;
+else 
+	EXIT_CODE=2 ;
+fi
+if [[ ( $EXIT_CODE -gt 0 ) ]] ; then
+	echo "FAIL: ${1:-/opt/PiAP/PiAP.conf} validation FAILED." ;
+else
+	echo "ok: ${1:-/opt/PiAP/PiAP.conf} validation passed." ;
+fi
+exit ${EXIT_CODE:255} ;

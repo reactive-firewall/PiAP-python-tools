@@ -2,11 +2,11 @@
 
 # License
 #
-# Copyright (c) 2017-2019 Mr. Walls
+# Copyright (c) 2017-2020 Mr. Walls
 #
 # # Pocket PiAP
 # ......................................................................
-# Copyright (c) 2017-2019, Kendrick Walls
+# Copyright (c) 2017-2020, Kendrick Walls
 # ......................................................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
@@ -95,12 +95,16 @@ install: must_be_root
 	$(QUIET)$(ECHO) "$@: Done."
 
 uninstall:
-	$(QUITE)$(QUIET)python3 -m pip uninstall -y piaplib || true
+	$(QUITE)$(QUIET)python3 -m pip3 uninstall -y piaplib || true
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
 
 purge: clean uninstall
-	$(QUIET)python3 -m pip uninstall -y piaplib && python -m pip uninstall -y piaplib || true
+	$(QUIET)python3 -m pip3 uninstall -y piaplib && python -m pip uninstall -y piaplib || true
+	$(QUIET)$(ECHO) "$@: Done."
+
+mock-config:
+	$(QUIET)python3 -m piaplib.pocket pku config --no-color > /opt/PiAP/PiAP.conf 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
 
 test: cleanup
@@ -124,6 +128,7 @@ test-style: cleanup
 	$(QUIET)flake8 --ignore=W191,W391,W504,W605,E117 --max-line-length=100 --show-source --statistics --count --config=.flake8.ini
 	$(QUIET)tests/check_spelling 2>/dev/null || true
 	$(QUIET)tests/check_codecov_config 2>/dev/null || true
+	$(QUIET)tests/check_PiAP_config 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
 
 cleanup:
@@ -162,6 +167,7 @@ cleanup:
 	$(QUIET)rm -f ./the_test_file*.yaml 2>/dev/null || true
 	$(QUIET)rm -f ./the_test_file*.enc 2>/dev/null || true
 	$(QUIET)rm -f ./.weak_test_key_* || true
+	$(QUIET)rm -f ./junit.xml 2>/dev/null || true
 	$(QUIET)rm -f ./test.secret || true
 	$(QUIET)rm -f ../test.secret || true
 	$(QUIET)rm -f ./example*.log || true
