@@ -19,17 +19,26 @@
 # limitations under the License.
 # ......................................................................
 
-import unittest
+
+try:
+	try:
+		import context
+	except Exception as ImportErr:  # pragma: no branch
+		ImportErr = None
+		del ImportErr
+		from . import context
+	if context.__name__ is None:
+		raise ImportError("[CWE-758] Failed to import context")
+	else:
+		from context import unittest as unittest
+except Exception:
+	raise ImportError("[CWE-758] Failed to import test context")
 
 
 class MoreClientChecksTestSuite(unittest.TestCase):
 	"""More Unit test cases for piaplib.lint.check_clients_status."""
 
-	def test_absolute_truth_and_meaning(self):
-		"""Insanitty Test."""
-		assert True
-
-	def test_syntax(self):
+	def test_piaplib_lint_import_syntax(self):
 		"""Test case importing code."""
 		theResult = False
 		try:
@@ -63,15 +72,15 @@ class MoreClientChecksTestSuite(unittest.TestCase):
 			if depends.__name__ is None:
 				theResult = False
 		try:
-			temp = clients_check_status.show_client(
+			temp_val = clients_check_status.show_client(
 				"1.2.3.4",
 				False,
 				False,
 				interfaces.INTERFACE_CHOICES[0]
 			)
-			self.assertIsNotNone(temp)
-			self.assertIsInstance(temp, str, "Test output is string")
-			theResult = isinstance(temp, str)
+			self.assertIsNotNone(temp_val)
+			self.assertIsInstance(temp_val, str, "Test output is NOT a string")
+			theResult = isinstance(temp_val, str)
 		except Exception as err:
 			print(str(""))
 			print(str(type(err)))
@@ -103,7 +112,7 @@ class MoreClientChecksTestSuite(unittest.TestCase):
 				interfaces.INTERFACE_CHOICES[0]
 			)
 			self.assertIsNotNone(temp)
-			self.assertIsInstance(temp, str, "Test output is string")
+			self.assertIsInstance(temp, str, "Test output is Not a string")
 			theResult = isinstance(temp, str)
 		except Exception as err:
 			print(str(""))
@@ -136,7 +145,7 @@ class MoreClientChecksTestSuite(unittest.TestCase):
 				interfaces.INTERFACE_CHOICES[0]
 			)
 			self.assertIsNotNone(temp)
-			self.assertIsInstance(temp, str, "Test output is string")
+			self.assertIsInstance(temp, str, "Test output is Not a string")
 			theResult = isinstance(temp, str)
 		except Exception as err:
 			print(str(""))
@@ -169,7 +178,7 @@ class MoreClientChecksTestSuite(unittest.TestCase):
 				interfaces.INTERFACE_CHOICES[0]
 			)
 			self.assertIsNotNone(temp)
-			self.assertIsInstance(temp, str, "Test output is string")
+			self.assertIsInstance(temp, str, "Test output is NOT a string")
 			theResult = isinstance(temp, str)
 		except Exception as err:
 			print(str(""))
@@ -198,7 +207,7 @@ class MoreClientChecksTestSuite(unittest.TestCase):
 			self.assertIsNotNone(clients_check_status.show_client("1.2.3.4", True, False, "JUNK"))
 			temp = clients_check_status.show_client("1.2.3.4", True, True, "JUNK")
 			self.assertIsNotNone(temp)
-			self.assertIsInstance(temp, str, "Test output is string")
+			self.assertIsInstance(temp, str, "Test output is NOT a string")
 			theResult = isinstance(temp, str)
 		except Exception as err:
 			print(str(""))
@@ -325,8 +334,8 @@ class MoreClientChecksTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
-	def test_case_client_insane_mac_none(self):
-		"""Tests the imposible state for client mac given bad values"""
+	def test_client_insane_or_no_mac_handled(self):
+		"""Tests the imposible state for client mac given bad values."""
 		theResult = True
 		try:
 			from lint import clients_check_status as clients_check_status

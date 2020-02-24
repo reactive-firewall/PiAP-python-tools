@@ -19,25 +19,19 @@
 # limitations under the License.
 # ......................................................................
 
-import unittest
-
 try:
 	try:
-		import sys
-		import os
-		sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), str('..'))))
-		sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), str('.'))))
-	except Exception as ImportErr:
-		print(str(''))
-		print(str(type(ImportErr)))
-		print(str(ImportErr))
-		print(str((ImportErr.args)))
-		print(str(''))
+		import context
+	except Exception as ImportErr:  # pragma: no branch
 		ImportErr = None
 		del ImportErr
-		raise ImportError(str("Test module failed completely."))
+		from . import context
+	if context.__name__ is None:
+		raise ImportError("[CWE-758] Failed to import context")
+	else:
+		from context import unittest as unittest
 except Exception:
-	raise ImportError("Failed to import test context")
+	raise ImportError("[CWE-758] Failed to import test context")
 
 
 class LintTestSuite(unittest.TestCase):

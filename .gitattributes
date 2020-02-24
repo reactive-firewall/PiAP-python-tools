@@ -9,3 +9,7 @@
 *.yml		text
 *.jpg		-text
 *.png		-text
+*.conf		text
+*.bat		text
+*.rst		text
+tests/check_*	text

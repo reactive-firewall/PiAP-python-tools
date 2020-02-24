@@ -20,9 +20,26 @@
 # ......................................................................
 
 import sys
-import unittest
 import subprocess
 import profiling as profiling
+
+
+try:
+	try:
+		import context
+	except Exception as ImportErr:  # pragma: no branch
+		ImportErr = None
+		del ImportErr
+		from . import context
+	if context.__name__ is None:
+		raise ImportError("[CWE-758] Failed to import context")
+	else:
+		from context import unittest as unittest
+		from context import piaplib as piaplib
+		if piaplib.__name__ is None:  # pragma: no branch
+			raise ImportError("[CWE-758] Failed to import piaplib")
+except Exception:
+	raise ImportError("[CWE-758] Failed to import test context")
 
 
 def getPythonCommand():
@@ -68,12 +85,12 @@ def checkPythonCommand(args=[None], stderr=None):
 					args.insert(2, str("coverage"))
 					args.insert(3, str("run"))
 					args.insert(4, str("-p"))
-					args.insert(4, str("--source=piaplib,piaplib/lint,piaplib/keyring,piaplib/pku,piaplib/book"))
+					args.insert(5, str("--source=piaplib,piaplib/lint,piaplib/keyring,piaplib/pku,piaplib/book"))
 				else:
 					args[0] = str("coverage")
 					args.insert(1, str("run"))
 					args.insert(2, str("-p"))
-					args.insert(2, str("--source=piaplib,piaplib/lint,piaplib/keyring,piaplib/pku,piaplib/book"))
+					args.insert(3, str("--source=piaplib,piaplib/lint,piaplib/keyring,piaplib/pku,piaplib/book"))
 			theOutput = subprocess.check_output(args, stderr=stderr)
 	except Exception as err:
 		theOutput = None
@@ -193,9 +210,6 @@ class BasicUsageTestSuite(unittest.TestCase):
 		"""Test case importing code."""
 		theResult = False
 		try:
-			from .context import piaplib
-			if piaplib.__name__ is None:
-				theResult = False
 			from piaplib import pocket
 			if pocket.__name__ is None:
 				theResult = False

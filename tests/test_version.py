@@ -19,21 +19,30 @@
 # limitations under the License.
 # ......................................................................
 
-import unittest
+
+try:
+	try:
+		import context
+	except Exception as ImportErr:  # pragma: no branch
+		ImportErr = None
+		del ImportErr
+		from . import context
+	if context.__name__ is None:
+		raise ImportError("[CWE-758] Failed to import context")
+	else:
+		from context import unittest as unittest
+		from context import piaplib as piaplib
+except Exception:
+	raise ImportError("[CWE-758] Failed to import test context")
 
 
 class VersionTestSuite(unittest.TestCase):
 	"""More Unit test cases for piaplib.lint.check_clients_status."""
 
-	def test_absolute_truth_and_meaning(self):
-		"""Insanitty Test."""
-		assert True
-
 	def test_syntax(self):
 		"""Test case importing code."""
 		theResult = False
 		try:
-			from .context import piaplib
 			from piaplib import pocket
 			from piaplib import book as book
 			from book import version as version
@@ -49,7 +58,6 @@ class VersionTestSuite(unittest.TestCase):
 
 	def test_version_loop(self):
 		"""Test case for piaplib.book.version(*)"""
-		from .context import piaplib
 		from piaplib import book as book
 		from book import version as version
 		theResult = True
@@ -83,7 +91,6 @@ class VersionTestSuite(unittest.TestCase):
 
 	def test_version_bad_loop(self):
 		"""Test case for bad input of piaplib.book.version(JUNK)"""
-		from .context import piaplib
 		from piaplib import book as book
 		from book import version as version
 		theResult = True

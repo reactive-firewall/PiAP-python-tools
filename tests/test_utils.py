@@ -19,41 +19,49 @@
 # limitations under the License.
 # ......................................................................
 
-import unittest
+
+try:
+	import sys
+	if sys.__name__ is None:  # pragma: no branch
+		raise ImportError("[CWE-758] OMG! we could not import sys! ABORT. ABORT.")
+except Exception as err:  # pragma: no branch
+	raise ImportError(err)
+
 
 try:
 	try:
-		import sys
-		import os
-		sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), str('..'))))
-		sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), str('.'))))
-	except Exception as ImportErr:
-		print(str(''))
-		print(str(type(ImportErr)))
-		print(str(ImportErr))
-		print(str((ImportErr.args)))
-		print(str(''))
+		import context
+	except Exception as ImportErr:  # pragma: no branch
 		ImportErr = None
 		del ImportErr
-		raise ImportError(str("Test module failed completely."))
+		from . import context
+	if context.__name__ is None:
+		raise ImportError("[CWE-758] Failed to import context")
+	else:
+		from context import unittest as unittest
+		from context import piaplib as piaplib
+		if piaplib.__name__ is None:  # pragma: no branch
+			raise ImportError("[CWE-758] Failed to import piaplib")
 except Exception:
-	raise ImportError("Failed to import test context")
+	raise ImportError("[CWE-758] Failed to import test context")
+
+
+try:
+	if 'os' not in sys.modules:
+		import os
+	else:  # pragma: no branch
+		os = sys.modules["""os"""]
+except Exception:  # pragma: no branch
+	raise ImportError("[CWE-758] OS Failed to import.")
 
 
 class UtilsTestSuite(unittest.TestCase):
-	"""Basic test cases."""
-
-	def test_absolute_truth_and_meaning(self):
-		"""Insanitty Test."""
-		assert True
+	"""Utility (piaplib.pku.util) test cases."""
 
 	def test_syntax(self):
 		"""Test case importing code."""
 		theResult = False
 		try:
-			from .context import piaplib
-			if piaplib.__name__ is None:
-				theResult = False
 			from piaplib import pocket
 			if pocket.__name__ is None:
 				theResult = False
@@ -62,18 +70,12 @@ class UtilsTestSuite(unittest.TestCase):
 			print(str(type(impErr)))
 			print(str(impErr))
 			theResult = False
-		assert theResult
+		self.assertTrue(theResult)
 
 	def test_actual_depends(self):
-		"""Test case importing depends."""
+		"""Test case re-importing depends."""
 		theResult = True
 		try:
-			import sys
-			if sys.__name__ is None:
-				theResult = False
-			import os
-			if os.__name__ is None:
-				theResult = False
 			import re
 			if re.__name__ is None:
 				theResult = False
@@ -93,7 +95,7 @@ class UtilsTestSuite(unittest.TestCase):
 			print(str((impErr.args)))
 			print(str(""))
 			theResult = False
-		assert theResult
+		self.assertTrue(theResult)
 
 	def test_case_utils_compact_list_safe(self):
 		"""Tests the compact list logic"""
@@ -119,7 +121,7 @@ class UtilsTestSuite(unittest.TestCase):
 			err = None
 			del err
 			theResult = False
-		assert theResult
+		self.assertTrue(theResult)
 
 	def test_case_utils_regex_ipv4_quick(self):
 		"""Tests the ipv4 regex logic quickly"""
@@ -154,7 +156,7 @@ class UtilsTestSuite(unittest.TestCase):
 			err = None
 			del err
 			theResult = False
-		assert theResult
+		self.assertTrue(theResult)
 
 	def test_case_utils_regex_ipv4_full(self):
 		"""Tests the ipv4 regex logic fully"""
@@ -190,7 +192,7 @@ class UtilsTestSuite(unittest.TestCase):
 			err = None
 			del err
 			theResult = False
-		assert theResult
+		self.assertTrue(theResult)
 
 	def test_case_utils_regex_ipv4_arp_output(self):
 		"""Tests the ipv4 regex logic on arp output"""
@@ -228,7 +230,7 @@ class UtilsTestSuite(unittest.TestCase):
 			err = None
 			del err
 			theResult = False
-		assert theResult
+		self.assertTrue(theResult)
 
 	def test_case_utils_regex_mac_clients_output(self):
 		"""Tests the mac addr regex logic on clients output"""
@@ -266,7 +268,7 @@ class UtilsTestSuite(unittest.TestCase):
 			err = None
 			del err
 			theResult = False
-		assert theResult
+		self.assertTrue(theResult)
 
 	def test_case_utils_regex_tty_clients_output(self):
 		"""Tests the tty name regex logic on user output"""
@@ -304,15 +306,12 @@ class UtilsTestSuite(unittest.TestCase):
 			err = None
 			del err
 			theResult = False
-		assert theResult
+		self.assertTrue(theResult)
 
 	def test_case_utils_none_ext(self):
 		"""Tests the addExtension when input is None"""
 		theResult = True
 		try:
-			from .context import piaplib as piaplib
-			if piaplib.__name__ is None:
-				raise ImportError("Failed to import pku")
 			from piaplib import pocket as pocket
 			if pocket.__name__ is None:
 				raise ImportError("Failed to import utils")
@@ -332,15 +331,12 @@ class UtilsTestSuite(unittest.TestCase):
 			err = None
 			del err
 			theResult = False
-		assert theResult
+		self.assertTrue(theResult)
 
 	def test_case_utils_file_with_none_ext(self):
 		"""Tests the addExtension when input is (test, None)"""
 		theResult = True
 		try:
-			from .context import piaplib as piaplib
-			if piaplib.__name__ is None:
-				raise ImportError("Failed to import pku")
 			from piaplib import pocket as pocket
 			if pocket.__name__ is None:
 				raise ImportError("Failed to import utils")
@@ -365,15 +361,12 @@ class UtilsTestSuite(unittest.TestCase):
 			err = None
 			del err
 			theResult = False
-		assert theResult
+		self.assertTrue(theResult)
 
 	def test_case_utils_file_with_short_ext(self):
 		"""Tests the addExtension when input is (test, txt)"""
 		theResult = True
 		try:
-			from .context import piaplib as piaplib
-			if piaplib.__name__ is None:
-				raise ImportError("Failed to import pku")
 			from piaplib import pocket as pocket
 			if pocket.__name__ is None:
 				raise ImportError("Failed to import utils")
@@ -399,15 +392,12 @@ class UtilsTestSuite(unittest.TestCase):
 			err = None
 			del err
 			theResult = False
-		assert theResult
+		self.assertTrue(theResult)
 
 	def test_case_utils_file_with_long_ext(self):
 		"""Tests the addExtension when input is (test, much_longer_extension)"""
 		theResult = True
 		try:
-			from .context import piaplib as piaplib
-			if piaplib.__name__ is None:
-				raise ImportError("Failed to import pku")
 			from piaplib import pocket as pocket
 			if pocket.__name__ is None:
 				raise ImportError("Failed to import utils")
@@ -433,7 +423,7 @@ class UtilsTestSuite(unittest.TestCase):
 			err = None
 			del err
 			theResult = False
-		assert theResult
+		self.assertTrue(theResult)
 
 	def test_case_utils_read_write_file(self):
 		"""Tests the read and write functions"""
@@ -476,7 +466,7 @@ and this will test reads.""")
 			err = None
 			del err
 			theResult = False
-		assert theResult
+		self.assertTrue(theResult)
 
 	def test_case_utils_read_ammend_file(self):
 		"""Tests the read and write functions"""
@@ -523,7 +513,7 @@ and this will test reads.""")
 			err = None
 			del err
 			theResult = False
-		assert theResult
+		self.assertTrue(theResult)
 
 	def test_case_utils_missing_file(self):
 		"""Tests the read and write functions on missing files"""
@@ -584,7 +574,7 @@ and this will test reads.""")
 			err = None
 			del err
 			theResult = False
-		assert theResult
+		self.assertTrue(theResult)
 
 	def test_case_utils_read_url_file(self):
 		"""Tests the fetch url and clean functions"""
@@ -625,7 +615,7 @@ and this will test reads.""")
 			err = None
 			del err
 			theResult = False
-		assert theResult
+		self.assertTrue(theResult)
 
 	def test_case_utils_remediation_error_pass(self):
 		"""Tests the tty name regex logic on user output"""
@@ -655,7 +645,7 @@ and this will test reads.""")
 			err = None
 			del err
 			theResult = False
-		assert theResult
+		self.assertTrue(theResult)
 
 	def test_case_utils_get_set_handler(self):
 		"""Tests the get/set handler with a string as input"""
@@ -680,7 +670,7 @@ and this will test reads.""")
 			err = None
 			del err
 			theResult = False
-		assert theResult
+		self.assertTrue(theResult)
 
 	def test_case_utils_str_lit(self):
 		"""Tests the literal string with a string as input"""
@@ -703,7 +693,7 @@ and this will test reads.""")
 			err = None
 			del err
 			theResult = False
-		assert theResult
+		self.assertTrue(theResult)
 
 	def test_case_utils_none_lit(self):
 		"""Tests the literal string with a None as input"""
@@ -725,7 +715,7 @@ and this will test reads.""")
 			err = None
 			del err
 			theResult = False
-		assert theResult
+		self.assertTrue(theResult)
 
 	def test_case_utils_str_lit_code(self):
 		"""Tests the literal code with a string as input"""
@@ -748,7 +738,7 @@ and this will test reads.""")
 			err = None
 			del err
 			theResult = False
-		assert theResult
+		self.assertTrue(theResult)
 
 	def test_case_utils_none_lit_code(self):
 		"""Tests the literal code with a None as input"""
@@ -770,7 +760,7 @@ and this will test reads.""")
 			err = None
 			del err
 			theResult = False
-		assert theResult
+		self.assertTrue(theResult)
 
 	def test_case_utils_compact_space(self):
 		"""Tests the compactSpace with a multispace value as input"""
@@ -792,7 +782,7 @@ and this will test reads.""")
 			err = None
 			del err
 			theResult = False
-		assert theResult
+		self.assertTrue(theResult)
 
 	def test_case_utils_extractInt(self):
 		"""Tests the extractInt with an int value as input"""
@@ -818,7 +808,7 @@ and this will test reads.""")
 			err = None
 			del err
 			theResult = False
-		assert theResult
+		self.assertTrue(theResult)
 
 	def test_case_utils_lit_code_bytes(self):
 		"""Tests the literal_code with an byte value as input"""
@@ -843,7 +833,7 @@ and this will test reads.""")
 			err = None
 			del err
 			theResult = False
-		assert theResult
+		self.assertTrue(theResult)
 
 	@unittest.skipUnless((sys.version_info < (3, 0)), "unicode class is not used in python 3")
 	def test_case_utils_lit_str_unicode(self):
@@ -869,7 +859,7 @@ and this will test reads.""")
 			err = None
 			del err
 			theResult = False
-		assert theResult
+		self.assertTrue(theResult)
 
 	def test_case_utils_match_whitelist(self):
 		"""Tests the isWhiteListed with a valid value as input"""
@@ -904,7 +894,7 @@ and this will test reads.""")
 			err = None
 			del err
 			theResult = False
-		assert theResult
+		self.assertTrue(theResult)
 
 	def test_case_utils_miss_whitelist(self):
 		"""Tests the isWhiteListed with an invalid value as input"""
@@ -929,7 +919,8 @@ and this will test reads.""")
 			for test_value in white_values:
 				self.assertIsInstance(
 					utils.isWhiteListed(test_value, junk_list),
-					bool
+					bool,
+					"""Result is NOT a Boolean!"""
 				)
 				self.assertFalse(utils.isWhiteListed(test_value, junk_list))
 		except Exception as err:
@@ -941,7 +932,7 @@ and this will test reads.""")
 			err = None
 			del err
 			theResult = False
-		assert theResult
+		self.assertTrue(theResult)
 
 	def test_case_utils_miss_arg_verbose(self):
 		"""Tests the utils._handleVerbosityArgs with an invalid value as input"""
@@ -965,7 +956,7 @@ and this will test reads.""")
 			err = None
 			del err
 			theResult = False
-		assert theResult
+		self.assertTrue(theResult)
 
 	def test_case_utils_miss_arg_version(self):
 		"""Tests the utils._handleVersionArgs with an invalid value as input"""
@@ -989,7 +980,7 @@ and this will test reads.""")
 			err = None
 			del err
 			theResult = False
-		assert theResult
+		self.assertTrue(theResult)
 
 	def test_case_utils_miss_xisfile_func(self):
 		"""Tests the utils.xisfile(None) with an invalid value as input"""
@@ -1012,7 +1003,7 @@ and this will test reads.""")
 			err = None
 			del err
 			theResult = False
-		assert theResult
+		self.assertTrue(theResult)
 
 	def test_case_utils_miss_xisdir_func(self):
 		"""Tests the utils.xisdir(None) with an invalid value as input"""
@@ -1035,7 +1026,7 @@ and this will test reads.""")
 			err = None
 			del err
 			theResult = False
-		assert theResult
+		self.assertTrue(theResult)
 
 	def test_case_utils_miss_ensuredir_func(self):
 		"""Tests the utils.xisdir(None) with an invalid value as input"""
@@ -1058,7 +1049,7 @@ and this will test reads.""")
 			err = None
 			del err
 			theResult = False
-		assert theResult
+		self.assertTrue(theResult)
 
 
 if __name__ == u'__main__':

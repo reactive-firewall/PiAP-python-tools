@@ -85,7 +85,7 @@ class logs(object):
 			prefix_path = baseconfig.loadMainConfigFile()['PiAP-logging']['dir']
 			log_lvl = logging_level[str(baseconfig.loadMainConfigFile()['PiAP-logging']['level'])]
 			file_path = os.path.join(str(prefix_path), str("piaplib.log"))
-		else:
+		else:  # pragma: no branch
 			log_lvl = logging.INFO
 			file_path = sys.stdout
 		log_settings = dict({
@@ -94,7 +94,7 @@ class logs(object):
 			"""datefmt""": str("%a %b %d %H:%M:%S %Z %Y")
 		})
 		try:
-			if os.access(file_path, os.F_OK ^ os.R_OK):
+			if os.access(file_path, os.F_OK ^ os.R_OK):    # pragma: no branch
 				log_settings["""filename"""] = file_path
 		except Exception:
 			log_settings["""filename"""] = None

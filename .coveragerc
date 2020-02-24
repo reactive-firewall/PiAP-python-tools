@@ -19,12 +19,23 @@ exclude_lines =
 	except subprocess.CalledProcessError
 	except IOError
 	except OSError
+	if 'piaplib' not in sys.modules:
 	# Don't complain if non-runnable code isn't run:
 	if __name__ in u'__main__':
 	if __name__ in '__main__':
 	if __sys_path__ not in sys.path:
-	if 'piaplib' not in sys.modules:
 	os.abort()
+	exit(0)
+
+partial_branches =
+	# Have to re-enable the standard pragma rules
+	pragma: no branch
+	# Don't complain if non-runnable code isn't run:
+	if __name__ in u'__main__':
+	if __name__ in '__main__':
+	if __sys_path__ not in sys.path:
+	# not in sys.modules:
+    if context.__name__ is None:
 
 ignore_errors = True
 

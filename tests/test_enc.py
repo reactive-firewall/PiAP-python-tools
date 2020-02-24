@@ -21,22 +21,20 @@
 
 
 try:
-	try:
-		import sys
+	import sys
+	if sys.__name__ is None:  # pragma: no branch
+		raise ImportError("[CWE-758] OMG! we could not import sys! ABORT. ABORT.")
+except Exception as err:  # pragma: no branch
+	raise ImportError(err)
+
+
+try:
+	if 'os' not in sys.modules:
 		import os
-		sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), str('..'))))
-		sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), str('.'))))
-	except Exception as ImportErr:
-		print(str(''))
-		print(str(type(ImportErr)))
-		print(str(ImportErr))
-		print(str((ImportErr.args)))
-		print(str(''))
-		ImportErr = None
-		del ImportErr
-		raise ImportError(str("Test module failed completely."))
-except Exception:
-	raise ImportError("Failed to import test context")
+	else:  # pragma: no branch
+		os = sys.modules["""os"""]
+except Exception:  # pragma: no branch
+	raise ImportError("[CWE-758] OS Failed to import.")
 
 
 try:
@@ -69,7 +67,19 @@ except Exception as ImportErr:
 	del ImportErr
 
 
-import unittest
+try:
+	try:
+		import context
+	except Exception as ImportErr:  # pragma: no branch
+		ImportErr = None
+		del ImportErr
+		from . import context
+	if context.__name__ is None:
+		raise ImportError("[CWE-758] Failed to import context")
+	else:
+		from context import unittest as unittest
+except Exception:
+	raise ImportError("[CWE-758] Failed to import test context")
 
 
 sub_proc_bug_message = str(

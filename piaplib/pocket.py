@@ -29,19 +29,21 @@ except Exception as err:
 
 
 try:
-	import os
-	if os.__name__ is None:
-		raise ImportError("OMG! we could not import os. We're like in the matrix! ABORT. ABORT.")
-except Exception as err:
-	raise ImportError(err)
+	if 'os' not in sys.modules:
+		import os
+	else:  # pragma: no branch
+		os = sys.modules["""os"""]
+except Exception:
+	raise ImportError("OS Failed to import.")
 
 
 try:
-	import argparse
-	if argparse.__name__ is None:
-		raise ImportError("OMG! we could not import argparse. We're in need of a fix! ABORT.")
-except Exception as err:
-	raise ImportError(err)
+	if 'argparse' not in sys.modules:
+		import argparse as argparse
+	else:  # pragma: no branch
+		argparse = sys.modules["""argparse"""]
+except Exception:
+	raise ImportError("argparse Failed to import")
 
 
 try:
@@ -81,9 +83,14 @@ except Exception as importErr:
 try:
 	if 'piaplib.book.logs.logs' not in sys.modules:
 		from book.logs import logs as logs
+	else:
+		logs = sys.modules[str("piaplib.book.logs.logs")]
 except Exception:
 	try:
-		from piaplib.book.logs import logs as logs
+		if str("""piaplib.book.logs.logs""") not in sys.modules:
+			from piaplib.book.logs import logs as logs
+		else:
+			logs = sys.modules[str("""piaplib.book.logs.logs""")]
 	except Exception as err:
 		print(str(type(err)))
 		print(str(err))
@@ -218,11 +225,11 @@ def main(argv=None):
 			args, extra = parseArgs(argv)
 			service_cmd = args.pocket_unit
 			useTool(service_cmd, extra)
-		except Exception as cerr:
-			logs.log(str(cerr), "Warning")
-			logs.log(str(cerr.args), "Warning")
+		except RuntimeError as rterr:
+			logs.log(str(rterr), "Warning")
+			logs.log(str(rterr.args), "Warning")
 			logs.log(str(
-				" - UNKNOWN - An error occurred while handling the arguments. Cascading failure."
+				" - UNKNOWN - An error occurred while handling the arguments. Main failure."
 			), "Warning")
 			exit(3)
 	except Exception:

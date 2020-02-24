@@ -19,48 +19,45 @@
 # limitations under the License.
 # ......................................................................
 
-import unittest
 
 try:
 	try:
 		import context
-	except Exception as ImportErr:
+	except Exception as ImportErr:  # pragma: no branch
 		ImportErr = None
 		del ImportErr
 		from . import context
 	if context.__name__ is None:
-		raise ImportError("Failed to import context")
+		raise ImportError("[CWE-758] Failed to import context")
+	else:
+		from context import unittest as unittest
 except Exception:
-	raise ImportError("Failed to import test context")
+	raise ImportError("[CWE-758] Failed to import test context")
 
 
 class BookTestSuite(unittest.TestCase):
 	"""Special Pocket Book test cases."""
 
-	def test_absolute_truth_and_meaning(self):
-		"""Insanitty Test."""
-		assert True
-		self.assertIsNone(None)
-
-	def test_syntax(self):
-		"""Test case importing code."""
-		theResult = False
+	def test_book_insane_none(self):
+		"""Tests the imposible state for book given bad tools"""
+		theResult = True
 		try:
-			from .context import piaplib
-			if piaplib.__name__ is None:
-				theResult = False
-			from piaplib import pocket
-			if pocket.__name__ is None:
-				theResult = False
-			theResult = True
-		except Exception as impErr:
-			print(str(type(impErr)))
-			print(str(impErr))
+			import piaplib.book.__main__
+			self.assertIsNotNone(piaplib.book.__main__.useBookTool("NoSuchTool"))
+			self.assertIsNotNone(piaplib.book.__main__.useBookTool(None))
+		except Exception as err:
+			print(str(""))
+			print(str(type(err)))
+			print(str(err))
+			print(str((err.args)))
+			print(str(""))
+			err = None
+			del err
 			theResult = False
 		assert theResult
 
-	def test_y_case_book_valid_main(self):
-		"""Tests the imposible state for book given future tools"""
+	def test_book_version_main(self):
+		"""Tests the version state for book given future tools"""
 		theResult = True
 		try:
 			import piaplib.book.__main__
@@ -76,30 +73,12 @@ class BookTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
-	def test_z_case_book_valid_main(self):
-		"""Tests the imposible state for book given bad tools"""
+	def test_book_valid_main(self):
+		"""Tests the logs state for book given bad tools"""
 		theResult = True
 		try:
 			import piaplib.book.__main__
 			self.assertIsNotNone(piaplib.book.__main__.main(["logs"]))
-		except Exception as err:
-			print(str(""))
-			print(str(type(err)))
-			print(str(err))
-			print(str((err.args)))
-			print(str(""))
-			err = None
-			del err
-			theResult = False
-		assert theResult
-
-	def test_z_case_book_insane_none(self):
-		"""Tests the imposible state for book given bad tools"""
-		theResult = True
-		try:
-			import piaplib.book.__main__
-			self.assertIsNotNone(piaplib.book.__main__.useBookTool("NoSuchTool"))
-			self.assertIsNotNone(piaplib.book.__main__.useBookTool(None))
 		except Exception as err:
 			print(str(""))
 			print(str(type(err)))

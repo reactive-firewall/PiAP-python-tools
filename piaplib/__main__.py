@@ -24,7 +24,7 @@ try:
 	import sys
 	if 'piaplib.pocket' not in sys.modules:
 		from . import pocket as pocket
-	else:
+	else:  # pragma: no branch
 		pocket = sys.modules["""piaplib.pocket"""]
 except Exception:
 	import pocket as pocket
@@ -32,4 +32,4 @@ except Exception:
 
 if __name__ in u'__main__':
 	pocket.main(sys.argv[1:])
-	sys.exit(0)
+	exit(0)

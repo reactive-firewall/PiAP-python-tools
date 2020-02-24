@@ -20,6 +20,9 @@
 # ......................................................................
 
 
+# beware of PEP-3130 issues
+
+
 # try:
 # 	from . import config as config
 # except Exception:
@@ -27,8 +30,8 @@
 
 
 try:
-	import os
 	import sys
+	import os
 	import functools
 	import time
 	import warnings
@@ -94,7 +97,7 @@ def suppress_warning(func):
 		"""Wraps a function in try-except"""
 		theOutput = None
 		with warnings.catch_warnings():
-			warnings.filterwarnings("ignore", module="piaplib")
+			warnings.filterwarnings("ignore", message=".*", module="piaplib*")
 			theOutput = func(*args, **kwargs)
 		return theOutput
 
@@ -105,12 +108,12 @@ def error_failsafe(func):
 	"""Runs a function in bare try-except"""
 
 	@functools.wraps(func)
-	def try_func(*args, **kwargs):
+	def unsafe_func(*args, **kwargs):
 		"""Wraps a function in try-except"""
 		theOutput = None
 		try:
 			with warnings.catch_warnings():
-				warnings.filterwarnings("ignore", module="piaplib")
+				warnings.filterwarnings("ignore", message=".*", module="piaplib*")
 				theOutput = func(*args, **kwargs)
 		except BaseException as berr:
 			theOutput = None
@@ -118,16 +121,17 @@ def error_failsafe(func):
 			raise baton
 		return theOutput
 
-	return try_func
+	return unsafe_func
 
 
 @error_failsafe
-def error_breakpoint(error, context=None):
+def error_breakpoint(error, context):
 	"""Just logs the error and returns None"""
 	timestamp = getTimeStamp()
 	logs.log(str("=" * 40), "Warning")
 	logs.log(str("An error occurred at {}").format(timestamp), "Error")
-	logs.log(str(context), "Debug")
+	if context is not None:
+		logs.log(str(context), "Debug")
 	logs.log(str(type(error)), "Debug")
 	logs.log(str(error), "Error")
 	if isinstance(error, PiAPError):
@@ -137,29 +141,32 @@ def error_breakpoint(error, context=None):
 		logs.log(str(type(error.cause)), "Debug")
 		logs.log(str(error.message), "Error")
 	else:
-		logs.log(str((error.args)), "Error")
+		if isinstance(error, Exception):
+			logs.log(str((error.args)), "Error")
+		else:
+			logs.log(str("Cause Redacted!"), "Debug")
 	return None
 
 
-@suppress_warning
 def error_passing(func):
 	"""Runs a function in try-except"""
 
 	@functools.wraps(func)
-	def safety_func(*args, **kwargs):
+	@suppress_warning
+	def proxy_safety_func(*args, **kwargs):
 		"""Wraps a function in try-except"""
 		theOutput = None
 		try:
 			theOutput = func(*args, **kwargs)
 		except Exception as err:
-			theOutput = error_breakpoint(err, context=func)
-			baton = PiAPError(err, str("An error occurred in {}.").format(str(func)))
+			theOutput = error_breakpoint(error=err, context=func)
+			baton = PiAPError(err, str("An error occurred at {}.").format(str(func)))
 			err = None
 			del err
 			raise baton
 		return theOutput
 
-	return safety_func
+	return proxy_safety_func
 
 
 def error_handling(func):

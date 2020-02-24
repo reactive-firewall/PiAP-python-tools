@@ -56,7 +56,7 @@ try:
 	if str("piaplib.book.logs.logs") not in sys.modules:
 		from piaplib.book.logs import logs as logs
 	else:
-		logs = sys.modules[str("piaplib.book.logs.logs")]
+		logs = sys.modules[str("""piaplib.book.logs.logs""")]
 except Exception:
 	try:
 		import piaplib.book.logs.logs as logs
@@ -66,9 +66,9 @@ except Exception:
 
 try:
 	if 'piaplib.pku.remediation' not in sys.modules:
-		from . import remediation as remediation
+		import piaplib.pku.remediation as remediation
 	else:
-		remediation = sys.modules['piaplib.pku.remediation']
+		remediation = sys.modules["""piaplib.pku.remediation"""]
 except Exception:
 	try:
 		import remediation as remediation
@@ -840,7 +840,7 @@ def getFileResource(someURL, outFile):
 		urlretrieve(url=someURL, filename=outFile)
 	except Exception as err:
 		logs.log(str("Failed to fetched file {}").format(str(someURL)), "Debug")
-		remediation.error_breakpoint(error=err, contex=getFileResource)
+		piaplib.pku.remediation.error_breakpoint(error=err, context=getFileResource)
 		return False
 	try:
 		logs.log(str("fetched file {}").format(someURL), "Debug")

@@ -32,26 +32,25 @@
 
 
 try:
-	import os
-	if os.__name__ is None:
-		raise NotImplementedError("[CWE-758] We could not import the os. We're like in the matrix!")
-except Exception as err:
+	import sys
+	if sys.__name__ is None:  # pragma: no branch
+		raise ImportError("[CWE-758] OMG! we could not import sys! ABORT. ABORT.")
+except Exception as err:  # pragma: no branch
 	raise ImportError(err)
-	exit(3)
 
 
 try:
-	import sys
-	if sys.__name__ is None:
-		raise NotImplementedError("[CWE-758] We could not import the sys.")
-except Exception as err:
-	raise ImportError(err)
-	exit(3)
+	if 'os' not in sys.modules:
+		import os
+	else:  # pragma: no branch
+		os = sys.modules["""os"""]
+except Exception:  # pragma: no branch
+	raise ImportError("[CWE-758] OS Failed to import.")
 
 
 try:
 	import time
-	if time.__name__ is None:
+	if time.__name__ is None:  # pragma: no branch
 		raise NotImplementedError("[CWE-758] We could not import time. Are we in the speed-force!")
 except Exception as err:
 	raise ImportError(err)
@@ -60,9 +59,9 @@ except Exception as err:
 
 try:
 	import cProfile
-	if cProfile.__name__ is None:
+	if cProfile.__name__ is None:  # pragma: no branch
 		raise NotImplementedError("[CWE-758] We could not import cProfile. ABORT!")
-except Exception as err:
+except Exception as err:  # pragma: no branch
 	raise ImportError(err)
 	exit(3)
 
@@ -71,7 +70,7 @@ try:
 	try:
 		sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), str('..'))))
 		sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), str('.'))))
-	except Exception as ImportErr:
+	except Exception as ImportErr:  # pragma: no branch
 		print(str(''))
 		print(str(type(ImportErr)))
 		print(str(ImportErr))
@@ -80,13 +79,13 @@ try:
 		ImportErr = None
 		del ImportErr
 		raise ImportError(str("Profile module failed completely."))
-except Exception:
+except Exception:  # pragma: no branch
 	raise ImportError("Failed to import test profiling")
 
 
 try:
 	from piaplib.book.logs import logs as logs
-except Exception:
+except Exception:  # pragma: no branch
 	try:
 		from book.logs import logs as logs
 	except Exception as err:
@@ -176,7 +175,7 @@ try:  # noqa
 
 except ImportError:
 	def do_profile(follow=[]):
-		"Helpful if you accidentally leave in production!"
+		"""Helpful if you accidentally leave in production!"""
 		def inner(func):
 			def nothing(*args, **kwargs):
 				return func(*args, **kwargs)

@@ -19,9 +19,31 @@
 # limitations under the License.
 # ......................................................................
 
-import unittest
+
 import subprocess
-import sys
+
+
+try:
+	import sys
+	if sys.__name__ is None:  # pragma: no branch
+		raise ImportError("[CWE-758] OMG! we could not import sys! ABORT. ABORT.")
+except Exception as err:  # pragma: no branch
+	raise ImportError(err)
+
+
+try:
+	try:
+		import context
+	except Exception as ImportErr:  # pragma: no branch
+		ImportErr = None
+		del ImportErr
+		from . import context
+	if context.__name__ is None:
+		raise ImportError("[CWE-758] Failed to import context")
+	else:
+		from context import unittest as unittest
+except Exception:
+	raise ImportError("[CWE-758] Failed to import test context")
 
 
 def getPythonCommand():

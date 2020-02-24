@@ -61,9 +61,10 @@ try:
 except Exception:
 	class_tags = str("""Development Status :: 4 - Beta""")
 
+
 setup(
 	name="""piaplib""",
-	version="""0.4.1""",
+	version="""0.4.2""",
 	description="""Beta for PiAP python tools""",
 	long_description=readme,
 	long_description_content_type="""text/markdown""",
@@ -75,6 +76,6 @@ setup(
 	classifiers=class_tags,
 	url="""https://github.com/reactive-firewall/PiAP-python-tools.git@stable""",
 	license=SLA,
-	packages=find_packages(exclude=("""tests""", """docs""")),
+	packages=find_packages(exclude=("""tests""", """docs"""))
 )
 

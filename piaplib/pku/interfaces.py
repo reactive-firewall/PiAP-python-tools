@@ -141,8 +141,15 @@ def parseargs(arguments=None):
 @remediation.error_handling
 def taint_name(rawtxt):
 	"""Checks the interface arguments."""
+
+	def _inner_taint(bad_juju):
+		enc_text = utils.literal_str(bad_juju)
+		if isinstance(enc_text, str):
+			return enc_text
+		return str("""[REDACTED VALUE]""")
+
 	theResult = None
-	tainted_input = utils.literal_str(rawtxt).lower()
+	tainted_input = _inner_taint(rawtxt).lower()
 	if utils.isWhiteListed(tainted_input, INTERFACE_CHOICES):
 		theResult = tainted_input
 	else:

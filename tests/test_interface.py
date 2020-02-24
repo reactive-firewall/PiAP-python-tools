@@ -19,34 +19,31 @@
 # limitations under the License.
 # ......................................................................
 
-import unittest
+try:
+	import sys
+	if sys.__name__ is None:  # pragma: no branch
+		raise ImportError("[CWE-758] OMG! we could not import sys! ABORT. ABORT.")
+except Exception as err:  # pragma: no branch
+	raise ImportError(err)
+
 
 try:
 	try:
-		import sys
-		import os
-		sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), str('..'))))
-		sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), str('.'))))
-	except Exception as ImportErr:
-		print(str(''))
-		print(str(type(ImportErr)))
-		print(str(ImportErr))
-		print(str((ImportErr.args)))
-		print(str(''))
+		import context
+	except Exception as ImportErr:  # pragma: no branch
 		ImportErr = None
 		del ImportErr
-		raise ImportError(str("Test module failed completely."))
+		from . import context
+	if context.__name__ is None:
+		raise ImportError("[CWE-758] Failed to import context")
+	else:
+		from context import unittest as unittest
 except Exception:
-	raise ImportError("Failed to import test context")
+	raise ImportError("[CWE-758] Failed to import test context")
 
 
 class iFaceTestSuite(unittest.TestCase):
 	"""Special pku.interface test cases."""
-
-	def test_absolute_truth_and_meaning(self):
-		"""Insanitty Test."""
-		assert True
-		self.assertIsNone(None)
 
 	def test_syntax(self):
 		"""Test case importing code."""
@@ -66,7 +63,7 @@ class iFaceTestSuite(unittest.TestCase):
 		assert theResult
 
 	def test_case_iface_insane_none(self):
-		"""Tests the imposible state for pku.interface given bad input"""
+		"""Tests the imposible state for pku.interface.taint_name given bad input"""
 		theResult = True
 		try:
 			import piaplib.pku.interfaces
@@ -85,7 +82,7 @@ class iFaceTestSuite(unittest.TestCase):
 
 	@unittest.skipUnless(sys.platform.startswith("linux"), "Requires linux ifup/ifdown tools")
 	def test_case_iface_check_nonroot_down(self):
-		"""Tests the imposible state for pku.interface given bad tools"""
+		"""Tests the imposible state for pku.interface given bad values"""
 		theResult = False
 		try:
 			import subprocess
@@ -94,7 +91,7 @@ class iFaceTestSuite(unittest.TestCase):
 				theResult = False
 			from pku import interfaces as interfaces
 			if interfaces.__name__ is None:
-				raise ImportError("Failed to import iface")
+				raise ImportError("[CWE-758] Failed to import pku.interface")
 			try:
 				interfaces.disable_iface("eth1", False)
 				theResult = True
@@ -122,7 +119,7 @@ class iFaceTestSuite(unittest.TestCase):
 				theResult = False
 			from pku import interfaces as interfaces
 			if interfaces.__name__ is None:
-				raise ImportError("Failed to import iface")
+				raise ImportError("[CWE-758] Failed to import pku.interface")
 			try:
 				interfaces.enable_iface("eth1")
 				theResult = True
