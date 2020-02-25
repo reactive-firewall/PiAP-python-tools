@@ -836,18 +836,19 @@ def _python2urlretrieve(url, filename):
 @remediation.error_handling
 def getFileResource(someURL, outFile):
 	"""Downloads a file from the given URL."""
+	theResult = True
 	try:
 		urlretrieve(url=someURL, filename=outFile)
 	except Exception as err:
 		logs.log(str("Failed to fetched file {}").format(str(someURL)), "Debug")
 		piaplib.pku.remediation.error_breakpoint(error=err, context=getFileResource)
-		return False
+		theResult = False
 	try:
 		if theResult:
 			logs.log(str("fetched file {}").format(someURL), "Debug")
 	except Exception:
 		pass
-	return True
+	return theResult
 
 
 @remediation.error_handling
