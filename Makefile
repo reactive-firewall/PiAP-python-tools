@@ -153,6 +153,7 @@ cleanup:
 	$(QUIET)rm -f ./piaplib/piaplib.egg-info/* 2>/dev/null || true
 	$(QUIET)rmdir ./piaplib/piaplib.egg-info 2>/dev/null || true
 	$(QUIET)rm -f ./*/*~ 2>/dev/null || true
+	$(QUIET)rm -f ./piaplib/*/*~ 2>/dev/null || true
 	$(QUIET)rm -f ./*~ 2>/dev/null || true
 	$(QUIET)coverage erase 2>/dev/null || true
 	$(QUIET)rm -f ./.coverage 2>/dev/null || true
