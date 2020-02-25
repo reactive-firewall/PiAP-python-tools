@@ -150,6 +150,8 @@ cleanup:
 	$(QUIET)rm -f piaplib/*/*.DS_Store 2>/dev/null || true
 	$(QUIET)rm -f piaplib.egg-info/* 2>/dev/null || true
 	$(QUIET)rmdir piaplib.egg-info 2>/dev/null || true
+	$(QUIET)rm -f ./piaplib/piaplib.egg-info/* 2>/dev/null || true
+	$(QUIET)rmdir ./piaplib/piaplib.egg-info 2>/dev/null || true
 	$(QUIET)rm -f ./*/*~ 2>/dev/null || true
 	$(QUIET)rm -f ./*~ 2>/dev/null || true
 	$(QUIET)coverage erase 2>/dev/null || true

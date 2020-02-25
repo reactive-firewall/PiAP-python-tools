@@ -76,6 +76,6 @@ setup(
 	classifiers=class_tags,
 	url="""https://github.com/reactive-firewall/PiAP-python-tools.git@stable""",
 	license=SLA,
-	packages=find_packages(exclude=("""tests""", """docs"""))
+	packages=find_packages(exclude=("""tests""", """docs""")),
 )
 

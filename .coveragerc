@@ -36,6 +36,9 @@ partial_branches =
 	if __sys_path__ not in sys.path:
 	# not in sys.modules:
     if context.__name__ is None:
+	if 'os' not in sys.modules:
+	if 'os.path' not in sys.modules:
+	if 'argparse' not in sys.modules:
 
 ignore_errors = True
 

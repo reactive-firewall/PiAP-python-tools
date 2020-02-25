@@ -843,7 +843,8 @@ def getFileResource(someURL, outFile):
 		piaplib.pku.remediation.error_breakpoint(error=err, context=getFileResource)
 		return False
 	try:
-		logs.log(str("fetched file {}").format(someURL), "Debug")
+		if theResult:
+			logs.log(str("fetched file {}").format(someURL), "Debug")
 	except Exception:
 		pass
 	return True
@@ -863,7 +864,7 @@ def cleanFileResource(theFile):
 		theResult = False
 	try:
 		if theResult:
-			logs.log(str("purged file {}").format(theFile), "debug")
+			logs.log(str("purged file {}").format(theFile), "Debug")
 	except Exception:
 		pass
 	return theResult
@@ -883,7 +884,7 @@ def moveFileResource(theSrc, theDest):
 		theResult = False
 	try:
 		if theResult:
-			logs.log(str("Moved file {} to {}").format(theSrc, theDest), "debug")
+			logs.log(str("Moved file {} to {}").format(theSrc, theDest), "Debug")
 	except Exception:
 		pass
 	return theResult

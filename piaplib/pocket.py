@@ -39,7 +39,7 @@ except Exception:
 
 try:
 	if 'argparse' not in sys.modules:
-		import argparse as argparse
+		import argparse
 	else:  # pragma: no branch
 		argparse = sys.modules["""argparse"""]
 except Exception:
@@ -47,7 +47,7 @@ except Exception:
 
 
 try:
-	if str("piaplib") in __file__:
+	if str("piaplib.") in __file__:
 		__sys_path__ = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 		if __sys_path__ not in sys.path:
 			sys.path.insert(0, __sys_path__)
