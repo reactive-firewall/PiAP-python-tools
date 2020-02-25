@@ -84,7 +84,7 @@ try:
 	else:
 		try_catch_error = sys.modules[str("piaplib.pku.try_catch_error")]
 except Exception:
-	raise ImportError(err, "Error Importing try_catch_error for config")
+	raise ImportError("Error defining try_catch_error for piaplib.pku")
 
 
 @try_catch_error
