@@ -393,7 +393,11 @@ class BasicUsageTestSuite(unittest.TestCase):
 			thepython = getPythonCommand()
 			if (thepython is not None):
 				try:
-					for unit in ["pku.interfaces", "pku.compile_interface", "pku.upgrade"]:
+					test_units = [
+						"pku.interfaces", "piaplib.pku.config"
+						"pku.compile_interface", "pku.upgrade"
+					]
+					for unit in test_units:
 						theOutputtext = checkPythonCommand([
 							str(thepython),
 							str("-m"),
@@ -430,7 +434,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 				theResult = False
 			if (thepython is not None):
 				test_units = [
-					"pocket", "book.version", "pku.interfaces",
+					"pocket", "book.version", "pku.interfaces", "piaplib.pku.config"
 					"pku.compile_interface", "pku.upgrade"
 				]
 				for unit in test_units:

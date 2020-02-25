@@ -37,6 +37,15 @@ except Exception:
 
 
 try:
+	if 'functools' not in sys.modules:
+		import functools
+	else:  # pragma: no branch
+		functools = sys.modules["""functools"""]
+except Exception:
+	raise ImportError("functools Failed to import.")
+
+
+try:
 	if str("pku") in __file__:
 		__sys_path__ = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 		if __sys_path__ not in sys.path:
@@ -52,25 +61,30 @@ try:
 except Exception:
 	raise ImportError("Pocket PKU failed to import.")
 
+try:
+	if str("piaplib.pku.try_catch_error") not in sys.modules:
+		def try_catch_error(func):
+			"""Runs a function in try-except"""
 
-def try_catch_error(func):
-	"""Runs a function in try-except"""
-	import functools
+			@functools.wraps(func)
+			def try_func(*args, **kwargs):
+				"""Wraps a function in try-except"""
+				theOutputOrNone = None
+				try:
+					theOutputOrNone = func(*args, **kwargs)
+				except Exception as err:
+					print(str(err))
+					print(str("[CWE-394] An error occurred in {}.").format(str(func)))
+					del err
+					theOutputOrNone = None
+				return theOutputOrNone
 
-	@functools.wraps(func)
-	def try_func(*args, **kwargs):
-		"""Wraps a function in try-except"""
-		theOutputOrNone = None
-		try:
-			theOutputOrNone = func(*args, **kwargs)
-		except Exception as err:
-			print(str(err))
-			print(str("[CWE-394] An error occurred in {}.").format(str(func)))
-			del err
-			theOutputOrNone = None
-		return theOutputOrNone
+			return try_func
 
-	return try_func
+	else:
+		try_catch_error = sys.modules[str("piaplib.pku.try_catch_error")]
+except Exception:
+	raise ImportError(err, "Error Importing try_catch_error for config")
 
 
 @try_catch_error
