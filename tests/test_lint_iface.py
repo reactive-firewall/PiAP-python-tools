@@ -99,7 +99,7 @@ class LintiFaceTestSuite(unittest.TestCase):
 				self.assertIsNone(
 					iface_check_status.get_iface_name(None, True)
 				)
-				self.assertIsNotNone(
+				self.assertIsNone(
 					iface_check_status.get_iface_name("junk", True)
 				)
 			except Exception as err:

@@ -457,6 +457,8 @@ def main(argv=None):
 		theFile = str("""/tmp/.beta_PiAP_weak_key""")
 	if args.key is not None:
 		theFile = makeKeystoreFile(utils.literal_str(args.key), theFile)
+		if theFile is None:
+			raise NotImplementedError("[CWE-758] No default keystore - homeless key bug")
 	else:
 		raise NotImplementedError("[CWE-758] No default key - empty key bug")
 	try:

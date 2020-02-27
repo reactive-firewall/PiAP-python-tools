@@ -102,8 +102,7 @@ def parseargs(arguments=None):
 @remediation.error_handling
 def taint_name(rawtxt):
 	"""check the interface arguments"""
-	tainted_input = str(rawtxt).lower()
-	return interfaces.taint_name(tainted_input)
+	return interfaces.taint_name(rawtxt)
 
 
 def show_iface(iface_name=None, is_verbose=False, use_html=False):
@@ -136,12 +135,13 @@ def show_iface(iface_name=None, is_verbose=False, use_html=False):
 
 @remediation.error_handling
 def get_iface_name(iface_name=None, use_html=False):
-	if iface_name is None:
+	tainted_iface_name = interfaces.taint_name(iface_name)
+	if tainted_iface_name is None:
 		return None
 	if use_html is not True:
-		return taint_name(iface_name)
+		return tainted_iface_name
 	else:
-		iface = str(get_iface_name(iface_name, False))
+		iface = str(get_iface_name(tainted_iface_name, False))
 		return html_generator.gen_html_td(iface, str(u'iface_status_dev_{}').format(iface))
 
 
@@ -165,9 +165,7 @@ def get_iface_status_raw(interface=None):
 	"""list the raw status of interfaces."""
 	cli_args = [x for x in get_iface_status_raw_cmd_args()]
 	theRawIfaceState = None
-	tainted_name = None
-	if interface is not None:
-		tainted_name = taint_name(interface)
+	tainted_name = interfaces.taint_name(interface)
 	if tainted_name is not None and tainted_name not in cli_args:
 		cli_args.append(str(tainted_name))
 	try:
@@ -226,7 +224,8 @@ def _extractIFaceStatus(status_txt=None):
 def get_iface_status(iface=u'lo', use_html=False):
 	"""Generate the status"""
 	theResult = None
-	if iface not in get_iface_list():
+	tainted_name = interfaces.taint_name(iface)
+	if tainted_name not in get_iface_list():
 		return theResult
 	status_txt = get_iface_status_raw(iface)
 	if use_html is False:
@@ -381,7 +380,6 @@ def main(argv=None):
 
 if __name__ == u'__main__':
 	try:
-		import sys
 		exitcode = 3
 		if (sys.argv is not None and len(sys.argv) > 0):
 			exitcode = main(sys.argv[1:])
