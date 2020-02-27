@@ -126,16 +126,21 @@ class CryptoTestSuite(unittest.TestCase):
 			self.assertIsNotNone(clarify.hasBackendCommand())
 			theTest = (theTest is True or clarify.hasBackendCommand() is False)
 			self.assertTrue(theTest)
+			theResult = (theTest is True)
 		except Exception as err:
 			print(str(""))
 			print(str(type(err)))
 			print(str(err))
 			print(str((err.args)))
 			print(str(""))
+			self.skip(str("""[CWE-754] Error prevents proper test."""))
 			err = None
 			del err
 			theResult = False
-		assert theResult
+		self.assertTrue(
+			theResult,
+			str("""[CWE-544] Could Not determin if keyring.clarify has backend to test.""")
+		)
 
 	def test_b_case_clarify_getKeyFile(self):
 		"""Tests the helper function getKeyFilePath of keyring.clarify"""
@@ -143,9 +148,15 @@ class CryptoTestSuite(unittest.TestCase):
 		try:
 			import piaplib.keyring.clarify as clarify
 			if clarify.__name__ is None:
-				raise ImportError("Failed to import clarify")
-			self.assertIsNotNone(clarify.getKeyFilePath())
-			self.assertIsNotNone(os.path.abspath(clarify.getKeyFilePath()))
+				self.fail("Failed to import clarify")
+			self.assertIsNotNone(
+				clarify.getKeyFilePath(),
+				str("[CWE-665] Path was unexpectedly None.")
+			)
+			self.assertIsNotNone(
+				os.path.abspath(clarify.getKeyFilePath()),
+				str("""[CWE-665] Inavalid Path caused CWE-1188.""")
+			)
 			theResult = True
 		except Exception as err:
 			print(str(""))
@@ -153,10 +164,11 @@ class CryptoTestSuite(unittest.TestCase):
 			print(str(err))
 			print(str((err.args)))
 			print(str(""))
+			self.skip(str("""[CWE-754] Error prevents proper test."""))
 			err = None
 			del err
 			theResult = False
-		assert theResult
+		self.assertTrue(theResult, str("Could Not determin if keyring.clarify has backend to test"))
 
 	def test_b_case_clarify_setKeyFile(self):
 		"""Tests the helper function makeKeystoreFile of keyring.clarify"""
@@ -175,6 +187,7 @@ class CryptoTestSuite(unittest.TestCase):
 			print(str(err))
 			print(str((err.args)))
 			print(str(""))
+			self.skip(str("""[CWE-754] Error prevents proper test."""))
 			err = None
 			del err
 			theResult = False
@@ -197,6 +210,7 @@ class CryptoTestSuite(unittest.TestCase):
 			print(str(err))
 			print(str((err.args)))
 			print(str(""))
+			self.skip(str("""[CWE-754] Error prevents proper test."""))
 			err = None
 			del err
 			theResult = False
@@ -220,6 +234,7 @@ class CryptoTestSuite(unittest.TestCase):
 			print(str(err))
 			print(str((err.args)))
 			print(str(""))
+			self.skip(str("""[CWE-754] Error prevents proper test."""))
 			err = None
 			del err
 			theResult = False
@@ -240,6 +255,7 @@ class CryptoTestSuite(unittest.TestCase):
 			print(str(err))
 			print(str((err.args)))
 			print(str(""))
+			self.skip(str("""[CWE-754] Error prevents proper test."""))
 			err = None
 			del err
 			theResult = False
@@ -262,6 +278,7 @@ class CryptoTestSuite(unittest.TestCase):
 			print(str(err))
 			print(str((err.args)))
 			print(str(""))
+			self.skip(str("""[CWE-754] Error prevents proper test."""))
 			err = None
 			del err
 			theResult = False
@@ -284,6 +301,7 @@ class CryptoTestSuite(unittest.TestCase):
 			print(str(err))
 			print(str((err.args)))
 			print(str(""))
+			self.skip(str("""[CWE-754] Error prevents proper test."""))
 			err = None
 			del err
 		assert theResult
@@ -326,7 +344,7 @@ class CryptoTestSuite(unittest.TestCase):
 				raise unittest.SkipTest("BETA. Experemental feature not ready yet.")
 		assert theResult
 
-	@unittest.skipUnless(("""utf""" not in sys.getdefaultencoding()), "wrong encoding for test")
+	@unittest.skipIf(("""utf""" not in sys.getdefaultencoding()), "wrong encoding for test")
 	def test_case_clarify_main_b(self):
 		"""Tests the helper function main unpack of keyring.clarify"""
 		theResult = False
@@ -372,9 +390,10 @@ class CryptoTestSuite(unittest.TestCase):
 				test_out = str(repr(bytes(test_out, encoding="""utf-8""").decode(
 					"""utf-8""", errors=clarify.getCTLModeForPY()
 				)))
+			print(str("... assert not none or junk"))
 			self.assertIsNotNone(test_out)
 			self.assertIsNotNone(str(test_out))
-			print(str("... assert not none or junk"))
+			print(str("... assert not junk"))
 			if (str("""This is a test Message""") in str(test_out)):
 				theResult = True
 			else:
@@ -406,7 +425,7 @@ class CryptoTestSuite(unittest.TestCase):
 				raise unittest.SkipTest("BETA. Experemental feature not ready yet.")
 		assert theResult
 
-	@unittest.skipUnless(("""utf""" not in sys.getdefaultencoding()), "wrong encoding for test")
+	@unittest.skipIf(("""utf""" not in sys.getdefaultencoding()), "wrong encoding for test")
 	def test_case_clarify_main_keyring(self):
 		"""Tests the helper function main unpack of keyring.main(clarify)"""
 		theResult = False
@@ -463,7 +482,7 @@ class CryptoTestSuite(unittest.TestCase):
 				raise unittest.SkipTest("BETA. Experemental feature not ready yet.")
 		assert theResult
 
-	@unittest.skipUnless(("""utf""" not in sys.getdefaultencoding()), "wrong encoding for test")
+	@unittest.skipIf(("""utf""" not in sys.getdefaultencoding()), "wrong encoding for test")
 	def test_case_clarify_write_inverts_read_example(self):
 		"""Tests the write then read workflow of keyring.clarify."""
 		theResult = False
@@ -519,7 +538,7 @@ class CryptoTestSuite(unittest.TestCase):
 				raise unittest.SkipTest("BETA. Experemental feature not ready yet.")
 		assert theResult
 
-	@unittest.skipUnless(("""utf""" not in sys.getdefaultencoding()), "wrong encoding for test")
+	@unittest.skipIf(("""utf""" not in sys.getdefaultencoding()), "wrong encoding for test")
 	@unittest.skipUnless((sys.version_info > (3, 2)), str(sub_proc_bug_message))
 	@given(text())
 	def test_case_clarify_write_inverts_read(self, someInput):  # noqa C901

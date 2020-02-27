@@ -64,6 +64,10 @@ __epilog__ = """Basicly a python wrapper for iface."""
 
 
 __ALTMODE = False
+"""Flag to use alternate interface name resolution (without netifaces)"""
+
+
+global INTERFACE_CHOICES
 
 
 if sys.platform.startswith("linux") and (sys.version_info > (3, 3)):
@@ -143,6 +147,7 @@ def taint_name(rawtxt):
 	"""Checks the interface arguments."""
 
 	def _inner_taint(bad_juju):
+		"""Helper function for input tainting"""
 		enc_text = utils.literal_str(bad_juju)
 		if isinstance(enc_text, str):
 			return enc_text
@@ -152,8 +157,6 @@ def taint_name(rawtxt):
 	tainted_input = _inner_taint(rawtxt).lower()
 	if utils.isWhiteListed(tainted_input, INTERFACE_CHOICES):
 		theResult = tainted_input
-	else:
-		print(str("rejected {}").format(tainted_input))
 	return theResult
 
 

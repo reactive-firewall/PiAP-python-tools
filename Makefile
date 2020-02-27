@@ -152,6 +152,8 @@ cleanup:
 	$(QUIET)rmdir piaplib.egg-info 2>/dev/null || true
 	$(QUIET)rm -f ./piaplib/piaplib.egg-info/* 2>/dev/null || true
 	$(QUIET)rmdir ./piaplib/piaplib.egg-info 2>/dev/null || true
+	$(QUIET)rm -f ./dist/* 2>/dev/null || true
+	$(QUIET)rmdir ./dist 2>/dev/null || true
 	$(QUIET)rm -f ./*/*~ 2>/dev/null || true
 	$(QUIET)rm -f ./piaplib/*/*~ 2>/dev/null || true
 	$(QUIET)rm -f ./*~ 2>/dev/null || true
