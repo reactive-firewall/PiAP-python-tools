@@ -224,7 +224,7 @@ def _extractIFaceStatus(status_txt=None):
 def get_iface_status(iface=u'lo', use_html=False):
 	"""Generate the status"""
 	theResult = None
-	tainted_name = interfaces.taint_name(interface)
+	tainted_name = interfaces.taint_name(iface)
 	if tainted_name not in get_iface_list():
 		return theResult
 	status_txt = get_iface_status_raw(iface)

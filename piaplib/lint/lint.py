@@ -21,32 +21,97 @@
 
 
 try:
-	import os
 	import sys
-	import argparse
-	sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+	if sys.__name__ is None:
+		raise ImportError("OMG! we could not import os. We're like in the matrix! ABORT. ABORT.")
+except Exception as err:
+	raise ImportError(err)
+
+
+try:
+	if 'os' not in sys.modules:
+		import os
+	else:  # pragma: no branch
+		os = sys.modules["""os"""]
+except Exception:
+	raise ImportError("OS Failed to import.")
+
+
+try:
+	if 'argparse' not in sys.modules:
+		import argparse
+	else:  # pragma: no branch
+		argparse = sys.modules["""argparse"""]
+except Exception:
+	raise ImportError("functools Failed to import.")
+
+
+try:
+	if str("lint") in __file__:
+		__sys_path__ = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+		if __sys_path__ not in sys.path:
+			sys.path.insert(0, __sys_path__)
+except Exception:
+	raise ImportError("Pocket Knife Unit Lint failed to accumulate.")
+
+
+try:
+	if str("piaplib") not in sys.modules:
+		raise ImportError("Pocket Lint failed to import.")  # import piaplib as piaplib
+	piaplib = sys.modules["""piaplib"""]
+except Exception:
+	raise ImportError("Pocket Lint failed to import.")
+
+
+try:
+	if str("piaplib.pku.utils") not in sys.modules:
+		from piaplib.pku import utils as utils
+	else:
+		utils = sys.modules[str("piaplib.pku.utils")]
+except Exception:
 	try:
-		import piaplib as piaplib
-	except Exception:
-		from . import piaplib as piaplib
+		import piaplib.pku.utils as utils
+	except Exception as err:
+		raise ImportError(err, "Error Importing piaplib.pku.utils")
+
+
+try:
+	if str("piaplib.pku.remediation") not in sys.modules:
+		from piaplib.pku import remediation as remediation
+	else:
+		remediation = sys.modules[str("piaplib.pku.remediation")]
+except Exception:
 	try:
-		from .. import utils as utils
-	except Exception:
-		import pku.utils as utils
+		import piaplib.pku.remediation as remediation
+	except Exception as err:
+		raise ImportError(err, "Error Importing piaplib.pku.remediation")
+
+
+try:
+	if str("piaplib.pku.interfaces") not in sys.modules:
+		from piaplib.pku import interfaces as interfaces
+	else:
+		interfaces = sys.modules[str("piaplib.pku.interfaces")]
+except Exception:
 	try:
-		from .. import remediation as remediation
-	except Exception:
-		import pku.remediation as remediation
+		import piaplib.pku.interfaces as interfaces
+	except Exception as err:
+		raise ImportError(err, "Error Importing piaplib.pku.interfaces")
+
+
+try:
+	if str("piaplib.lint.html_generator") not in sys.modules:
+		from piaplib.lint import html_generator as html_generator
+	else:
+		html_generator = sys.modules[str("piaplib.lint.html_generator")]
+except Exception:
 	try:
-		from . import html_generator as html_generator
-	except Exception as ImpErr:
-		ImpErr = None
-		del ImpErr
-		import html_generator as html_generator
-	try:
-		from .. import interfaces as interfaces
-	except Exception:
-		import pku.interfaces as interfaces
+		import piaplib.lint.html_generator as html_generator
+	except Exception as err:
+		raise ImportError(err, "Error Importing piaplib.lint.html_generator")
+
+
+try:
 	for depends in [interfaces, html_generator, remediation, utils]:
 		if depends.__name__ is None:
 			raise ImportError("Failed to import depends.")
@@ -58,15 +123,29 @@ except Exception as importErr:
 	raise ImportError("Failed to import " + str(__file__))
 	exit(255)
 
-try:
-	from . import check as check
-except Exception:
-	import check as check
 
 try:
-	from . import do_execve as do_execve
+	if str("piaplib.lint.check") not in sys.modules:
+		from piaplib.lint import check as check
+	else:
+		check = sys.modules[str("piaplib.lint.check")]
 except Exception:
-	import do_execve as do_execve
+	try:
+		import piaplib.lint.check as check
+	except Exception as err:
+		raise ImportError(err, "Error Importing piaplib.lint.check")
+
+
+try:
+	if str("piaplib.lint.do_execve") not in sys.modules:
+		from piaplib.lint import do_execve as do_execve
+	else:
+		do_execve = sys.modules[str("piaplib.lint.do_execve")]
+except Exception:
+	try:
+		import piaplib.lint.do_execve as do_execve
+	except Exception as err:
+		raise ImportError(err, "Error Importing piaplib.lint.do_execve")
 
 
 __prog__ = """piaplib.lint"""
