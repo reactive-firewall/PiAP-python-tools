@@ -345,6 +345,7 @@ class CryptoTestSuite(unittest.TestCase):
 		assert theResult
 
 	@unittest.skipIf(("""utf""" not in sys.getdefaultencoding()), "wrong encoding for test")
+	@unittest.skipUnless((os.path.supports_unicode_filenames is True), "wrong os encoding for test")
 	def test_case_clarify_main_b(self):
 		"""Tests the helper function main unpack of keyring.clarify"""
 		theResult = False
