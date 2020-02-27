@@ -1,0 +1,19 @@
+name: CI
+
+on: [push]
+
+jobs:
+  MATS:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Clean Build Env
+      run: make -j1 -f Makefile clean || true ;
+    - name: Run Test Env
+      run: |
+        echo Testing build,
+        make -j1 -f Makefile test || true
+    - name: Clean Test Env
+      run: make -j1 -f Makefile clean || true ;
