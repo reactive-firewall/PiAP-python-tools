@@ -232,10 +232,11 @@ def splitDottedKeyPath(fullkey):
 	kp = {}
 	if fullkey is None:
 		kp[0] = str(None)
-	if str(""".""") not in str(fullkey):
-		kp[0] = str(fullkey)
 	else:
-		kp = str(fullkey).rsplit(""".""", 1)
+		if str(""".""") not in str(fullkey):
+			kp[0] = str(fullkey)
+		else:
+			kp = str(fullkey).rsplit(""".""", 1)
 	return kp
 
 
@@ -520,7 +521,8 @@ def xstr(some_str=None):
 		if xstr(test) in xstr(ref):
 	"""
 	try:
-		return str("_x_" + literal_str(some_str) + "_x_")
+		JNKSTUB = str("""_x_""")
+		return str(JNKSTUB + literal_str(some_str) + JNKSTUB)
 	except Exception:
 		return None
 
@@ -636,7 +638,8 @@ def ensureDir(somedir):
 	if os.path.isabs(somedir) and (os.path.islink(somedir) or os.path.ismount(somedir)):
 		return True
 	else:
-		ensureDir(os.path.dirname(os.path.abspath(somedir)))
+		if not ensureDir(os.path.dirname(os.path.abspath(somedir))):
+			return False
 		oldmask = os.umask(2)
 		os.mkdir(os.path.abspath(somedir))
 		os.umask(oldmask)

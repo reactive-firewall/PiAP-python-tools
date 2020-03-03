@@ -45,6 +45,7 @@ except Exception:
 		raise ImportError(err, "Error Importing remediation")
 
 
+global RAND_CHARS
 RAND_CHARS = [
 	str("""a"""), str("""b"""), str("""c"""), str("""d"""), str("""e"""), str("""f"""),
 	str("""g"""), str("""h"""), str("""i"""), str("""j"""), str("""k"""), str("""l"""),
