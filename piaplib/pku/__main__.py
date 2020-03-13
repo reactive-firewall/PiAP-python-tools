@@ -96,6 +96,8 @@ try:
 		from piaplib.pku import utils as utils
 	else:
 		utils = sys.modules[str("piaplib.pku.utils")]
+	if utils.__name__ is None:
+		raise ImportError("Error Importing piaplib.pku.utils")
 except Exception:
 	try:
 		import piaplib.pku.utils as utils

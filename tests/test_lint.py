@@ -61,7 +61,7 @@ class LintTestSuite(unittest.TestCase):
 			from piaplib import lint as lint
 			if lint.__name__ is None:
 				raise ImportError("Failed to import lint")
-			from piaplib.lint import __main__
+			from piaplib.lint import __main__  # noqa
 			for testInput in [str("NoSuchTool"), None]:
 				self.assertIsNotNone(lint.__main__.useLintTool(testInput))
 				self.assertIsInstance(lint.__main__.useLintTool(testInput), int)

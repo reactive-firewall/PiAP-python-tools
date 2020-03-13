@@ -212,19 +212,6 @@ class memoize:
 			return self.__func__(*args, **kwargs)
 
 
-#def memoize(func):
-#	"""
-#	Memoize wrapper
-#	:Param func: - a Function to memoize.
-#	"""
-#
-#	@functools.wraps(func)
-#	def memoized_func(*args, **kwargs):
-#		return Memoize(func(*args, **kwargs)
-#
-#	return memoized_func
-
-
 @remediation.error_passing
 @memoize
 def extractRegexPattern(theInput_Str, theInputPattern):
@@ -431,8 +418,6 @@ def extractMACAddr(theInputStr):
 	theResult = extractRegexPattern(
 		theInputStr,
 		"""(?:.*?){0,1}(?P<Mac>(?:[0-9a-fA-F]{1,2}[:]{1}){5}(?:[0-9a-fA-F]{1,2}){1})+(?:.*){0,1}"""
-									#  """(?:(?:[[:print:]]*){0,1}(?P<Mac>(?:(?:[0-9a-fA-F]{1,2}[:]{1}){5}""" +
-									#  """(?:[0-9a-fA-F]{1,2}){1}){1})+(?:[[:print:]]*){0,1})+"""
 	)
 	return theResult
 
@@ -473,8 +458,6 @@ def extractTTYs(theInputStr):
 	theResult = extractRegexPattern(
 		theInputStr,
 		"""(?:.*?)?(?P<TTYs>(?:pts|tty|console|ptty){1}[/]?[0-9]+)+(?:.*?)?"""
-									#  """(?:[[:print:]]*)?(?P<TTYs>(?:pts|tty|console|ptty)""" +
-									#  """{1}[/]?[0-9]+)+(?:[[:print:]]*)?"""
 	)
 	return theResult
 

@@ -94,7 +94,6 @@ __prog__ = str("""piaplib.lint.check.iface""")
 """The Program's name"""
 
 
-
 __description__ = """Report the state of a given interface."""
 """The Description"""
 
