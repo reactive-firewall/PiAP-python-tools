@@ -125,6 +125,18 @@ except Exception as importErr:
 
 
 try:
+	if str("piaplib.book.logs.logs") not in sys.modules:
+		from piaplib.book.logs import logs as logs
+	else:
+		logs = sys.modules[str("piaplib.book.logs.logs")]
+except Exception:
+	try:
+		import piaplib.book.logs.logs as logs
+	except Exception as err:
+		raise ImportError(err, "Error Importing piaplib.book.logs.logs")
+
+
+try:
 	if str("piaplib.lint.check") not in sys.modules:
 		from piaplib.lint import check as check
 	else:
@@ -149,60 +161,85 @@ except Exception:
 
 
 __prog__ = """piaplib.lint"""
-"""The name of this PiAPLib tool is keyring"""
+"""The name of this PiAPLib tool is lint"""
 
 
-LINT_UNITS = {u'html': html_generator, u'check': check, u'execve': do_execve}
+__description__ = """Pocket Lint. PiAP Pocket Controller for extra tools."""
+"""The description is 'PiAP Pocket Controller for extra tools.'"""
+
+
+__epilog__ = """Handles PiAP pocket lint"""
+"""... Handles PiAP pocket lint"""
+
+
+LINT_UNITS = {u'check': check, u'execve': do_execve, u'html': None, }
 """	The Pocket Knife Unit actions.
 	check - monitoring checks
-	execve - sandbox functions.
+	do_execve - sandbox functions.
 	html -  (FUTURE/RESERVED)
 	"""
+
+
+def generateParser(calling_parser_group):
+	"""Parses the CLI arguments."""
+	if calling_parser_group is None:
+		parser = argparse.ArgumentParser(
+			prog=__prog__,
+			description=__description__,
+			epilog=__epilog__
+		)
+	else:
+		parser = calling_parser_group.add_parser(
+			str(__prog__).split(".")[-1], help='the pocket lint service option.'
+		)
+	parser = utils._handleVersionArgs(parser)
+	subparser = parser.add_subparsers(
+		title="Units", dest='lint_unit',
+		help='the pocket lint service option.', metavar="LINT_UNIT"
+	)
+	for sub_parser in sorted(LINT_UNITS.keys()):
+		if LINT_UNITS[sub_parser] is not None:
+			subparser = LINT_UNITS[sub_parser].generateParser(subparser)
+	if calling_parser_group is None:
+		calling_parser_group = parser
+	return calling_parser_group
 
 
 @remediation.error_handling
 def parseArgs(arguments=None):
 	"""Parses the CLI arguments."""
-	parser = argparse.ArgumentParser(
-		prog=__prog__,
-		description='Handles PiAP pocket lint',
-		epilog="PiAP Lint Controller for extra tools."
-	)
-	parser.add_argument(
-		'lint_unit',
-		choices=LINT_UNITS.keys(),
-		help='the pocket lint service option.'
-	)
-	parser.add_argument('-V', '--version', action='version', version=str(
-		"%(prog)s {}"
-	).format(str(piaplib.__version__)))
+	parser = generateParser(None)
 	return parser.parse_known_args(arguments)
 
 
-@remediation.error_handling
 def useLintTool(tool, arguments=[None]):
 	"""Handler for launching pocket-tools."""
+	theExitCode = 1
 	if tool is None:
-		return None
-	if tool in LINT_UNITS.keys():
-		theResult = LINT_UNITS[tool].main(arguments)
-		return theResult
-	else:
-		return None
+		theExitCode = 0
+	elif tool in LINT_UNITS.keys():
+		try:
+			logs.log(str("lint launching: {}").format(str(tool)), "DEBUG")
+			theExitCode = 0
+			LINT_UNITS[tool].main(arguments)
+		except Exception:
+			logs.log(str("An error occurred while handling the lint tool. "), "WARNING")
+			logs.log(str("lint failure."), "Error")
+			theExitCode = 3
+	return theExitCode
 
 
 @remediation.bug_handling
 def main(argv=None):
 	"""The main event"""
-	args, extra = parseArgs(argv)
+	(args, extra) = parseArgs(argv)
 	lint_cmd = args.lint_unit
-	useLintTool(lint_cmd, extra)
+	useLintTool(lint_cmd, argv[1:])
 	return 0
 
 
 if __name__ in u'__main__':
 	try:
-		import sys
 		error_code = main(sys.argv[1:])
 		exit(error_code)
 	except Exception as err:

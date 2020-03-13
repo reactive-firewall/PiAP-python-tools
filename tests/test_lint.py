@@ -37,11 +37,6 @@ except Exception:
 class LintTestSuite(unittest.TestCase):
 	"""Special Lint test cases."""
 
-	def test_absolute_truth_and_meaning(self):
-		"""Insanitty Test."""
-		assert True
-		self.assertIsNone(None)
-
 	def test_syntax(self):
 		"""Test case importing code."""
 		theResult = False
@@ -61,13 +56,16 @@ class LintTestSuite(unittest.TestCase):
 
 	def test_case_lint_insane_none(self):
 		"""Tests the imposible state for lint given bad tools"""
-		theResult = True
+		theResult = False
 		try:
 			from piaplib import lint as lint
 			if lint.__name__ is None:
 				raise ImportError("Failed to import lint")
-			self.assertIsNone(lint.lint.useLintTool("NoSuchTool"))
-			self.assertIsNone(lint.lint.useLintTool(None))
+			from piaplib.lint import __main__
+			for testInput in [str("NoSuchTool"), None]:
+				self.assertIsNotNone(lint.__main__.useLintTool(testInput))
+				self.assertIsInstance(lint.__main__.useLintTool(testInput), int)
+			theResult = True
 		except Exception as err:
 			print(str(""))
 			print(str(type(err)))
@@ -86,8 +84,9 @@ class LintTestSuite(unittest.TestCase):
 			from piaplib import lint as lint
 			if lint.__name__ is None:
 				raise ImportError("Failed to import lint (and thus lint.check)")
-			self.assertIsNone(lint.check.useCheckTool("NoSuchCheck"))
-			self.assertIsNone(lint.check.useCheckTool(None))
+			from piaplib.lint import check as check
+			self.assertIsNone(check.useCheckTool("NoSuchCheck"))
+			self.assertIsNone(check.useCheckTool(None))
 		except Exception as err:
 			print(str(""))
 			print(str(type(err)))

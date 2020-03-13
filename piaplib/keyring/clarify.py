@@ -193,7 +193,7 @@ def getBackendVersion():
 		PLEASE NOTE THIS RETURNS NONE IF YOU HAVE NOT INSTALLED OPENSSL"""
 	if hasBackendCommand():
 		versiontxt = str(getBackendVersionString())
-		theVersion = utils.extractRegexPattern(versiontxt, """(\d+)+""")
+		theVersion = utils.extractRegexPattern(versiontxt, """([0-9]+)+""")
 		return [int(x) for x in theVersion[:2]]
 	else:  # pragma: no branch
 		return [0, 0]
@@ -285,7 +285,7 @@ def packForRest(message, keyStore=None):
 	if message is None:
 		return None
 	cmdArgs = []
-	if keyStore is None:
+	if keyStore is None:  # pragma: no branch
 		keyStore = getKeyFilePath()
 	if hasBackendCommand():
 		ciphertext = None
@@ -323,10 +323,10 @@ def unpackFromRest(ciphertext, keyStore=None):
 		param ciphertext - str the encrypted data.
 		param keyStore - str the path to this file with the key.
 	"""
-	if ciphertext is None:
+	if ciphertext is None:  # pragma: no branch
 		return None
 	cmdArgs = []
-	if keyStore is None:
+	if keyStore is None:  # pragma: no branch
 		keyStore = getKeyFilePath()
 	if hasBackendCommand():
 		cmdArgs = getArgsForBackend(True)
@@ -353,7 +353,7 @@ def unpackFromRest(ciphertext, keyStore=None):
 		if stderrdata:
 			cleartext = str(stderrdata)
 		del(ciptxtBuffer)
-		if isinstance(cleartext, bytes):
+		if isinstance(cleartext, bytes):  # pragma: no branch
 			cleartext = cleartext.decode(encoding="""utf-8""", errors=getCTLModeForPY())
 		return utils.literal_code(cleartext)
 	else:
@@ -364,11 +364,10 @@ def unpackFromRest(ciphertext, keyStore=None):
 def unpackFromFile(somefile, keyStore=None):
 	"""Reads the raw encrypted file and decrypts it."""
 	read_data = None
-	enc_data_file = None
 	try:
 		someFilePath = utils.literal_code(utils.addExtension(str(somefile), str("enc")))
 		read_enc_data = utils.readFile(someFilePath)
-		if isinstance(read_enc_data, bytes):
+		if isinstance(read_enc_data, bytes):  # pragma: no branch
 			read_enc_data = read_enc_data.decode(encoding="""utf-8""", errors=getCTLModeForPY())
 		read_data = utils.literal_code(unpackFromRest(read_enc_data, keyStore))
 	except Exception as clearerr:
@@ -377,18 +376,15 @@ def unpackFromFile(somefile, keyStore=None):
 		clearerr = None
 		del clearerr
 		raise baton
-	finally:
-		if enc_data_file:
-			enc_data_file.close()
 	return read_data
 
 
 @remediation.error_handling
 def packToFile(somefile, data, keyStore=None):
 	"""Writes the raw encrypted file."""
-	if data is None:
+	if data is None:  # pragma: no branch
 		return False
-	if somefile is None:
+	if somefile is None:  # pragma: no branch
 		return False
 	did_write = False
 	try:
@@ -506,7 +502,7 @@ def main(argv=None):
 	args = parseArgs(argv)
 	theFile = None
 	output = None
-	if args.keystore is not None:
+	if args.keystore is not None:  # pragma: no branch
 		theFile = utils.literal_str(args.keystore)
 	else:
 		theFile = str("""/tmp/.beta_PiAP_weak_key""")
@@ -541,7 +537,6 @@ def main(argv=None):
 if __name__ in u'__main__':
 	exitcode = 0
 	try:
-		import sys
 		exitcode = main(sys.argv[1:])
 		if not isinstance(exitcode, type(int(0))):
 			exitcode = 0

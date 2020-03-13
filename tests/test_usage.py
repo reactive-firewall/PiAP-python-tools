@@ -350,12 +350,12 @@ class BasicUsageTestSuite(unittest.TestCase):
 				raise ImportError("Failed to import system. WTF?!!")
 			thepython = getPythonCommand()
 			test_units = [
-				"lint.lint",
-				"pku.__main__",
-				"book.__main__",
-				"book.version",
-				"book.logs",
-				"keyring.__main__"
+				"lint",
+				"pku",
+				"book",
+				"book\ version",
+				"book\ logs",
+				"keyring"
 			]
 			if (thepython is not None):
 				try:
@@ -363,7 +363,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 						theOutputtext = checkPythonCommand([
 							str(thepython),
 							str("-m"),
-							str("piaplib.{}").format(str(unit)),
+							str("piaplib.pocket"), str("{}").format(str(unit)),
 							str("--help")
 						], stderr=subprocess.STDOUT)
 						if (str("usage:") in str(theOutputtext)):
@@ -394,7 +394,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 			if (thepython is not None):
 				try:
 					test_units = [
-						"pku.interfaces", "piaplib.pku.config"
+						"pku.interfaces", "pku.config"
 						"pku.compile_interface", "pku.upgrade"
 					]
 					for unit in test_units:
@@ -434,7 +434,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 				theResult = False
 			if (thepython is not None):
 				test_units = [
-					"pocket", "book.version", "pku.interfaces", "piaplib.pku.config"
+					"pocket", "book.version", "pku.interfaces", "pku.config"
 					"pku.compile_interface", "pku.upgrade"
 				]
 				for unit in test_units:
@@ -474,7 +474,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 			if (thepython is not None):
 				try:
 					mod_tests = [
-						"lint.lint", "lint.check", "lint.clients_check_status",
+						"lint", "lint.check", "lint.clients_check_status",
 						"lint.iface_check_status", "lint.users_check_status", "lint.do_execve"
 					]
 					for unit in mod_tests:
@@ -513,7 +513,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 			if piaplib.__version__ is not None:
 				theResult = False
 			if (thepython is not None):
-				for unit in ["lint.lint", "lint.check", "lint.do_execve"]:
+				for unit in ["lint", "lint.check", "lint.do_execve"]:
 					theOutputtext = checkPythonCommand([
 						str(thepython),
 						str("-m"),

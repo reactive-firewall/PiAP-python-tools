@@ -180,30 +180,52 @@ def parametrized(dec):
 	return layer
 
 
-def memoize(func):
-	"""memoize wrapper"""
-	cache = func.cache = {}
+class memoize:
 
-	@functools.wraps(func)
-	def memoized_func(*args, **kwargs):
+	def __init__(self, fn):
+		self.__func__ = fn
+		self.__name__ = fn.__name__
+		self.__cache = dict({})
+		self.__skip = False
+
+	def __call__(self, *args, **kwargs):
 		try:
-			key = str(str(args) + str(kwargs))
-			if key not in cache.keys():
-				cache[key] = func(*args, **kwargs)
-			return cache[key]
+			stub_a = str((args))
+			stub_b = str((kwargs))
+			if stub_a is None:
+				stub_a = str("""""")
+			if stub_b is None:
+				stub_b = str("""""")
+			key = str(str(stub_a) + str(stub_b))
+			if key not in self.__cache.keys():
+				self.__cache[key] = self.__func__(*args, **kwargs)
+			return self.__cache[key]
 		except Exception as memoErr:
-			logOrPrint(
-				str("[CWE-233] Possible malformed argument attack occurred. Skipping cache."),
-				"Warning"
-			)
+			if self.__skip is False:
+				logOrPrint(
+					str("[CWE-233] Possible malformed argument attack occurred. Skipping cache."),
+					"Warning"
+				)
 			memoErr = None
 			del(memoErr)
-			return func(*args, **kwargs)
+			self.__skip = True
+			return self.__func__(*args, **kwargs)
 
-	return memoized_func
+
+#def memoize(func):
+#	"""
+#	Memoize wrapper
+#	:Param func: - a Function to memoize.
+#	"""
+#
+#	@functools.wraps(func)
+#	def memoized_func(*args, **kwargs):
+#		return Memoize(func(*args, **kwargs)
+#
+#	return memoized_func
 
 
-@remediation.error_handling
+@remediation.error_passing
 @memoize
 def extractRegexPattern(theInput_Str, theInputPattern):
 	"""
@@ -211,6 +233,9 @@ def extractRegexPattern(theInput_Str, theInputPattern):
 	:Param theInput_Str: - a String to extract from.
 	:Param theInputPattern: - the pattern to extract
 	"""
+	theList = sourceStr = None
+	if literal_code(theInput_Str) is None:
+		return []
 	sourceStr = literal_str(theInput_Str)
 	prog = re.compile(theInputPattern)
 	theList = prog.findall(sourceStr)
@@ -405,8 +430,9 @@ def extractMACAddr(theInputStr):
 	theResult = []
 	theResult = extractRegexPattern(
 		theInputStr,
-		"""(?:(?:[[:print:]]*){0,1}(?P<Mac>(?:(?:[0-9a-fA-F]{1,2}[:]{1}){5}""" +
-		"""(?:[0-9a-fA-F]{1,2}){1}){1})+(?:[[:print:]]*){0,1})+"""
+		"""(?:.*?){0,1}(?P<Mac>(?:[0-9a-fA-F]{1,2}[:]{1}){5}(?:[0-9a-fA-F]{1,2}){1})+(?:.*){0,1}"""
+									#  """(?:(?:[[:print:]]*){0,1}(?P<Mac>(?:(?:[0-9a-fA-F]{1,2}[:]{1}){5}""" +
+									#  """(?:[0-9a-fA-F]{1,2}){1}){1})+(?:[[:print:]]*){0,1})+"""
 	)
 	return theResult
 
@@ -415,7 +441,7 @@ def extractMACAddr(theInputStr):
 @memoize
 def extractInts(theInputStr):
 	"""Extract the ints from a string."""
-	theResult = extractRegexPattern(theInputStr, """(\d+)+""")
+	theResult = extractRegexPattern(theInputStr, """([0-9]+)+""")
 	return theResult
 
 
@@ -446,8 +472,9 @@ def extractTTYs(theInputStr):
 	theResult = []
 	theResult = extractRegexPattern(
 		theInputStr,
-		"""(?:(?:[[:print:]]*){0,1}(?P<TTYs>(?:(?:pts|tty|console|ptty)""" +
-		"""{1}[/]?[0-9]+){1})+(?:[[:print:]]*){0,1})+"""
+		"""(?:.*?)?(?P<TTYs>(?:pts|tty|console|ptty){1}[/]?[0-9]+)+(?:.*?)?"""
+									#  """(?:[[:print:]]*)?(?P<TTYs>(?:pts|tty|console|ptty)""" +
+									#  """{1}[/]?[0-9]+)+(?:[[:print:]]*)?"""
 	)
 	return theResult
 

@@ -239,7 +239,7 @@ def parseArgs(arguments=None):
 def main(argv=None):
 	"""The Main Event makes no sense to logs yet."""
 	try:
-		args, extra = parseArgs(argv)
+		(args, extra) = parseArgs(argv)
 		del extra
 		raise NotImplementedError("[CWE-758] - Pocket Book logs main() not implemented.")
 	except Exception as err:

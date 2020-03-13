@@ -103,7 +103,7 @@ except Exception:
 		raise ImportError(err, "Error Importing piaplib.book.version")
 
 
-__prog__ = """piaplib.book.__main__"""
+__prog__ = """piaplib.book"""
 """The name of this PiAPLib tool is pocket book"""
 
 
@@ -135,7 +135,7 @@ def generateParser(calling_parser_group):
 	parser.add_argument('-V', '--version', action='version', version=str(
 		"%(prog)s {}"
 	).format(str(piaplib.__version__)))
-	for sub_parser in BOOK_UNITS.keys():
+	for sub_parser in sorted(BOOK_UNITS.keys()):
 		if BOOK_UNITS[sub_parser] is not None:
 			subparser = BOOK_UNITS[sub_parser].generateParser(subparser)
 	if calling_parser_group is None:
@@ -167,7 +167,7 @@ def main(argv=None):
 	"""The main event"""
 	args, extra = parseArgs(argv)
 	book_cmd = args.book_unit
-	useBookTool(book_cmd, extra)
+	useBookTool(book_cmd, argv[1:])
 	return 0
 
 

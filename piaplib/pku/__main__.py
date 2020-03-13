@@ -21,14 +21,29 @@
 
 
 try:
-	import os
 	import sys
-	import argparse
-	for someModule in [os, sys, argparse]:
-		if someModule.__name__ is None:
-			raise ImportError(str("OMG! we could not import {}. ABORT. ABORT.").format(someModule))
+	if sys.__name__ is None:
+		raise ImportError("OMG! we could not import os. We're like in the matrix! ABORT. ABORT.")
 except Exception as err:
 	raise ImportError(err)
+
+
+try:
+	if 'os' not in sys.modules:
+		import os
+	else:  # pragma: no branch
+		os = sys.modules["""os"""]
+except Exception:
+	raise ImportError("OS Failed to import.")
+
+
+try:
+	if 'argparse' not in sys.modules:
+		import argparse
+	else:  # pragma: no branch
+		argparse = sys.modules["""argparse"""]
+except Exception:
+	raise ImportError("argparse Failed to import.")
 
 
 try:
@@ -45,13 +60,11 @@ except Exception as importErr:
 
 
 try:
-	if 'piaplib' not in sys.modules:
-		raise ImportError("Pocket PKU failed to import.")  # import piaplib as piaplib
-	piaplib = sys.modules['piaplib']
-	if piaplib.__name__ is None:
-		raise ImportError("OMG! we could not import piaplib. We're in need of a fix! ABORT.")
-except Exception as err:
-	raise ImportError(err)
+	if str("""piaplib""") not in sys.modules:
+		raise ImportError("Pocket Book failed to import.")  # import piaplib as piaplib
+	piaplib = sys.modules["""piaplib"""]
+except Exception:
+	raise ImportError("Pocket Book failed to import.")
 
 
 try:
@@ -126,7 +139,7 @@ except Exception:
 		raise ImportError(err, "Error Importing piaplib.book.logs.logs")
 
 
-__prog__ = """piaplib.pku.__main__"""
+__prog__ = """piaplib.pku"""
 """The name of this PiAPLib tool is Pocket Knife Unit"""
 
 
@@ -194,16 +207,12 @@ def usePKUTool(tool, arguments=[None]):
 		theExitCode = 0
 	elif tool in PKU_UNITS.keys():
 		try:
-			try:
-				logs.log(str("pku launching: {}").format(str(tool)), "DEBUG")
-				theExitCode = 0
-				PKU_UNITS[tool].main(arguments)
-			except Exception:
-				logs.log(str("An error occurred while handling the PKU tool. "), "WARNING")
-				logs.log(str("Cascading failure."), "Error")
-				theExitCode = 3
+			logs.log(str("pku launching: {}").format(str(tool)), "DEBUG")
+			theExitCode = 0
+			PKU_UNITS[tool].main(arguments)
 		except Exception:
-			logs.log(str("An error occurred while handling the cascading failure."), "CRITICAL")
+			logs.log(str("An error occurred while handling the PKU tool. "), "WARNING")
+			logs.log(str("PKU failure."), "Error")
 			theExitCode = 3
 	return theExitCode
 
@@ -211,40 +220,12 @@ def usePKUTool(tool, arguments=[None]):
 @remediation.bug_handling
 def main(argv=None):
 	"""The main event"""
-	# logs.log(str(__prog__), "DEBUG")
-	theExitCode = 0
-	try:
-		try:
-			(args, extra) = parseArgs(argv)
-			pku_cmd = args.pku_unit
-			theExitCode = usePKUTool(pku_cmd, argv)
-		except Exception as cerr:
-			logs.log(str(cerr), "Error")
-			logs.log(str(cerr.args), "Error")
-			logs.log(
-				str(" UNKNOWN - An error occurred while handling the arguments. Command failure."),
-				"Error"
-			)
-			theExitCode = 2
-	except Exception:
-		logs.log(
-			str(" UNKNOWN - An error occurred while handling the failure. Cascading failure."),
-			"Error"
-		)
-		theExitCode = 2
-	return theExitCode
+	(args, extra) = parseArgs(argv)
+	pku_cmd = args.pku_unit
+	return usePKUTool(pku_cmd, argv[1:])
 
 
 if __name__ in u'__main__':
-	for unit_test in [utils, config, interfaces, upgrade, remediation, logs]:
-		if unit_test.__name__ is None:
-			raise ImportError(str("Error Importing {}}").format(str(unit_test)))
-	try:
-		if (sys.argv is not None and (sys.argv is not []) and (len(sys.argv) > 1)):
-			exit_code = main(sys.argv[1:])
-		else:
-			exit_code = main(["--help"])
-	except Exception:
-		raise ImportError("Error running main")
+	exit_code = main(sys.argv[1:])
 	exit(exit_code)
 

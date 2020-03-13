@@ -280,7 +280,7 @@ class UtilsTestSuite(unittest.TestCase):
 			from pku import utils as utils
 			if utils.__name__ is None:
 				raise ImportError("Failed to import utils")
-			validMAC = ["tty2", "pts2", "tty1"]
+			validMAC = ["ptty2", "pts2", "tty1"]
 			temp = utils.extractTTYs(
 				"""the ptty2 terminal is a tty like the pts2 session but unlike the tty1 console"""
 			)
@@ -382,6 +382,7 @@ class UtilsTestSuite(unittest.TestCase):
 			self.assertIsNone(test)
 			test = utils.addExtension(test_name, test_ext)
 			self.assertIsNotNone(test)
+			self.assertIsInstance(test, str, str("""Result is not a string"""))
 			self.assertNotEqual(test, test_name)
 		except Exception as err:
 			print(str(""))
@@ -413,6 +414,7 @@ class UtilsTestSuite(unittest.TestCase):
 			self.assertIsNone(test)
 			test = utils.addExtension(test_name, test_ext)
 			self.assertIsNotNone(test)
+			self.assertIsInstance(test, str, str("""Result is not a string"""))
 			self.assertNotEqual(test, test_name)
 		except Exception as err:
 			print(str(""))
@@ -440,6 +442,7 @@ and this will test reads.""")
 			somefile = str("the_test_file.txt")
 			if (utils.writeFile(somefile, theBlob) is True):
 				readback = utils.readFile(somefile)
+				self.assertIsInstance(readback, str, str("""Result is not a string"""))
 				if (theBlob in readback) and (readback in theBlob):
 					theResult = (len(readback) is len(theBlob))
 				else:
@@ -515,6 +518,7 @@ and this will test reads.""")
 			theResult = False
 		self.assertTrue(theResult)
 
+	@unittest.skipUnless((sys.version_info >= (3, 4)), "log testing is not posible in old pythons")
 	def test_case_utils_missing_file(self):
 		"""Tests the read and write functions on missing files"""
 		theResult = False
@@ -545,26 +549,17 @@ and this will test reads.""")
 					str('filename.tmp')
 				)
 			))
-			if (utils.writeFile(somefile, theBlob) is False):
-				if (utils.appendFile(somefile, theBlob) is False):
-					readback = utils.readFile(somefile)
-					if readback is None:
-						theResult = True
-					else:
-						theResult = False
-					if (theResult is False):
-						print(str("wrote"))
-						print(str(theBlob))
-						print(str(""))
-						print(str("read"))
-						print(str(readback))
-						print(str(""))
-				else:
-					theResult = False
-					print(str("append worked"))
-			else:
-				theResult = False
-				print(str("write worked"))
+			with self.assertLogs('piaplib') as cm:
+				self.assertFalse(utils.writeFile(somefile, theBlob), str("""write worked"""))
+				self.assertFalse(utils.appendFile(somefile, theBlob), str("""append worked"""))
+				self.assertIsNone(utils.readFile(somefile))
+			test_mesg = str(cm.output)
+			for test_error in [str("""[CWE-73]"""), str("""File could not be opened""")]:
+				self.assertIn(
+					test_error, test_mesg,
+					str("""Wrong Error Messages (missing test case error)""")
+				)
+			theResult = True
 		except Exception as err:
 			print(str(""))
 			print(str(type(err)))
@@ -618,8 +613,8 @@ and this will test reads.""")
 		self.assertTrue(theResult)
 
 	def test_case_utils_remediation_error_pass(self):
-		"""Tests the tty name regex logic on user output"""
-		theResult = True
+		"""Tests the remediation.error_passing logic on false error"""
+		theResult = False
 		try:
 			from piaplib import pku as pku
 			if pku.__name__ is None:
@@ -797,7 +792,13 @@ and this will test reads.""")
 			for i in range(100):
 				self.assertEqual(
 					int(utils.extractInt(str("The number is {}").format(str(i)))),
-					int(i)
+					int(i),
+					str("""Failed to extract the number""")
+				)
+				self.assertEqual(
+					int(utils.extractInt(str("The number {} is not 1234").format(str(i)))),
+					int(i),
+					str("""Extracted the wrong number""")
 				)
 		except Exception as err:
 			print(str(""))
@@ -934,6 +935,7 @@ and this will test reads.""")
 			theResult = False
 		self.assertTrue(theResult)
 
+	@unittest.skipUnless((sys.version_info >= (3, 4)), "log testing is not posible in old pythons")
 	def test_case_utils_miss_arg_verbose(self):
 		"""Tests the utils._handleVerbosityArgs with an invalid value as input"""
 		theResult = False
@@ -944,8 +946,16 @@ and this will test reads.""")
 			from pku import utils as utils
 			if utils.__name__ is None:
 				raise ImportError("Failed to import utils")
-			with self.assertRaises(RuntimeError):
-				utils._handleVerbosityArgs(argParser=None, default=True)
+			test_error = str("""__init__() missing 1 required positional argument: 'message'""")
+			with self.assertLogs('piaplib') as cm:
+				with self.assertRaises(RuntimeError):
+					utils._handleVerbosityArgs(argParser=None, default=True)
+			self.assertIsNotNone(cm.output, str("""No Error Message Logged"""))
+			test_mesg = str(cm.output)
+			self.assertIn(
+				test_error, test_mesg,
+				str("""Wrong Error Messages (missing test case error)""")
+			)
 			theResult = True
 		except Exception as err:
 			print(str(""))
@@ -958,6 +968,7 @@ and this will test reads.""")
 			theResult = False
 		self.assertTrue(theResult)
 
+	@unittest.skipUnless((sys.version_info >= (3, 4)), "log testing is not posible in old pythons")
 	def test_case_utils_miss_arg_version(self):
 		"""Tests the utils._handleVersionArgs with an invalid value as input"""
 		theResult = False
@@ -968,8 +979,16 @@ and this will test reads.""")
 			from pku import utils as utils
 			if utils.__name__ is None:
 				raise ImportError("Failed to import utils")
-			with self.assertRaises(RuntimeError):
-				utils._handleVersionArgs(argParser=None)
+			test_error = str("""__init__() missing 1 required positional argument: 'message'""")
+			with self.assertLogs('piaplib') as cm:
+				with self.assertRaises(RuntimeError):
+					utils._handleVersionArgs(argParser=None)
+			self.assertIsNotNone(cm.output, str("""No Error Message Logged"""))
+			test_mesg = str(cm.output)
+			self.assertIn(
+				test_error, test_mesg,
+				str("""Wrong Error Messages (missing test case error)""")
+			)
 			theResult = True
 		except Exception as err:
 			print(str(""))
@@ -993,6 +1012,11 @@ and this will test reads.""")
 			if utils.__name__ is None:
 				raise ImportError("Failed to import utils")
 			theResult = (utils.xisfile(somefile=None) is False)
+			self.assertIsInstance(
+				theResult,
+				bool,
+				"""Result is NOT a Boolean!"""
+			)
 			self.assertTrue(theResult)
 		except Exception as err:
 			print(str(""))
@@ -1016,6 +1040,11 @@ and this will test reads.""")
 			if utils.__name__ is None:
 				raise ImportError("Failed to import utils")
 			theResult = (utils.xisdir(None) is False)
+			self.assertIsInstance(
+				theResult,
+				bool,
+				"""Result is NOT a Boolean!"""
+			)
 			self.assertTrue(theResult)
 		except Exception as err:
 			print(str(""))
@@ -1039,6 +1068,11 @@ and this will test reads.""")
 			if utils.__name__ is None:
 				raise ImportError("Failed to import utils")
 			theResult = (utils.ensureDir(None) is False)
+			self.assertIsInstance(
+				theResult,
+				bool,
+				"""Result is NOT a Boolean!"""
+			)
 			self.assertTrue(theResult)
 		except Exception as err:
 			print(str(""))

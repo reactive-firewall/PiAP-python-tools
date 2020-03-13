@@ -138,7 +138,7 @@ def checkPythonFuzzing(args=[None], stderr=None):
 					args.insert(2, str("--source=piaplib,piaplib/lint,piaplib/keyring,piaplib/pku,piaplib/book"))
 			theOutput = subprocess.check_output(args, stderr=stderr)
 		if isinstance(theOutput, bytes):
-			theOutput = theOutput.decode('utf8')
+			theOutput = theOutput.decode("""utf-8""")
 	except Exception as err:
 		theOutput = None
 		raise RuntimeError(err)
@@ -280,6 +280,10 @@ class PocketUsageTestSuite(unittest.TestCase):
 						print(str(""))
 						print(str("python cmd is {}").format(str(thepython)))
 						print(str(""))
+						print(str("Expected output was..."))
+						print(str(""))
+						print(str("'usage:'"))
+						print(str(""))
 						print(str("actual output was..."))
 						print(str(""))
 						print(str("{}").format(str(theOutputtext)))
@@ -373,6 +377,10 @@ class PocketUsageTestSuite(unittest.TestCase):
 							print(str(""))
 							print(str("python cmd is {}").format(str(thepython)))
 							print(str(""))
+							print(str("Expected output was..."))
+							print(str(""))
+							print(str("'usage:'"))
+							print(str(""))
 							print(str("actual output was..."))
 							print(str(""))
 							print(str("{}").format(repr(theOutputtext)))
@@ -412,14 +420,16 @@ class PocketUsageTestSuite(unittest.TestCase):
 				raise ImportError("Failed to import system. WTF?!!")
 			thepython = getPythonCommand()
 			if (thepython is not None):
-				theOutputtext = None
-				with self.assertRaises(Exception):
-					theOutputtext = checkPythonFuzzing([
-						str(thepython),
-						str("-m"),
-						str("piaplib.pocket")
-					], stderr=subprocess.STDOUT)
-				self.assertIsNone(theOutputtext)
+				theOutputtext = checkPythonFuzzing([
+					str(thepython),
+					str("-m"),
+					str("piaplib.pocket")
+				], stderr=subprocess.STDOUT)
+				self.assertIsNotNone(theOutputtext)
+				if (str("usage:") in str(theOutputtext)):
+					theResult = True
+				elif (theOutputtext is None) or (str(theOutputtext) in str("")):
+					theResult = True
 		except Exception as err:
 			print(str(""))
 			print(str(type(err)))

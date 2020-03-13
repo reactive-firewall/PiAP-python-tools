@@ -19,24 +19,48 @@
 # limitations under the License.
 # ......................................................................
 
+
 try:
 	import sys
-	import os
-	import argparse
-	try:
-		if str("keyring") in __file__:
-			__sys_path__ = os.path.abspath(os.path.dirname(__file__))
-			if __sys_path__ not in sys.path:
-				sys.path.insert(0, __sys_path__)
-	except Exception:
-		raise ImportError("PiAPlib Keyring failed to import.")
-except Exception as ImportErr:
-	print(str(type(ImportErr)))
-	print(str(ImportErr))
-	print(str((ImportErr.args)))
-	ImportErr = None
-	del ImportErr
-	raise ImportError(u'Keyring Failed to Import')
+	if sys.__name__ is None:
+		raise ImportError("OMG! we could not import os. We're like in the matrix! ABORT. ABORT.")
+except Exception as err:
+	raise ImportError(err)
+
+
+try:
+	if 'os' not in sys.modules:
+		import os
+	else:  # pragma: no branch
+		os = sys.modules["""os"""]
+except Exception:
+	raise ImportError("OS Failed to import.")
+
+
+try:
+	if 'argparse' not in sys.modules:
+		import argparse
+	else:  # pragma: no branch
+		argparse = sys.modules["""argparse"""]
+except Exception:
+	raise ImportError("argparse Failed to import.")
+
+
+try:
+	if str("keyring") in __file__:
+		__sys_path__ = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+		if __sys_path__ not in sys.path:
+			sys.path.insert(0, __sys_path__)
+except Exception:
+	raise ImportError("Pocket Keyring failed to import.")
+
+
+try:
+	if 'piaplib' not in sys.modules:
+		raise ImportError("Pocket PKU failed to import.")  # import piaplib as piaplib
+	piaplib = sys.modules["""piaplib"""]
+except Exception:
+	raise ImportError("Pocket Keyring failed to import.")
 
 
 try:
@@ -122,9 +146,9 @@ def generateParser(calling_parser_group):
 		)
 	subparser = parser.add_subparsers(
 		title="Units", dest='keyring_unit',
-		help='The pocket keyring options.', metavar="KEYRING_UNITS"
+		help='The pocket keyring options.', metavar="KEYRING_UNIT"
 	)
-	for sub_parser in KEYRING_UNITS.keys():
+	for sub_parser in sorted(KEYRING_UNITS.keys()):
 		if KEYRING_UNITS[sub_parser] is not None:
 			subparser = KEYRING_UNITS[sub_parser].generateParser(subparser)
 	if calling_parser_group is None:
@@ -162,7 +186,7 @@ def main(argv=None):
 	try:
 		args, extra = parseArgs(argv)
 		keyring_cmd = args.keyring_unit
-		useKeyTool(keyring_cmd, argv)
+		useKeyTool(keyring_cmd, argv[1:])
 	except Exception as cerr:
 		remediation.error_breakpoint(cerr, str(u'piaplib.keyring.__MAIN__.main()'))
 		ecode = int(3)

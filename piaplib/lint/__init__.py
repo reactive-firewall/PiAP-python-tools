@@ -42,22 +42,45 @@ try:
 		if __sys_path__ not in sys.path:
 			sys.path.insert(0, __sys_path__)
 except Exception:
-	raise ImportError("Pocket Knife Unit Lint failed to import.")
-
-
-try:
-	if str("piaplib.lint.lint") not in sys.modules:
-		from piaplib.lint import lint as lint
-	else:  # pragma: no branch
-		lint = sys.modules["""piaplib.lint.lint"""]
-except Exception:
-	raise ImportError("Error Importing piaplib.lint.lint")
+	raise ImportError("Pocket Keyring failed to import.")
 
 
 try:
 	if 'piaplib' not in sys.modules:
-		raise ImportError("Pocket PKU failed to import.")  # import piaplib as piaplib
+		raise ImportError("Pocket Lint failed to import.")  # import piaplib as piaplib
 	piaplib = sys.modules["""piaplib"""]
 except Exception:
-	raise ImportError("Pocket Lint failed to accumulate.")
+	raise ImportError("Pocket lint failed to import.")
 
+
+def generateParser(calling_parser_group):
+	try:
+		if 'piaplib.lint.__main__' not in sys.modules:
+			import piaplib.lint.__main__
+		else:
+			piaplib.lint.__main__ = sys.modules["""piaplib.lint.__main__"""]
+		if piaplib.lint.__main__.__name__ is None:
+			raise ImportError("Failed to import piaplib.lint.__main__")
+	except Exception as importErr:
+		del importErr
+		import piaplib.lint.__main__
+	return piaplib.lint.__main__.generateParser(calling_parser_group)
+
+
+def main(argv=None):
+	"""The main event"""
+	try:
+		if 'piaplib.lint.__main__' not in sys.modules:
+			import piaplib.lint.__main__
+		else:
+			piaplib.lint.__main__ = sys.modules["""piaplib.lint.__main__"""]
+		if piaplib.lint.__main__.__name__ is None:
+			raise ImportError("Failed to import piaplib.lint.__main__")
+	except Exception as importErr:
+		del importErr
+		import piaplib.lint.__main__
+	return piaplib.lint.__main__.main(argv)
+
+
+if __name__ in u'__main__':
+	main(sys.argv[1:])

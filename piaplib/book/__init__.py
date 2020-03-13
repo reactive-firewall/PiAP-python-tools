@@ -53,13 +53,29 @@ except Exception:
 	raise ImportError("Pocket Book failed to import.")
 
 
+def generateParser(calling_parser_group):
+	try:
+		if 'piaplib.book.__main__' not in sys.modules:
+			import piaplib.book.__main__
+		else:
+			piaplib.book.__main__ = sys.modules["""piaplib.book.__main__"""]
+		if piaplib.book.__main__.__name__ is None:
+			raise ImportError("Failed to import piaplib.book.__main__")
+	except Exception as importErr:
+		del importErr
+		import piaplib.book.__main__
+	return piaplib.book.__main__.generateParser(calling_parser_group)
+
+
 def main(argv=None):
 	"""The main event"""
 	try:
 		if 'piaplib.book.__main__' not in sys.modules:
 			import piaplib.book.__main__
-			if piaplib.book.__main__.__name__ is None:
-				raise ImportError("Failed to import piaplib.book.__main__")
+		else:
+			piaplib.book.__main__ = sys.modules["""piaplib.book.__main__"""]
+		if piaplib.book.__main__.__name__ is None:
+			raise ImportError("Failed to import piaplib.book.__main__")
 	except Exception as importErr:
 		del importErr
 		import piaplib.book.__main__

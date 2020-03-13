@@ -19,12 +19,43 @@
 # limitations under the License.
 # ......................................................................
 
+
 try:
-	import os
 	import sys
-	import subprocess
-	import argparse
-	sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+	if sys.__name__ is None:
+		raise ImportError("OMG! we could not import os. We're like in the matrix! ABORT. ABORT.")
+except Exception as err:
+	raise ImportError(err)
+
+
+try:
+	if 'os' not in sys.modules:
+		import os
+	else:  # pragma: no branch
+		os = sys.modules["""os"""]
+except Exception:
+	raise ImportError("OS Failed to import.")
+
+
+try:
+	if 'argparse' not in sys.modules:
+		import argparse
+	else:  # pragma: no branch
+		argparse = sys.modules["""argparse"""]
+except Exception:
+	raise ImportError("argparse Failed to import.")
+
+
+try:
+	if 'subprocess' not in sys.modules:
+		import subprocess
+	else:  # pragma: no branch
+		subprocess = sys.modules["""subprocess"""]
+except Exception:
+	raise ImportError("subprocess Failed to import.")
+
+
+try:
 	try:
 		import piaplib as piaplib
 	except Exception:
@@ -59,44 +90,63 @@ except Exception as importErr:
 	exit(255)
 
 
-__prog__ = str("""iface_check_status""")
+__prog__ = str("""piaplib.lint.check.iface""")
 """The Program's name"""
 
 
-def parseargs(arguments=None):
-	"""Parse the arguments"""
-	try:
+
+__description__ = """Report the state of a given interface."""
+"""The Description"""
+
+
+__epilog__ = """Basicly a python wrapper for ip addr show."""
+"""More Help Text."""
+
+
+def generateParser(calling_parser_group):
+	"""Parses the CLI arguments."""
+	if calling_parser_group is None:
 		parser = argparse.ArgumentParser(
 			prog=__prog__,
-			description='Report the state of a given interface.',
-			epilog='Basicly a python wrapper for ip addr show.'
+			description=__description__,
+			epilog=__epilog__
 		)
-		parser.add_argument(
-			'-i', '--interface',
-			default=interfaces.INTERFACE_CHOICES[0], choices=interfaces.INTERFACE_CHOICES,
-			help='The interface to show.'
+	else:
+		parser = calling_parser_group.add_parser(
+			str(__prog__).split(".")[-1], help=__description__
 		)
-		parser.add_argument(
-			'-l', '--list',
-			default=False, action='store_true',
-			help='List current interfaces.'
-		)
-		parser.add_argument(
-			'--html', dest='output_html',
-			default=False, action='store_true',
-			help='output html.'
-		)
-		parser.add_argument(
-			'-a', '--all',
-			dest='show_all', default=False,
-			action='store_true', help='show all interfaces.'
-		)
-		parser = utils._handleVerbosityArgs(parser, default=False)
-		parser = utils._handleVersionArgs(parser)
-		theResult = parser.parse_args(arguments)
-	except Exception as parseErr:
-		parser.error(str(parseErr))
-	return theResult
+	parser.add_argument(
+		'-i', '--interface',
+		default=interfaces.INTERFACE_CHOICES[0], choices=interfaces.INTERFACE_CHOICES,
+		help='The interface to show.'
+	)
+	parser.add_argument(
+		'-l', '--list',
+		default=False, action='store_true',
+		help='List current interfaces.'
+	)
+	parser.add_argument(
+		'--html', dest='output_html',
+		default=False, action='store_true',
+		help='output html.'
+	)
+	parser.add_argument(
+		'-a', '--all',
+		dest='show_all', default=False,
+		action='store_true', help='show all interfaces.'
+	)
+	parser = utils._handleVerbosityArgs(parser, default=False)
+	parser = utils._handleVersionArgs(parser)
+	if calling_parser_group is None:
+		calling_parser_group = parser
+	return calling_parser_group
+
+
+@remediation.error_handling
+def parseArgs(arguments=None):
+	"""Parses the CLI arguments."""
+	parser = generateParser(None)
+	return parser.parse_known_args(arguments)
 
 
 @remediation.error_handling
@@ -337,7 +387,7 @@ def showAlliFace(verbose_mode, output_html):
 	elif output_html:
 		theText = str("{}{}").format(
 			theText,
-			str("""<tr><td colspan="4"><span class=\"label label-danger\">\2<\/span></td></tr>""")
+			str("""<tr><td colspan="4"><span class=\"label label-danger\">\2</span></td></tr>""")
 		)
 	if output_html:
 		theText = str("{}{}").format(
@@ -348,7 +398,7 @@ def showAlliFace(verbose_mode, output_html):
 
 def main(argv=None):
 	"""The main function."""
-	args = parseargs(argv)
+	(args, extras) = parseArgs(argv)
 	try:
 		verbose = False
 		output_html = False
