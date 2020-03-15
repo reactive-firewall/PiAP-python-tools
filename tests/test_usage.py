@@ -1123,42 +1123,34 @@ class BasicUsageTestSuite(unittest.TestCase):
 		"""Test case for piaplib.pocket.lint check iface."""
 		theResult = False
 		try:
-			thepython = getPythonCommand()
-			if (thepython is not None):
-				try:
-					theOutputtext = checkPythonCommand([
-						str(thepython),
-						str("-m"),
-						str("piaplib.pocket"),
-						str("lint"),
-						str("check"),
-						str("iface"),
-						str("--all")
-					], stderr=subprocess.STDOUT)
-					if (str("eth0") in str(theOutputtext)):
-						theResult = True
-					elif (str("ens") in str(theOutputtext)):
-						raise unittest.SkipTest("function probably ok, but not a compatible Test network")
-					elif (str("enp0s") in str(theOutputtext)):
-						raise unittest.SkipTest("function ok, but not a compatible Test network")
-					elif (str("en0") in str(theOutputtext)):
-						raise unittest.SkipTest("function ok, but not a compatible Test network")
-					else:
-						theResult = False
-						print(str(""))
-						print(str("python cmd is {}").format(str(thepython)))
-						print(str(""))
-						print(str("actual output was..."))
-						print(str(""))
-						print(str("{}").format(str(theOutputtext)))
-						print(str(""))
-				except unittest.SkipTest:
-					raise unittest.SkipTest("function ok, but not a compatible Test network")
-				except Exception as othererr:
-					debugtestError(othererr)
-					othererr = None
-					del othererr
-					theResult = False
+			theOutputtext = checkPythonCommand([
+				str(self._thepython),
+				str("-m"),
+				str("piaplib.pocket"),
+				str("lint"),
+				str("check"),
+				str("iface"),
+				str("--all")
+			], stderr=subprocess.STDOUT)
+			if (str("eth0") in str(theOutputtext)):
+				theResult = True
+			elif (str("ens") in str(theOutputtext)):
+				raise unittest.SkipTest("function probably ok, but not a compatible Test network")
+			elif (str("enp0s") in str(theOutputtext)):
+				raise unittest.SkipTest("function ok, but not a compatible Test network")
+			elif (str("en0") in str(theOutputtext)):
+				raise unittest.SkipTest("function ok, but not a compatible Test network")
+			elif (str("lo") in str(theOutputtext)):
+				raise unittest.SkipTest("function probably ok, but not a compatible Test network")
+			else:
+				theResult = False
+				print(str(""))
+				print(str("python cmd is {}").format(str(self._thepython)))
+				print(str(""))
+				print(str("actual output was..."))
+				print(str(""))
+				print(str("{}").format(str(theOutputtext)))
+				print(str(""))
 		except unittest.SkipTest:
 			raise unittest.SkipTest("function ok, but not a compatible Test network")
 		except Exception as err:
@@ -1193,6 +1185,8 @@ class BasicUsageTestSuite(unittest.TestCase):
 						raise unittest.SkipTest("function ok, but not a compatible Test network")
 					elif (str("en0") in str(theOutputtext)):
 						raise unittest.SkipTest("function ok, but not a compatible Test network")
+					elif (str("lo") in str(theOutputtext)):
+						raise unittest.SkipTest("function probably ok, but not a compatible Test network")
 					else:
 						theResult = False
 						print(str(""))
