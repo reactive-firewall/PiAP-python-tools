@@ -35,6 +35,9 @@ except Exception:
 	raise ImportError("[CWE-758] Failed to import test context")
 
 
+import piaplib.book.__main__
+
+
 class BookTestSuite(unittest.TestCase):
 	"""Special Pocket Book test cases."""
 
@@ -42,7 +45,6 @@ class BookTestSuite(unittest.TestCase):
 		"""Tests the imposible state for book given bad tools"""
 		theResult = True
 		try:
-			import piaplib.book.__main__
 			self.assertIsNotNone(piaplib.book.__main__.useBookTool("NoSuchTool"))
 			self.assertIsNotNone(piaplib.book.__main__.useBookTool(None))
 		except Exception as err:
@@ -54,13 +56,12 @@ class BookTestSuite(unittest.TestCase):
 			err = None
 			del err
 			theResult = False
-		assert theResult
+		self.assertTrue(theResult, str("""piaplib.book.__main__.useBookTool(JUNK) == error"""))
 
 	def test_book_version_main(self):
 		"""Tests the version state for book given future tools"""
 		theResult = True
 		try:
-			import piaplib.book.__main__
 			self.assertIsNotNone(piaplib.book.__main__.useBookTool("version", ["all"]))
 		except Exception as err:
 			print(str(""))
@@ -71,13 +72,12 @@ class BookTestSuite(unittest.TestCase):
 			err = None
 			del err
 			theResult = False
-		assert theResult
+		self.assertTrue(theResult)
 
-	def test_book_valid_main(self):
+	def test_book_invalid_main(self):
 		"""Tests the logs state for book given bad tools"""
 		theResult = True
 		try:
-			import piaplib.book.__main__
 			self.assertIsNotNone(piaplib.book.__main__.main(["logs"]))
 		except Exception as err:
 			print(str(""))
@@ -88,7 +88,7 @@ class BookTestSuite(unittest.TestCase):
 			err = None
 			del err
 			theResult = False
-		assert theResult
+		self.assertTrue(theResult)
 
 
 if __name__ == u'__main__':

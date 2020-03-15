@@ -90,12 +90,13 @@ init:
 	$(QUIET)$(ECHO) "$@: Done."
 
 install: must_be_root
-	$(QUIET)python3 -m pip install --upgrade "git+https://github.com/reactive-firewall/PiAP-python-tools.git@stable#egg=piaplib"
+	$(QUIET)python3 -m pip3 install --upgrade "git+https://github.com/reactive-firewall/PiAP-python-tools.git@stable#egg=piaplib"
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
 
 uninstall:
 	$(QUITE)$(QUIET)python3 -m pip3 uninstall -y piaplib || true
+	$(QUITE)$(QUIET)python -m pip uninstall -y piaplib 2>/dev/null || true
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
 
@@ -115,9 +116,10 @@ test: cleanup
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-mats: cleanup
-	$(QUIET)coverage run -p --source=piaplib,piaplib/lint,piaplib/keyring,piaplib/pku,piaplib/book -m unittest tests.test_basic tests.test_html tests.test_strings tests.test_salt tests.test_rand tests.test_utils tests.test_lint tests.test_book tests.test_interface tests.test_config tests.test_usage tests.test_pocket || python3 -m unittest tests.test_basic tests.test_html tests.test_strings tests.test_salt tests.test_rand tests.test_enc tests.test_utils tests.test_lint tests.test_book tests.test_interface tests.test_config tests.test_usage tests.test_pocket || python -m unittest tests.test_basic tests.test_html tests.test_strings tests.test_salt tests.test_rand tests.test_utils tests.test_lint tests.test_interface tests.test_book tests.test_config tests.test_usage tests.test_pocket
+	$(QUIET)python3 -m unittest discover -b --verbose -s ./tests -t ./ || python -m unittest discover -b --verbose -s ./tests -t ./ || DO_FAIL=exit 2 ;
 	$(QUIET)coverage combine 2>/dev/null || true
 	$(QUIET)coverage report --include=piaplib* 2>/dev/null || true
+	$(QUIET)$(DO_FAIL);
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-tox: cleanup

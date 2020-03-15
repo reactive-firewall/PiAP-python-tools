@@ -61,10 +61,10 @@ except Exception as importErr:
 
 try:
 	if str("""piaplib""") not in sys.modules:
-		raise ImportError("Pocket Book failed to import.")  # import piaplib as piaplib
+		raise ImportError("Pocket PKU failed to import.")  # import piaplib as piaplib
 	piaplib = sys.modules["""piaplib"""]
 except Exception:
-	raise ImportError("Pocket Book failed to import.")
+	raise ImportError("Pocket PKU failed to import.")
 
 
 try:
