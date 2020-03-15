@@ -92,7 +92,7 @@ if __ALTMODE:
 	"""whitelist of valid iface prefixes"""
 
 	INTERFACE_CHOICES = [
-		str('{}{}').format(str(x), str(y)) for x in IFACE_PREFIXES for y in range(5)
+		str("""{}{}""").format(str(x), str(y)) for x in IFACE_PREFIXES for y in range(5)
 	]
 	"""whitelist of valid iface names"""
 
@@ -148,10 +148,10 @@ def taint_name(rawtxt):
 
 	def _inner_taint(bad_juju):
 		"""Helper function for input tainting"""
-		enc_text = utils.literal_str(bad_juju)
-		if isinstance(enc_text, str):
+		enc_text = utils.literal_code(bad_juju)
+		if not isinstance(enc_text, type(None)):
 			return enc_text
-		return str("""[REDACTED VALUE]""")
+		return str("")
 
 	theResult = None
 	tainted_input = _inner_taint(rawtxt).lower()

@@ -94,11 +94,11 @@ __prog__ = str("""piaplib.lint.check.iface""")
 """The Program's name"""
 
 
-__description__ = """Report the state of a given interface."""
+__description__ = str("""Report the state of a given interface.""")
 """The Description"""
 
 
-__epilog__ = """Basicly a python wrapper for ip addr show."""
+__epilog__ = str("""Basicly a python wrapper for ip addr show.""")
 """More Help Text."""
 
 
@@ -156,14 +156,15 @@ def taint_name(rawtxt):
 
 def show_iface(iface_name=None, is_verbose=False, use_html=False):
 	"""enable the given interface by calling ifup."""
+	theResult = str("""UNKNOWN""")
 	if is_verbose is True:
 		theResult = str(get_iface_status_raw(iface_name))
 	else:
 		try:
 			if use_html:
-				format_pattern = str(u'{}{}{}{}')
+				format_pattern = str("""{}{}{}{}""")
 			else:
-				format_pattern = str(u'{} {} {} {}')
+				format_pattern = str("""{} {} {} {}""")
 			theResult = str(format_pattern).format(
 				get_iface_name(iface_name, use_html),
 				get_iface_mac(iface_name, use_html),
@@ -178,7 +179,7 @@ def show_iface(iface_name=None, is_verbose=False, use_html=False):
 		except Exception as cmdErr:
 			logs.log(str(cmdErr), "Error")
 			logs.log(str((cmdErr.args)), "Error")
-			theResult = "UNKNOWN"
+			theResult = str("""UNKNOWN""")
 	return theResult
 
 
@@ -194,44 +195,48 @@ def get_iface_name(iface_name=None, use_html=False):
 		return html_generator.gen_html_td(iface, str(u'iface_status_dev_{}').format(iface))
 
 
+@utils.memoize
+def _isMacOS():
+	"""Simply returns a boolean stating if sys.platform is darwin."""
+	return (str(sys.platform).lower().startswith(str("""darwin""")) is True)
+
+
 @remediation.error_handling
 @utils.memoize
 def get_iface_status_raw_cmd_args():
 	"""Either ip addr or ifconfig depending on system."""
 	theResult = [str("ip"), str("addr"), str("show")]
-	try:
-		if (str(sys.platform).lower().startswith(str("""darwin""")) is True):
-			theResult = [str("ifconfig")]
-	except Exception as someErr:
-		logs.log(str(type(someErr)), "Error")
-		logs.log(str(someErr), "Error")
-		logs.log(str((someErr.args)), "Error")
+	if _isMacOS():
+		theResult = [str("ifconfig")]
 	return theResult
 
 
 @remediation.error_passing
-def get_iface_status_raw(interface=None):
+def get_iface_status_raw(interface):
 	"""list the raw status of interfaces."""
 	cli_args = [x for x in get_iface_status_raw_cmd_args()]
 	theRawIfaceState = None
+	stderrdata = None
 	tainted_name = interfaces.taint_name(interface)
-	if tainted_name is not None and tainted_name not in cli_args:
+	if (tainted_name is not None) and (tainted_name not in cli_args):
 		cli_args.append(str(tainted_name))
+	p0 = subprocess.Popen(
+		args=cli_args,
+		shell=False,
+		universal_newlines=True,
+		stdin=subprocess.PIPE,
+		stdout=subprocess.PIPE,
+		stderr=subprocess.PIPE,
+		close_fds=True
+	)
 	try:
-		theRawIfaceState = subprocess.check_output(
-			cli_args, stderr=subprocess.STDOUT, shell=False
-		)
-	except subprocess.CalledProcessError as subErr:
-		cli_args = None
-		del cli_args
-		subErr = None
-		del subErr
+		(theRawIfaceState, stderrdata) = p0.communicate(str(os.linesep))
+	except Exception:
+		p0.kill()
 		theRawIfaceState = None
-	except Exception as cmdErr:
-		logs.log(str(cmdErr), "Error")
-		logs.log(str(cmdErr.args), "Error")
-		cmdErr = None
-		del cmdErr
+	finally:
+		p0.wait()
+	if stderrdata:  # pragma: no branch
 		theRawIfaceState = None
 	return theRawIfaceState
 
@@ -242,18 +247,14 @@ def get_iface_list():
 	theResult = []
 	theRawIfaceState = get_iface_status_raw(None)
 	if theRawIfaceState is None:
-		return theResult
-	for x in utils.extractIfaceNames(str(theRawIfaceState)):
+		return []
+	theResult = []
+	for x in utils.extractIfaceNames(theRawIfaceState):
 		if utils.isWhiteListed(x, interfaces.INTERFACE_CHOICES):
 			theResult.append(x)
 	theResult = utils.compactList(theResult)
 	"""while regex would probably work well here, best to whitelist. """
 	return theResult
-
-
-def _isMacOS():
-	"""Simply returns a boolean stating if sys.platform is darwin."""
-	return (str(sys.platform).lower().startswith(str("""darwin""")) is True)
 
 
 def _extractIFaceStatus(status_txt=None):
@@ -270,7 +271,7 @@ def _extractIFaceStatus(status_txt=None):
 
 
 @remediation.error_handling
-def get_iface_status(iface=u'lo', use_html=False):
+def get_iface_status(iface, use_html=False):
 	"""Generate the status"""
 	theResult = None
 	tainted_name = interfaces.taint_name(iface)
@@ -315,10 +316,11 @@ def generate_iface_status_html_raw(iface=u'lo', status="UNKNOWN", lable=None):
 
 
 @remediation.error_passing
-def get_iface_mac(iface=u'lo', use_html=False):
+def get_iface_mac(iface, use_html=False):
 	"""Generate output of the iface mac."""
 	theResult = None
-	mac_list_txt = utils.extractMACAddr(get_iface_status_raw(iface))
+	tainted_name = interfaces.taint_name(iface)
+	mac_list_txt = utils.extractMACAddr(get_iface_status_raw(tainted_name))
 	if use_html is False:
 		if mac_list_txt is not None and (len(mac_list_txt) > 0):
 			theResult = str(mac_list_txt[0])
@@ -328,12 +330,12 @@ def get_iface_mac(iface=u'lo', use_html=False):
 		if mac_list_txt is not None and (len(mac_list_txt) > 0):
 			theResult = html_generator.gen_html_td(
 				str(mac_list_txt[0]),
-				str(u'iface_status_mac_{}').format(iface)
+				str(u'iface_status_mac_{}').format(tainted_name)
 			)
 		else:
 			theResult = html_generator.gen_html_td(
 				"",
-				str(u'iface_status_mac_{}').format(iface)
+				str(u'iface_status_mac_{}').format(tainted_name)
 			)
 	return theResult
 
@@ -372,7 +374,7 @@ def get_iface_ip_list(iface=u'lo', use_html=False):
 @remediation.error_handling
 def showAlliFace(verbose_mode, output_html):
 	"""Used by main to show all. Not intended to be called directly"""
-	theText = str("")
+	theText = str("""""")
 	if output_html:
 		theText = str(
 			"<table class=\"table table-striped\">" +
@@ -380,8 +382,8 @@ def showAlliFace(verbose_mode, output_html):
 		)
 	if (get_iface_list() is not None):
 		for iface_name in get_iface_list():
-			theText = str("{}{}\n").format(
-				theText, str(show_iface(iface_name, verbose_mode, output_html))
+			theText = str("{stra}{strb}\n").format(
+				stra=theText, strb=str(show_iface(iface_name, verbose_mode, output_html))
 			)
 	elif output_html:
 		theText = str("{}{}").format(
@@ -404,7 +406,7 @@ def main(argv=None):
 		if args.verbose_mode is not None:
 				verbose = args.verbose_mode
 		if args.output_html is not None:
-				output_html = args.output_html
+				output_html = bool(args.output_html)
 		if args.show_all is True:
 			showAlliFace(verbose, output_html)
 		elif args.list is True:

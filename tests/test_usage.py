@@ -202,9 +202,17 @@ def debugUnexpectedOutput(expectedOutput, actualOutput, thepython):
 class BasicUsageTestSuite(unittest.TestCase):
 	"""Basic functional test cases."""
 
-	def test_absolute_truth_and_meaning(self):
-		"""Insanitty Test."""
-		assert True
+	@classmethod
+	def setUpClass(cls):
+		cls._thepython = getPythonCommand()
+
+	def setUp(self):
+		if (self._thepython is None):
+			self.skipTest(str("""No python cmd to test with!"""))
+
+	@classmethod
+	def tearDownClass(cls):
+		cls._thepython = None
 
 	def test_syntax(self):
 		"""Test case importing code."""
@@ -218,7 +226,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 			print(str(type(impErr)))
 			print(str(impErr))
 			theResult = False
-		assert theResult
+		self.assertTrue(theResult)
 
 	def test_actual_depends(self):
 		"""Test case importing depends."""
@@ -238,7 +246,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 		except Exception as impErr:
 			debugtestError(impErr)
 			theResult = False
-		assert theResult
+		self.assertTrue(theResult)
 
 	def test_a_which_command(self):
 		"""Test case for backend which."""
@@ -258,97 +266,86 @@ class BasicUsageTestSuite(unittest.TestCase):
 			othererr = None
 			del othererr
 			theResult = False
-		assert theResult
+		self.assertTrue(theResult, str("""Could Not find the which comand"""))
 
 	def test_b_python_command(self):
 		"""Test case for backend library."""
 		theResult = False
 		try:
-			import sys
-			if sys.__name__ is None:
-				raise ImportError("Failed to import system. WTF?!!")
 			thepython = getPythonCommand()
 			if (str("/python3") in str(thepython)) or (sys.version_info <= (3, 2)):
 				theResult = True
 			elif (str("coverage") in str(thepython)) or (sys.version_info <= (3, 2)):
 				theResult = True
-			elif (str("python") in str(thepython)) or (sys.version_info >= (3, 2)):
+			elif (str("python") in str(thepython)) and (sys.version_info >= (3, 2)):
 				theResult = True
 		except Exception:
 			theResult = False
 			try:
 				theOutputtext = checkPythonCommand(["which", "python"])
-				if (str("/python") in str(theOutputtext)):
-					theResult = True
+				self.assertIn(str("/python"), str(theOutputtext))
+				theResult = True
 			except Exception:
 				theResult = False
-		assert theResult
+		self.assertTrue(theResult, str("""Could Not find the python comand"""))
 
-	def test_d_python_command_main(self):
+	def test_run_lib_command_plain(self):
 		"""Test case for piaplib.pocket help."""
 		theResult = False
 		try:
 			thepython = getPythonCommand()
 			if (thepython is not None):
 				theOutputtext = checkPythonCommand([
-					str(thepython),
+					str(self._thepython),
 					str("-m"),
 					str("piaplib"),
 					str("--help")
 				], stderr=subprocess.STDOUT)
+				self.assertIn(str("usage:"), str(theOutputtext))
 				if (str("usage:") in str(theOutputtext)):
 					theResult = True
 				else:
 					theResult = False
-					debugUnexpectedOutput(str("usage:"), str(theOutputtext), thepython)
+					debugUnexpectedOutput(str("usage:"), str(theOutputtext), self._thepython)
 		except Exception as err:
 			debugtestError(err)
 			err = None
 			del err
 			theResult = False
-		assert theResult
+		self.assertTrue(theResult, str("""Could Not find usage from piaplib --help"""))
 
-	def test_d_python_command_lib_main(self):
+	def test_run_lib_command_main(self):
 		"""Test case for piaplib vs piaplib.__main__"""
 		theResult = False
 		try:
-			thepython = getPythonCommand()
-			if (thepython is not None):
-				theExpectedText = checkPythonCommand([
-					str(thepython),
-					str("-m"),
-					str("piaplib.__main__")
-				], stderr=subprocess.STDOUT)
-				self.assertIsNotNone(theExpectedText)
-				theOutputtext = checkPythonCommand([
-					str(thepython),
-					str("-m"),
-					str("piaplib")
-				], stderr=subprocess.STDOUT)
-				if (str(theExpectedText) in str(theOutputtext)):
-					theResult = True
-				else:
-					theResult = False
-					debugUnexpectedOutput(str(theExpectedText), str(theOutputtext), str(thepython))
+			theExpectedText = checkPythonCommand([
+				str(self._thepython),
+				str("-m"),
+				str("piaplib.__main__")
+			], stderr=subprocess.STDOUT)
+			self.assertIsNotNone(theExpectedText)
+			theOutputtext = checkPythonCommand([
+				str(self._thepython),
+				str("-m"),
+				str("piaplib")
+			], stderr=subprocess.STDOUT)
+			self.assertIn(str(theExpectedText), str(theOutputtext))
+			if (str(theExpectedText) in str(theOutputtext)):
+				theResult = True
 			else:
 				theResult = False
-				print(str(""))
-				print(str("No Python found"))
+				debugUnexpectedOutput(str(theExpectedText), str(theOutputtext), self._thepython)
 		except BaseException as err:
 			debugtestError(err)
 			err = None
 			del err
 			theResult = False
-		assert theResult
+		self.assertTrue(theResult, str("""Could Not swap piaplib for piaplib.__main__"""))
 
 	def test_c_python_command_pocket_units(self):
 		"""Test case for piaplib.* --help."""
-		theResult = False
+		theResult = True
 		try:
-			import sys
-			if sys.__name__ is None:
-				raise ImportError("Failed to import system. WTF?!!")
-			thepython = getPythonCommand()
 			test_units = [
 				"lint",
 				"pku",
@@ -357,220 +354,185 @@ class BasicUsageTestSuite(unittest.TestCase):
 				"book\ logs",
 				"keyring"
 			]
-			if (thepython is not None):
-				try:
-					for unit in test_units:
-						theOutputtext = checkPythonCommand([
-							str(thepython),
-							str("-m"),
-							str("piaplib.pocket"), str("{}").format(str(unit)),
-							str("--help")
-						], stderr=subprocess.STDOUT)
-						if (str("usage:") in str(theOutputtext)):
-							theResult = True
-						else:
-							theResult = False
-							debugUnexpectedOutput(str("usage:"), str(theOutputtext), thepython)
-				except Exception as othererr:
-					debugtestError(othererr)
-					othererr = None
-					del othererr
-					theResult = False
+			try:
+				for unit in test_units:
+					theOutputtext = checkPythonCommand([
+						str(self._thepython),
+						str("-m"),
+						str("piaplib.pocket"), str("{}").format(str(unit)),
+						str("--help")
+					], stderr=subprocess.STDOUT)
+					self.assertIn(str("usage:"), str(theOutputtext))
+					if (str("usage:") in str(theOutputtext)):
+						theResult = (theResult is True)
+					else:
+						theResult = False
+						debugUnexpectedOutput(str("usage:"), str(theOutputtext), self._thepython)
+			except Exception as othererr:
+				debugtestError(othererr)
+				othererr = None
+				del othererr
+				theResult = False
 		except Exception as err:
 			debugtestError(err)
 			err = None
 			del err
 			theResult = False
-		assert theResult
+		self.assertTrue(theResult, str("""Could not find some usage from piaplib.*"""))
 
 	def test_c_python_command_pku_units(self):
 		"""Test case for piaplib.pku.* --help."""
-		theResult = False
+		theResult = True
 		try:
-			import sys
-			if sys.__name__ is None:
-				raise ImportError("Failed to import system. WTF?!!")
-			thepython = getPythonCommand()
-			if (thepython is not None):
-				try:
-					test_units = [
-						"pku.interfaces", "pku.config"
-						"pku.compile_interface", "pku.upgrade"
-					]
-					for unit in test_units:
-						theOutputtext = checkPythonCommand([
-							str(thepython),
-							str("-m"),
-							str("piaplib.{}").format(str(unit)),
-							str("--help")
-						], stderr=subprocess.STDOUT)
-						if (str("usage:") in str(theOutputtext)):
-							theResult = True
-						else:
-							theResult = False
-							debugUnexpectedOutput(str("usage:"), str(theOutputtext), thepython)
-				except Exception as othererr:
-					debugtestError(othererr)
-					othererr = None
-					del othererr
+			test_units = [
+				"pku.interfaces", "pku.config",
+				"pku.compile_interface", "pku.upgrade"
+			]
+			for unit in test_units:
+				theOutputtext = checkPythonCommand([
+					str(self._thepython),
+					str("-m"),
+					str("piaplib.{}").format(str(unit)),
+					str("--help")
+				], stderr=subprocess.STDOUT)
+				self.assertIn(str("usage:"), str(theOutputtext))
+				if (str("usage:") in str(theOutputtext)):
+					theResult = (theResult is True)
+				else:
 					theResult = False
-		except Exception as err:
-			debugtestError(err)
-			err = None
-			del err
+					debugUnexpectedOutput(str("usage:"), str(theOutputtext), self._thepython)
+		except Exception as othererr:
+			debugtestError(othererr)
+			othererr = None
+			del othererr
 			theResult = False
-		assert theResult
+		self.assertTrue(theResult, str("""Could not find some usage from piaplib.pku.*"""))
 
 	def test_e_python_command_pku_units_versions(self):
 		"""Test case for piaplib.pku.* --version."""
-		theResult = False
+		theResult = True
 		try:
-			import sys
-			if sys.__name__ is None:
-				raise ImportError("Failed to import system. WTF?!!")
-			thepython = getPythonCommand()
 			from .context import piaplib as piaplib
-			if piaplib.__version__ is not None:
-				theResult = False
-			if (thepython is not None):
-				test_units = [
-					"pocket", "book.version", "pku.interfaces", "pku.config"
-					"pku.compile_interface", "pku.upgrade"
-				]
-				for unit in test_units:
-					theOutputtext = checkPythonCommand([
-						str(thepython),
-						str("-m"),
-						str("piaplib.{}").format(str(unit)),
-						str("--version")
-					], stderr=subprocess.STDOUT)
-					if (str(piaplib.__version__) in str(theOutputtext)):
-						theResult = True
-					else:
-						theResult = False
-						print(str(""))
-						print(str("python cmd is {}").format(str(thepython)))
-						print(str("{} unit is {}").format(str(unit).split(".")[0], str(unit)))
-						print(str(""))
-						print(str("actual version was..."))
-						print(str(""))
-						print(str("{}").format(str(theOutputtext)))
-						print(str(""))
+			self.assertIsNotNone(piaplib.__version__)
+			test_units = [
+				"pocket", "book.version", "pku.interfaces", "pku.config",
+				"pku.compile_interface", "pku.upgrade"
+			]
+			for unit in test_units:
+				theOutputtext = checkPythonCommand([
+					str(self._thepython),
+					str("-m"),
+					str("piaplib.{}").format(str(unit)),
+					str("--version")
+				], stderr=subprocess.STDOUT)
+				self.assertIn(str(piaplib.__version__), str(theOutputtext))
+				if (str(piaplib.__version__) in str(theOutputtext)):
+					theResult = (theResult is True)
+				else:
+					theResult = False
+					print(str(""))
+					print(str("python cmd is {}").format(str(self._thepython)))
+					print(str("{} unit is {}").format(str(unit).split(".")[0], str(unit)))
+					print(str(""))
+					print(str("actual version was..."))
+					print(str(""))
+					print(str("{}").format(str(theOutputtext)))
+					print(str(""))
 		except Exception as err:
 			debugtestError(err)
 			err = None
 			del err
 			theResult = False
-		assert theResult
+		self.assertTrue(theResult, str("""Could not find some version from piaplib.pku.*"""))
 
 	def test_c_python_command_lint_units(self):
 		"""Test case for piaplib.lint.* --help."""
-		theResult = False
+		theResult = True
 		try:
-			import sys
-			if sys.__name__ is None:
-				raise ImportError("Failed to import system. WTF?!!")
-			thepython = getPythonCommand()
-			if (thepython is not None):
-				try:
-					mod_tests = [
-						"lint", "lint.check", "lint.clients_check_status",
-						"lint.iface_check_status", "lint.users_check_status", "lint.do_execve"
-					]
-					for unit in mod_tests:
-						theOutputtext = checkPythonCommand([
-							str(thepython),
-							str("-m"),
-							str("piaplib.{}").format(str(unit)),
-							str("--help")
-						], stderr=subprocess.STDOUT)
-						if (str("usage:") in str(theOutputtext)):
-							theResult = True
-						else:
-							theResult = False
-							debugUnexpectedOutput(str("usage:"), str(theOutputtext), thepython)
-				except Exception as othererr:
-					debugtestError(othererr)
-					othererr = None
-					del othererr
+			mod_tests = [
+				"lint", "lint.check", "lint.clients_check_status",
+				"lint.iface_check_status", "lint.users_check_status", "lint.do_execve"
+			]
+			for unit in mod_tests:
+				theOutputtext = checkPythonCommand([
+					str(self._thepython),
+					str("-m"),
+					str("piaplib.{}").format(str(unit)),
+					str("--help")
+				], stderr=subprocess.STDOUT)
+				self.assertIn(str("usage:"), str(theOutputtext))
+				if (str("usage:") in str(theOutputtext)):
+					theResult = (theResult is True)
+				else:
 					theResult = False
-		except Exception as err:
-			debugtestError(err)
-			err = None
-			del err
+					debugUnexpectedOutput(str("usage:"), str(theOutputtext), self._thepython)
+		except Exception as othererr:
+			debugtestError(othererr)
+			othererr = None
+			del othererr
 			theResult = False
-		assert theResult
+		self.assertTrue(theResult, str("""Could not find some usage from piaplib.lint.*"""))
 
 	def test_e_python_command_lint_units_versions(self):
 		"""Test case for piaplib.lint.* --version."""
-		theResult = False
+		theResult = True
 		try:
-			import sys
-			if sys.__name__ is None:
-				raise ImportError("Failed to import system. WTF?!!")
-			thepython = getPythonCommand()
 			from .context import piaplib as piaplib
-			if piaplib.__version__ is not None:
-				theResult = False
-			if (thepython is not None):
-				for unit in ["lint", "lint.check", "lint.do_execve"]:
-					theOutputtext = checkPythonCommand([
-						str(thepython),
-						str("-m"),
-						str("piaplib.{}").format(str(unit)),
-						str("--version")
-					], stderr=subprocess.STDOUT)
-					if (str(piaplib.__version__) in str(theOutputtext)):
-						theResult = True
-					else:
-						theResult = False
-						print(str(""))
-						print(str("python cmd is {}").format(str(thepython)))
-						print(str("check unit is {}").format(str(unit)))
-						print(str(""))
-						print(str("actual version was..."))
-						print(str(""))
-						print(str("{}").format(str(theOutputtext)))
-						print(str(""))
+			self.assertIsNotNone(piaplib.__version__)
+			for unit in ["lint", "lint.check", "lint.do_execve"]:
+				theOutputtext = checkPythonCommand([
+					str(self._thepython),
+					str("-m"),
+					str("piaplib.{}").format(str(unit)),
+					str("--version")
+				], stderr=subprocess.STDOUT)
+				self.assertIn(str(piaplib.__version__), str(theOutputtext))
+				if (str(piaplib.__version__) in str(theOutputtext)):
+					theResult = (theResult is True)
+				else:
+					theResult = False
+					print(str(""))
+					print(str("python cmd is {}").format(str(self._thepython)))
+					print(str("check unit is {}").format(str(unit)))
+					print(str(""))
+					print(str("actual version was..."))
+					print(str(""))
+					print(str("{}").format(str(theOutputtext)))
+					print(str(""))
 		except Exception as err:
 			debugtestError(err)
 			err = None
 			del err
 			theResult = False
-		assert theResult
+		self.assertTrue(theResult, str("""Could not find some version from piaplib.lint.*"""))
 
 	def test_e_python_command_lint_check_units(self):
 		"""Test case for piaplib.lint.check* --version."""
 		theResult = False
 		try:
-			import sys
-			if sys.__name__ is None:
-				raise ImportError("Failed to import system. WTF?!!")
-			thepython = getPythonCommand()
 			from .context import piaplib as piaplib
-			if piaplib.__version__ is not None:
+			if piaplib.__version__ is None:
 				theResult = False
-			if (thepython is not None):
-				for unit in ["iface", "clients", "users"]:
-					theOutputtext = checkPythonCommand([
-						str(thepython),
-						str("-m"),
-						str("piaplib.lint.check"),
-						str(unit),
-						str("--version")
-					], stderr=subprocess.STDOUT)
-					if (str(piaplib.__version__) in str(theOutputtext)):
-						theResult = True
-					else:
-						theResult = False
-						print(str(""))
-						print(str("python cmd is {}").format(str(thepython)))
-						print(str("check unit is {}").format(str(unit)))
-						print(str(""))
-						print(str("actual version was..."))
-						print(str(""))
-						print(str("{}").format(str(theOutputtext)))
-						print(str(""))
+			for unit in ["iface", "clients", "users"]:
+				theOutputtext = checkPythonCommand([
+					str(self._thepython),
+					str("-m"),
+					str("piaplib.lint.check"),
+					str(unit),
+					str("--version")
+				], stderr=subprocess.STDOUT)
+				if (str(piaplib.__version__) in str(theOutputtext)):
+					theResult = True
+				else:
+					theResult = False
+					print(str(""))
+					print(str("python cmd is {}").format(str(self._thepython)))
+					print(str("check unit is {}").format(str(unit)))
+					print(str(""))
+					print(str("actual version was..."))
+					print(str(""))
+					print(str("{}").format(str(theOutputtext)))
+					print(str(""))
 		except Exception as err:
 			debugtestError(err)
 			err = None
@@ -581,36 +543,26 @@ class BasicUsageTestSuite(unittest.TestCase):
 	def test_c_python_command_keyring_units(self):
 		"""Test case for piaplib.keyring.* --help."""
 		theResult = False
+		test_units = [
+			"keyring.saltify",
+			"keyring.rand",
+			"keyring.clarify",
+			"keyring.__main__"
+		]
 		try:
-			import sys
-			if sys.__name__ is None:
-				raise ImportError("Failed to import system. WTF?!!")
-			thepython = getPythonCommand()
-			test_units = [
-				"keyring.saltify",
-				"keyring.rand",
-				"keyring.clarify",
-				"keyring.__main__"
-			]
-			if (thepython is not None):
-				try:
-					for unit in test_units:
-						theOutputtext = checkPythonCommand([
-							str(thepython),
-							str("-m"),
-							str("piaplib.{}").format(str(unit)),
-							str("--help")
-						], stderr=subprocess.STDOUT)
-						if (str("usage:") in str(theOutputtext)):
-							theResult = True
-						else:
-							theResult = False
-							debugUnexpectedOutput(str("usage:"), str(theOutputtext), thepython)
-				except Exception as othererr:
-					debugtestError(othererr)
-					othererr = None
-					del othererr
+			for unit in test_units:
+				theOutputtext = checkPythonCommand([
+					str(self._thepython),
+					str("-m"),
+					str("piaplib.{}").format(str(unit)),
+					str("--help")
+				], stderr=subprocess.STDOUT)
+				self.assertIn(str("usage:"), str(theOutputtext))
+				if (str("usage:") in str(theOutputtext)):
+					theResult = True
+				else:
 					theResult = False
+					debugUnexpectedOutput(str("usage:"), str(theOutputtext), self._thepython)
 		except Exception as err:
 			debugtestError(err)
 			err = None
@@ -714,60 +666,60 @@ class BasicUsageTestSuite(unittest.TestCase):
 			import piaplib.keyring.rand as rand
 			if rand.__name__ is None:
 				raise ImportError("Failed to import rand.")
-			thepython = getPythonCommand()
-			if (thepython is not None):
-				try:
-					test_message = str("This is a test Message")
-					enc_string_salted = str("U2FsdGVk")
-					enc_string_py3 = str("jO2fjYejUczBE9ol2lsFWO0JjLRCaQ==")
-					enc_string_test_key = str("{}junk{}junk{}key{}").format(
-						str(rand.randInt(1, 11, 99)),
-						str(rand.randInt(1, 1001, 9999)),
-						str(rand.randInt(1, 0, 99)),
-						str(rand.randInt(1, 1000, 9999))
-					)
-					theOutputtext = test_message
-					for unit in ["--pack", "--unpack"]:
-						input_text = str(theOutputtext)
-						arguments = [
-							str(thepython),
-							str("-m"),
-							str("piaplib.pocket keyring clarify"),
-							str("""{}""").format(str(unit)),
-							str("""--msg={}""").format(theOutputtext),
-							str("-S=testSeedNeedstobelong"),
-							str("""-K={}""").format(str(enc_string_test_key)),
-							str("-k=/tmp/.beta_PiAP_weak_key")
-						]
-						theOutputtext = checkPythonCommand(arguments, stderr=subprocess.STDOUT)
-						theOutputtext = str(theOutputtext).replace(str("\\n"), str(""))
-						if (test_message in str(theOutputtext)):
-							theResult = True
-						elif (enc_string_py3 in str(theOutputtext)):
-							theResult = True
-						elif (enc_string_salted in str(theOutputtext)):
-							theResult = True
-						else:
-							print(str(""))
-							print(str("Not working yet"))
-							print(str(""))
-							print(str("python cmd is {}").format(str(thepython)))
-							print(str("arguments are {}").format(str(arguments)))
-							print(str(""))
-							print(str("action is {}").format(str(unit)))
-							print(str("input given {}").format(str(input_text)))
-							print(str("but actual output was..."))
-							print(str(""))
-							print(str("{}").format(str(theOutputtext)))
-							print(str(""))
-							raise unittest.SkipTest("BETA. Experemental feature not ready yet.")
-				except unittest.SkipTest:
-					raise unittest.SkipTest("BETA. Experemental feature not ready yet.")
-				except Exception as othererr:
-					debugtestError(othererr)
-					othererr = None
-					del othererr
-					theResult = False
+			try:
+				test_message = str("This is a test Message")
+				enc_string_salted = str("U2FsdGVk")
+				enc_string_py3 = str("jO2fjYejUczBE9ol2lsFWO0JjLRCaQ==")
+				enc_string_test_key = str("{}junk{}junk{}key{}").format(
+					str(rand.randInt(1, 11, 99)),
+					str(rand.randInt(1, 1001, 9999)),
+					str(rand.randInt(1, 0, 99)),
+					str(rand.randInt(1, 1000, 9999))
+				)
+				theOutputtext = test_message
+				for unit in ["--pack", "--unpack"]:
+					input_text = str(theOutputtext)
+					arguments = [
+						str(self._thepython),
+						str("-m"),
+						str("piaplib.pocket"),
+						str("keyring"),
+						str("clarify"),
+						str("""{}""").format(str(unit)),
+						str("""--msg={}""").format(theOutputtext),
+						str("-S=testSeedNeedstobelong"),
+						str("""-K={}""").format(str(enc_string_test_key)),
+						str("-k=/tmp/.beta_PiAP_weak_key")
+					]
+					theOutputtext = checkPythonCommand(arguments, stderr=subprocess.STDOUT)
+					theOutputtext = str(theOutputtext).replace(str("\\n"), str(""))
+					if (test_message in str(theOutputtext)):
+						theResult = True
+					elif (enc_string_py3 in str(theOutputtext)):
+						theResult = True
+					elif (enc_string_salted in str(theOutputtext)):
+						theResult = True
+					else:
+						print(str(""))
+						print(str("Not working yet"))
+						print(str(""))
+						print(str("python cmd is {}").format(str(self._thepython)))
+						print(str("arguments are {}").format(str(arguments)))
+						print(str(""))
+						print(str("action is {}").format(str(unit)))
+						print(str("input given {}").format(str(input_text)))
+						print(str("but actual output was..."))
+						print(str(""))
+						print(str("{}").format(str(theOutputtext)))
+						print(str(""))
+						raise unittest.SkipTest("BETA. Experemental feature not ready yet.")
+			except unittest.SkipTest:
+				raise unittest.SkipTest("BETA. Experemental feature not ready yet.")
+			except Exception as othererr:
+				debugtestError(othererr)
+				othererr = None
+				del othererr
+				theResult = False
 		except unittest.SkipTest:
 			raise unittest.SkipTest("BETA. Experemental feature not ready yet.")
 		except Exception as err:
@@ -1167,7 +1119,6 @@ class BasicUsageTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
-	@unittest.skipUnless(sys.platform.startswith("linux"), "Requires linux")
 	def test_d_python_command_check_iface(self):
 		"""Test case for piaplib.pocket.lint check iface."""
 		theResult = False
@@ -1217,7 +1168,6 @@ class BasicUsageTestSuite(unittest.TestCase):
 			theResult = False
 		assert theResult
 
-	@unittest.skipUnless(sys.platform.startswith("linux"), "Requires linux")
 	def test_d_python_command_check_iface_html(self):
 		"""Test case for piaplib.pocket.lint check iface with html."""
 		theResult = False

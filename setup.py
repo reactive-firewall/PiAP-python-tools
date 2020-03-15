@@ -64,7 +64,7 @@ except Exception:
 
 setup(
 	name="""piaplib""",
-	version="""0.4.2""",
+	version="""0.4.3""",
 	description="""Beta for PiAP python tools""",
 	long_description=readme,
 	long_description_content_type="""text/markdown""",

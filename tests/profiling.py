@@ -51,7 +51,7 @@ except Exception:  # pragma: no branch
 try:
 	import time
 	if time.__name__ is None:  # pragma: no branch
-		raise NotImplementedError("[CWE-758] We could not import time. Are we in the speed-force!")
+		raise NotImplementedError("[CWE-440] We could not import time. Are we in the speed-force!")
 except Exception as err:
 	raise ImportError(err)
 	exit(3)
@@ -60,7 +60,7 @@ except Exception as err:
 try:
 	import cProfile
 	if cProfile.__name__ is None:  # pragma: no branch
-		raise NotImplementedError("[CWE-758] We could not import cProfile. ABORT!")
+		raise NotImplementedError("[CWE-440] We could not import cProfile. ABORT!")
 except Exception as err:  # pragma: no branch
 	raise ImportError(err)
 	exit(3)
@@ -78,9 +78,9 @@ try:
 		print(str(''))
 		ImportErr = None
 		del ImportErr
-		raise ImportError(str("Profile module failed completely."))
+		raise ImportError(str("[CWE-758] Profile module failed completely."))
 except Exception:  # pragma: no branch
-	raise ImportError("Failed to import test profiling")
+	raise ImportError("[CWE-440] Failed to import test profiling")
 
 
 try:

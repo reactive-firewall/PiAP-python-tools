@@ -179,20 +179,12 @@ class SaltTestSuite(unittest.TestCase):
 							a = saltify.saltify(str(this_test), str(randomSalt))
 							b = saltify.saltify(str(that_test), str(test_salt))
 							self.assertIsNotNone(a)
+							self.assertIsInstance(a, str)
 							self.assertIsNotNone(b)
+							self.assertIsInstance(b, str)
 							self.assertNotEqual(a, b)
 				except Exception:
-					self.assertIsNotNone(that_test)
-					self.assertIsNotNone(this_test)
-					self.assertNotEqual(this_test, that_test)
-					for test_salt in salt_list:
-						a = saltify.saltify(str(this_test), str(randomSalt))
-						b = saltify.saltify(str(that_test), str(test_salt))
-						self.assertIsNotNone(a)
-						self.assertIsNotNone(b)
-						self.assertNotEqual(a, b)
-				if ((int(someRandomTest) % int(100)) == 0):
-					print(str("Test {} ... ok").format(str(someRandomTest)))
+					raise unittest.SkipTest("Testing Framework does not allow subTest()")
 		except Exception as testErr:
 			print(str("Entropy - Fuzzing Crash Found new test"))
 			print(str(""))

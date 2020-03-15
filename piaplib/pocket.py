@@ -246,8 +246,9 @@ def main(argv=None):
 	try:
 		try:
 			(args, extra) = parseArgs(argv)
-			service_cmd = args.pocket_unit
-			useTool(service_cmd, argv[1:])
+			if (argv is not None and len(argv) > 1):
+				service_cmd = args.pocket_unit
+				useTool(service_cmd, argv[1:])
 		except RuntimeError as rterr:
 			logs.log(str(rterr), "Warning")
 			logs.log(str(rterr.args), "Warning")
@@ -267,5 +268,7 @@ def main(argv=None):
 
 
 if __name__ == '__main__':
-	main(sys.argv[1:])
-
+	if (sys.argv is not None and len(sys.argv) > 1):
+		main(sys.argv[1:])
+	else:
+		main([str("""--help""")])

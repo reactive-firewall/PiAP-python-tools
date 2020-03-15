@@ -31,11 +31,58 @@
 
 try:
 	import sys
-	import os
-	import functools
-	import time
-	import warnings
-	for someModule in [os, sys, functools, time, warnings]:
+	if sys.__name__ is None:
+		raise ImportError("OMG! we could not import os. We're like in the matrix! ABORT. ABORT.")
+except Exception as err:
+	raise ImportError(err)
+
+
+try:
+	if 'os' not in sys.modules:
+		import os
+	else:  # pragma: no branch
+		os = sys.modules["""os"""]
+except Exception:
+	raise ImportError("OS Failed to import.")
+
+
+try:
+	if 'functools' not in sys.modules:
+		import functools
+	else:  # pragma: no branch
+		functools = sys.modules["""functools"""]
+except Exception:
+	raise ImportError("functools Failed to import.")
+
+
+try:
+	if 'time' not in sys.modules:
+		import time
+	else:  # pragma: no branch
+		time = sys.modules["""time"""]
+except Exception:
+	raise ImportError("time Failed to import.")
+
+
+try:
+	if 'warnings' not in sys.modules:
+		import warnings
+	else:  # pragma: no branch
+		warnings = sys.modules["""warnings"""]
+except Exception:
+	raise ImportError("warnings Failed to import.")
+
+
+try:
+	if 'piaplib' not in sys.modules:
+		raise ImportError("Pocket Book failed to import.")  # import piaplib as piaplib
+	piaplib = sys.modules["""piaplib"""]
+except Exception:
+	raise ImportError("Pocket Book failed to import.")
+
+
+try:
+	for someModule in [sys, os, functools, time, warnings]:
 		if someModule.__name__ is None:
 			raise ImportError(str("OMG! we could not import {}. ABORT. ABORT.").format(someModule))
 except Exception as err:
@@ -60,23 +107,63 @@ __prog__ = """piaplib.pku.remediation"""
 
 class PiAPError(RuntimeError):
 	"""An Error class for PiAP errors"""
-	cause = None
-	message = None
 
 	def __init__(self, cause=None, message=None):
 		if cause is not None and isinstance(cause, Exception):
-			self.cause = cause
-			self.message = str(cause)
+			super(PiAPError, self).__setattr__("""cause""", cause)
+			super(PiAPError, self).__setattr__("""message""", str(cause))
 		elif cause is not None and isinstance(cause, str):
-			self.message = str(cause)
-			self.cause = None
+			super(PiAPError, self).__setattr__("""message""", str(cause))
+			super(PiAPError, self).__setattr__("""cause""", None)
 		if message is not None and isinstance(message, str):
-			self.message = str(message)
+			super(PiAPError, self).__setattr__("""message""", str(message))
+		super(PiAPError, self).__init__(self)
+
+	def __len__(self):
+		if self.cause is not None:
+			if isinstance(self.cause, PiAPError):
+				return (1 + len(self.cause))
+			return 1
+		return 0
+
+	def __getitem__(self, key):
+		if not isinstance(key, int):
+			raise TypeError(key)
+		if (self.cause is not None) and (key >= 1):
+			if isinstance(self.cause, PiAPError) and key > 1:
+				return self.cause[key - 1]
+			return self.cause
+		raise KeyError(key)
+
+	def __getattr__(self, name):
+		super(PiAPError, self).__getattr__(name)
+
+	def __setattr__(self, name, value):
+		if name == """message""":
+			msgval = None
+			if isinstance(value, str):
+				msgval = value
+			else:
+				msgval = str(value)
+			super(PiAPError, self).__setattr__("""message""", str(msgval))
+		else:
+			super(PiAPError, self).__setattr__(name, value)
+
+	def __delattr__(self, name):
+		if name == """message""":
+			super(PiAPError, self).__setattr__("""message""", str(""))
+		else:
+			super(PiAPError, self).__delattr__(name)
 
 	def __del__(self):
-		del self.message
-		del self.cause
-		del self
+		super(PiAPError, self).__delattr__("""cause""")
+		super(PiAPError, self).__delattr__("""message""")
+
+	def __str__(self):
+		return str(self.message)
+
+	def __unicode__(self):
+		return self.__str__()
 
 
 def getTimeStamp():
@@ -117,7 +204,7 @@ def error_failsafe(func):
 				theOutput = func(*args, **kwargs)
 		except BaseException as berr:
 			theOutput = None
-			baton = PiAPError(berr, str("An abrupt unexpected error occurred."))
+			baton = PiAPError(berr, str("[CWE-431] An abrupt unexpected error occurred."))
 			raise baton
 		return theOutput
 
@@ -139,12 +226,11 @@ def error_breakpoint(error, context):
 		logs.log(str("Caused by:"), "Warning")
 		logs.log(str(error.cause), "Error")
 		logs.log(str(type(error.cause)), "Debug")
-		logs.log(str(error.message), "Error")
 	else:
 		if isinstance(error, Exception):
 			logs.log(str((error.args)), "Error")
 		else:
-			logs.log(str("Cause Redacted!"), "Debug")
+			logs.log(str("[CWE-209] Cause Redacted!"), "Debug")
 	return None
 
 
@@ -160,7 +246,7 @@ def error_passing(func):
 			theOutput = func(*args, **kwargs)
 		except Exception as err:
 			theOutput = error_breakpoint(error=err, context=func)
-			baton = PiAPError(err, str("An error occurred at {}.").format(str(func)))
+			baton = PiAPError(err, str("An error occurred in {}.").format(str(func)))
 			err = None
 			del err
 			raise baton
@@ -199,8 +285,8 @@ def bug_handling(func):
 			theOutput = func(*args, **kwargs)
 		except Exception as err:
 			error_breakpoint(error=err, context=func)
-			logs.log(str("Action will not be completed! ABORT!"), "CRITICAL")
-			logs.log(str("You found a bug. Please report this to my creator."), "CRITICAL")
+			logs.log(str("[CWE-691] Action will not be completed! ABORT!"), "CRITICAL")
+			logs.log(str("[CWE-209] You found a bug. Please report this to my creator."), "Error")
 			logs.log(str(""), "CRITICAL")
 			err = None
 			del err
@@ -225,11 +311,11 @@ def warning_handling(func):
 			theOutput = func(*args, **kwargs)
 		except Exception as err:
 			timestamp = getTimeStamp()
-			logs.log(str("An error occurred at {}").format(timestamp), "Warning")
+			logs.log(str("An exception occurred at {}").format(timestamp), "Warning")
 			logs.log(str(func), "Debug")
-			logs.log(str(type(err)), "Warning")
+			logs.log(str(type(err)), "Debug")
 			logs.log(str(err), "Warning")
-			logs.log(str((err.args)), "Warning")
+			logs.log(str((err.args)), "Debug")
 			logs.log(str(""), "Warning")
 			# sys.exc_clear()
 			err = None

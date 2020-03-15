@@ -442,7 +442,8 @@ and this will test reads.""")
 			somefile = str("the_test_file.txt")
 			if (utils.writeFile(somefile, theBlob) is True):
 				readback = utils.readFile(somefile)
-				self.assertIsInstance(readback, str, str("""Result is not a string"""))
+				if (sys.version_info >= (3, 2)):
+					self.assertIsInstance(readback, str, str("""Result is not a string"""))
 				if (theBlob in readback) and (readback in theBlob):
 					theResult = (len(readback) is len(theBlob))
 				else:

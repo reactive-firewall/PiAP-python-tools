@@ -444,9 +444,9 @@ def extractIfaceNames(theInputStr):
 	"""Extracts the expected iface names."""
 	return extractRegexPattern(
 		theInputStr,
-		"""(?:(?:[[:print:]]*){0,1}""" +
-		"""(?P<iface_name>[br|mon|usb|lan|vlan|wan|wla|eth|enp0s|lo|en]{2,5}[n]?[0-9]+){1}""" +
-		"""(?:[[:print:]]*){0,1})+"""
+		"""(?:[[:print:]]*?)?""" +
+		"""(?P<iface_name>(?:br|mon|usb|lan|vlan|wan|wla|eth|enp0s|lo|en)+[n]?[0-9]*){1}""" +
+		"""(?:[[:print:]]*?)?"""
 	)
 
 
@@ -539,11 +539,14 @@ def xstr(some_str=None):
 
 @remediation.error_handling
 @memoize
-def isWhiteListed(someString=None, whitelist=[]):
+def isWhiteListed(someString, whitelist):
 	"""Determins if a raw input string is an exact string in the whitelist."""
-	for validString in [xstr(x) for x in compactList(whitelist)]:
-		if xstr(someString) in validString:
-			return True
+	if whitelist is None:
+		return isWhiteListed(someString, [])
+	if someString is not None:
+		for validString in [xstr(x) for x in compactList(whitelist)]:
+			if xstr(someString) in validString:
+				return True
 	return False
 
 
@@ -564,7 +567,7 @@ def _handleVerbosityArgs(argParser, default=False):
 	the_action.add_argument(
 		'-q', '--quiet',
 		dest='verbose_mode', default=False,
-		action='store_false', help='Disable the given interface.'
+		action='store_false', help='Disable verbose mode.'
 	)
 	return argParser
 

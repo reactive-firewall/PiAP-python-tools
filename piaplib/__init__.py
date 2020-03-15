@@ -22,18 +22,21 @@
 global __version__
 
 
-__version__ = """0.4.2"""
+__version__ = """0.4.3"""
 
 
 try:
 	import sys
 	import os
 	import os.path
+	_DIR_NAME = str(".")
+	_PARENT_DIR_NAME = str("..")
+	_BASE_NAME = os.path.dirname(__file__)
 	try:
 		if str("piaplib") in __file__:
 			search_list = [
-				os.path.abspath(os.path.join(os.path.dirname(__file__), '..')),
-				os.path.abspath(os.path.join(os.path.dirname(__file__), '.'))
+				os.path.abspath(os.path.join(_BASE_NAME, _PARENT_DIR_NAME)),
+				os.path.abspath(os.path.join(_BASE_NAME, _DIR_NAME))
 			]
 			for __sys_path__ in search_list:
 				if __sys_path__ not in sys.path:

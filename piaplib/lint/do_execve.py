@@ -335,7 +335,7 @@ if __name__ in u'__main__':
 		if (sys.argv is not None and len(sys.argv) > 1):
 			unsafe_pid = main(sys.argv[1:])
 		else:
-			raise Exception("MAIN FAILED WHEN FOUND TO BE CWE-20 UNSAFE. ABORT.")
+			raise Exception("MAIN FAILED WHEN FOUND TO BE CWE-22 UNSAFE. ABORT.")
 	except Exception as err:
 		remediation.error_breakpoint(err, str(u'MAIN FAILED DURING UNSAFE COMMAND. ABORT.'))
 		err = None
