@@ -184,7 +184,9 @@ class SaltTestSuite(unittest.TestCase):
 							self.assertIsInstance(b, str)
 							self.assertNotEqual(a, b)
 				except Exception:
-					raise unittest.SkipTest("Testing Framework does not allow subTest()")
+					raise unittest.SkipTest()
+		except unittest.SkipTest:
+			raise unittest.SkipTest("Testing Framework does not allow subTest()")
 		except Exception as testErr:
 			print(str("Entropy - Fuzzing Crash Found new test"))
 			print(str(""))
