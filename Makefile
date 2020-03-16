@@ -184,7 +184,7 @@ cleanup:
 	$(QUIET)rm -f /opt/PiAP/.beta_* 2>/dev/null || true
 
 clean: cleanup
-	$(QUIET)$(MAKE) -s -C ./docs/ -f Makefile clean 2>/dev/null || true
+	$(QUIET)$(MAKE) -j1 -s -C ./docs/ -f Makefile clean 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
 
 must_be_root:

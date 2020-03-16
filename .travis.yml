@@ -173,6 +173,10 @@ matrix:
   - os: osx
     osx_image: xcode11.3
     language: shell
+  - os: osx
+    osx_image: xcode11.3
+    env: TRAVIS_PYTHON_VERSION="3.7"
+    language: shell
   allow_failures:
   - os: linux
     python: "nightly"
@@ -220,6 +224,10 @@ matrix:
     language: shell
   - os: osx
     osx_image: xcode11.1
+    language: shell
+  - os: osx
+    osx_image: xcode11.3
+    env: TRAVIS_PYTHON_VERSION="3.7"
     language: shell
   - os: linux
     python: "2.6"
@@ -399,7 +407,7 @@ before_install:
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install codecov || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install pip || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then export VERSIONER_PYTHON_VERSION=${TRAVIS_PYTHON_VERSION:-3.7} || true ; fi
-  - if [ $TRAVIS_OS_NAME == osx ] ; then defaults write com.apple.versioner.python Version $TRAVIS_PYTHON_VERSION || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then defaults write com.apple.versioner.python Version ${TRAVIS_PYTHON_VERSION:-3.7} || true ; fi
   - travis_retry pip3 install --upgrade pip || true ;
   - travis_retry pip install tox || pip install tox || true ;
   - travis_retry pip install coverage || true ;
@@ -435,11 +443,13 @@ script:
   - coveralls 2>/dev/null || true
   - travis_retry pip uninstall -y python-coveralls || travis_retry python3 -m pip3 uninstall -y python-coveralls || true
   - travis_retry pip uninstall -y PyYAML || travis_retry python3 -m pip3 uninstall -y PyYAML || true
+  - cp -vf .coverage ".codecov.$HOSTNAME.$TRAVIS_JOB_NUMBER" 2>/dev/null || true
   - make clean || TRAVIS_TEST_RESULT=$? ;
   - if [ $TRAVIS_OS_NAME == osx ] || [[ ( $TRAVIS_PYTHON_VERSION -le "3.4" ) ]] || [ $TRAVIS_EVENT_TYPE == "cron" ] || [ $TRAVIS_ALLOW_FAILURE == true ] ; then echo "SKIP tox test" ; else make test-tox || TRAVIS_TEST_RESULT=$? ; fi ;
   - cp -vf .coverage ".coverall.Lasting.$TRAVIS_PYTHON_VERSION.12345" 2>/dev/null || true
   - make clean ;
-  - mv -vf ".coverall.Lasting.$TRAVIS_PYTHON_VERSION.12345" .coverage 2>/dev/null || true ;
+  - mv -vf ".coverall.Lasting.$TRAVIS_PYTHON_VERSION.12345" .coverage.tox.$TRAVIS_BUILD_NUMBER.12345 2>/dev/null || true ;
+  - mv -vf ".codecov.$HOSTNAME.$TRAVIS_JOB_NUMBER" ".coverage.$HOSTNAME.$TRAVIS_JOB_NUMBER" 2>/dev/null || true ;
   - if [ $TRAVIS_OS_NAME == osx ] || [[ ( $TRAVIS_PYTHON_VERSION -le "3.4" ) ]] || [ $TRAVIS_ALLOW_FAILURE == true ] ; then export CI_TEST_UPGRADE_PATH=true ; fi ;
   - if [ $CI_TEST_UPGRADE_PATH == true ] ; then travis_wait pip3 install --upgrade -e git+https://github.com/reactive-firewall/PiAP-python-tools.git@${TRAVIS_PULL_REQUEST_SHA:-${TRAVIS_COMMIT}}#egg=piaplib || TRAVIS_TEST_RESULT=$? ; fi ;
   - bash -c ./tests/check_spelling || TRAVIS_TEST_RESULT=$? ;
