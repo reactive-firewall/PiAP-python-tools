@@ -450,7 +450,7 @@ script:
   - make clean ;
   - mv -vf ".coverall.Lasting.$TRAVIS_PYTHON_VERSION.12345" .coverage.tox.$TRAVIS_BUILD_NUMBER.12345 2>/dev/null || true ;
   - mv -vf ".codecov.$HOSTNAME.$TRAVIS_JOB_NUMBER" ".coverage.$HOSTNAME.$TRAVIS_JOB_NUMBER" 2>/dev/null || true ;
-  - if [ $TRAVIS_OS_NAME == osx ] || [[ ( $TRAVIS_PYTHON_VERSION -le "3.4" ) ]] || [ $TRAVIS_ALLOW_FAILURE == true ] ; then export CI_TEST_UPGRADE_PATH=true ; fi ;
+- if [ $TRAVIS_OS_NAME == osx ] || [[ ( $TRAVIS_PYTHON_VERSION -le "3.4" ) ]] || [ $TRAVIS_ALLOW_FAILURE == true ] ; then export CI_TEST_UPGRADE_PATH=false ; else export CI_TEST_UPGRADE_PATH=true ; fi ;
   - if [ $CI_TEST_UPGRADE_PATH == true ] ; then travis_wait pip3 install --upgrade -e git+https://github.com/reactive-firewall/PiAP-python-tools.git@${TRAVIS_PULL_REQUEST_SHA:-${TRAVIS_COMMIT}}#egg=piaplib || TRAVIS_TEST_RESULT=$? ; fi ;
   - bash -c ./tests/check_spelling || TRAVIS_TEST_RESULT=$? ;
 
