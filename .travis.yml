@@ -371,8 +371,9 @@ install: "make init"
 before_install:
   - if [ $TRAVIS_OS_NAME == osx ] ; then travis_wait git -C "$(brew --repo homebrew/core)" fetch --unshallow || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then travis_retry brew tap homebrew/versions || true ; fi
-  - if [ $TRAVIS_OS_NAME == osx ] && [ $TRAVIS_OSX_IMAGE == xcode8 ] ; then brew outdated | cut -d\  -f 1 | xargs -L1 -I{} travis_retry brew upgrade {} || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] && [ $TRAVIS_EVENT_TYPE == "cron" ] ; then brew outdated | cut -d\  -f 1 | xargs -L1 -I{} travis_retry brew upgrade {} || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] && [ $TRAVIS_OSX_IMAGE != xcode8 ] ; then travis_wait brew upgrade || travis_retry brew upgrade || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then travis_wait brew install python || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python2.6 || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python26 || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then travis_wait brew install python3 || true ; fi
@@ -454,13 +455,13 @@ after_success:
   - coverage combine || true
   - coverage xml || true
   - if [ $CI_USE_CC_TEST == true ] ; then ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT || true ; else echo "SKIP code climate" ; fi ;
-  - if [ $TRAVIS_PYTHON_VERSION == "3.2" ] || [ $TRAVIS_PYTHON_VERSION == "3.3" ] || [ $TRAVIS_ALLOW_FAILURE == true ] ; then echo "SKIP codecov" ; else codecov || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] || [ $TRAVIS_ALLOW_FAILURE == true ] ; then bash <(curl --header "Dnt: 1" --tlsv1.2 -fSL -s https://codecov.io/bash) || echo "SKIP codecov" ; else codecov || true ; fi ;
   - travis_retry python3 -m pip install python-coveralls || python3 -m pip install python-coveralls || true ;
   - if [ $TRAVIS_PYTHON_VERSION == "3.2" ] || [ $TRAVIS_PYTHON_VERSION == "3.3" ] || [ $TRAVIS_ALLOW_FAILURE == true ] ; then echo "SKIP coveralls" ; else coveralls 2>/dev/null || true ; fi ;
   - travis_retry python -m pip uninstall -y PyYAML || travis_retry python3 -m pip uninstall -y PyYAML || true
-  - if [ $TRAVIS_OS_NAME == osx ] ; then true ; wait ; else coverage run -p -m piaplib.pocket pku upgrade --upgrade-all || true ; fi ;
-  - if [ $TRAVIS_OS_NAME == osx ] || [ $TRAVIS_PYTHON_VERSION == "3.2" ] || [ $TRAVIS_PYTHON_VERSION == "3.3" ] || [ $TRAVIS_ALLOW_FAILURE == true ] ; then bash <(curl --header "Dnt: 1" --tlsv1.2 -fSL -s https://codecov.io/bash) || echo "SKIP codecov" ; else codecov || exit $? ; fi ;
-  - if [ $TRAVIS_PYTHON_VERSION == "3.2" ] || [ $TRAVIS_PYTHON_VERSION == "3.3" ] || [ $TRAVIS_ALLOW_FAILURE == true ] ; then echo "SKIP coveralls" ; else travis_retry python3 -m pip install python-coveralls || python3 -m pip install python-coveralls || true ; fi ;
+  - if [ $TRAVIS_OS_NAME == osx ] || [ $TRAVIS_ALLOW_FAILURE == true ] ; then true ; wait ; else coverage run -p -m piaplib.pocket pku upgrade --upgrade-all || true ; fi ;
+  - if [ $TRAVIS_OS_NAME == osx ] || [ $TRAVIS_ALLOW_FAILURE == true ] ; then bash <(curl --header "Dnt: 1" --tlsv1.2 -fSL -s https://codecov.io/bash) || echo "SKIP codecov" ; else codecov || true ; fi ;
+  - if [ $TRAVIS_PYTHON_VERSION == "3.2" ] || [ $TRAVIS_PYTHON_VERSION == "3.3" ] || [ $TRAVIS_ALLOW_FAILURE == true ] ; then echo "SKIP coveralls" ; else travis_retry python3 -m pip install python-coveralls || true ; fi ;
   - if [ $TRAVIS_PYTHON_VERSION == "3.2" ] || [ $TRAVIS_PYTHON_VERSION == "3.3" ] || [ $TRAVIS_ALLOW_FAILURE == true ] ; then echo "SKIP coveralls" ; else coveralls 2>/dev/null || true ; fi ;
   - travis_retry python -m pip uninstall -y PyYAML || travis_retry python3 -m pip uninstall -y PyYAML || true
 
