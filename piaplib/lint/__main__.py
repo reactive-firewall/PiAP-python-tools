@@ -43,52 +43,24 @@ try:
 	else:  # pragma: no branch
 		argparse = sys.modules["""argparse"""]
 except Exception:
-	raise ImportError("argparse Failed to import.")
+	raise ImportError("functools Failed to import.")
 
 
 try:
-	if str("pku") in __file__:
+	if str("lint") in __file__:
 		__sys_path__ = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 		if __sys_path__ not in sys.path:
 			sys.path.insert(0, __sys_path__)
-except Exception as importErr:
-	print(str(importErr))
-	print(str(importErr.args))
-	importErr = None
-	del importErr
-	raise ImportError("Failed to import " + str(__file__))
+except Exception:
+	raise ImportError("Pocket Knife Unit Lint failed to accumulate.")
 
 
 try:
-	if str("""piaplib""") not in sys.modules:
-		raise ImportError("Pocket PKU failed to import.")  # import piaplib as piaplib
+	if str("piaplib") not in sys.modules:
+		raise ImportError("Pocket Lint failed to import.")  # import piaplib as piaplib
 	piaplib = sys.modules["""piaplib"""]
 except Exception:
-	raise ImportError("Pocket PKU failed to import.")
-
-
-try:
-	if str("piaplib.pku.upgrade") not in sys.modules:
-		from piaplib.pku import upgrade as upgrade
-	else:
-		upgrade = sys.modules[str("piaplib.pku.upgrade")]
-except Exception:
-	try:
-		import piaplib.pku.upgrade as upgrade
-	except Exception as err:
-		raise ImportError(err, "Error Importing piaplib.pku.upgrade")
-
-
-try:
-	if str("piaplib.pku.config") not in sys.modules:
-		from piaplib.pku import config as config
-	else:
-		config = sys.modules[str("piaplib.pku.config")]
-except Exception:
-	try:
-		import piaplib.pku.config as config
-	except Exception as err:
-		raise ImportError(err, "Error Importing piaplib.pku.config")
+	raise ImportError("Pocket Lint failed to import.")
 
 
 try:
@@ -96,8 +68,6 @@ try:
 		from piaplib.pku import utils as utils
 	else:
 		utils = sys.modules[str("piaplib.pku.utils")]
-	if utils.__name__ is None:
-		raise ImportError("Error Importing piaplib.pku.utils")
 except Exception:
 	try:
 		import piaplib.pku.utils as utils
@@ -114,7 +84,7 @@ except Exception:
 	try:
 		import piaplib.pku.remediation as remediation
 	except Exception as err:
-		raise ImportError(err, "Error Importing remediation")
+		raise ImportError(err, "Error Importing piaplib.pku.remediation")
 
 
 try:
@@ -126,7 +96,32 @@ except Exception:
 	try:
 		import piaplib.pku.interfaces as interfaces
 	except Exception as err:
-		raise ImportError(err, "Error Importing interfaces")
+		raise ImportError(err, "Error Importing piaplib.pku.interfaces")
+
+
+try:
+	if str("piaplib.lint.html_generator") not in sys.modules:
+		from piaplib.lint import html_generator as html_generator
+	else:
+		html_generator = sys.modules[str("piaplib.lint.html_generator")]
+except Exception:
+	try:
+		import piaplib.lint.html_generator as html_generator
+	except Exception as err:
+		raise ImportError(err, "Error Importing piaplib.lint.html_generator")
+
+
+try:
+	for depends in [interfaces, html_generator, remediation, utils]:
+		if depends.__name__ is None:
+			raise ImportError("Failed to import depends.")
+except Exception as importErr:
+	print(str(importErr))
+	print(str(importErr.args))
+	importErr = None
+	del importErr
+	raise ImportError("Failed to import " + str(__file__))
+	exit(255)
 
 
 try:
@@ -141,30 +136,47 @@ except Exception:
 		raise ImportError(err, "Error Importing piaplib.book.logs.logs")
 
 
-__prog__ = """piaplib.pku"""
-"""The name of this PiAPLib tool is Pocket Knife Unit"""
+try:
+	if str("piaplib.lint.check") not in sys.modules:
+		from piaplib.lint import check as check
+	else:
+		check = sys.modules[str("piaplib.lint.check")]
+except Exception:
+	try:
+		import piaplib.lint.check as check
+	except Exception as err:
+		raise ImportError(err, "Error Importing piaplib.lint.check")
 
 
-__description__ = """Pocket Knife Units. PiAP Pocket Controller for main tools."""
-"""The description is 'Pocket Knife Unit PiAP Pocket Controller for main tools.'"""
+try:
+	if str("piaplib.lint.do_execve") not in sys.modules:
+		from piaplib.lint import do_execve as do_execve
+	else:
+		do_execve = sys.modules[str("piaplib.lint.do_execve")]
+except Exception:
+	try:
+		import piaplib.lint.do_execve as do_execve
+	except Exception as err:
+		raise ImportError(err, "Error Importing piaplib.lint.do_execve")
 
 
-__epilog__ = """Handles PiAP pockets tools"""
-"""...Handles PiAP pockets tools"""
+__prog__ = """piaplib.lint"""
+"""The name of this PiAPLib tool is lint"""
 
 
-PKU_UNITS = {
-	u'config': config,
-	u'backup': None,
-	u'upgrade': upgrade,
-	u'help': None,
-	u'interfaces': interfaces
-}
-""" The Pocket Knife Unit actions.
-	config -  configuration stuff
-	backup -  (FUTURE/RESERVED)
-	upgrade -  (see reactive-firewall/PiAP-python-tools#1)
-	help -  (FUTURE/RESERVED)
+__description__ = """Pocket Lint. PiAP Pocket Controller for extra tools."""
+"""The description is 'PiAP Pocket Controller for extra tools.'"""
+
+
+__epilog__ = """Handles PiAP pocket lint"""
+"""... Handles PiAP pocket lint"""
+
+
+LINT_UNITS = {u'check': check, u'execve': do_execve, u'html': None, }
+"""	The Pocket Knife Unit actions.
+	check - monitoring checks
+	do_execve - sandbox functions.
+	html -  (FUTURE/RESERVED)
 	"""
 
 
@@ -178,18 +190,16 @@ def generateParser(calling_parser_group):
 		)
 	else:
 		parser = calling_parser_group.add_parser(
-			str(__prog__).split(".")[-1], help='the pocket pku service option.'
+			str(__prog__).split(".")[-1], help='the pocket lint service option.'
 		)
-	parser.add_argument('-V', '--version', action='version', version=str(
-		"%(prog)s {}"
-	).format(str(piaplib.__version__)))
+	parser = utils._handleVersionArgs(parser)
 	subparser = parser.add_subparsers(
-		title="Units", dest='pku_unit',
-		help='The pocket pku options.', metavar="PKU_UNIT"
+		title="Units", dest='lint_unit',
+		help='the pocket lint service option.', metavar="LINT_UNIT"
 	)
-	for sub_parser in sorted(PKU_UNITS.keys()):
-		if PKU_UNITS[sub_parser] is not None:
-			subparser = PKU_UNITS[sub_parser].generateParser(subparser)
+	for sub_parser in sorted(LINT_UNITS.keys()):
+		if LINT_UNITS[sub_parser] is not None:
+			subparser = LINT_UNITS[sub_parser].generateParser(subparser)
 	if calling_parser_group is None:
 		calling_parser_group = parser
 	return calling_parser_group
@@ -202,19 +212,19 @@ def parseArgs(arguments=None):
 	return parser.parse_known_args(arguments)
 
 
-def usePKUTool(tool, arguments=[None]):
+def useLintTool(tool, arguments=[None]):
 	"""Handler for launching pocket-tools."""
 	theExitCode = 1
 	if tool is None:
 		theExitCode = 0
-	elif tool in PKU_UNITS.keys():
+	elif tool in LINT_UNITS.keys():
 		try:
-			logs.log(str("pku launching: {}").format(str(tool)), "DEBUG")
+			logs.log(str("lint launching: {}").format(str(tool)), "DEBUG")
 			theExitCode = 0
-			PKU_UNITS[tool].main(arguments)
+			LINT_UNITS[tool].main(arguments)
 		except Exception:
-			logs.log(str("An error occurred while handling the PKU tool. "), "WARNING")
-			logs.log(str("PKU failure."), "Error")
+			logs.log(str("An error occurred while handling the lint tool. "), "WARNING")
+			logs.log(str("lint failure."), "Error")
 			theExitCode = 3
 	return theExitCode
 
@@ -223,11 +233,22 @@ def usePKUTool(tool, arguments=[None]):
 def main(argv=None):
 	"""The main event"""
 	(args, extra) = parseArgs(argv)
-	pku_cmd = args.pku_unit
-	return usePKUTool(pku_cmd, argv[1:])
+	lint_cmd = args.lint_unit
+	useLintTool(lint_cmd, argv[1:])
+	return 0
 
 
 if __name__ in u'__main__':
-	exit_code = main(sys.argv[1:])
-	exit(exit_code)
+	try:
+		error_code = main(sys.argv[1:])
+		exit(error_code)
+	except Exception as err:
+		print(str(u'MAIN FAILED DURING LINT. ABORT.'))
+		print(str(type(err)))
+		print(str(err))
+		print(str(err.args))
+		del err
+		exit(255)
+	finally:
+		exit(0)
 

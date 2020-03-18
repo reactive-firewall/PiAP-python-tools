@@ -21,27 +21,66 @@
 
 try:
 	import sys
-	import os
-	try:
-		if str("lint") in __file__:
-			__sys_path__ = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-			if __sys_path__ not in sys.path:
-				sys.path.insert(0, __sys_path__)
-	except Exception:
-		raise ImportError("Pocket Knife Unit Lint failed to import.")
-except Exception as ImportErr:
-	print(str(type(ImportErr)))
-	print(str(ImportErr))
-	print(str((ImportErr.args)))
-	ImportErr = None
-	del ImportErr
-	raise ImportError(u'Pocket Lint Failed to accumulate')
+	if sys.__name__ is None:
+		raise ImportError("OMG! we could not import os. We're like in the matrix! ABORT. ABORT.")
+except Exception as err:
+	raise ImportError(err)
+
 
 try:
-	from . import lint as lint
-	if lint.__name__ is False:
-		raise ImportError(u'Failed to import Pocket Lint')
-except Exception as importErr:
-	del importErr
-	import lint as lint
+	if 'os' not in sys.modules:
+		import os
+	else:  # pragma: no branch
+		os = sys.modules["""os"""]
+except Exception:
+	raise ImportError("OS Failed to import.")
 
+
+try:
+	if str("lint") in __file__:
+		__sys_path__ = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+		if __sys_path__ not in sys.path:
+			sys.path.insert(0, __sys_path__)
+except Exception:
+	raise ImportError("Pocket Keyring failed to import.")
+
+
+try:
+	if 'piaplib' not in sys.modules:
+		raise ImportError("Pocket Lint failed to import.")  # import piaplib as piaplib
+	piaplib = sys.modules["""piaplib"""]
+except Exception:
+	raise ImportError("Pocket lint failed to import.")
+
+
+def generateParser(calling_parser_group):
+	try:
+		if 'piaplib.lint.__main__' not in sys.modules:
+			import piaplib.lint.__main__
+		else:
+			piaplib.lint.__main__ = sys.modules["""piaplib.lint.__main__"""]
+		if piaplib.lint.__main__.__name__ is None:
+			raise ImportError("Failed to import piaplib.lint.__main__")
+	except Exception as importErr:
+		del importErr
+		import piaplib.lint.__main__
+	return piaplib.lint.__main__.generateParser(calling_parser_group)
+
+
+def main(argv=None):
+	"""The main event"""
+	try:
+		if 'piaplib.lint.__main__' not in sys.modules:
+			import piaplib.lint.__main__
+		else:
+			piaplib.lint.__main__ = sys.modules["""piaplib.lint.__main__"""]
+		if piaplib.lint.__main__.__name__ is None:
+			raise ImportError("Failed to import piaplib.lint.__main__")
+	except Exception as importErr:
+		del importErr
+		import piaplib.lint.__main__
+	return piaplib.lint.__main__.main(argv)
+
+
+if __name__ in u'__main__':
+	main(sys.argv[1:])

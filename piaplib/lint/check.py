@@ -19,11 +19,34 @@
 # limitations under the License.
 # ......................................................................
 
+
 try:
-	import os
 	import sys
-	import argparse
-	sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+	if sys.__name__ is None:
+		raise ImportError("OMG! we could not import os. We're like in the matrix! ABORT. ABORT.")
+except Exception as err:
+	raise ImportError(err)
+
+
+try:
+	if 'os' not in sys.modules:
+		import os
+	else:  # pragma: no branch
+		os = sys.modules["""os"""]
+except Exception:
+	raise ImportError("OS Failed to import.")
+
+
+try:
+	if 'argparse' not in sys.modules:
+		import argparse
+	else:  # pragma: no branch
+		argparse = sys.modules["""argparse"""]
+except Exception:
+	raise ImportError("functools Failed to import.")
+
+
+try:
 	try:
 		import piaplib as piaplib
 	except Exception:
@@ -75,6 +98,12 @@ __prog__ = """piaplib.lint.check"""
 """The name of this PiAPLib tool is check"""
 
 
+__description__ = """Handles PiAP pocket checks"""
+
+
+__epilog__ = """PiAP Pocket Check Controller for health checks."""
+
+
 CHECK_UNITS = {
 	u'clients': clients_check_status,
 	u'iface': iface_check_status,
@@ -83,25 +112,40 @@ CHECK_UNITS = {
 """	The Pocket Lint Check actions.
 	clients - client monitoring checks
 	iface - interface health checks.
-	user - users health checks.
+	users - users health checks.
 	fw -  (FUTURE/RESERVED)
 	"""
+
+
+def generateParser(calling_parser_group):
+	"""Parses the CLI arguments."""
+	if calling_parser_group is None:
+		parser = argparse.ArgumentParser(
+			prog=__prog__,
+			description=__description__,
+			epilog=__epilog__
+		)
+	else:
+		parser = calling_parser_group.add_parser(
+			str(__prog__).split(".")[-1], help='the pocket lint service option.'
+		)
+	parser = utils._handleVersionArgs(parser)
+	subparser = parser.add_subparsers(
+		title="Checks", dest='check_unit',
+		help='the pocket service check option.', metavar="CHECK_UNIT"
+	)
+	for sub_parser in sorted(CHECK_UNITS.keys()):
+		if CHECK_UNITS[sub_parser] is not None:
+			subparser = CHECK_UNITS[sub_parser].generateParser(subparser)
+	if calling_parser_group is None:
+		calling_parser_group = parser
+	return calling_parser_group
 
 
 @remediation.error_handling
 def parseArgs(arguments=None):
 	"""Parses the CLI arguments."""
-	parser = argparse.ArgumentParser(
-		prog=__prog__,
-		description='Handles PiAP pocket checks',
-		epilog="PiAP Pocket Check Controller for health checks."
-	)
-	parser.add_argument(
-		'check_unit',
-		choices=CHECK_UNITS.keys(),
-		help='the pocket service check option.'
-	)
-	parser = utils._handleVersionArgs(parser)
+	parser = generateParser(None)
 	return parser.parse_known_args(arguments)
 
 
@@ -131,9 +175,9 @@ def main(argv=None):
 	"""The main event"""
 	try:
 		try:
-			args, extra = parseArgs(argv)
-			lint_cmd = args.check_unit
-			useCheckTool(lint_cmd, extra)
+			(args, extra) = parseArgs(argv)
+			chk_cmd = args.check_unit
+			useCheckTool(chk_cmd, argv[1:])
 		except Exception as cerr:
 			logs.log(
 				str(

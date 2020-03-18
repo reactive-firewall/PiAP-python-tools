@@ -61,9 +61,10 @@ try:
 except Exception:
 	class_tags = str("""Development Status :: 4 - Beta""")
 
+
 setup(
 	name="""piaplib""",
-	version="""0.4.1""",
+	version="""0.4.3""",
 	description="""Beta for PiAP python tools""",
 	long_description=readme,
 	long_description_content_type="""text/markdown""",

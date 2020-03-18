@@ -3,7 +3,7 @@
 # exit fast if config is missing
 EXIT_CODE=1 ;
 test -e "${1:-/opt/PiAP/PiAP.conf}" || echo "ERROR: ${1:-/opt/PiAP/PiAP.conf} not found." ;
-test -f "${1:-/opt/PiAP/PiAP.conf}" || echo "ERROR: ${1:-/opt/PiAP/PiAP.conf} is not a regular file." ;
+test -f "${1:-/opt/PiAP/PiAP.conf}" || echo "WARNING: ${1:-/opt/PiAP/PiAP.conf} is not a regular file." ;
 test -r "${1:-/opt/PiAP/PiAP.conf}" || echo "WARNING: ${1:-/opt/PiAP/PiAP.conf} is not readable." ;
 if [[ ( $(head -n 900000000 "${1:-/opt/PiAP/PiAP.conf}" | fgrep -c "[PiAP-" ) -gt 0) ]] ; then
 	EXIT_CODE=0 ;

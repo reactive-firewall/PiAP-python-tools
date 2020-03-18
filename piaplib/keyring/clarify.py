@@ -151,6 +151,54 @@ def hasBackendCommand():
 		return hasbackend
 
 
+@utils.memoize
+def getBackendVersionString():
+	"""Function for backend openssl command if available.
+		PLEASE NOTE THIS RETURNS NONE IF YOU HAVE NOT INSTALLED OPENSSL"""
+	if hasBackendCommand():
+		args = [
+			getBackendCommand(),
+			str("version")
+		]
+		versiontext = None
+		stderrdata = None
+		p0 = subprocess.Popen(
+			args,
+			shell=False,
+			universal_newlines=True,
+			stdin=subprocess.PIPE,
+			stdout=subprocess.PIPE,
+			stderr=subprocess.PIPE,
+			close_fds=True
+		)
+		try:
+			(versiontext, stderrdata) = p0.communicate(EOFNEWLINE)
+		except Exception:
+			p0.kill()
+			versiontext = None
+		finally:
+			p0.wait()
+		if stderrdata:  # pragma: no branch
+			versiontext = str(stderrdata)
+		if isinstance(versiontext, bytes):
+			versiontext = versiontext.decode(encoding="""utf-8""", errors=getCTLModeForPY())
+		return utils.literal_code(versiontext)
+	else:
+		raise NotImplementedError("[CWE-758] No Implemented Backend - BUG")
+
+
+@utils.memoize
+def getBackendVersion():
+	"""Function for backend openssl command if available.
+		PLEASE NOTE THIS RETURNS NONE IF YOU HAVE NOT INSTALLED OPENSSL"""
+	if hasBackendCommand():
+		versiontxt = str(getBackendVersionString())
+		theVersion = utils.extractRegexPattern(versiontxt, """([0-9]+)+""")
+		return [int(x) for x in theVersion[:2]]
+	else:  # pragma: no branch
+		return [0, 0]
+
+
 @remediation.error_passing
 @utils.memoize
 def getAlgoForOS():
@@ -161,6 +209,25 @@ def getAlgoForOS():
 	else:
 		theAlgo = str("-blowfish")
 	return theAlgo
+
+
+@remediation.error_passing
+def getArgsForBackend(decrypt=False):
+	"""returns blowfish (old) for darwin and AES-ctr (sane) for linux"""
+	theArgs = None
+	if hasBackendCommand():
+		theArgs = [getBackendCommand(), str("""enc"""), getAlgoForOS()]
+		if decrypt is not True:
+			theArgs.append(str("""-e"""))
+		else:
+			theArgs.append(str("""-d"""))
+		theArgs.append(str("""-a"""))
+		theArgs.append(str("""-A"""))
+		theArgs.append(str("""-salt"""))
+		if ([1, 1] <= getBackendVersion()) and (sys.platform.startswith("linux")):
+			theArgs.append(str("""-pbkdf2"""))
+		theArgs.append(str("""-kfile"""))
+	return theArgs
 
 
 @remediation.error_passing
@@ -198,39 +265,34 @@ def makeKeystoreFile(theKey=str(str(rand.randPW(16)).replace("%", "%%")), somePa
 			str(somePath)
 		)
 	try:
-		utils.ensureDir(os.path.dirname(os.path.realpath(U2FsdGVkX1_KOouklCprVMv6P6TFdZhCFg)))
-		utils.writeFile(
-			os.path.realpath(U2FsdGVkX1_KOouklCprVMv6P6TFdZhCFg),
-			str(theKey)
-		)
+		if theKey is not None:
+			utils.ensureDir(os.path.dirname(os.path.realpath(U2FsdGVkX1_KOouklCprVMv6P6TFdZhCFg)))
+			utils.writeFile(
+				os.path.realpath(U2FsdGVkX1_KOouklCprVMv6P6TFdZhCFg),
+				str(theKey)
+			)
 	except Exception:
 		return None
 	return os.path.realpath(U2FsdGVkX1_KOouklCprVMv6P6TFdZhCFg)
 
 
 @remediation.error_handling
-def packForRest(message=None, keyStore=None):
+def packForRest(message, keyStore=None):
 	"""Serializes the given cleartext.
 		param ciphertext - str the encrypted data.
 		param keyStore - str the path to this file with the key.
 	"""
-	if keyStore is None:
+	if message is None:
+		return None
+	cmdArgs = []
+	if keyStore is None:  # pragma: no branch
 		keyStore = getKeyFilePath()
 	if hasBackendCommand():
 		ciphertext = None
-		args = [
-			getBackendCommand(),
-			str("enc"),
-			getAlgoForOS(),
-			str("-e"),
-			str("-a"),
-			str("-A"),
-			str("-salt"),
-			str("-kfile"),
-			str("{}").format(str(keyStore))
-		]
+		cmdArgs = getArgsForBackend(False)
+		cmdArgs.append(str("""{}""").format(str(keyStore)))
 		p1 = subprocess.Popen(
-			args,
+			args=cmdArgs,
 			shell=False,
 			universal_newlines=True,
 			stdin=subprocess.PIPE,
@@ -239,12 +301,14 @@ def packForRest(message=None, keyStore=None):
 			close_fds=True
 		)
 		try:
-			(ciphertext, stderrdata) = p1.communicate(utils.literal_code(message))
+			(ciphertext, stderrdata) = p1.communicate(input=utils.literal_code(message))
 		except Exception:
 			p1.kill()
 			ciphertext = None
 		finally:
 			p1.wait()
+		if stderrdata:
+			ciphertext = str(stderrdata)
 		if isinstance(ciphertext, bytes):
 			ciphertext = ciphertext.decode(encoding="""utf-8""", errors=getCTLModeForPY())
 			# ciphertext = str(ciphertext).replace(str("\\n"), str(""))
@@ -254,30 +318,24 @@ def packForRest(message=None, keyStore=None):
 
 
 @remediation.error_handling
-def unpackFromRest(ciphertext=None, keyStore=None):
+def unpackFromRest(ciphertext, keyStore=None):
 	"""Deserializes the given ciphertext.
 		param ciphertext - str the encrypted data.
 		param keyStore - str the path to this file with the key.
 	"""
-	if keyStore is None:
+	if ciphertext is None:  # pragma: no branch
+		return None
+	cmdArgs = []
+	if keyStore is None:  # pragma: no branch
 		keyStore = getKeyFilePath()
 	if hasBackendCommand():
-		args = [
-			getBackendCommand(),
-			str("enc"),
-			getAlgoForOS(),
-			str("-d"),
-			str("-a"),
-			str("-A"),
-			str("-salt"),
-			str("-kfile"),
-			str("{}").format(str(keyStore))
-		]
-		clrtxtBuffer = str("""{}{}""").format(utils.literal_code(ciphertext), EOFNEWLINE)
+		cmdArgs = getArgsForBackend(True)
+		cmdArgs.append(str("""{}""").format(str(keyStore)))
+		ciptxtBuffer = str("""{}{}""").format(utils.literal_code(ciphertext), EOFNEWLINE)
 		cleartext = None
 		stderrdata = None
 		p2 = subprocess.Popen(
-			args,
+			args=cmdArgs,
 			shell=False,
 			universal_newlines=True,
 			stdin=subprocess.PIPE,
@@ -286,18 +344,16 @@ def unpackFromRest(ciphertext=None, keyStore=None):
 			close_fds=True
 		)
 		try:
-			(cleartext, stderrdata) = p2.communicate(utils.literal_code(clrtxtBuffer))
-		except Exception as err:
+			(cleartext, stderrdata) = p2.communicate(input=utils.literal_code(ciptxtBuffer))
+		except Exception:
 			p2.kill()
-			print(str(type(err)))
-			print(str(err))
 			cleartext = None
 		finally:
 			p2.wait()
 		if stderrdata:
 			cleartext = str(stderrdata)
-		del(clrtxtBuffer)
-		if isinstance(cleartext, bytes):
+		del(ciptxtBuffer)
+		if isinstance(cleartext, bytes):  # pragma: no branch
 			cleartext = cleartext.decode(encoding="""utf-8""", errors=getCTLModeForPY())
 		return utils.literal_code(cleartext)
 	else:
@@ -308,32 +364,27 @@ def unpackFromRest(ciphertext=None, keyStore=None):
 def unpackFromFile(somefile, keyStore=None):
 	"""Reads the raw encrypted file and decrypts it."""
 	read_data = None
-	enc_data_file = None
 	try:
-		someFilePath = utils.addExtension(somefile, str("""enc"""))
-		with utils.open_func(someFilePath, mode=u'r+', encoding="""utf-8""") as enc_data_file:
-			read_enc_data = enc_data_file.read()
-			if isinstance(read_enc_data, bytes):
-				read_enc_data = read_enc_data.decode(encoding="""utf-8""", errors=getCTLModeForPY())
-			read_data = utils.literal_code(unpackFromRest(read_enc_data, keyStore))
+		someFilePath = utils.literal_code(utils.addExtension(str(somefile), str("enc")))
+		read_enc_data = utils.readFile(someFilePath)
+		if isinstance(read_enc_data, bytes):  # pragma: no branch
+			read_enc_data = read_enc_data.decode(encoding="""utf-8""", errors=getCTLModeForPY())
+		read_data = utils.literal_code(unpackFromRest(read_enc_data, keyStore))
 	except Exception as clearerr:
 		read_data = None
 		baton = PiAPError(clearerr, str("Failed to load or deycrypt file."))
 		clearerr = None
 		del clearerr
 		raise baton
-	finally:
-		if enc_data_file:
-			enc_data_file.close()
 	return read_data
 
 
 @remediation.error_handling
 def packToFile(somefile, data, keyStore=None):
 	"""Writes the raw encrypted file."""
-	if data is None:
+	if data is None:  # pragma: no branch
 		return False
-	if somefile is None:
+	if somefile is None:  # pragma: no branch
 		return False
 	did_write = False
 	try:
@@ -451,14 +502,17 @@ def main(argv=None):
 	args = parseArgs(argv)
 	theFile = None
 	output = None
-	if args.keystore is not None:
+	if args.keystore is not None:  # pragma: no branch
 		theFile = utils.literal_str(args.keystore)
 	else:
 		theFile = str("""/tmp/.beta_PiAP_weak_key""")
 	if args.key is not None:
 		theFile = makeKeystoreFile(utils.literal_str(args.key), theFile)
+		if theFile is None:
+			raise NotImplementedError("[CWE-758] No default keystore - homeless key bug")
 	else:
-		raise NotImplementedError("[CWE-758] No default key - empty key bug")
+		if not utils.xisfile(theFile):
+			raise NotImplementedError("[CWE-758] No default key - empty key bug")
 	try:
 		output = utils.literal_code(
 			WEAK_ACTIONS[args.clear_action](utils.literal_code(args.msg), theFile)
@@ -483,7 +537,6 @@ def main(argv=None):
 if __name__ in u'__main__':
 	exitcode = 0
 	try:
-		import sys
 		exitcode = main(sys.argv[1:])
 		if not isinstance(exitcode, type(int(0))):
 			exitcode = 0

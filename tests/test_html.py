@@ -19,18 +19,26 @@
 # limitations under the License.
 # ......................................................................
 
-import unittest
+try:
+	try:
+		import context
+	except Exception as ImportErr:  # pragma: no branch
+		ImportErr = None
+		del ImportErr
+		from . import context
+	if context.__name__ is None:
+		raise ImportError("[CWE-758] Failed to import context")
+	else:
+		from context import unittest as unittest
+except Exception:
+	raise ImportError("[CWE-758] Failed to import test context")
 
 
 class BasicHTMLTestSuite(unittest.TestCase):
 	"""Basic functional test cases."""
 
-	def test_absolute_truth_and_meaning(self):
-		"""Insanitty Test."""
-		assert True
-
 	def test_syntax(self):
-		"""Test case importing code."""
+		"""Test case re-importing code."""
 		theResult = False
 		try:
 			from .context import piaplib

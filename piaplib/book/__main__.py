@@ -22,8 +22,31 @@
 
 try:
 	import sys
-	import os
-	import argparse
+	if sys.__name__ is None:
+		raise ImportError("OMG! we could not import os. We're like in the matrix! ABORT. ABORT.")
+except Exception as err:
+	raise ImportError(err)
+
+
+try:
+	if 'os' not in sys.modules:
+		import os
+	else:  # pragma: no branch
+		os = sys.modules["""os"""]
+except Exception:
+	raise ImportError("OS Failed to import.")
+
+
+try:
+	if 'argparse' not in sys.modules:
+		import argparse as argparse
+	else:  # pragma: no branch
+		argparse = sys.modules["""argparse"""]
+except Exception:
+	raise ImportError("argparse Failed to import")
+
+
+try:
 	if str("book") in __file__:
 		__sys_path__ = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 		if __sys_path__ not in sys.path:
@@ -38,9 +61,8 @@ except Exception as importErr:
 
 try:
 	if 'piaplib' not in sys.modules:
-		import piaplib as piaplib
-	else:
-		piaplib = sys.modules['piaplib']
+		raise ImportError("Pocket Book failed to import.")  # import piaplib as piaplib
+	piaplib = sys.modules["""piaplib"""]
 except Exception:
 	raise ImportError("OMG! we could not import piaplib. We're in need of a fix! ABORT.")
 
@@ -81,7 +103,7 @@ except Exception:
 		raise ImportError(err, "Error Importing piaplib.book.version")
 
 
-__prog__ = """piaplib.book.__main__"""
+__prog__ = """piaplib.book"""
 """The name of this PiAPLib tool is pocket book"""
 
 
@@ -113,7 +135,7 @@ def generateParser(calling_parser_group):
 	parser.add_argument('-V', '--version', action='version', version=str(
 		"%(prog)s {}"
 	).format(str(piaplib.__version__)))
-	for sub_parser in BOOK_UNITS.keys():
+	for sub_parser in sorted(BOOK_UNITS.keys()):
 		if BOOK_UNITS[sub_parser] is not None:
 			subparser = BOOK_UNITS[sub_parser].generateParser(subparser)
 	if calling_parser_group is None:
@@ -145,7 +167,7 @@ def main(argv=None):
 	"""The main event"""
 	args, extra = parseArgs(argv)
 	book_cmd = args.book_unit
-	useBookTool(book_cmd, extra)
+	useBookTool(book_cmd, argv[1:])
 	return 0
 
 

@@ -19,34 +19,23 @@
 # limitations under the License.
 # ......................................................................
 
-import unittest
-
 try:
 	try:
-		import sys
-		import os
-		sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), str('..'))))
-		sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), str('.'))))
-	except Exception as ImportErr:
-		print(str(''))
-		print(str(type(ImportErr)))
-		print(str(ImportErr))
-		print(str((ImportErr.args)))
-		print(str(''))
+		import context
+	except Exception as ImportErr:  # pragma: no branch
 		ImportErr = None
 		del ImportErr
-		raise ImportError(str("Test module failed completely."))
+		from . import context
+	if context.__name__ is None:
+		raise ImportError("[CWE-758] Failed to import context")
+	else:
+		from context import unittest as unittest
 except Exception:
-	raise ImportError("Failed to import test context")
+	raise ImportError("[CWE-758] Failed to import test context")
 
 
 class LintTestSuite(unittest.TestCase):
 	"""Special Lint test cases."""
-
-	def test_absolute_truth_and_meaning(self):
-		"""Insanitty Test."""
-		assert True
-		self.assertIsNone(None)
 
 	def test_syntax(self):
 		"""Test case importing code."""
@@ -67,13 +56,16 @@ class LintTestSuite(unittest.TestCase):
 
 	def test_case_lint_insane_none(self):
 		"""Tests the imposible state for lint given bad tools"""
-		theResult = True
+		theResult = False
 		try:
 			from piaplib import lint as lint
 			if lint.__name__ is None:
 				raise ImportError("Failed to import lint")
-			self.assertIsNone(lint.lint.useLintTool("NoSuchTool"))
-			self.assertIsNone(lint.lint.useLintTool(None))
+			from piaplib.lint import __main__  # noqa
+			for testInput in [str("NoSuchTool"), None]:
+				self.assertIsNotNone(lint.__main__.useLintTool(testInput))
+				self.assertIsInstance(lint.__main__.useLintTool(testInput), int)
+			theResult = True
 		except Exception as err:
 			print(str(""))
 			print(str(type(err)))
@@ -92,8 +84,9 @@ class LintTestSuite(unittest.TestCase):
 			from piaplib import lint as lint
 			if lint.__name__ is None:
 				raise ImportError("Failed to import lint (and thus lint.check)")
-			self.assertIsNone(lint.check.useCheckTool("NoSuchCheck"))
-			self.assertIsNone(lint.check.useCheckTool(None))
+			from piaplib.lint import check as check
+			self.assertIsNone(check.useCheckTool("NoSuchCheck"))
+			self.assertIsNone(check.useCheckTool(None))
 		except Exception as err:
 			print(str(""))
 			print(str(type(err)))

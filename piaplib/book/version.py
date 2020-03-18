@@ -26,39 +26,50 @@
 
 
 try:
-	import os
-	if os.__name__ is None:
-		raise NotImplementedError("[CWE-758] Could not import the os. We're like in the matrix!")
-except Exception as err:
-	raise ImportError(err)
-	exit(3)
-
-
-try:
 	import sys
 	if sys.__name__ is None:
-		raise NotImplementedError("[CWE-758] Could not import the sys.")
+		raise ImportError("[CWE-758] Could not import the sys.")
 except Exception as err:
 	raise ImportError(err)
-	exit(3)
 
 
 try:
-	import argparse
-	if argparse.__name__ is None:
-		raise NotImplementedError("[CWE-758] We could not import argparse.")
-except Exception as err:
-	raise ImportError(err)
-	exit(3)
+	if 'os' not in sys.modules:
+		import os
+	else:  # pragma: no branch
+		os = sys.modules["""os"""]
+except Exception:
+	raise ImportError("[CWE-758] Could not import the os. We're like in the matrix!")
+
+
+try:
+	if 'argparse' not in sys.modules:
+		import argparse as argparse
+	else:  # pragma: no branch
+		argparse = sys.modules["""argparse"""]
+except Exception:
+	raise ImportError("[CWE-758] We could not import argparse.")
+
+
+try:
+	if str("book") in __file__:
+		__sys_path__ = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+		if __sys_path__ not in sys.path:
+			sys.path.insert(0, __sys_path__)
+except Exception as importErr:
+	print(str(importErr))
+	print(str(importErr.args))
+	importErr = None
+	del importErr
+	raise ImportError("Failed to import " + str(__file__))
 
 
 try:
 	if 'piaplib' not in sys.modules:
-		import piaplib as piaplib
-	else:
-		piaplib = sys.modules['piaplib']
+		raise ImportError("Pocket Book failed to import.")  # import piaplib as piaplib
+	piaplib = sys.modules["""piaplib"""]
 except Exception:
-	raise ImportError("PiAPLib failed to import.")
+	raise ImportError("[CWE-758] Could not import the piaplib. We're in need of a fix! ABORT.")
 
 
 try:

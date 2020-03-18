@@ -4,7 +4,8 @@ coverage:
       default: off
       piaplib:
         target: 80%
-        flags: piaplib
+        flags:
+          - piaplib
         base: auto
         paths:
           - piaplib/
@@ -14,31 +15,36 @@ coverage:
           - piaplib/book
       piaplib.book:
         target: 90%
-        flags: book
+        flags:
+          - book
         base: auto
         paths:
           - piaplib/book
       piaplib.pku:
         target: 70%
-        flags: pku
+        flags:
+          - pku
         base: auto
         paths:
           - piaplib/pku
       piaplib.lint:
         target: 70%
-        flags: lint
+        flags:
+          - lint
         base: auto
         paths:
           - piaplib/lint
       piaplib.keyring:
         target: 90%
-        flags: keyring
+        flags:
+          - keyring
         base: auto
         paths:
           - piaplib/keyring
     tests:
       default: off
-      flags: tests
+      flags:
+        - tests
       base: auto
       paths:
         - tests

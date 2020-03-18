@@ -79,7 +79,7 @@ except Exception:
 		raise ImportError("Failed to import logs for do_execve")
 		exit(255)
 
-__prog__ = str("""do_execve.py""")
+__prog__ = str("""piaplib.lint.do_execve""")
 """This tool is called do_execve.py."""
 
 
@@ -103,60 +103,60 @@ def taint_int(raw_input):
 	return finalResult
 
 
-@remediation.error_handling
-def parseargs(tainted_arguments=None):
-	"""Parse the given arguments."""
-	try:
+def generateParser(calling_parser_group):
+	"""Parses the CLI arguments."""
+	if calling_parser_group is None:
 		parser = argparse.ArgumentParser(
 			prog=__prog__,
 			description=u'Run an untrusted plugin or command.',
 			epilog=u'This is for all the dirty work. So unpoetic.'
 		)
-		parser.add_argument(
-			'-u', '--uid',
-			default=os.geteuid(), type=int,
-			required=False, help='the uid to use.'
+	else:
+		parser = calling_parser_group.add_parser(
+			str(__prog__).split(".")[-1], help='Run an untrusted plugin or command.'
 		)
-		parser.add_argument(
-			'-g', '--gid',
-			default=os.getegid(), type=int,
-			required=False, help='the gid to use.'
-		)
-		parser.add_argument(
-			'--chroot', dest='chroot_path',
-			default=None, type=str, required=False,
-			help='the sandbox to play in.'
-		)
-		parser = utils._handleVerbosityArgs(parser, default=False)
-		parser.add_argument(
-			'-c', '--cmd',
-			dest='unsafe_input', action='append',
-			help='The command.'
-		)
-		parser.add_argument(
-			'-a', '--args',
-			dest='unsafe_input', action='append',
-			help='The command arguments.'
-		)
-		parser.add_argument(
-			'-o', '--out',
-			dest='unsafe_output', default=False, action='store_true',
-			help='Return the command output.'
-		)
-		parser = utils._handleVersionArgs(parser)
-		theResult = parser.parse_args(tainted_arguments)
-	except Exception as parseErr:
-		try:
-			parser.error(str(parseErr))
-		except Exception as junk:
-			junk = None
-			del junk
-			print(str(u'CWE-20. Mighty creator help us.'))
-		finally:
-			parseErr = None
-			del parseErr
-			theResult = False
-	return theResult
+	parser.add_argument(
+		'-u', '--uid',
+		default=os.geteuid(), type=int,
+		required=False, help='the uid to use.'
+	)
+	parser.add_argument(
+		'-g', '--gid',
+		default=os.getegid(), type=int,
+		required=False, help='the gid to use.'
+	)
+	parser.add_argument(
+		'--chroot', dest='chroot_path',
+		default=None, type=str, required=False,
+		help='the sandbox to play in.'
+	)
+	parser = utils._handleVerbosityArgs(parser, default=False)
+	parser.add_argument(
+		'-c', '--cmd',
+		dest='unsafe_input', action='append',
+		help='The command.'
+	)
+	parser.add_argument(
+		'-a', '--args',
+		dest='unsafe_input', action='append',
+		help='The command arguments.'
+	)
+	parser.add_argument(
+		'-o', '--out',
+		dest='unsafe_output', default=False, action='store_true',
+		help='Return the command output.'
+	)
+	parser = utils._handleVersionArgs(parser)
+	if calling_parser_group is None:
+		calling_parser_group = parser
+	return calling_parser_group
+
+
+@remediation.error_handling
+def parseArgs(arguments=None):
+	"""Parses the CLI arguments."""
+	parser = generateParser(None)
+	return parser.parse_known_args(arguments)
 
 
 @remediation.error_handling
@@ -304,7 +304,7 @@ def unsafe_main(unsafe_input=None, chrootpath=None, uid=None, gid=None, passOutp
 def main(argv=None):
 	"""The main event."""
 	try:
-		args = parseargs(argv)
+		args = parseArgs(argv)
 		tainted_input = None
 		chroot_path = str(u'/tmp')
 		tainted_uid = os.geteuid()
@@ -335,7 +335,7 @@ if __name__ in u'__main__':
 		if (sys.argv is not None and len(sys.argv) > 1):
 			unsafe_pid = main(sys.argv[1:])
 		else:
-			raise Exception("MAIN FAILED WHEN FOUND TO BE CWE-20 UNSAFE. ABORT.")
+			raise Exception("MAIN FAILED WHEN FOUND TO BE CWE-22 UNSAFE. ABORT.")
 	except Exception as err:
 		remediation.error_breakpoint(err, str(u'MAIN FAILED DURING UNSAFE COMMAND. ABORT.'))
 		err = None

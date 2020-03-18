@@ -29,24 +29,26 @@ except Exception as err:
 
 
 try:
-	import os
-	if os.__name__ is None:
-		raise ImportError("OMG! we could not import os. We're like in the matrix! ABORT. ABORT.")
-except Exception as err:
-	raise ImportError(err)
+	if 'os' not in sys.modules:
+		import os
+	else:  # pragma: no branch
+		os = sys.modules["""os"""]
+except Exception:
+	raise ImportError("OS Failed to import.")
 
 
 try:
-	import argparse
-	if argparse.__name__ is None:
-		raise ImportError("OMG! we could not import argparse. We're in need of a fix! ABORT.")
-except Exception as err:
-	raise ImportError(err)
+	if 'argparse' not in sys.modules:
+		import argparse
+	else:  # pragma: no branch
+		argparse = sys.modules["""argparse"""]
+except Exception:
+	raise ImportError("argparse Failed to import")
 
 
 try:
-	if str("piaplib") in __file__:
-		__sys_path__ = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+	if str("piaplib.") in __file__:
+		__sys_path__ = os.path.abspath(os.path.join(os.path.dirname(__file__), '.'))
 		if __sys_path__ not in sys.path:
 			sys.path.insert(0, __sys_path__)
 except Exception as importErr:
@@ -81,9 +83,14 @@ except Exception as importErr:
 try:
 	if 'piaplib.book.logs.logs' not in sys.modules:
 		from book.logs import logs as logs
+	else:
+		logs = sys.modules[str("piaplib.book.logs.logs")]
 except Exception:
 	try:
-		from piaplib.book.logs import logs as logs
+		if str("""piaplib.book.logs.logs""") not in sys.modules:
+			from piaplib.book.logs import logs as logs
+		else:
+			logs = sys.modules[str("""piaplib.book.logs.logs""")]
 	except Exception as err:
 		print(str(type(err)))
 		print(str(err))
@@ -122,8 +129,16 @@ except Exception as importErr:
 		raise ImportError(str(u'Failed to gather Pocket Lint'))
 
 
-__prog__ = "pocket"
+__prog__ = """pocket"""
 """The name of this program is pocket"""
+
+
+__description__ = """Handles PiAP python tools"""
+""" ... Handles PiAP python tools"""
+
+
+__epilog__ = """PiAP Controller for PiAP tools."""
+""" ... PiAP Controller for PiAP tools."""
 
 
 POCKET_UNITS = {
@@ -132,7 +147,7 @@ POCKET_UNITS = {
 	u'protector': None,
 	u'blade': None,
 	u'keyring': piaplib.keyring,
-	u'lint': piaplib.lint.lint,
+	u'lint': piaplib.lint,
 	u'fruitsnack': None
 }
 """ The Pocket Knife Units available.
@@ -157,21 +172,36 @@ PROTECTOR_OPTIONS = [u'fw', u'ids', u'acl']
 # etc... (FUTURE/RESERVED)
 
 
-def parseArgs(arguments=None):
+def generateParser(calling_parser_group):
 	"""Parses the CLI arguments."""
-	parser = argparse.ArgumentParser(
-		prog=__prog__,
-		description="Handles PiAP python tools",
-		epilog="PiAP Controller for PiAP tools."
-	)
-	parser.add_argument(
-		'pocket_unit',
-		choices=sorted(POCKET_UNITS.keys()),
-		help='the pocket service option.'
-	)
+	if calling_parser_group is None:
+		parser = argparse.ArgumentParser(
+			prog=__prog__,
+			description=__description__,
+			epilog=__epilog__
+		)
+	else:
+		parser = calling_parser_group.add_parser(
+			str(__prog__), help='the pocket pku service option.'
+		)
 	parser.add_argument('-V', '--version', action='version', version=str(
 		"%(prog)s {}"
 	).format(str(piaplib.__version__)))
+	subparser = parser.add_subparsers(
+		title="Tools", dest='pocket_unit',
+		help='The pocket service options.', metavar="POCKET_UNIT"
+	)
+	for sub_parser in sorted(POCKET_UNITS.keys()):
+		if POCKET_UNITS[sub_parser] is not None:
+			subparser = POCKET_UNITS[sub_parser].generateParser(subparser)
+	if calling_parser_group is None:
+		calling_parser_group = parser
+	return calling_parser_group
+
+
+def parseArgs(arguments=None):
+	"""Parses the CLI arguments."""
+	parser = generateParser(None)
 	return parser.parse_known_args(arguments)
 
 
@@ -215,17 +245,20 @@ def main(argv=None):
 	"""The Main Event."""
 	try:
 		try:
-			args, extra = parseArgs(argv)
-			service_cmd = args.pocket_unit
-			useTool(service_cmd, extra)
-		except Exception as cerr:
-			logs.log(str(cerr), "Warning")
-			logs.log(str(cerr.args), "Warning")
+			(args, extra) = parseArgs(argv)
+			if (argv is not None and len(argv) > 1):
+				service_cmd = args.pocket_unit
+				useTool(service_cmd, argv[1:])
+		except RuntimeError as rterr:
+			logs.log(str(rterr), "Warning")
+			logs.log(str(rterr.args), "Warning")
 			logs.log(str(
-				" - UNKNOWN - An error occurred while handling the arguments. Cascading failure."
+				" - UNKNOWN - An error occurred while handling the arguments. Main failure."
 			), "Warning")
 			exit(3)
-	except Exception:
+	except Exception as err:
+		logs.log(str(err), "Warning")
+		logs.log(str(err.args), "Warning")
 		logs.log(
 			str(" UNKNOWN - An error occurred while handling the failure. Cascading failure."),
 			"warning"
@@ -235,5 +268,7 @@ def main(argv=None):
 
 
 if __name__ == '__main__':
-	main(sys.argv[1:])
-
+	if (sys.argv is not None and len(sys.argv) > 1):
+		main(sys.argv[1:])
+	else:
+		main([str("""--help""")])

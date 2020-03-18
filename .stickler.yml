@@ -5,9 +5,9 @@ linters:
         max-line-length: 100
         max-complexity: 15
         ignore: 'W191,W391,W504,W605,E117'
-        exclude: ['.git', '__pycache__', 'docs', '.tox', 'build']
+        exclude: ['.git', '.github', '__pycache__', 'docs', '.tox', 'build']
         format: default
     yamllint:
         config: ./.yamllint.conf
 files:
-    ignore: ['*/*.pyc', '.tox/*', '*.pyc', '*~', '.git', '__pycache__', '*/__pycache__/*']
+    ignore: ['*/*.pyc', '.tox/*', '*.pyc', '*~', '.git', '.github', '.github/workflows/*.yml', '__pycache__', '*/__pycache__/*']

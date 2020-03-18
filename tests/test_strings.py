@@ -19,45 +19,34 @@
 # limitations under the License.
 # ......................................................................
 
-import unittest
-
 try:
 	try:
-		import sys
-		import os
-		sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), str('..'))))
-		sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), str('.'))))
-	except Exception as ImportErr:
-		print(str(''))
-		print(str(type(ImportErr)))
-		print(str(ImportErr))
-		print(str((ImportErr.args)))
-		print(str(''))
+		import context
+	except Exception as ImportErr:  # pragma: no branch
 		ImportErr = None
 		del ImportErr
-		raise ImportError(str("Test module failed completely."))
+		from . import context
+	if context.__name__ is None:
+		raise ImportError("[CWE-758] Failed to import context")
+	else:
+		from context import unittest as unittest
+		from context import piaplib as piaplib
+		if piaplib.__name__ is None:  # pragma: no branch
+			raise ImportError("[CWE-758] Failed to import piaplib")
 except Exception:
-	raise ImportError("Failed to import test context")
+	raise ImportError("[CWE-758] Failed to import test context")
 
 
 class StringsTestSuite(unittest.TestCase):
 	"""Basic test cases."""
 
-	def test_absolute_truth_and_meaning(self):
-		"""Insanitty Test."""
-		assert True
-
 	def test_syntax(self):
 		"""Test case importing code."""
-		theResult = False
+		theResult = True
 		try:
-			from .context import piaplib
-			if piaplib.__name__ is None:
-				theResult = False
 			from piaplib import pocket
 			if pocket.__name__ is None:
 				theResult = False
-			theResult = True
 		except Exception as impErr:
 			print(str(type(impErr)))
 			print(str(impErr))

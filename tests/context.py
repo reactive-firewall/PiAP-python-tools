@@ -21,30 +21,35 @@
 
 try:
 	import sys
-	import os
-	_DIR_NAME = str(".")
-	_PARENT_DIR_NAME = str("..")
-	_BASE_NAME = os.path.dirname(__file__)
-	if 'piaplib' in __file__:
-		sys.path.insert(0, os.path.abspath(os.path.join(_BASE_NAME, _PARENT_DIR_NAME)))
-	if 'tests' in __file__:
-		sys.path.insert(0, os.path.abspath(os.path.join(_BASE_NAME, _DIR_NAME)))
-except Exception as ImportErr:
-	print(str(type(ImportErr)))
-	print(str(ImportErr))
-	print(str((ImportErr.args)))
-	ImportErr = None
-	del ImportErr
-	raise ImportError(u'PiAPlib Failed to Import')
+	if sys.__name__ is None:  # pragma: no branch
+		raise ImportError("[CWE-758] OMG! we could not import sys! ABORT. ABORT.")
+except Exception as err:  # pragma: no branch
+	raise ImportError(err)
 
 
 try:
-	import piaplib as piaplib
-	if piaplib.__name__ is None:
-		raise ImportError("Failed to import piaplib.")
-except Exception as importErr:
-	importErr = None
-	del importErr
-	raise ImportError(u'Test module failed to load piaplib for test.')
-	exit(0)
+	if 'os' not in sys.modules:
+		import os
+	else:  # pragma: no branch
+		os = sys.modules["""os"""]
+except Exception:  # pragma: no branch
+	raise ImportError("[CWE-758] OS Failed to import.")
+
+
+try:
+	if 'unittest' not in sys.modules:
+		import unittest
+	else:  # pragma: no branch
+		unittest = sys.modules["""unittest"""]
+except Exception:  # pragma: no branch
+	raise ImportError("[CWE-758] unittest Failed to import.")
+
+
+try:
+	if 'piaplib' not in sys.modules:
+		import piaplib
+	else:  # pragma: no branch
+		piaplib = sys.modules["""piaplib"""]
+except Exception:  # pragma: no branch
+	raise ImportError("[CWE-758] piaplib Failed to import.")
 

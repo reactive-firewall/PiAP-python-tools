@@ -22,18 +22,21 @@
 global __version__
 
 
-__version__ = """0.4.1"""
+__version__ = """0.4.3"""
 
 
 try:
 	import sys
 	import os
 	import os.path
+	_DIR_NAME = str(".")
+	_PARENT_DIR_NAME = str("..")
+	_BASE_NAME = os.path.dirname(__file__)
 	try:
 		if str("piaplib") in __file__:
 			search_list = [
-				os.path.abspath(os.path.join(os.path.dirname(__file__), '..')),
-				os.path.abspath(os.path.join(os.path.dirname(__file__), '.'))
+				os.path.abspath(os.path.join(_BASE_NAME, _PARENT_DIR_NAME)),
+				os.path.abspath(os.path.join(_BASE_NAME, _DIR_NAME))
 			]
 			for __sys_path__ in search_list:
 				if __sys_path__ not in sys.path:
@@ -52,7 +55,7 @@ except Exception as ImportErr:
 try:
 	if 'piaplib.book' not in sys.modules:
 		from . import book as book
-	else:
+	else:  # pragma: no branch
 		book = sys.modules["""piaplib.book"""]
 except Exception as importErr:
 	del importErr
@@ -62,7 +65,7 @@ except Exception as importErr:
 try:
 	if 'piaplib.pku' not in sys.modules:
 		from . import pku as pku
-	else:
+	else:  # pragma: no branch
 		pku = sys.modules["""piaplib.pku"""]
 except Exception as importErr:
 	del importErr
@@ -72,7 +75,7 @@ except Exception as importErr:
 try:
 	if 'piaplib.keyring' not in sys.modules:
 		from . import keyring as keyring
-	else:
+	else:  # pragma: no branch
 		keyring = sys.modules["""piaplib.keyring"""]
 except Exception as importErr:
 	del importErr
@@ -82,7 +85,7 @@ except Exception as importErr:
 try:
 	if 'piaplib.lint' not in sys.modules:
 		from . import lint as lint
-	else:
+	else:  # pragma: no branch
 		lint = sys.modules["""piaplib.lint"""]
 except Exception as importErr:
 	del importErr
@@ -93,7 +96,7 @@ if __name__ in u'__main__':
 	try:
 		if 'piaplib.pocket' not in sys.modules:
 			from . import pocket as pocket
-		else:
+		else:  # pragma: no branch
 			pocket = sys.modules["""piaplib.pocket"""]
 	except Exception:
 		import pocket as pocket

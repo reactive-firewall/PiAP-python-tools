@@ -19,19 +19,20 @@
 # limitations under the License.
 # ......................................................................
 
-import unittest
-
 try:
 	try:
 		import context
-	except Exception as ImportErr:
+	except Exception as ImportErr:  # pragma: no branch
 		ImportErr = None
 		del ImportErr
 		from . import context
 	if context.__name__ is None:
-		raise ImportError("Failed to import context")
+		raise ImportError("[CWE-758] Failed to import context")
+	else:
+		from context import unittest as unittest
+		from context import piaplib as piaplib
 except Exception:
-	raise ImportError("Failed to import test context")
+	raise ImportError("[CWE-758] Failed to import test context")
 
 
 def dict_compare(d1, d2):
@@ -52,24 +53,22 @@ def debugtestError(someError=None):
 
 
 def random_file_path():
-	from .context import piaplib as piaplib
 	if piaplib.__name__ is None:
-		raise ImportError("Failed to import piaplib")
+		raise ImportError("[CWE-758] Failed to import piaplib")
 	from piaplib import keyring as keyring
 	if keyring.__name__ is None:
-		raise ImportError("Failed to import keyring")
+		raise ImportError("[CWE-758] Failed to import keyring")
 	from piaplib.keyring import rand as rand
 	rOut = str("""config_{someInt}_temp_file.tmp""").format(someInt=rand.randInt())
 	return rOut
 
 
 def clean_temp_file(someFile):
-	from .context import piaplib as piaplib
 	if piaplib.__name__ is None:
-		raise ImportError("Failed to import piaplib")
+		raise ImportError("[CWE-758] Failed to import piaplib")
 	from piaplib import pku as pku
 	if pku.__name__ is None:
-		raise ImportError("Failed to import pku")
+		raise ImportError("[CWE-758] Failed to import pku")
 	from piaplib.pku import utils as utils
 	return utils.cleanFileResource(someFile)
 
@@ -88,27 +87,20 @@ class ConfigTestSuite(unittest.TestCase):
 
 	def setUp(self):
 		"""sets up the configuration tests."""
-		from .context import piaplib as piaplib
-		if piaplib.__name__ is None:
-			raise ImportError("Failed to import pku")
 		from piaplib import pocket as pocket
 		if pocket.__name__ is None:
-			raise ImportError("Failed to import utils")
+			raise ImportError("[CWE-758] Failed to import utils")
 		from piaplib import pku as pku
 		if pku.__name__ is None:
-			raise ImportError("Failed to import pku")
+			raise ImportError("[CWE-758] Failed to import pku")
 		from pku import config as config
 		if config.__name__ is None:
-			raise ImportError("Failed to import config")
+			raise ImportError("[CWE-758] Failed to import config")
 		if config.isLoaded() is not True:
 			config.reloadConfigCache(config._raw_getConfigPath())
 		if config.isLoaded() is not True:
 			self.skipTest("No Loaded config file to test")
 		self.assertTrue(config.isLoaded(), "No Loaded config file to test")
-
-	def test_absolute_truth_and_meaning(self):
-		"""Test case: Insanity Test (True is True)."""
-		assert True
 
 	def test_dict_compare(self):
 		"""Meta dict-Test; Tests the utility function for comparing python dict type values."""
@@ -210,6 +202,7 @@ class ConfigTestSuite(unittest.TestCase):
 					u'read_test': u'and this will test reads.'
 				}
 			})
+			self.maxDiff = None
 			somefile = str("the_test_file.json")
 			if (config.writeJsonFile(somefile, theBlob) is True):
 				readback = config.readJsonFile(somefile)
@@ -564,6 +557,7 @@ class ConfigTestSuite(unittest.TestCase):
 				baseconfig.getDefaultMainConfigFile()
 			)
 			self.assertIsNotNone(baseconfig.loadMainConfigFile(test_path))
+			self.maxDiff = None
 			self.assertDictEqual(
 				baseconfig.loadMainConfigFile(test_path),
 				baseconfig.getDefaultMainConfigFile()

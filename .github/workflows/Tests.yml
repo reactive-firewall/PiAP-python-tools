@@ -1,0 +1,34 @@
+name: CI
+
+on: [push]
+
+jobs:
+  MATS:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Pre-Clean
+      run: make -j1 -f Makefile clean || true ;
+    - name: Run Tests
+      run: |
+        echo Testing build,
+        make -j1 -f Makefile test || true
+    - name: Post-Clean
+      run: make -j1 -f Makefile clean || true ;
+
+  STYLE:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Pre-Clean
+      run: make -j1 -f Makefile clean || true ;
+    - name: Run Tests
+      run: |
+        echo Testing Style,
+        make -j1 -f Makefile test-style || true
+    - name: Post-Clean
+      run: make -j1 -f Makefile clean || true ;

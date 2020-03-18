@@ -31,19 +31,58 @@ __prog__ = """piaplib.book.logs"""
 
 try:
 	import sys
-	import os
-	import os.path
-	import argparse
-	if str("book") in __file__:
-		__sys_path__ = os.path.abspath(os.path.join(os.path.dirname(__file__), '.'))
-		if __sys_path__ not in sys.path:
-			sys.path.insert(0, __sys_path__)
-except Exception:
-	raise ImportError("Pocket Book failed to import.")
+	if sys.__name__ is None:
+		raise ImportError("OMG! we could not import os. We're like in the matrix! ABORT. ABORT.")
+except Exception as err:
+	raise ImportError(err)
 
 
 try:
-	import logging as logging
+	if 'os' not in sys.modules:
+		import os
+	else:  # pragma: no branch
+		os = sys.modules["""os"""]
+except Exception:
+	raise ImportError("OS Failed to import.")
+
+
+try:
+	if 'os.path' not in sys.modules:
+		import os.path
+	else:  # pragma: no branch
+		os.path = sys.modules["""os.path"""]
+except Exception:
+	raise ImportError("OS Failed to import.")
+
+
+try:
+	if 'argparse' not in sys.modules:
+		import argparse as argparse
+	else:  # pragma: no branch
+		argparse = sys.modules["""argparse"""]
+except Exception:
+	raise ImportError("argparse Failed to import")
+
+
+try:  # pragma: no branch
+	if str("book") in __file__:
+		__sys_path__ = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+		if __sys_path__ not in sys.path:
+			sys.path.insert(0, __sys_path__)
+except Exception as importErr:  # pragma: no branch
+	importErr = None
+	del importErr
+	raise ImportError("Failed to import " + str(__file__))
+
+
+try:
+	try:
+		if 'logging' not in sys.modules:
+			import logging as logging
+		else:  # pragma: no branch
+			logging = sys.modules["""logging"""]
+	except Exception:
+		raise ImportError("logging Failed to import")
 	if logging.__name__ is None:
 		raise NotImplementedError("[CWE-758] We could not import the builtin logs!")
 except Exception as err:
@@ -85,7 +124,7 @@ class logs(object):
 			prefix_path = baseconfig.loadMainConfigFile()['PiAP-logging']['dir']
 			log_lvl = logging_level[str(baseconfig.loadMainConfigFile()['PiAP-logging']['level'])]
 			file_path = os.path.join(str(prefix_path), str("piaplib.log"))
-		else:
+		else:  # pragma: no branch
 			log_lvl = logging.INFO
 			file_path = sys.stdout
 		log_settings = dict({
@@ -94,7 +133,7 @@ class logs(object):
 			"""datefmt""": str("%a %b %d %H:%M:%S %Z %Y")
 		})
 		try:
-			if os.access(file_path, os.F_OK ^ os.R_OK):
+			if os.access(file_path, os.F_OK ^ os.R_OK):  # pragma: no branch
 				log_settings["""filename"""] = file_path
 		except Exception:
 			log_settings["""filename"""] = None
@@ -200,7 +239,7 @@ def parseArgs(arguments=None):
 def main(argv=None):
 	"""The Main Event makes no sense to logs yet."""
 	try:
-		args, extra = parseArgs(argv)
+		(args, extra) = parseArgs(argv)
 		del extra
 		raise NotImplementedError("[CWE-758] - Pocket Book logs main() not implemented.")
 	except Exception as err:

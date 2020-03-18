@@ -56,7 +56,7 @@ try:
 	if str("piaplib.book.logs.logs") not in sys.modules:
 		from piaplib.book.logs import logs as logs
 	else:
-		logs = sys.modules[str("piaplib.book.logs.logs")]
+		logs = sys.modules[str("""piaplib.book.logs.logs""")]
 except Exception:
 	try:
 		import piaplib.book.logs.logs as logs
@@ -66,9 +66,9 @@ except Exception:
 
 try:
 	if 'piaplib.pku.remediation' not in sys.modules:
-		from . import remediation as remediation
+		import piaplib.pku.remediation as remediation
 	else:
-		remediation = sys.modules['piaplib.pku.remediation']
+		remediation = sys.modules["""piaplib.pku.remediation"""]
 except Exception:
 	try:
 		import remediation as remediation
@@ -180,30 +180,39 @@ def parametrized(dec):
 	return layer
 
 
-def memoize(func):
-	"""memoize wrapper"""
-	cache = func.cache = {}
+class memoize:
 
-	@functools.wraps(func)
-	def memoized_func(*args, **kwargs):
+	def __init__(self, fn):
+		self.__func__ = fn
+		self.__name__ = fn.__name__
+		self.__cache = dict({})
+		self.__skip = False
+
+	def __call__(self, *args, **kwargs):
 		try:
-			key = str(str(args) + str(kwargs))
-			if key not in cache.keys():
-				cache[key] = func(*args, **kwargs)
-			return cache[key]
+			stub_a = str((args))
+			stub_b = str((kwargs))
+			if stub_a is None:
+				stub_a = str("""""")
+			if stub_b is None:
+				stub_b = str("""""")
+			key = str(str(stub_a) + str(stub_b))
+			if key not in self.__cache.keys():
+				self.__cache[key] = self.__func__(*args, **kwargs)
+			return self.__cache[key]
 		except Exception as memoErr:
-			logOrPrint(
-				str("[CWE-233] Possible malformed argument attack occurred. Skipping cache."),
-				"Warning"
-			)
+			if self.__skip is False:
+				logOrPrint(
+					str("[CWE-233] Possible malformed argument attack occurred. Skipping cache."),
+					"Warning"
+				)
 			memoErr = None
 			del(memoErr)
-			return func(*args, **kwargs)
+			self.__skip = True
+			return self.__func__(*args, **kwargs)
 
-	return memoized_func
 
-
-@remediation.error_handling
+@remediation.error_passing
 @memoize
 def extractRegexPattern(theInput_Str, theInputPattern):
 	"""
@@ -211,6 +220,9 @@ def extractRegexPattern(theInput_Str, theInputPattern):
 	:Param theInput_Str: - a String to extract from.
 	:Param theInputPattern: - the pattern to extract
 	"""
+	theList = sourceStr = None
+	if literal_code(theInput_Str) is None:
+		return []
 	sourceStr = literal_str(theInput_Str)
 	prog = re.compile(theInputPattern)
 	theList = prog.findall(sourceStr)
@@ -232,10 +244,11 @@ def splitDottedKeyPath(fullkey):
 	kp = {}
 	if fullkey is None:
 		kp[0] = str(None)
-	if str(""".""") not in str(fullkey):
-		kp[0] = str(fullkey)
 	else:
-		kp = str(fullkey).rsplit(""".""", 1)
+		if str(""".""") not in str(fullkey):
+			kp[0] = str(fullkey)
+		else:
+			kp = str(fullkey).rsplit(""".""", 1)
 	return kp
 
 
@@ -404,8 +417,7 @@ def extractMACAddr(theInputStr):
 	theResult = []
 	theResult = extractRegexPattern(
 		theInputStr,
-		"""(?:(?:[[:print:]]*){0,1}(?P<Mac>(?:(?:[0-9a-fA-F]{1,2}[:]{1}){5}""" +
-		"""(?:[0-9a-fA-F]{1,2}){1}){1})+(?:[[:print:]]*){0,1})+"""
+		"""(?:.*?){0,1}(?P<Mac>(?:[0-9a-fA-F]{1,2}[:]{1}){5}(?:[0-9a-fA-F]{1,2}){1})+(?:.*){0,1}"""
 	)
 	return theResult
 
@@ -414,7 +426,7 @@ def extractMACAddr(theInputStr):
 @memoize
 def extractInts(theInputStr):
 	"""Extract the ints from a string."""
-	theResult = extractRegexPattern(theInputStr, """(\d+)+""")
+	theResult = extractRegexPattern(theInputStr, """([0-9]+)+""")
 	return theResult
 
 
@@ -432,9 +444,9 @@ def extractIfaceNames(theInputStr):
 	"""Extracts the expected iface names."""
 	return extractRegexPattern(
 		theInputStr,
-		"""(?:(?:[[:print:]]*){0,1}""" +
-		"""(?P<iface_name>[br|mon|usb|lan|vlan|wan|wla|eth|enp0s|lo|en]{2,5}[n]?[0-9]+){1}""" +
-		"""(?:[[:print:]]*){0,1})+"""
+		"""(?:[[:print:]]*?)?""" +
+		"""(?P<iface_name>(?:br|mon|usb|lan|vlan|wan|wla|eth|enp0s|lo|en)+[n]?[0-9]*){1}""" +
+		"""(?:[[:print:]]*?)?"""
 	)
 
 
@@ -445,8 +457,7 @@ def extractTTYs(theInputStr):
 	theResult = []
 	theResult = extractRegexPattern(
 		theInputStr,
-		"""(?:(?:[[:print:]]*){0,1}(?P<TTYs>(?:(?:pts|tty|console|ptty)""" +
-		"""{1}[/]?[0-9]+){1})+(?:[[:print:]]*){0,1})+"""
+		"""(?:.*?)?(?P<TTYs>(?:pts|tty|console|ptty){1}[/]?[0-9]+)+(?:.*?)?"""
 	)
 	return theResult
 
@@ -520,18 +531,22 @@ def xstr(some_str=None):
 		if xstr(test) in xstr(ref):
 	"""
 	try:
-		return str("_x_" + literal_str(some_str) + "_x_")
+		JNKSTUB = str("""_x_""")
+		return str(JNKSTUB + literal_str(some_str) + JNKSTUB)
 	except Exception:
 		return None
 
 
 @remediation.error_handling
 @memoize
-def isWhiteListed(someString=None, whitelist=[]):
+def isWhiteListed(someString, whitelist):
 	"""Determins if a raw input string is an exact string in the whitelist."""
-	for validString in [xstr(x) for x in compactList(whitelist)]:
-		if xstr(someString) in validString:
-			return True
+	if whitelist is None:
+		return isWhiteListed(someString, [])
+	if someString is not None:
+		for validString in [xstr(x) for x in compactList(whitelist)]:
+			if xstr(someString) in validString:
+				return True
 	return False
 
 
@@ -552,7 +567,7 @@ def _handleVerbosityArgs(argParser, default=False):
 	the_action.add_argument(
 		'-q', '--quiet',
 		dest='verbose_mode', default=False,
-		action='store_false', help='Disable the given interface.'
+		action='store_false', help='Disable verbose mode.'
 	)
 	return argParser
 
@@ -636,7 +651,8 @@ def ensureDir(somedir):
 	if os.path.isabs(somedir) and (os.path.islink(somedir) or os.path.ismount(somedir)):
 		return True
 	else:
-		ensureDir(os.path.dirname(os.path.abspath(somedir)))
+		if not ensureDir(os.path.dirname(os.path.abspath(somedir))):
+			return False
 		oldmask = os.umask(2)
 		os.mkdir(os.path.abspath(somedir))
 		os.umask(oldmask)
@@ -836,17 +852,19 @@ def _python2urlretrieve(url, filename):
 @remediation.error_handling
 def getFileResource(someURL, outFile):
 	"""Downloads a file from the given URL."""
+	theResult = True
 	try:
 		urlretrieve(url=someURL, filename=outFile)
 	except Exception as err:
 		logs.log(str("Failed to fetched file {}").format(str(someURL)), "Debug")
-		remediation.error_breakpoint(error=err, contex=getFileResource)
-		return False
+		piaplib.pku.remediation.error_breakpoint(error=err, context=getFileResource)
+		theResult = False
 	try:
-		logs.log(str("fetched file {}").format(someURL), "Debug")
+		if theResult:
+			logs.log(str("fetched file {}").format(someURL), "Debug")
 	except Exception:
 		pass
-	return True
+	return theResult
 
 
 @remediation.error_handling
@@ -863,7 +881,7 @@ def cleanFileResource(theFile):
 		theResult = False
 	try:
 		if theResult:
-			logs.log(str("purged file {}").format(theFile), "debug")
+			logs.log(str("purged file {}").format(theFile), "Debug")
 	except Exception:
 		pass
 	return theResult
@@ -883,7 +901,7 @@ def moveFileResource(theSrc, theDest):
 		theResult = False
 	try:
 		if theResult:
-			logs.log(str("Moved file {} to {}").format(theSrc, theDest), "debug")
+			logs.log(str("Moved file {} to {}").format(theSrc, theDest), "Debug")
 	except Exception:
 		pass
 	return theResult
