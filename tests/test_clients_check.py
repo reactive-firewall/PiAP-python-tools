@@ -318,10 +318,6 @@ class MoreClientChecksTestSuite(unittest.TestCase):
 				theResult = False
 		try:
 			self.assertIsNotNone(clients_check_status.get_client_lease_status_raw())
-			self.assertEqual(
-				str(clients_check_status.get_client_lease_status_raw()),
-				str("UNKNOWN")
-			)
 			theResult = True
 		except Exception as err:
 			print(str(""))
