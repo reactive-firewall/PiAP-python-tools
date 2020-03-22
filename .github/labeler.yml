@@ -1,0 +1,56 @@
+# Add 'Pocket' label to any root file changes
+Pocket:
+  - ./piaplib/**/*.py
+  - ./piaplib/*.py
+
+# Add 'P.K.U.' label to any pku file changes
+P.K.U.:
+  - ./piaplib/pku/*.py
+
+# Add 'Lint' label to any lint file changes
+Lint:
+  - ./piaplib/lint/*.py
+
+# Add 'keyring' label to any keyring file changes
+Keyring:
+  - ./piaplib/keyring/*.py
+
+# Add 'Log' label to any log file changes
+Logs:
+  - ./piaplib/book/logs.py
+
+# Add 'Lint' label to any lint file changes
+Linter:
+  - ./.stickler.yml
+  - ./.hound.yml
+  - ./.yamllint.conf
+  - ./.flake8.ini
+  - ./tests/check_*
+
+# Add 'Lint' label to any lint file changes
+Python Lang:
+  - ./**/*.py
+  - ./*.py
+
+Configs:
+  - *.yml
+  - *.ini
+  - ./piaplib/pku/config.py
+
+# Add 'test' label
+Testing:
+  - tests/**/*.py
+  - tests/*
+
+CI:
+  - tests/*.py
+  - ./.stickler.yml
+  - ./.hound.yml
+  - ./.travis.yml
+  - ./.github/workflows/*
+  - ./.circleci/*
+
+Github:
+- ./.github/**/*
+- ./.github/*
+- ./README.md
