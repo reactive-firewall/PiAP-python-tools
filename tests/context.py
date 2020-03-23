@@ -42,7 +42,7 @@ try:
 	else:  # pragma: no branch
 		unittest = sys.modules["""unittest"""]
 except Exception:  # pragma: no branch
-	raise ImportError("[CWE-758] unittest Failed to import.")
+	raise ImportError("[CWE-440] unittest Failed to import.")
 
 
 try:
@@ -51,5 +51,5 @@ try:
 	else:  # pragma: no branch
 		piaplib = sys.modules["""piaplib"""]
 except Exception:  # pragma: no branch
-	raise ImportError("[CWE-758] piaplib Failed to import.")
+	raise ImportError("[CWE-440] piaplib Failed to import.")
 
