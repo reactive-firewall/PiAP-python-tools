@@ -33,8 +33,9 @@ Python Lang:
   - ./*.py
 
 Configs:
-  - *.yml
-  - *.ini
+  - ./*.yml
+  - ./**/*.yml
+  - ./*.ini
   - ./piaplib/pku/config.py
 
 # Add 'test' label
@@ -51,6 +52,6 @@ CI:
   - ./.circleci/*
 
 Github:
-- ./.github/**/*
-- ./.github/*
-- ./README.md
+  - ./.github/**/*
+  - ./.github/*
+  - ./README.md
