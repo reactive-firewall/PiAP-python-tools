@@ -16,7 +16,7 @@ six>=1.13.0
 tox>=3.14.0
 #py>=1.4.33
 pip>=19.1
-requests>=2.22
+requests>=2.21
 # cryptography - Apache 2
 #cryptography>=1.2.3
 # pycrypto - MIT
