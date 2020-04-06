@@ -10,4 +10,4 @@ linters:
     yamllint:
         config: ./.yamllint.conf
 files:
-    ignore: ['*/*.pyc', '.tox/*', '*.pyc', '*~', '.git', '.github', '.github/workflows/*.yml', '__pycache__', '*/__pycache__/*']
+    ignore: ['*/*.pyc', '.tox/*', '*.pyc', '*~', '.git', '.github', '.github/labeler.yml', '.github/workflows/*.yml', '__pycache__', '*/__pycache__/*']
